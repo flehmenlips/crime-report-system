@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: crime-report
+    env: node
+    buildCommand: npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NEXTAUTH_URL
+        fromSecret: nextauth-url
+      - key: NEXTAUTH_SECRET
+        fromSecret: nextauth-secret
+      - key: AUTH_USERNAME
+        fromSecret: auth-username
+      - key: AUTH_PASSWORD
+        fromSecret: auth-password
+      - key: CLOUDINARY_CLOUD_NAME
+        fromSecret: cloudinary-cloud-name
+      - key: CLOUDINARY_API_KEY
+        fromSecret: cloudinary-api-key
+      - key: CLOUDINARY_API_SECRET
+        fromSecret: cloudinary-api-secret
+    healthCheckPath: /api/health
+    autoDeploy: true

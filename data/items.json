@@ -1,0 +1,127 @@
+[
+  {
+    "id": 1,
+    "name": "John Deere Tractor Model 8R 250",
+    "description": "Large agricultural tractor, green and yellow color scheme, with front loader attachment and GPS guidance system",
+    "serialNumber": "JD8R250-2023-001",
+    "purchaseDate": "2023-03-15",
+    "purchaseCost": 285000,
+    "dateLastSeen": "2023-12-20",
+    "locationLastSeen": "Main barn equipment storage area, Birkenfeld Farm",
+    "estimatedValue": 320000,
+    "evidence": {
+      "photos": [
+        "crime_report/tractor_main_view",
+        "crime_report/tractor_side_view",
+        "crime_report/tractor_damage_closeup",
+        "crime_report/tractor_serial_plate"
+      ],
+      "videos": [
+        "crime_report/tractor_walkaround"
+      ],
+      "documents": [
+        "crime_report/tractor_purchase_receipt",
+        "crime_report/tractor_maintenance_records",
+        "crime_report/tractor_insurance_docs"
+      ]
+    }
+  },
+  {
+    "id": 2,
+    "name": "Case IH Magnum 255 Tractor",
+    "description": "High-horsepower row crop tractor with precision ag technology and automated steering",
+    "serialNumber": "CIHM255-2022-045",
+    "purchaseDate": "2022-08-22",
+    "purchaseCost": 245000,
+    "dateLastSeen": "2023-12-20",
+    "locationLastSeen": "Equipment shed #2, southeast corner of property",
+    "estimatedValue": 275000,
+    "evidence": {
+      "photos": [
+        "crime_report/case_tractor_front",
+        "crime_report/case_tractor_rear",
+        "crime_report/case_tractor_interior"
+      ],
+      "videos": [],
+      "documents": [
+        "crime_report/case_purchase_invoice",
+        "crime_report/case_service_history"
+      ]
+    }
+  },
+  {
+    "id": 3,
+    "name": "Kuhn Krause 5810 Disc Harrow",
+    "description": "48-foot wide tandem disc harrow with hydraulic depth control and transport wheels",
+    "serialNumber": "KK5810-2021-112",
+    "purchaseDate": "2021-11-10",
+    "purchaseCost": 185000,
+    "dateLastSeen": "2023-12-19",
+    "locationLastSeen": "Field equipment storage area, north of main barn",
+    "estimatedValue": 210000,
+    "evidence": {
+      "photos": [
+        "crime_report/disc_harrow_working",
+        "crime_report/disc_harrow_transport",
+        "crime_report/disc_harrow_wear_marks"
+      ],
+      "videos": [
+        "crime_report/disc_harrow_operation"
+      ],
+      "documents": [
+        "crime_report/disc_harrow_receipt",
+        "crime_report/disc_harrow_warranty"
+      ]
+    }
+  },
+  {
+    "id": 4,
+    "name": "New Holland CR10.90 Combine",
+    "description": "High-capacity grain combine harvester with automated yield monitoring and straw chopper",
+    "serialNumber": "NHCR1090-2020-078",
+    "purchaseDate": "2020-06-15",
+    "purchaseCost": 425000,
+    "dateLastSeen": "2023-12-20",
+    "locationLastSeen": "Combine shed, west side of property",
+    "estimatedValue": 480000,
+    "evidence": {
+      "photos": [
+        "crime_report/combine_full_view",
+        "crime_report/combine_header",
+        "crime_report/combine_interior_cab",
+        "crime_report/combine_engine_compartment"
+      ],
+      "videos": [
+        "crime_report/combine_operation_demo"
+      ],
+      "documents": [
+        "crime_report/combine_purchase_contract",
+        "crime_report/combine_service_records",
+        "crime_report/combine_yield_data"
+      ]
+    }
+  },
+  {
+    "id": 5,
+    "name": "Fendt 930 Vario Tractor",
+    "description": "930 horsepower articulated tractor with continuously variable transmission and ISOBUS compatibility",
+    "serialNumber": "F930V-2019-034",
+    "purchaseDate": "2019-09-28",
+    "purchaseCost": 385000,
+    "dateLastSeen": "2023-12-19",
+    "locationLastSeen": "Heavy equipment parking area, south of main barn",
+    "estimatedValue": 420000,
+    "evidence": {
+      "photos": [
+        "crime_report/fendt_tractor_profile",
+        "crime_report/fendt_tractor_front_axle",
+        "crime_report/fendt_tractor_rear_axle"
+      ],
+      "videos": [],
+      "documents": [
+        "crime_report/fendt_purchase_invoice",
+        "crime_report/fendt_maintenance_log"
+      ]
+    }
+  }
+]
