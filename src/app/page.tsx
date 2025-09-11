@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { SimpleFileUpload } from '@/components/SimpleFileUpload'
 import { ModernItemForm } from '@/components/ModernItemForm'
+import { ItemDetailView } from '@/components/ItemDetailView'
 import { StolenItem, ItemFormData } from '@/types'
 import { getAllItems, getTotalValue, formatCurrency, formatDate, addItem } from '@/lib/data'
 
@@ -22,6 +23,8 @@ export default function Home() {
   const [bulkMode, setBulkMode] = useState(false)
   const [showModernForm, setShowModernForm] = useState(false)
   const [editingFormItem, setEditingFormItem] = useState<StolenItem | null>(null)
+  const [showDetailView, setShowDetailView] = useState(false)
+  const [detailViewItem, setDetailViewItem] = useState<StolenItem | null>(null)
 
   useEffect(() => {
     if (status === 'loading') return
@@ -1106,7 +1109,37 @@ export default function Home() {
                       )}
                     </div>
 
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                      <button
+                        onClick={() => {
+                          setDetailViewItem(item)
+                          setShowDetailView(true)
+                        }}
+                        style={{
+                          background: 'linear-gradient(135deg, #1f2937 0%, #374151 100%)',
+                          color: 'white',
+                          border: 'none',
+                          padding: '16px 24px',
+                          borderRadius: '12px',
+                          cursor: 'pointer',
+                          fontWeight: '600',
+                          fontSize: '16px',
+                          boxShadow: '0 4px 12px rgba(31, 41, 55, 0.3)',
+                          transition: 'all 0.3s ease',
+                          gridColumn: 'span 2'
+                        }}
+                        onMouseOver={(e) => {
+                          e.currentTarget.style.transform = 'translateY(-2px)'
+                          e.currentTarget.style.boxShadow = '0 8px 20px rgba(31, 41, 55, 0.4)'
+                        }}
+                        onMouseOut={(e) => {
+                          e.currentTarget.style.transform = 'translateY(0)'
+                          e.currentTarget.style.boxShadow = '0 4px 12px rgba(31, 41, 55, 0.3)'
+                        }}
+                      >
+                        👁️ View Full Details
+                      </button>
+                      
                       <button
                         onClick={() => {
                           setSelectedItem(item)
@@ -1161,7 +1194,7 @@ export default function Home() {
                           e.currentTarget.style.transform = 'translateY(0)'
                         }}
                       >
-                        👁️ View Evidence ({item.evidence.photos.length + item.evidence.videos.length + item.evidence.documents.length})
+                        📊 Quick View
                       </button>
                     </div>
                   </div>
@@ -1189,6 +1222,39 @@ export default function Home() {
                 setEditingFormItem(null)
               }}
               onSubmit={handleModernFormSubmit}
+            />
+          )}
+
+          {/* Item Detail View Modal */}
+          {showDetailView && detailViewItem && (
+            <ItemDetailView
+              item={detailViewItem}
+              onClose={() => {
+                setShowDetailView(false)
+                setDetailViewItem(null)
+              }}
+              onEdit={(item) => {
+                setShowDetailView(false)
+                setDetailViewItem(null)
+                setEditingFormItem(item)
+                setShowModernForm(true)
+              }}
+              onDelete={(item) => {
+                setShowDetailView(false)
+                setDetailViewItem(null)
+                handleDeleteItem(item)
+              }}
+              onDuplicate={(item) => {
+                setShowDetailView(false)
+                setDetailViewItem(null)
+                handleDuplicateItem(item)
+              }}
+              onUploadEvidence={(item) => {
+                setShowDetailView(false)
+                setDetailViewItem(null)
+                setSelectedItem(item)
+                setShowSimpleUpload(true)
+              }}
             />
           )}
 

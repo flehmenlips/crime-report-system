@@ -83,27 +83,11 @@ export function ModernItemForm({ onClose, onSubmit, initialData, mode = 'create'
     const currentFields = currentStepData?.fields || []
 
     currentFields.forEach(field => {
+      // Only item name is required - everything else is optional for quick entry
       if (field === 'name' && !formData.name.trim()) {
         newErrors.name = 'Item name is required'
       }
-      if (field === 'description' && !formData.description.trim()) {
-        newErrors.description = 'Description is required'
-      }
-      if (field === 'purchaseDate' && !formData.purchaseDate) {
-        newErrors.purchaseDate = 'Purchase date is required'
-      }
-      if (field === 'purchaseCost' && formData.purchaseCost <= 0) {
-        newErrors.purchaseCost = 'Purchase cost must be greater than 0'
-      }
-      if (field === 'dateLastSeen' && !formData.dateLastSeen) {
-        newErrors.dateLastSeen = 'Date last seen is required'
-      }
-      if (field === 'locationLastSeen' && !formData.locationLastSeen.trim()) {
-        newErrors.locationLastSeen = 'Location is required'
-      }
-      if (field === 'estimatedValue' && formData.estimatedValue <= 0) {
-        newErrors.estimatedValue = 'Estimated value must be greater than 0'
-      }
+      // All other fields are optional - users can add details later
     })
 
     setErrors(newErrors)
@@ -280,7 +264,7 @@ export function ModernItemForm({ onClose, onSubmit, initialData, mode = 'create'
 
                 <div>
                   <label style={{ display: 'block', fontSize: '16px', fontWeight: '600', color: '#1f2937', marginBottom: '8px' }}>
-                    Description *
+                    Description <span style={{ color: '#6b7280', fontWeight: '400' }}>(optional)</span>
                   </label>
                   <textarea
                     value={formData.description}

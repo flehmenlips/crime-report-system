@@ -231,28 +231,33 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
     
-    // Validate required fields
-    const requiredFields = ['name', 'description', 'purchaseDate', 'purchaseCost', 'dateLastSeen', 'locationLastSeen', 'estimatedValue', 'ownerId']
-    for (const field of requiredFields) {
-      if (!body[field]) {
-        return NextResponse.json(
-          { error: `Missing required field: ${field}` },
-          { status: 400 }
-        )
-      }
+    // Validate required fields - only name and ownerId are required for quick entry
+    if (!body.name || !body.ownerId) {
+      return NextResponse.json(
+        { error: 'Missing required fields: name and ownerId' },
+        { status: 400 }
+      )
     }
 
-    // Create new item in database
+    // Validate name is not empty
+    if (!body.name.trim()) {
+      return NextResponse.json(
+        { error: 'Item name cannot be empty' },
+        { status: 400 }
+      )
+    }
+
+    // Create new item in database with optional fields
     const newItem = await prisma.stolenItem.create({
       data: {
         name: sanitizeString(body.name),
-        description: sanitizeString(body.description),
+        description: body.description ? sanitizeString(body.description) : 'No description provided',
         serialNumber: body.serialNumber ? sanitizeString(body.serialNumber) : null,
-        purchaseDate: body.purchaseDate,
-        purchaseCost: parseFloat(body.purchaseCost),
-        dateLastSeen: body.dateLastSeen,
-        locationLastSeen: sanitizeString(body.locationLastSeen),
-        estimatedValue: parseFloat(body.estimatedValue),
+        purchaseDate: body.purchaseDate || new Date().toISOString().split('T')[0], // Default to today
+        purchaseCost: body.purchaseCost ? parseFloat(body.purchaseCost) : 0,
+        dateLastSeen: body.dateLastSeen || new Date().toISOString().split('T')[0], // Default to today
+        locationLastSeen: body.locationLastSeen ? sanitizeString(body.locationLastSeen) : 'Location not specified',
+        estimatedValue: body.estimatedValue ? parseFloat(body.estimatedValue) : 0,
         category: body.category ? sanitizeString(body.category) : null,
         tags: body.tags ? JSON.stringify(body.tags) : null,
         notes: body.notes ? sanitizeString(body.notes) : null,
