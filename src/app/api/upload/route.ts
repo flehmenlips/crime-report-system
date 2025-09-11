@@ -113,16 +113,19 @@ export async function POST(request: NextRequest) {
         })
       }
 
-      // Save evidence record to database
+      // Save evidence record to database with full URL
       const evidence = await prisma.evidence.create({
         data: {
           type: evidenceType,
-          cloudinaryId: cloudinaryResult.public_id,
+          cloudinaryId: cloudinaryResult.secure_url, // Save the full URL instead of just public_id
           originalName: file.name,
           description: `${evidenceType} evidence for ${item.name}`,
           itemId: parseInt(itemId)
         }
       })
+
+      console.log('Saved to database - cloudinaryId:', cloudinaryResult.public_id)
+      console.log('Cloudinary secure_url:', cloudinaryResult.secure_url)
 
       return NextResponse.json({
         success: true,
