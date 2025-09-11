@@ -302,8 +302,24 @@ export default function Home() {
       const ownerId = 'cmfeyn7es0000t6oil8p6d45c'
       
       if (editingFormItem) {
-        // Update existing item
-        const updateData = { ...formData, id: editingFormItem.id }
+        // Update existing item with all fields including category and notes
+        const updateData = {
+          id: editingFormItem.id,
+          name: formData.name,
+          description: formData.description || 'No description provided',
+          serialNumber: formData.serialNumber || null,
+          purchaseDate: formData.purchaseDate || editingFormItem.purchaseDate,
+          purchaseCost: formData.purchaseCost || 0,
+          dateLastSeen: formData.dateLastSeen || editingFormItem.dateLastSeen,
+          locationLastSeen: formData.locationLastSeen || 'Location not specified',
+          estimatedValue: formData.estimatedValue || 0,
+          category: formData.category || null,
+          tags: formData.tags || [],
+          notes: formData.notes || null
+        }
+        
+        console.log('Sending update with category and notes:', updateData)
+        
         const response = await fetch('/api/items', {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
@@ -913,7 +929,23 @@ export default function Home() {
                           <h3 style={{ fontSize: '24px', fontWeight: '700', color: '#1f2937', marginBottom: '4px' }}>
                             {item.name}
                           </h3>
-                          <p style={{ color: '#6b7280', fontSize: '14px' }}>ID: {item.id} • Added {new Date().toLocaleDateString()}</p>
+                          <p style={{ color: '#6b7280', fontSize: '14px', marginBottom: '4px' }}>
+                            ID: {item.id}
+                          </p>
+                          {item.serialNumber && (
+                            <p style={{
+                              color: '#92400e',
+                              fontSize: '14px',
+                              fontWeight: '600',
+                              fontFamily: 'monospace',
+                              background: '#fef3c7',
+                              padding: '4px 8px',
+                              borderRadius: '6px',
+                              display: 'inline-block'
+                            }}>
+                              Serial: {item.serialNumber}
+                            </p>
+                          )}
                         </div>
                       </div>
                       
@@ -1215,7 +1247,10 @@ export default function Home() {
                 purchaseCost: editingFormItem.purchaseCost,
                 dateLastSeen: editingFormItem.dateLastSeen,
                 locationLastSeen: editingFormItem.locationLastSeen,
-                estimatedValue: editingFormItem.estimatedValue
+                estimatedValue: editingFormItem.estimatedValue,
+                category: (editingFormItem as any).category || '',
+                tags: (editingFormItem as any).tags || [],
+                notes: (editingFormItem as any).notes || ''
               } : undefined}
               onClose={() => {
                 setShowModernForm(false)

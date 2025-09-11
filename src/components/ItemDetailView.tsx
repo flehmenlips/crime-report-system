@@ -263,10 +263,6 @@ export function ItemDetailView({ item, onClose, onEdit, onDelete, onDuplicate, o
                 <span style={{ fontSize: '18px', opacity: 0.8 }}>
                   ID: {item.id}
                 </span>
-                <span style={{ fontSize: '18px', opacity: 0.8 }}>•</span>
-                <span style={{ fontSize: '18px', opacity: 0.8 }}>
-                  Serial: {item.serialNumber || 'Not provided'}
-                </span>
               </div>
             </div>
             <div style={{ textAlign: 'right' }}>
@@ -298,6 +294,32 @@ export function ItemDetailView({ item, onClose, onEdit, onDelete, onDuplicate, o
             </p>
           </div>
 
+          {/* Serial Number - Prominent Display */}
+          {item.serialNumber && (
+            <div style={{ marginBottom: '32px' }}>
+              <div style={{
+                background: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)',
+                padding: '24px',
+                borderRadius: '16px',
+                border: '2px solid #f59e0b',
+                textAlign: 'center'
+              }}>
+                <div style={{ fontSize: '16px', color: '#92400e', marginBottom: '8px', fontWeight: '600' }}>
+                  🔢 Serial Number
+                </div>
+                <div style={{
+                  fontSize: '28px',
+                  fontWeight: '800',
+                  color: '#92400e',
+                  fontFamily: 'monospace',
+                  letterSpacing: '2px'
+                }}>
+                  {item.serialNumber}
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Details Grid */}
           <div style={{ marginBottom: '32px' }}>
             <h2 style={{ fontSize: '24px', fontWeight: '700', color: '#1f2937', marginBottom: '16px' }}>
@@ -325,6 +347,25 @@ export function ItemDetailView({ item, onClose, onEdit, onDelete, onDuplicate, o
               </div>
             </div>
           </div>
+
+          {/* Category and Notes */}
+          {(item.serialNumber || item.notes) && (
+            <div style={{ marginBottom: '32px' }}>
+              <h2 style={{ fontSize: '24px', fontWeight: '700', color: '#1f2937', marginBottom: '16px' }}>
+                📋 Additional Information
+              </h2>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px' }}>
+                {item.notes && (
+                  <div style={{ background: '#f0f9ff', padding: '20px', borderRadius: '16px', border: '2px solid #bfdbfe' }}>
+                    <div style={{ fontSize: '14px', color: '#6b7280', marginBottom: '8px', fontWeight: '600' }}>📝 Additional Notes</div>
+                    <div style={{ fontSize: '16px', color: '#1f2937', lineHeight: '1.6' }}>
+                      {item.notes}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Evidence Section */}
           <div style={{ marginBottom: '32px' }}>

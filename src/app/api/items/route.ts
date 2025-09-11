@@ -315,21 +315,28 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Item ID is required' }, { status: 400 })
     }
 
+    console.log('Updating item with data:', body)
+    
     const updatedItem = await prisma.stolenItem.update({
       where: { id: parseInt(body.id) },
       data: {
         name: sanitizeString(body.name),
-        description: sanitizeString(body.description),
+        description: body.description ? sanitizeString(body.description) : 'No description provided',
         serialNumber: body.serialNumber ? sanitizeString(body.serialNumber) : null,
-        purchaseDate: body.purchaseDate,
-        purchaseCost: parseFloat(body.purchaseCost),
-        dateLastSeen: body.dateLastSeen,
-        locationLastSeen: sanitizeString(body.locationLastSeen),
-        estimatedValue: parseFloat(body.estimatedValue),
+        purchaseDate: body.purchaseDate || new Date().toISOString().split('T')[0],
+        purchaseCost: body.purchaseCost ? parseFloat(body.purchaseCost) : 0,
+        dateLastSeen: body.dateLastSeen || new Date().toISOString().split('T')[0],
+        locationLastSeen: body.locationLastSeen ? sanitizeString(body.locationLastSeen) : 'Location not specified',
+        estimatedValue: body.estimatedValue ? parseFloat(body.estimatedValue) : 0,
+        category: body.category ? sanitizeString(body.category) : null,
+        tags: body.tags ? JSON.stringify(body.tags) : null,
+        notes: body.notes ? sanitizeString(body.notes) : null,
         updatedAt: new Date()
       },
       include: { evidence: true, owner: true }
     })
+    
+    console.log('Item updated in database:', updatedItem.name, 'Category:', updatedItem.category, 'Notes:', updatedItem.notes)
 
     const formattedItem: StolenItem = {
       id: updatedItem.id,
