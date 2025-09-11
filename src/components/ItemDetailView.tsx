@@ -47,12 +47,41 @@ export function ItemDetailView({ item, onClose, onEdit, onDelete, onDuplicate, o
   }
 
   const getCloudinaryThumbnailUrl = (cloudinaryId: string) => {
-    const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'demo'
+    // Handle different cloudinaryId formats
+    if (cloudinaryId.startsWith('demo/')) {
+      return `https://via.placeholder.com/200x150/6366f1/ffffff?text=Demo+File`
+    }
+    
+    // If it's already a full URL, convert to thumbnail
+    if (cloudinaryId.startsWith('https://res.cloudinary.com/')) {
+      return cloudinaryId.replace(
+        /\/image\/upload\/[^/]*\//,
+        '/image/upload/w_200,h_150,c_fill,f_auto,q_auto/'
+      ).replace(
+        /\/raw\/upload\/[^/]*\//,
+        '/image/upload/w_200,h_150,c_fill,f_auto,q_auto/'
+      )
+    }
+    
+    // For public_id format, construct URL
+    const cloudName = 'dhaacekdd'
     return `https://res.cloudinary.com/${cloudName}/image/upload/w_200,h_150,c_fill,f_auto,q_auto/${cloudinaryId}`
   }
 
   const getCloudinaryFullUrl = (cloudinaryId: string) => {
-    const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'demo'
+    // If it's already a full URL, convert to full size
+    if (cloudinaryId.startsWith('https://res.cloudinary.com/')) {
+      return cloudinaryId.replace(
+        /\/image\/upload\/[^/]*\//,
+        '/image/upload/w_1200,h_800,c_limit,f_auto,q_auto/'
+      ).replace(
+        /\/raw\/upload\/[^/]*\//,
+        '/image/upload/w_1200,h_800,c_limit,f_auto,q_auto/'
+      )
+    }
+    
+    // For public_id format, construct URL
+    const cloudName = 'dhaacekdd'
     return `https://res.cloudinary.com/${cloudName}/image/upload/w_1200,h_800,c_limit,f_auto,q_auto/${cloudinaryId}`
   }
 

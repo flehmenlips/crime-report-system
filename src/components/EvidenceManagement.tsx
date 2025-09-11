@@ -100,13 +100,24 @@ export function EvidenceManagement({ item, onClose, onUpdate }: EvidenceManageme
   }
 
   const getCloudinaryThumbnailUrl = (cloudinaryId: string) => {
-    const cloudName = 'dhaacekdd'
-    
+    // Handle different cloudinaryId formats
     if (cloudinaryId.startsWith('demo/')) {
       return `https://via.placeholder.com/200x150/6366f1/ffffff?text=Demo+File`
     }
     
-    // Try to construct the correct Cloudinary URL
+    // If it's already a full URL, convert to thumbnail
+    if (cloudinaryId.startsWith('https://res.cloudinary.com/')) {
+      return cloudinaryId.replace(
+        /\/image\/upload\/[^/]*\//,
+        '/image/upload/w_200,h_150,c_fill,f_auto,q_auto/'
+      ).replace(
+        /\/raw\/upload\/[^/]*\//,
+        '/image/upload/w_200,h_150,c_fill,f_auto,q_auto/'
+      )
+    }
+    
+    // For public_id format, construct URL
+    const cloudName = 'dhaacekdd'
     return `https://res.cloudinary.com/${cloudName}/image/upload/w_200,h_150,c_fill,f_auto,q_auto/${cloudinaryId}`
   }
 
