@@ -116,23 +116,6 @@ export function ItemCardIcon({ item, size = 64 }: ItemCardIconProps) {
             console.log('Image loaded successfully for', item.name)
           }}
         />
-        
-        {/* Photo indicator */}
-        <div style={{
-          position: 'absolute',
-          bottom: '4px',
-          right: '4px',
-          width: '16px',
-          height: '16px',
-          background: '#10b981',
-          borderRadius: '50%',
-          border: '2px solid white',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center'
-        }}>
-          <span style={{ fontSize: '8px', color: 'white' }}>📷</span>
-        </div>
       </div>
     )
   }

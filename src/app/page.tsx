@@ -11,6 +11,7 @@ import { MockPhotoThumbnails } from '@/components/MockPhotoThumbnails'
 import { RealPhotoThumbnails } from '@/components/RealPhotoThumbnails'
 import { EvidenceManagement } from '@/components/EvidenceManagement'
 import { ItemCardIcon } from '@/components/ItemCardIcon'
+import { BulkUpload } from '@/components/BulkUpload'
 import { StolenItem, ItemFormData } from '@/types'
 import { getAllItems, getTotalValue, formatCurrency, formatDate, addItem } from '@/lib/data'
 
@@ -32,6 +33,8 @@ export default function Home() {
   const [detailViewItem, setDetailViewItem] = useState<StolenItem | null>(null)
   const [showEvidenceManagement, setShowEvidenceManagement] = useState(false)
   const [evidenceManagementItem, setEvidenceManagementItem] = useState<StolenItem | null>(null)
+  const [showBulkUpload, setShowBulkUpload] = useState(false)
+  const [viewMode, setViewMode] = useState<'cards' | 'list'>('cards')
 
   useEffect(() => {
     if (status === 'loading') return
@@ -614,23 +617,34 @@ export default function Home() {
                 Add New Item
               </button>
               
-              <button style={{
-                background: 'rgba(255, 255, 255, 0.1)',
-                backdropFilter: 'blur(10px)',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
-                color: 'white',
-                padding: '20px 32px',
-                borderRadius: '16px',
-                cursor: 'pointer',
-                fontWeight: '600',
-                fontSize: '18px',
-                transition: 'all 0.3s ease',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '12px'
-              }}>
-                <span style={{ fontSize: '20px' }}>📸</span>
+              <button
+                onClick={() => setShowBulkUpload(true)}
+                style={{
+                  background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 50%, #b45309 100%)',
+                  color: 'white',
+                  border: 'none',
+                  padding: '20px 32px',
+                  borderRadius: '16px',
+                  cursor: 'pointer',
+                  fontWeight: '600',
+                  fontSize: '18px',
+                  boxShadow: '0 10px 25px rgba(245, 158, 11, 0.3)',
+                  transition: 'all 0.3s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '12px'
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-4px)'
+                  e.currentTarget.style.boxShadow = '0 20px 40px rgba(245, 158, 11, 0.4)'
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)'
+                  e.currentTarget.style.boxShadow = '0 10px 25px rgba(245, 158, 11, 0.3)'
+                }}
+              >
+                <span style={{ fontSize: '20px' }}>📤</span>
                 Bulk Upload
               </button>
               
@@ -684,33 +698,84 @@ export default function Home() {
             boxShadow: '0 20px 40px rgba(0, 0, 0, 0.1)',
             border: '1px solid rgba(255, 255, 255, 0.2)'
           }}>
-            <div style={{ marginBottom: '32px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
-                <div>
-                  <h2 style={{ fontSize: '48px', fontWeight: '800', color: '#1f2937', marginBottom: '16px' }}>
-                    Your Stolen Items
-                  </h2>
-                  <p style={{ fontSize: '20px', color: '#6b7280' }}>
-                    {allItems.length} items documented • {formatCurrency(totalValue)} total value
-                  </p>
+              <div style={{ marginBottom: '32px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
+                  <div>
+                    <h2 style={{ fontSize: '48px', fontWeight: '800', color: '#1f2937', marginBottom: '16px' }}>
+                      Your Stolen Items
+                    </h2>
+                    <p style={{ fontSize: '20px', color: '#6b7280' }}>
+                      {allItems.length} items documented • {formatCurrency(totalValue)} total value
+                    </p>
+                  </div>
+                  
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                    {/* View Mode Toggle */}
+                    <div style={{ display: 'flex', background: '#f3f4f6', borderRadius: '12px', padding: '4px' }}>
+                      <button
+                        onClick={() => setViewMode('cards')}
+                        style={{
+                          background: viewMode === 'cards' ? '#3b82f6' : 'transparent',
+                          color: viewMode === 'cards' ? 'white' : '#6b7280',
+                          border: 'none',
+                          padding: '8px 16px',
+                          borderRadius: '8px',
+                          fontSize: '14px',
+                          fontWeight: '600',
+                          cursor: 'pointer',
+                          transition: 'all 0.2s ease',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px'
+                        }}
+                      >
+                        <svg style={{ width: '16px', height: '16px' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                        </svg>
+                        Cards
+                      </button>
+                      <button
+                        onClick={() => setViewMode('list')}
+                        style={{
+                          background: viewMode === 'list' ? '#3b82f6' : 'transparent',
+                          color: viewMode === 'list' ? 'white' : '#6b7280',
+                          border: 'none',
+                          padding: '8px 16px',
+                          borderRadius: '8px',
+                          fontSize: '14px',
+                          fontWeight: '600',
+                          cursor: 'pointer',
+                          transition: 'all 0.2s ease',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px'
+                        }}
+                      >
+                        <svg style={{ width: '16px', height: '16px' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                        </svg>
+                        List
+                      </button>
+                    </div>
+                    
+                    <button
+                      onClick={() => setBulkMode(!bulkMode)}
+                      style={{
+                        background: bulkMode ? '#dc2626' : '#6b7280',
+                        color: 'white',
+                        border: 'none',
+                        padding: '12px 24px',
+                        borderRadius: '12px',
+                        fontSize: '16px',
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease'
+                      }}
+                    >
+                      {bulkMode ? '✕ Exit Bulk Mode' : '☑️ Bulk Select'}
+                    </button>
+                  </div>
                 </div>
-                <button
-                  onClick={() => setBulkMode(!bulkMode)}
-                  style={{
-                    background: bulkMode ? '#dc2626' : '#6b7280',
-                    color: 'white',
-                    border: 'none',
-                    padding: '12px 24px',
-                    borderRadius: '12px',
-                    fontSize: '16px',
-                    fontWeight: '600',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease'
-                  }}
-                >
-                  {bulkMode ? '✕ Exit Bulk Mode' : '☑️ Bulk Select'}
-                </button>
-              </div>
 
               {/* Bulk Operations Toolbar */}
               {bulkMode && (
@@ -873,7 +938,7 @@ export default function Home() {
                   Get Started
                 </button>
               </div>
-            ) : (
+            ) : viewMode === 'cards' ? (
               <div style={{ 
                 display: 'grid', 
                 gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', 
@@ -917,7 +982,7 @@ export default function Home() {
                     {/* Header with Action Menu */}
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                        <ItemCardIcon item={item} size={64} />
+                        <ItemCardIcon item={item} size={80} />
                         <div>
                           <h3 style={{ fontSize: '24px', fontWeight: '700', color: '#1f2937', marginBottom: '4px' }}>
                             {item.name}
@@ -1226,6 +1291,188 @@ export default function Home() {
                   </div>
                 ))}
               </div>
+            ) : (
+              /* List View */
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{ 
+                  width: '100%', 
+                  borderCollapse: 'collapse',
+                  fontSize: '14px',
+                  background: 'white',
+                  borderRadius: '16px',
+                  overflow: 'hidden',
+                  boxShadow: '0 10px 25px rgba(0, 0, 0, 0.08)'
+                }}>
+                  <thead>
+                    <tr style={{ background: '#f8fafc', borderBottom: '2px solid #e2e8f0' }}>
+                      {bulkMode && (
+                        <th style={{ padding: '16px', textAlign: 'left', fontWeight: '700', color: '#374151' }}>
+                          <input
+                            type="checkbox"
+                            checked={selectedItems.size === allItems.length && allItems.length > 0}
+                            onChange={() => {
+                              if (selectedItems.size === allItems.length) {
+                                clearSelection()
+                              } else {
+                                selectAllItems()
+                              }
+                            }}
+                            style={{ width: '16px', height: '16px', accentColor: '#3b82f6' }}
+                          />
+                        </th>
+                      )}
+                      <th style={{ padding: '16px', textAlign: 'left', fontWeight: '700', color: '#374151' }}>Item</th>
+                      <th style={{ padding: '16px', textAlign: 'left', fontWeight: '700', color: '#374151' }}>Description</th>
+                      <th style={{ padding: '16px', textAlign: 'left', fontWeight: '700', color: '#374151' }}>Serial #</th>
+                      <th style={{ padding: '16px', textAlign: 'left', fontWeight: '700', color: '#374151' }}>Value</th>
+                      <th style={{ padding: '16px', textAlign: 'left', fontWeight: '700', color: '#374151' }}>Evidence</th>
+                      <th style={{ padding: '16px', textAlign: 'left', fontWeight: '700', color: '#374151' }}>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {allItems.map((item, index) => (
+                      <tr key={item.id} style={{ 
+                        borderBottom: '1px solid #e5e7eb',
+                        background: index % 2 === 0 ? 'white' : '#f9fafb'
+                      }}>
+                        {bulkMode && (
+                          <td style={{ padding: '16px' }}>
+                            <input
+                              type="checkbox"
+                              checked={selectedItems.has(item.id)}
+                              onChange={() => toggleItemSelection(item.id)}
+                              style={{ width: '16px', height: '16px', accentColor: '#3b82f6' }}
+                            />
+                          </td>
+                        )}
+                        <td style={{ padding: '16px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                            <ItemCardIcon item={item} size={48} />
+                            <div>
+                              <div style={{ fontWeight: '600', color: '#1f2937', marginBottom: '2px' }}>
+                                {item.name}
+                              </div>
+                              <div style={{ fontSize: '12px', color: '#6b7280' }}>
+                                ID: {item.id}
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+                        <td style={{ padding: '16px', maxWidth: '250px' }}>
+                          <div style={{ color: '#374151', lineHeight: '1.4' }}>
+                            {item.description.length > 100 
+                              ? `${item.description.substring(0, 100)}...`
+                              : item.description
+                            }
+                          </div>
+                        </td>
+                        <td style={{ padding: '16px' }}>
+                          {item.serialNumber ? (
+                            <span style={{
+                              background: '#fef3c7',
+                              color: '#92400e',
+                              padding: '4px 8px',
+                              borderRadius: '6px',
+                              fontSize: '12px',
+                              fontWeight: '600',
+                              fontFamily: 'monospace'
+                            }}>
+                              {item.serialNumber}
+                            </span>
+                          ) : (
+                            <span style={{ color: '#9ca3af', fontSize: '12px' }}>N/A</span>
+                          )}
+                        </td>
+                        <td style={{ padding: '16px' }}>
+                          <div style={{ fontWeight: '700', color: '#059669', fontSize: '16px' }}>
+                            {formatCurrency(item.estimatedValue)}
+                          </div>
+                        </td>
+                        <td style={{ padding: '16px' }}>
+                          <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+                            {item.evidence.photos.length > 0 && (
+                              <span style={{
+                                background: '#dbeafe',
+                                color: '#1e40af',
+                                padding: '2px 6px',
+                                borderRadius: '4px',
+                                fontSize: '11px',
+                                fontWeight: '600'
+                              }}>
+                                📷 {item.evidence.photos.length}
+                              </span>
+                            )}
+                            {item.evidence.videos.length > 0 && (
+                              <span style={{
+                                background: '#dcfce7',
+                                color: '#166534',
+                                padding: '2px 6px',
+                                borderRadius: '4px',
+                                fontSize: '11px',
+                                fontWeight: '600'
+                              }}>
+                                🎥 {item.evidence.videos.length}
+                              </span>
+                            )}
+                            {item.evidence.documents.length > 0 && (
+                              <span style={{
+                                background: '#fef3c7',
+                                color: '#92400e',
+                                padding: '2px 6px',
+                                borderRadius: '4px',
+                                fontSize: '11px',
+                                fontWeight: '600'
+                              }}>
+                                📄 {item.evidence.documents.length}
+                              </span>
+                            )}
+                          </div>
+                        </td>
+                        <td style={{ padding: '16px' }}>
+                          <div style={{ display: 'flex', gap: '8px' }}>
+                            <button
+                              onClick={() => {
+                                setDetailViewItem(item)
+                                setShowDetailView(true)
+                              }}
+                              style={{
+                                background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+                                color: 'white',
+                                border: 'none',
+                                padding: '6px 12px',
+                                borderRadius: '6px',
+                                cursor: 'pointer',
+                                fontSize: '12px',
+                                fontWeight: '600'
+                              }}
+                            >
+                              View
+                            </button>
+                            <button
+                              onClick={() => {
+                                setSelectedItem(item)
+                                setShowSimpleUpload(true)
+                              }}
+                              style={{
+                                background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+                                color: 'white',
+                                border: 'none',
+                                padding: '6px 12px',
+                                borderRadius: '6px',
+                                cursor: 'pointer',
+                                fontSize: '12px',
+                                fontWeight: '600'
+                              }}
+                            >
+                              Upload
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             )}
           </div>
 
@@ -1316,6 +1563,20 @@ export default function Home() {
                 setAllItems(updatedItems)
                 setShowSimpleUpload(false)
                 setSelectedItem(null)
+              }}
+            />
+          )}
+
+          {/* Bulk Upload Modal */}
+          {showBulkUpload && (
+            <BulkUpload
+              items={allItems}
+              onClose={() => setShowBulkUpload(false)}
+              onSuccess={async () => {
+                const updatedItems = await getAllItems()
+                setAllItems(updatedItems)
+                setTotalValue(await getTotalValue())
+                setShowBulkUpload(false)
               }}
             />
           )}
@@ -1620,7 +1881,7 @@ export default function Home() {
                     }}>
                       <td style={{ padding: '16px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                          <ItemCardIcon item={item} size={40} />
+                          <ItemCardIcon item={item} size={48} />
                           <div>
                             <div style={{ fontWeight: '600', color: '#1f2937', marginBottom: '2px' }}>
                               {item.name}
