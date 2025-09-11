@@ -7,6 +7,7 @@ import { SimpleFileUpload } from '@/components/SimpleFileUpload'
 import { ModernItemForm } from '@/components/ModernItemForm'
 import { ItemDetailView } from '@/components/ItemDetailView'
 import { ItemCardThumbnails } from '@/components/ItemCardThumbnails'
+import { MockPhotoThumbnails } from '@/components/MockPhotoThumbnails'
 import { StolenItem, ItemFormData } from '@/types'
 import { getAllItems, getTotalValue, formatCurrency, formatDate, addItem } from '@/lib/data'
 
@@ -1103,11 +1104,11 @@ export default function Home() {
                       {item.description}
                     </p>
 
-                    {/* Photo Thumbnails */}
-                    <ItemCardThumbnails 
+                    {/* Photo Thumbnails - Mock for Demo */}
+                    <MockPhotoThumbnails 
                       item={item}
-                      onImageClick={(cloudinaryId) => {
-                        alert(`Photo preview: ${cloudinaryId}\n\nClick "View Full Details" to see all evidence in gallery format`)
+                      onImageClick={(index) => {
+                        alert(`Photo ${index + 1} preview\n\nShowing demo images since Cloudinary isn't configured.\nClick "View Full Details" for complete evidence management.`)
                       }}
                     />
 
