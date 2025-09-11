@@ -38,7 +38,15 @@ export function ItemCardThumbnails({ item, onImageClick }: ItemCardThumbnailsPro
   }
 
   const getCloudinaryThumbnailUrl = (cloudinaryId: string) => {
-    const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'demo'
+    const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'dhaacekdd'
+    
+    // Handle different cloudinaryId formats
+    if (cloudinaryId.startsWith('demo/')) {
+      // Demo mode - show placeholder
+      return `https://via.placeholder.com/120x80/3b82f6/ffffff?text=Demo+Photo`
+    }
+    
+    // Real Cloudinary image
     return `https://res.cloudinary.com/${cloudName}/image/upload/w_120,h_80,c_fill,f_auto,q_auto/${cloudinaryId}`
   }
 

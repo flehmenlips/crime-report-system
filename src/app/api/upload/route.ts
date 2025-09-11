@@ -57,10 +57,10 @@ export async function POST(request: NextRequest) {
       const bytes = await file.arrayBuffer()
       const buffer = Buffer.from(bytes)
 
-      // Create a unique public ID
+      // Create a unique public ID with clean path structure
       const timestamp = Date.now()
       const sanitizedFileName = file.name.replace(/[^a-zA-Z0-9.]/g, '_')
-      const publicId = `evidence/item_${itemId}/${evidenceType}/${timestamp}_${sanitizedFileName}`
+      const publicId = `CrimeReport/item_${itemId}/${timestamp}_${sanitizedFileName}`
 
       // Upload to Cloudinary (or simulate if no credentials)
       let cloudinaryResult
@@ -80,8 +80,9 @@ export async function POST(request: NextRequest) {
             {
               resource_type: evidenceType === 'video' ? 'video' : 'auto',
               public_id: publicId,
-              folder: `evidence/item_${itemId}`,
-              overwrite: false
+              overwrite: false,
+              quality: 'auto',
+              fetch_format: 'auto'
             },
             (error, result) => {
               if (error) reject(error)

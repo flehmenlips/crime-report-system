@@ -8,6 +8,8 @@ import { ModernItemForm } from '@/components/ModernItemForm'
 import { ItemDetailView } from '@/components/ItemDetailView'
 import { ItemCardThumbnails } from '@/components/ItemCardThumbnails'
 import { MockPhotoThumbnails } from '@/components/MockPhotoThumbnails'
+import { RealPhotoThumbnails } from '@/components/RealPhotoThumbnails'
+import { EvidenceManagement } from '@/components/EvidenceManagement'
 import { StolenItem, ItemFormData } from '@/types'
 import { getAllItems, getTotalValue, formatCurrency, formatDate, addItem } from '@/lib/data'
 
@@ -27,6 +29,8 @@ export default function Home() {
   const [editingFormItem, setEditingFormItem] = useState<StolenItem | null>(null)
   const [showDetailView, setShowDetailView] = useState(false)
   const [detailViewItem, setDetailViewItem] = useState<StolenItem | null>(null)
+  const [showEvidenceManagement, setShowEvidenceManagement] = useState(false)
+  const [evidenceManagementItem, setEvidenceManagementItem] = useState<StolenItem | null>(null)
 
   useEffect(() => {
     if (status === 'loading') return
@@ -1104,11 +1108,11 @@ export default function Home() {
                       {item.description}
                     </p>
 
-                    {/* Photo Thumbnails - Mock for Demo */}
-                    <MockPhotoThumbnails 
+                    {/* Real Photo Thumbnails */}
+                    <RealPhotoThumbnails 
                       item={item}
-                      onImageClick={(index) => {
-                        alert(`Photo ${index + 1} preview\n\nShowing demo images since Cloudinary isn't configured.\nClick "View Full Details" for complete evidence management.`)
+                      onImageClick={(cloudinaryId) => {
+                        alert(`Real photo: ${cloudinaryId}\n\nClick "View Full Details" to see the full gallery and manage evidence.`)
                       }}
                     />
 
@@ -1213,13 +1217,13 @@ export default function Home() {
                       
                       <button
                         onClick={() => {
-                          const evidenceCount = item.evidence.photos.length + item.evidence.videos.length + item.evidence.documents.length
-                          alert(`Evidence for: ${item.name}\n\n📷 Photos: ${item.evidence.photos.length}\n🎥 Videos: ${item.evidence.videos.length}\n📄 Documents: ${item.evidence.documents.length}\n\nTotal: ${evidenceCount} files`)
+                          setEvidenceManagementItem(item)
+                          setShowEvidenceManagement(true)
                         }}
                         style={{
-                          background: 'rgba(0, 0, 0, 0.05)',
-                          border: '1px solid rgba(0, 0, 0, 0.1)',
-                          color: '#374151',
+                          background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+                          color: 'white',
+                          border: 'none',
                           padding: '16px 24px',
                           borderRadius: '12px',
                           cursor: 'pointer',
@@ -1228,15 +1232,15 @@ export default function Home() {
                           transition: 'all 0.3s ease'
                         }}
                         onMouseOver={(e) => {
-                          e.currentTarget.style.background = 'rgba(0, 0, 0, 0.08)'
-                          e.currentTarget.style.transform = 'translateY(-1px)'
+                          e.currentTarget.style.transform = 'translateY(-2px)'
+                          e.currentTarget.style.boxShadow = '0 8px 20px rgba(245, 158, 11, 0.4)'
                         }}
                         onMouseOut={(e) => {
-                          e.currentTarget.style.background = 'rgba(0, 0, 0, 0.05)'
                           e.currentTarget.style.transform = 'translateY(0)'
+                          e.currentTarget.style.boxShadow = 'none'
                         }}
                       >
-                        📊 Quick View
+                        🛠️ Manage Evidence
                       </button>
                     </div>
                   </div>
@@ -1299,6 +1303,22 @@ export default function Home() {
                 setDetailViewItem(null)
                 setSelectedItem(item)
                 setShowSimpleUpload(true)
+              }}
+            />
+          )}
+
+          {/* Evidence Management Modal */}
+          {showEvidenceManagement && evidenceManagementItem && (
+            <EvidenceManagement
+              item={evidenceManagementItem}
+              onClose={() => {
+                setShowEvidenceManagement(false)
+                setEvidenceManagementItem(null)
+              }}
+              onUpdate={async () => {
+                // Reload items to show updated evidence counts
+                const updatedItems = await getAllItems()
+                setAllItems(updatedItems)
               }}
             />
           )}
