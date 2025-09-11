@@ -91,6 +91,8 @@ export function formatDate(dateString: string): string {
  */
 export async function addItem(itemData: any, ownerId: string): Promise<StolenItem | null> {
   try {
+    console.log('Sending API request with data:', { ...itemData, ownerId })
+    
     const response = await fetch('/api/items', {
       method: 'POST',
       headers: {
@@ -102,15 +104,20 @@ export async function addItem(itemData: any, ownerId: string): Promise<StolenIte
       })
     })
 
+    console.log('API response status:', response.status)
+    
     if (!response.ok) {
-      throw new Error('Failed to add item')
+      const errorData = await response.text()
+      console.error('API error response:', errorData)
+      throw new Error(`Failed to add item: ${response.status} ${errorData}`)
     }
 
     const data = await response.json()
+    console.log('API success response:', data)
     return data.item
   } catch (error) {
     console.error('Error adding item:', error)
-    return null
+    throw error // Re-throw to see the actual error in the UI
   }
 }
 

@@ -3,6 +3,7 @@
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import { SimpleFileUpload } from '@/components/SimpleFileUpload'
 import { StolenItem } from '@/types'
 import { getAllItems, getTotalValue, formatCurrency, formatDate, addItem } from '@/lib/data'
 
@@ -12,6 +13,8 @@ export default function Home() {
   const [allItems, setAllItems] = useState<StolenItem[]>([])
   const [totalValue, setTotalValue] = useState(0)
   const [loading, setLoading] = useState(true)
+  const [showSimpleUpload, setShowSimpleUpload] = useState(false)
+  const [selectedItem, setSelectedItem] = useState<StolenItem | null>(null)
 
   useEffect(() => {
     if (status === 'loading') return
@@ -61,8 +64,10 @@ export default function Home() {
     if (!estimatedValue) return
 
     try {
+      console.log('Starting item creation process...')
       const ownerId = 'cmfeyn7es0000t6oil8p6d45c'
-      const newItem = await addItem({
+      
+      const itemData = {
         name: itemName,
         description,
         serialNumber,
@@ -71,21 +76,31 @@ export default function Home() {
         dateLastSeen,
         locationLastSeen,
         estimatedValue: parseFloat(estimatedValue)
-      }, ownerId)
+      }
+      
+      console.log('Item data prepared:', itemData)
+      console.log('Using owner ID:', ownerId)
+      
+      const newItem = await addItem(itemData, ownerId)
       
       if (newItem) {
+        console.log('Item created successfully:', newItem)
         setAllItems(prev => [...prev, newItem])
         setTotalValue(prev => prev + newItem.estimatedValue)
-        alert('✅ Item added successfully!')
+        alert(`✅ Item "${newItem.name}" added successfully to database!`)
         
+        // Reload data to ensure consistency
+        console.log('Reloading items from database...')
         const updatedItems = await getAllItems()
         setAllItems(updatedItems)
+        console.log('Data reloaded, new total:', updatedItems.length)
       } else {
-        alert('❌ Error adding item')
+        console.error('addItem returned null')
+        alert('❌ Error: Failed to create item in database')
       }
     } catch (error) {
-      console.error('Error adding item:', error)
-      alert(`❌ Error: ${error}`)
+      console.error('Error in handleAddItem:', error)
+      alert(`❌ Error adding item: ${error instanceof Error ? error.message : String(error)}`)
     }
   }
 
@@ -565,7 +580,10 @@ export default function Home() {
 
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                       <button
-                        onClick={() => alert(`Upload evidence for: ${item.name}`)}
+                        onClick={() => {
+                          setSelectedItem(item)
+                          setShowSimpleUpload(true)
+                        }}
                         style={{
                           background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
                           color: 'white',
@@ -623,6 +641,23 @@ export default function Home() {
               </div>
             )}
           </div>
+
+          {/* File Upload Modal */}
+          {showSimpleUpload && selectedItem && (
+            <SimpleFileUpload
+              item={selectedItem}
+              onClose={() => {
+                setShowSimpleUpload(false)
+                setSelectedItem(null)
+              }}
+              onSuccess={async () => {
+                const updatedItems = await getAllItems()
+                setAllItems(updatedItems)
+                setShowSimpleUpload(false)
+                setSelectedItem(null)
+              }}
+            />
+          )}
         </div>
       </div>
     )

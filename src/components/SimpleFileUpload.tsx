@@ -12,19 +12,48 @@ interface SimpleFileUploadProps {
 export function SimpleFileUpload({ item, onClose, onSuccess }: SimpleFileUploadProps) {
   const [uploading, setUploading] = useState(false)
   const [uploadResults, setUploadResults] = useState<string[]>([])
+  const [uploadProgress, setUploadProgress] = useState<{ [key: string]: number }>({})
+  const [dragActive, setDragActive] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const handleDrag = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setDragActive(true)
+    } else if (e.type === "dragleave") {
+      setDragActive(false)
+    }
+  }
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setDragActive(false)
+    
+    const files = e.dataTransfer.files
+    if (files && files.length > 0) {
+      handleFileUpload(files)
+    }
+  }
 
   const handleFileUpload = async (files: FileList | null) => {
     if (!files || files.length === 0) return
 
     setUploading(true)
     const results: string[] = []
+    const progressMap: { [key: string]: number } = {}
 
     for (let i = 0; i < files.length; i++) {
       const file = files[i]
+      const fileKey = `${file.name}-${i}`
       
       try {
         console.log('Uploading file:', file.name)
+        
+        // Initialize progress
+        progressMap[fileKey] = 0
+        setUploadProgress({ ...progressMap })
         
         // Determine file type
         let evidenceType = 'document'
@@ -37,16 +66,26 @@ export function SimpleFileUpload({ item, onClose, onSuccess }: SimpleFileUploadP
         formData.append('itemId', item.id.toString())
         formData.append('type', evidenceType)
 
+        // Simulate progress for user feedback
+        const progressInterval = setInterval(() => {
+          progressMap[fileKey] = Math.min(progressMap[fileKey] + 10, 90)
+          setUploadProgress({ ...progressMap })
+        }, 100)
+
         // Upload file
         const response = await fetch('/api/upload', {
           method: 'POST',
           body: formData
         })
 
+        clearInterval(progressInterval)
+        progressMap[fileKey] = 100
+        setUploadProgress({ ...progressMap })
+
         const result = await response.json()
         
         if (response.ok) {
-          results.push(`✅ ${file.name} uploaded successfully`)
+          results.push(`✅ ${file.name} uploaded successfully (${evidenceType})`)
           console.log('Upload successful:', result)
         } else {
           results.push(`❌ ${file.name} failed: ${result.error}`)
@@ -56,6 +95,8 @@ export function SimpleFileUpload({ item, onClose, onSuccess }: SimpleFileUploadP
       } catch (error) {
         results.push(`❌ ${file.name} failed: ${error}`)
         console.error('Upload error:', error)
+        progressMap[fileKey] = 0
+        setUploadProgress({ ...progressMap })
       }
     }
 
@@ -88,14 +129,49 @@ export function SimpleFileUpload({ item, onClose, onSuccess }: SimpleFileUploadP
         <div className="p-6">
           {!uploading && uploadResults.length === 0 && (
             <div>
-              <div className="text-center mb-6">
-                <div className="text-6xl mb-4">📁</div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                  Select Files to Upload
+              {/* Drag & Drop Area */}
+              <div
+                className={`border-2 border-dashed rounded-xl p-8 text-center mb-6 transition-all duration-300 ${
+                  dragActive 
+                    ? 'border-blue-500 bg-blue-50' 
+                    : 'border-gray-300 hover:border-gray-400'
+                }`}
+                onDragEnter={handleDrag}
+                onDragLeave={handleDrag}
+                onDragOver={handleDrag}
+                onDrop={handleDrop}
+                onClick={() => fileInputRef.current?.click()}
+                style={{ cursor: 'pointer' }}
+              >
+                <div className="text-6xl mb-4">
+                  {dragActive ? '📤' : '📁'}
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                  {dragActive ? 'Drop files here!' : 'Upload Evidence Files'}
                 </h3>
-                <p className="text-gray-600">
-                  Choose photos, videos, or documents related to this stolen item
+                <p className="text-gray-600 mb-4">
+                  {dragActive 
+                    ? 'Release to upload files' 
+                    : 'Drag and drop files here, or click to browse'
+                  }
                 </p>
+                <div className="text-sm text-gray-500">
+                  <p>Supported: Photos (JPG, PNG), Videos (MP4, MOV), Documents (PDF, DOC)</p>
+                  <p>Max file size: 50MB per file</p>
+                </div>
+              </div>
+
+              <input
+                ref={fileInputRef}
+                type="file"
+                multiple
+                accept="image/*,video/*,.pdf,.doc,.docx,.txt"
+                onChange={(e) => handleFileUpload(e.target.files)}
+                className="hidden"
+              />
+
+              <div className="text-center mb-6">
+                <p className="text-gray-500 text-sm mb-4">Or choose file type:</p>
               </div>
 
               <div className="space-y-4">
@@ -156,10 +232,30 @@ export function SimpleFileUpload({ item, onClose, onSuccess }: SimpleFileUploadP
           )}
 
           {uploading && (
-            <div className="text-center py-8">
-              <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Uploading Files...</h3>
-              <p className="text-gray-600">Please wait while we process your evidence files</p>
+            <div className="py-8">
+              <div className="text-center mb-6">
+                <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">Uploading Files...</h3>
+                <p className="text-gray-600">Processing your evidence files</p>
+              </div>
+              
+              {/* Progress Bars */}
+              {Object.entries(uploadProgress).map(([fileKey, progress]) => (
+                <div key={fileKey} className="mb-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium text-gray-700">
+                      {fileKey.split('-')[0]}
+                    </span>
+                    <span className="text-sm text-gray-500">{progress}%</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div 
+                      className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                      style={{ width: `${progress}%` }}
+                    ></div>
+                  </div>
+                </div>
+              ))}
             </div>
           )}
 
