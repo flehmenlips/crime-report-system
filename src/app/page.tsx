@@ -1108,15 +1108,16 @@ export default function Home() {
                       {item.description}
                     </p>
 
-                    {/* Real Photo Thumbnails */}
+                    {/* Compact Photo Thumbnails */}
                     <RealPhotoThumbnails 
                       item={item}
                       onImageClick={(cloudinaryId) => {
-                        alert(`Real photo: ${cloudinaryId}\n\nClick "View Full Details" to see the full gallery and manage evidence.`)
+                        console.log('Photo clicked:', cloudinaryId)
+                        // Don't show alert - just log for debugging
                       }}
                     />
 
-                    <div style={{ display: 'flex', gap: '12px', marginBottom: '24px' }}>
+                    <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
                       {item.evidence.photos.length > 0 && (
                         <div style={{
                           background: '#dbeafe',
@@ -1155,7 +1156,7 @@ export default function Home() {
                       )}
                     </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '8px' }}>
                       <button
                         onClick={() => {
                           setDetailViewItem(item)
@@ -1165,18 +1166,17 @@ export default function Home() {
                           background: 'linear-gradient(135deg, #1f2937 0%, #374151 100%)',
                           color: 'white',
                           border: 'none',
-                          padding: '16px 24px',
-                          borderRadius: '12px',
+                          padding: '12px 20px',
+                          borderRadius: '10px',
                           cursor: 'pointer',
                           fontWeight: '600',
-                          fontSize: '16px',
+                          fontSize: '14px',
                           boxShadow: '0 4px 12px rgba(31, 41, 55, 0.3)',
-                          transition: 'all 0.3s ease',
-                          gridColumn: 'span 2'
+                          transition: 'all 0.3s ease'
                         }}
                         onMouseOver={(e) => {
-                          e.currentTarget.style.transform = 'translateY(-2px)'
-                          e.currentTarget.style.boxShadow = '0 8px 20px rgba(31, 41, 55, 0.4)'
+                          e.currentTarget.style.transform = 'translateY(-1px)'
+                          e.currentTarget.style.boxShadow = '0 6px 16px rgba(31, 41, 55, 0.4)'
                         }}
                         onMouseOut={(e) => {
                           e.currentTarget.style.transform = 'translateY(0)'
@@ -1186,62 +1186,47 @@ export default function Home() {
                         👁️ View Full Details
                       </button>
                       
-                      <button
-                        onClick={() => {
-                          setSelectedItem(item)
-                          setShowSimpleUpload(true)
-                        }}
-                        style={{
-                          background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
-                          color: 'white',
-                          border: 'none',
-                          padding: '16px 24px',
-                          borderRadius: '12px',
-                          cursor: 'pointer',
-                          fontWeight: '600',
-                          fontSize: '16px',
-                          boxShadow: '0 4px 12px rgba(99, 102, 241, 0.3)',
-                          transition: 'all 0.3s ease'
-                        }}
-                        onMouseOver={(e) => {
-                          e.currentTarget.style.transform = 'translateY(-2px)'
-                          e.currentTarget.style.boxShadow = '0 8px 20px rgba(99, 102, 241, 0.4)'
-                        }}
-                        onMouseOut={(e) => {
-                          e.currentTarget.style.transform = 'translateY(0)'
-                          e.currentTarget.style.boxShadow = '0 4px 12px rgba(99, 102, 241, 0.3)'
-                        }}
-                      >
-                        📸 Upload Evidence
-                      </button>
-                      
-                      <button
-                        onClick={() => {
-                          setEvidenceManagementItem(item)
-                          setShowEvidenceManagement(true)
-                        }}
-                        style={{
-                          background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
-                          color: 'white',
-                          border: 'none',
-                          padding: '16px 24px',
-                          borderRadius: '12px',
-                          cursor: 'pointer',
-                          fontWeight: '600',
-                          fontSize: '16px',
-                          transition: 'all 0.3s ease'
-                        }}
-                        onMouseOver={(e) => {
-                          e.currentTarget.style.transform = 'translateY(-2px)'
-                          e.currentTarget.style.boxShadow = '0 8px 20px rgba(245, 158, 11, 0.4)'
-                        }}
-                        onMouseOut={(e) => {
-                          e.currentTarget.style.transform = 'translateY(0)'
-                          e.currentTarget.style.boxShadow = 'none'
-                        }}
-                      >
-                        🛠️ Manage Evidence
-                      </button>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                        <button
+                          onClick={() => {
+                            setSelectedItem(item)
+                            setShowSimpleUpload(true)
+                          }}
+                          style={{
+                            background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+                            color: 'white',
+                            border: 'none',
+                            padding: '10px 16px',
+                            borderRadius: '8px',
+                            cursor: 'pointer',
+                            fontWeight: '600',
+                            fontSize: '13px',
+                            transition: 'all 0.2s ease'
+                          }}
+                        >
+                          📸 Upload
+                        </button>
+                        
+                        <button
+                          onClick={() => {
+                            setEvidenceManagementItem(item)
+                            setShowEvidenceManagement(true)
+                          }}
+                          style={{
+                            background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+                            color: 'white',
+                            border: 'none',
+                            padding: '10px 16px',
+                            borderRadius: '8px',
+                            cursor: 'pointer',
+                            fontWeight: '600',
+                            fontSize: '13px',
+                            transition: 'all 0.2s ease'
+                          }}
+                        >
+                          🛠️ Manage
+                        </button>
+                      </div>
                     </div>
                   </div>
                 ))}

@@ -80,34 +80,37 @@ export function RealPhotoThumbnails({ item, onImageClick }: RealPhotoThumbnailsP
   }
 
   return (
-    <div style={{ marginBottom: '16px' }}>
-      {/* Real Photo Thumbnails */}
+    <div style={{ marginBottom: '12px' }}>
+      {/* Compact Photo Thumbnails */}
       {photos.length > 0 && (
-        <div style={{ marginBottom: '12px' }}>
-          <div style={{ fontSize: '12px', color: '#6b7280', marginBottom: '8px', fontWeight: '600' }}>
-            📷 Photos ({photos.length}) - Real Uploads
+        <div style={{ marginBottom: '8px' }}>
+          <div style={{ fontSize: '11px', color: '#6b7280', marginBottom: '6px', fontWeight: '600' }}>
+            📷 {photos.length} Photos Uploaded
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(80px, 1fr))', gap: '8px', maxHeight: '80px' }}>
-            {photos.slice(0, 4).map((photo, index) => (
+          <div style={{ display: 'flex', gap: '4px', maxWidth: '100%', overflowX: 'auto' }}>
+            {photos.slice(0, 3).map((photo, index) => (
               <div
                 key={photo.id}
-                onClick={() => onImageClick?.(photo.cloudinaryId)}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onImageClick?.(photo.cloudinaryId)
+                }}
                 style={{
-                  borderRadius: '8px',
+                  borderRadius: '6px',
                   overflow: 'hidden',
                   cursor: 'pointer',
                   transition: 'transform 0.2s ease',
                   position: 'relative',
-                  aspectRatio: '3/2',
-                  border: '2px solid #10b981'
+                  width: '60px',
+                  height: '40px',
+                  flexShrink: 0,
+                  border: '1px solid #10b981'
                 }}
                 onMouseOver={(e) => {
-                  e.currentTarget.style.transform = 'scale(1.05)'
-                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(16, 185, 129, 0.3)'
+                  e.currentTarget.style.transform = 'scale(1.1)'
                 }}
                 onMouseOut={(e) => {
                   e.currentTarget.style.transform = 'scale(1)'
-                  e.currentTarget.style.boxShadow = 'none'
                 }}
               >
                 <img
@@ -119,55 +122,39 @@ export function RealPhotoThumbnails({ item, onImageClick }: RealPhotoThumbnailsP
                     objectFit: 'cover'
                   }}
                   onError={(e) => {
-                    // If image fails to load, show file info instead
+                    // Compact error display
                     const parent = e.currentTarget.parentElement
                     if (parent) {
-                      parent.style.background = 'linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%)'
+                      parent.style.background = '#dbeafe'
                       parent.innerHTML = `
-                        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: #1e40af; font-size: 10px; font-weight: 600; text-align: center; padding: 4px;">
-                          <div style="font-size: 16px; margin-bottom: 2px;">📷</div>
-                          <div>${photo.originalName?.split('_').pop()?.substring(0, 10) || 'Photo'}</div>
-                          <div style="font-size: 8px; opacity: 0.7;">Click to debug</div>
+                        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: #1e40af; font-size: 8px; font-weight: 600;">
+                          <div style="font-size: 12px;">📷</div>
+                          <div>Debug</div>
                         </div>
                       `
-                      parent.onclick = () => {
-                        alert(`Debug Info:\nCloudinary ID: ${photo.cloudinaryId}\nOriginal Name: ${photo.originalName}\nGenerated URL: ${getCloudinaryThumbnailUrl(photo.cloudinaryId)}\n\nTry uploading a new photo to test the latest upload path structure.`)
-                      }
+                      parent.title = `Debug: ${photo.cloudinaryId}`
                     }
                   }}
-                  onLoad={() => {
-                    console.log('Image loaded successfully:', photo.cloudinaryId)
-                  }}
                 />
-                
-                {/* Success indicator for loaded images */}
-                <div style={{
-                  position: 'absolute',
-                  top: '4px',
-                  right: '4px',
-                  width: '12px',
-                  height: '12px',
-                  background: '#10b981',
-                  borderRadius: '50%',
-                  border: '2px solid white'
-                }}></div>
-                
-                {/* Photo overlay */}
-                <div style={{
-                  position: 'absolute',
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  background: 'linear-gradient(to top, rgba(0,0,0,0.8), transparent)',
-                  color: 'white',
-                  padding: '4px 6px',
-                  fontSize: '9px',
-                  fontWeight: '600'
-                }}>
-                  {photo.originalName?.split('_').pop()?.substring(0, 15) || 'Photo'}
-                </div>
               </div>
             ))}
+            {photos.length > 3 && (
+              <div style={{
+                width: '60px',
+                height: '40px',
+                background: 'linear-gradient(135deg, #6b7280 0%, #4b5563 100%)',
+                borderRadius: '6px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'white',
+                fontSize: '10px',
+                fontWeight: '600',
+                flexShrink: 0
+              }}>
+                +{photos.length - 3}
+              </div>
+            )}
           </div>
         </div>
       )}
