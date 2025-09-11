@@ -12,6 +12,8 @@ import { RealPhotoThumbnails } from '@/components/RealPhotoThumbnails'
 import { EvidenceManagement } from '@/components/EvidenceManagement'
 import { ItemCardIcon } from '@/components/ItemCardIcon'
 import { BulkUpload } from '@/components/BulkUpload'
+import { AdvancedSearch } from '@/components/AdvancedSearch'
+import { GenerateReport } from '@/components/GenerateReport'
 import { StolenItem, ItemFormData } from '@/types'
 import { getAllItems, getTotalValue, formatCurrency, formatDate, addItem } from '@/lib/data'
 
@@ -35,6 +37,10 @@ export default function Home() {
   const [evidenceManagementItem, setEvidenceManagementItem] = useState<StolenItem | null>(null)
   const [showBulkUpload, setShowBulkUpload] = useState(false)
   const [viewMode, setViewMode] = useState<'cards' | 'list'>('cards')
+  const [showAdvancedSearch, setShowAdvancedSearch] = useState(false)
+  const [showGenerateReport, setShowGenerateReport] = useState(false)
+  const [filteredItems, setFilteredItems] = useState<StolenItem[]>([])
+  const [isFiltered, setIsFiltered] = useState(false)
 
   useEffect(() => {
     if (status === 'loading') return
@@ -299,7 +305,7 @@ export default function Home() {
   }
 
   const selectAllItems = () => {
-    setSelectedItems(new Set(allItems.map(item => item.id)))
+    setSelectedItems(new Set(displayItems.map(item => item.id)))
   }
 
   const clearSelection = () => {
@@ -398,6 +404,10 @@ export default function Home() {
 
   const userRole = (session.user as any)?.role || 'law_enforcement'
   const evidenceCount = allItems.reduce((total, item) => total + item.evidence.photos.length + item.evidence.videos.length + item.evidence.documents.length, 0)
+  
+  // Use filtered items if search is active, otherwise use all items
+  const displayItems = isFiltered ? filteredItems : allItems
+  const displayTotalValue = displayItems.reduce((sum, item) => sum + item.estimatedValue, 0)
 
   if (userRole === 'citizen') {
     return (
@@ -648,42 +658,64 @@ export default function Home() {
                 Bulk Upload
               </button>
               
-              <button style={{
-                background: 'rgba(255, 255, 255, 0.1)',
-                backdropFilter: 'blur(10px)',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
-                color: 'white',
-                padding: '20px 32px',
-                borderRadius: '16px',
-                cursor: 'pointer',
-                fontWeight: '600',
-                fontSize: '18px',
-                transition: 'all 0.3s ease',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '12px'
-              }}>
+              <button
+                onClick={() => setShowAdvancedSearch(true)}
+                style={{
+                  background: 'linear-gradient(135deg, #059669 0%, #047857 50%, #065f46 100%)',
+                  color: 'white',
+                  border: 'none',
+                  padding: '20px 32px',
+                  borderRadius: '16px',
+                  cursor: 'pointer',
+                  fontWeight: '600',
+                  fontSize: '18px',
+                  boxShadow: '0 10px 25px rgba(5, 150, 105, 0.3)',
+                  transition: 'all 0.3s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '12px'
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-4px)'
+                  e.currentTarget.style.boxShadow = '0 20px 40px rgba(5, 150, 105, 0.4)'
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)'
+                  e.currentTarget.style.boxShadow = '0 10px 25px rgba(5, 150, 105, 0.3)'
+                }}
+              >
                 <span style={{ fontSize: '20px' }}>🔍</span>
                 Advanced Search
               </button>
               
-              <button style={{
-                background: 'rgba(255, 255, 255, 0.1)',
-                backdropFilter: 'blur(10px)',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
-                color: 'white',
-                padding: '20px 32px',
-                borderRadius: '16px',
-                cursor: 'pointer',
-                fontWeight: '600',
-                fontSize: '18px',
-                transition: 'all 0.3s ease',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '12px'
-              }}>
+              <button
+                onClick={() => setShowGenerateReport(true)}
+                style={{
+                  background: 'linear-gradient(135deg, #dc2626 0%, #b91c1c 50%, #991b1b 100%)',
+                  color: 'white',
+                  border: 'none',
+                  padding: '20px 32px',
+                  borderRadius: '16px',
+                  cursor: 'pointer',
+                  fontWeight: '600',
+                  fontSize: '18px',
+                  boxShadow: '0 10px 25px rgba(220, 38, 38, 0.3)',
+                  transition: 'all 0.3s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '12px'
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-4px)'
+                  e.currentTarget.style.boxShadow = '0 20px 40px rgba(220, 38, 38, 0.4)'
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)'
+                  e.currentTarget.style.boxShadow = '0 10px 25px rgba(220, 38, 38, 0.3)'
+                }}
+              >
                 <span style={{ fontSize: '20px' }}>📄</span>
                 Generate Report
               </button>
@@ -705,7 +737,28 @@ export default function Home() {
                       Your Stolen Items
                     </h2>
                     <p style={{ fontSize: '20px', color: '#6b7280' }}>
-                      {allItems.length} items documented • {formatCurrency(totalValue)} total value
+                      {displayItems.length} items {isFiltered ? 'found' : 'documented'} • {formatCurrency(displayTotalValue)} {isFiltered ? 'filtered' : 'total'} value
+                      {isFiltered && (
+                        <button
+                          onClick={() => {
+                            setIsFiltered(false)
+                            setFilteredItems([])
+                          }}
+                          style={{
+                            background: '#fef3c7',
+                            color: '#92400e',
+                            border: 'none',
+                            padding: '4px 8px',
+                            borderRadius: '6px',
+                            fontSize: '12px',
+                            fontWeight: '600',
+                            cursor: 'pointer',
+                            marginLeft: '12px'
+                          }}
+                        >
+                          Clear Filter
+                        </button>
+                      )}
                     </p>
                   </div>
                   
@@ -792,7 +845,7 @@ export default function Home() {
                         Bulk Operations
                       </h3>
                       <p style={{ color: '#6b7280', fontSize: '16px' }}>
-                        {selectedItems.size} of {allItems.length} items selected
+                        {selectedItems.size} of {displayItems.length} items selected
                       </p>
                     </div>
                     <div style={{ display: 'flex', gap: '12px' }}>
@@ -833,7 +886,7 @@ export default function Home() {
                     <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
                       <button
                         onClick={() => {
-                          const selectedItemsData = allItems.filter(item => selectedItems.has(item.id))
+                          const selectedItemsData = displayItems.filter(item => selectedItems.has(item.id))
                           const totalValue = selectedItemsData.reduce((sum, item) => sum + item.estimatedValue, 0)
                           alert(`Export ${selectedItems.size} items\nTotal value: ${formatCurrency(totalValue)}\n\nExport functionality coming soon!`)
                         }}
@@ -899,7 +952,7 @@ export default function Home() {
               )}
             </div>
 
-            {allItems.length === 0 ? (
+            {displayItems.length === 0 ? (
               <div style={{ textAlign: 'center', padding: '80px 0' }}>
                 <div style={{
                   width: '128px',
@@ -944,7 +997,7 @@ export default function Home() {
                 gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', 
                 gap: '32px' 
               }}>
-                {allItems.map((item) => (
+                {displayItems.map((item) => (
                   <div key={item.id} style={{
                     background: 'white',
                     borderRadius: '20px',
@@ -1330,7 +1383,7 @@ export default function Home() {
                     </tr>
                   </thead>
                   <tbody>
-                    {allItems.map((item, index) => (
+                    {displayItems.map((item, index) => (
                       <tr key={item.id} style={{ 
                         borderBottom: '1px solid #e5e7eb',
                         background: index % 2 === 0 ? 'white' : '#f9fafb'
@@ -1578,6 +1631,27 @@ export default function Home() {
                 setTotalValue(await getTotalValue())
                 setShowBulkUpload(false)
               }}
+            />
+          )}
+
+          {/* Advanced Search Modal */}
+          {showAdvancedSearch && (
+            <AdvancedSearch
+              items={allItems}
+              onClose={() => setShowAdvancedSearch(false)}
+              onResults={(results) => {
+                setFilteredItems(results)
+                setIsFiltered(true)
+                setShowAdvancedSearch(false)
+              }}
+            />
+          )}
+
+          {/* Generate Report Modal */}
+          {showGenerateReport && (
+            <GenerateReport
+              items={isFiltered ? filteredItems : allItems}
+              onClose={() => setShowGenerateReport(false)}
             />
           )}
         </div>
