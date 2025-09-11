@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react'
 import { SimpleFileUpload } from '@/components/SimpleFileUpload'
 import { ModernItemForm } from '@/components/ModernItemForm'
 import { ItemDetailView } from '@/components/ItemDetailView'
+import { ItemCardThumbnails } from '@/components/ItemCardThumbnails'
 import { StolenItem, ItemFormData } from '@/types'
 import { getAllItems, getTotalValue, formatCurrency, formatDate, addItem } from '@/lib/data'
 
@@ -1101,6 +1102,14 @@ export default function Home() {
                     <p style={{ color: '#4b5563', fontSize: '16px', lineHeight: '1.6', marginBottom: '24px' }}>
                       {item.description}
                     </p>
+
+                    {/* Photo Thumbnails */}
+                    <ItemCardThumbnails 
+                      item={item}
+                      onImageClick={(cloudinaryId) => {
+                        alert(`Photo preview: ${cloudinaryId}\n\nClick "View Full Details" to see all evidence in gallery format`)
+                      }}
+                    />
 
                     <div style={{ display: 'flex', gap: '12px', marginBottom: '24px' }}>
                       {item.evidence.photos.length > 0 && (
