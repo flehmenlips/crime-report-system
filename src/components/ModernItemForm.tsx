@@ -158,8 +158,9 @@ export function ModernItemForm({ onClose, onSubmit, initialData, mode = 'create'
         borderRadius: '24px',
         maxWidth: '800px',
         width: '100%',
-        maxHeight: '90vh',
-        overflow: 'hidden',
+        maxHeight: '85vh',
+        display: 'flex',
+        flexDirection: 'column',
         boxShadow: '0 25px 50px rgba(0, 0, 0, 0.25)'
       }}>
         {/* Header */}
@@ -240,7 +241,7 @@ export function ModernItemForm({ onClose, onSubmit, initialData, mode = 'create'
         </div>
 
         {/* Content */}
-        <div style={{ padding: '32px', minHeight: '400px' }}>
+        <div style={{ padding: '32px', flex: 1, overflowY: 'auto', minHeight: 0 }}>
           {/* Step 1: Basic Information */}
           {currentStep === 1 && (
             <div style={{ display: 'flex', gap: '32px', height: '100%' }}>
@@ -875,14 +876,15 @@ export function ModernItemForm({ onClose, onSubmit, initialData, mode = 'create'
           )}
         </div>
 
-        {/* Footer with Navigation */}
+        {/* Footer with Navigation - ALWAYS VISIBLE */}
         <div style={{
           padding: '24px 32px',
           borderTop: '1px solid #e5e7eb',
           background: '#f8fafc',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'space-between'
+          justifyContent: 'space-between',
+          flexShrink: 0
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
             {currentStep > 1 && (
