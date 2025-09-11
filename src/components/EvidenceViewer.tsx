@@ -67,7 +67,18 @@ export function EvidenceViewer({ item, onClose, onUpdate }: EvidenceViewerProps)
   }
 
   const getCloudinaryUrl = (cloudinaryId: string, type: string) => {
-    const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'demo'
+    // Handle different cloudinaryId formats
+    if (cloudinaryId.startsWith('demo/')) {
+      return `https://via.placeholder.com/300x200/6366f1/ffffff?text=Demo`
+    }
+    
+    // If it's already a full URL, use it directly
+    if (cloudinaryId.startsWith('https://res.cloudinary.com/')) {
+      return cloudinaryId
+    }
+    
+    // For public_id format, construct URL
+    const cloudName = 'dhaacekdd'
     const baseUrl = `https://res.cloudinary.com/${cloudName}`
 
     if (type === 'photo') {
@@ -75,12 +86,23 @@ export function EvidenceViewer({ item, onClose, onUpdate }: EvidenceViewerProps)
     } else if (type === 'video') {
       return `${baseUrl}/video/upload/w_300,h_200,c_fill,f_mp4/${cloudinaryId}`
     } else {
-      return `${baseUrl}/image/upload/f_auto,q_auto/${cloudinaryId}`
+      return `${baseUrl}/raw/upload/${cloudinaryId}`
     }
   }
 
   const getFullSizeUrl = (cloudinaryId: string, type: string) => {
-    const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'demo'
+    // Handle different cloudinaryId formats
+    if (cloudinaryId.startsWith('demo/')) {
+      return `https://via.placeholder.com/800x600/6366f1/ffffff?text=Demo`
+    }
+    
+    // If it's already a full URL, use it directly
+    if (cloudinaryId.startsWith('https://res.cloudinary.com/')) {
+      return cloudinaryId
+    }
+    
+    // For public_id format, construct URL
+    const cloudName = 'dhaacekdd'
     const baseUrl = `https://res.cloudinary.com/${cloudName}`
 
     if (type === 'photo') {
@@ -90,6 +112,22 @@ export function EvidenceViewer({ item, onClose, onUpdate }: EvidenceViewerProps)
     } else {
       return `${baseUrl}/raw/upload/${cloudinaryId}`
     }
+  }
+
+  const getDocumentViewUrl = (cloudinaryId: string) => {
+    // Handle different cloudinaryId formats
+    if (cloudinaryId.startsWith('demo/')) {
+      return `https://via.placeholder.com/800x600/6366f1/ffffff?text=Demo+Document`
+    }
+    
+    // If it's already a full URL, use it directly
+    if (cloudinaryId.startsWith('https://res.cloudinary.com/')) {
+      return cloudinaryId
+    }
+    
+    // For public_id format, construct raw URL for documents
+    const cloudName = 'dhaacekdd'
+    return `https://res.cloudinary.com/${cloudName}/raw/upload/${cloudinaryId}`
   }
 
   const filteredEvidence = evidence.filter(e => {
@@ -228,12 +266,37 @@ export function EvidenceViewer({ item, onClose, onUpdate }: EvidenceViewerProps)
                           </div>
                         ) : (
                           <div 
-                            className="w-full h-48 bg-gray-200 flex items-center justify-center cursor-pointer"
-                            onClick={() => window.open(getFullSizeUrl(evidenceItem.cloudinaryId, evidenceItem.type), '_blank')}
+                            style={{
+                              width: '100%',
+                              height: '192px',
+                              background: '#f3f4f6',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              cursor: 'pointer',
+                              flexDirection: 'column',
+                              gap: '12px',
+                              transition: 'all 0.2s ease'
+                            }}
+                            onClick={() => {
+                              setSelectedEvidence(evidenceItem)
+                              setShowFullscreen(true)
+                            }}
+                            onMouseOver={(e) => {
+                              e.currentTarget.style.background = '#e5e7eb'
+                            }}
+                            onMouseOut={(e) => {
+                              e.currentTarget.style.background = '#f3f4f6'
+                            }}
                           >
-                            <div className="text-center">
-                              <div className="text-4xl mb-2">📄</div>
-                              <div className="text-sm text-gray-600">Click to download</div>
+                            <div style={{ fontSize: '48px' }}>📄</div>
+                            <div style={{ textAlign: 'center' }}>
+                              <div style={{ fontSize: '14px', color: '#374151', fontWeight: '600', marginBottom: '4px' }}>
+                                {evidenceItem.originalName?.split('.').pop()?.toUpperCase() || 'DOC'}
+                              </div>
+                              <div style={{ fontSize: '12px', color: '#6b7280' }}>
+                                Click to view
+                              </div>
                             </div>
                           </div>
                         )}
@@ -329,19 +392,139 @@ export function EvidenceViewer({ item, onClose, onUpdate }: EvidenceViewerProps)
                   Your browser does not support the video tag.
                 </video>
               ) : (
-                <div className="p-8 text-center">
-                  <div className="text-6xl mb-4">📄</div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">
-                    {selectedEvidence.originalName}
-                  </h3>
-                  <a
-                    href={getFullSizeUrl(selectedEvidence.cloudinaryId, selectedEvidence.type)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium inline-block"
-                  >
-                    Download Document
-                  </a>
+                <div style={{ 
+                  padding: '32px', 
+                  textAlign: 'center',
+                  minHeight: '400px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  gap: '24px'
+                }}>
+                  <div style={{ fontSize: '80px' }}>📄</div>
+                  <div>
+                    <h3 style={{ 
+                      fontSize: '24px', 
+                      fontWeight: '700', 
+                      color: '#1f2937', 
+                      marginBottom: '8px',
+                      margin: '0 0 8px 0'
+                    }}>
+                      {selectedEvidence.originalName}
+                    </h3>
+                    <p style={{ 
+                      fontSize: '16px', 
+                      color: '#6b7280', 
+                      marginBottom: '24px',
+                      margin: '0 0 24px 0'
+                    }}>
+                      Document • {new Date(selectedEvidence.createdAt).toLocaleDateString()}
+                    </p>
+                  </div>
+                  
+                  {/* PDF Viewer for PDF files */}
+                  {(selectedEvidence.originalName?.toLowerCase().includes('.pdf') || 
+                    selectedEvidence.cloudinaryId.toLowerCase().includes('.pdf')) ? (
+                    <div style={{ width: '100%', marginBottom: '24px' }}>
+                      <iframe
+                        src={getDocumentViewUrl(selectedEvidence.cloudinaryId)}
+                        style={{
+                          width: '100%',
+                          height: '500px',
+                          border: '1px solid #e5e7eb',
+                          borderRadius: '12px'
+                        }}
+                        title={selectedEvidence.originalName || 'Document'}
+                      />
+                    </div>
+                  ) : (
+                    <div style={{
+                      background: '#f0f9ff',
+                      border: '1px solid #bfdbfe',
+                      borderRadius: '12px',
+                      padding: '16px',
+                      marginBottom: '24px',
+                      maxWidth: '400px'
+                    }}>
+                      <p style={{ 
+                        fontSize: '14px', 
+                        color: '#1e40af', 
+                        margin: 0,
+                        lineHeight: '1.5'
+                      }}>
+                        📋 This document type requires download to view. Click the button below to download and open with your default application.
+                      </p>
+                    </div>
+                  )}
+                  
+                  <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', justifyContent: 'center' }}>
+                    {/* View in Browser (for PDFs) */}
+                    {(selectedEvidence.originalName?.toLowerCase().includes('.pdf') || 
+                      selectedEvidence.cloudinaryId.toLowerCase().includes('.pdf')) && (
+                      <a
+                        href={getDocumentViewUrl(selectedEvidence.cloudinaryId)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+                          color: 'white',
+                          textDecoration: 'none',
+                          padding: '12px 24px',
+                          borderRadius: '12px',
+                          fontSize: '16px',
+                          fontWeight: '600',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)',
+                          transition: 'all 0.3s ease'
+                        }}
+                        onMouseOver={(e) => {
+                          e.currentTarget.style.transform = 'translateY(-2px)'
+                          e.currentTarget.style.boxShadow = '0 8px 20px rgba(59, 130, 246, 0.4)'
+                        }}
+                        onMouseOut={(e) => {
+                          e.currentTarget.style.transform = 'translateY(0)'
+                          e.currentTarget.style.boxShadow = '0 4px 12px rgba(59, 130, 246, 0.3)'
+                        }}
+                      >
+                        <span style={{ fontSize: '18px' }}>👁️</span>
+                        View in Browser
+                      </a>
+                    )}
+                    
+                    {/* Download Document */}
+                    <a
+                      href={getFullSizeUrl(selectedEvidence.cloudinaryId, selectedEvidence.type)}
+                      download={selectedEvidence.originalName || 'document'}
+                      style={{
+                        background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                        color: 'white',
+                        textDecoration: 'none',
+                        padding: '12px 24px',
+                        borderRadius: '12px',
+                        fontSize: '16px',
+                        fontWeight: '600',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)',
+                        transition: 'all 0.3s ease'
+                      }}
+                      onMouseOver={(e) => {
+                        e.currentTarget.style.transform = 'translateY(-2px)'
+                        e.currentTarget.style.boxShadow = '0 8px 20px rgba(16, 185, 129, 0.4)'
+                      }}
+                      onMouseOut={(e) => {
+                        e.currentTarget.style.transform = 'translateY(0)'
+                        e.currentTarget.style.boxShadow = '0 4px 12px rgba(16, 185, 129, 0.3)'
+                      }}
+                    >
+                      <span style={{ fontSize: '18px' }}>💾</span>
+                      Download Document
+                    </a>
+                  </div>
                 </div>
               )}
             </div>

@@ -92,14 +92,28 @@ export async function POST(request: NextRequest) {
         console.log('REAL CLOUDINARY: Attempting upload with public_id:', publicId)
         
         cloudinaryResult = await new Promise((resolve, reject) => {
+          const uploadOptions: any = {
+            public_id: publicId,
+            overwrite: false
+          }
+
+          // Set proper resource type based on evidence type
+          if (evidenceType === 'video') {
+            uploadOptions.resource_type = 'video'
+            uploadOptions.quality = 'auto'
+          } else if (evidenceType === 'document') {
+            uploadOptions.resource_type = 'raw' // Use 'raw' for documents to preserve original format
+            uploadOptions.format = 'auto'
+          } else {
+            uploadOptions.resource_type = 'image'
+            uploadOptions.quality = 'auto'
+            uploadOptions.fetch_format = 'auto'
+          }
+
+          console.log('Upload options:', uploadOptions)
+
           cloudinary.uploader.upload_stream(
-            {
-              resource_type: evidenceType === 'video' ? 'video' : 'auto',
-              public_id: publicId,
-              overwrite: false,
-              quality: 'auto',
-              fetch_format: 'auto'
-            },
+            uploadOptions,
             (error, result) => {
               if (error) {
                 console.error('Cloudinary upload error:', error)

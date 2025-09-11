@@ -34,10 +34,13 @@ export function ItemDetailView({ item, onClose, onEdit, onDelete, onDuplicate, o
 
   const loadEvidence = async () => {
     try {
+      console.log('Loading evidence for item:', item.id)
       const response = await fetch(`/api/evidence?itemId=${item.id}`)
       if (response.ok) {
         const data = await response.json()
+        console.log('Evidence data received:', data)
         setEvidence(data.evidence || [])
+        console.log('Evidence set:', data.evidence || [])
       }
     } catch (error) {
       console.error('Error loading evidence:', error)
@@ -88,6 +91,15 @@ export function ItemDetailView({ item, onClose, onEdit, onDelete, onDuplicate, o
   const photos = evidence.filter(e => e.type === 'photo')
   const videos = evidence.filter(e => e.type === 'video')
   const documents = evidence.filter(e => e.type === 'document')
+  
+  // Debug logging
+  console.log('ItemDetailView - Evidence breakdown:', {
+    total: evidence.length,
+    photos: photos.length,
+    videos: videos.length,
+    documents: documents.length,
+    evidenceTypes: evidence.map(e => e.type)
+  })
 
   return (
     <div style={{
@@ -557,18 +569,40 @@ export function ItemDetailView({ item, onClose, onEdit, onDelete, onDuplicate, o
                       {documents.map((doc) => (
                         <div
                           key={doc.id}
+                          onClick={() => {
+                            console.log('Document clicked:', doc)
+                            const documentUrl = doc.cloudinaryId.startsWith('https://') 
+                              ? doc.cloudinaryId 
+                              : `https://res.cloudinary.com/dhaacekdd/raw/upload/${doc.cloudinaryId}`
+                            console.log('Opening document URL:', documentUrl)
+                            window.open(documentUrl, '_blank')
+                          }}
                           style={{
                             background: '#fffbeb',
                             borderRadius: '12px',
                             padding: '16px',
                             border: '2px solid #fde68a',
                             textAlign: 'center',
-                            cursor: 'pointer'
+                            cursor: 'pointer',
+                            transition: 'all 0.2s ease'
+                          }}
+                          onMouseOver={(e) => {
+                            e.currentTarget.style.background = '#fef3c7'
+                            e.currentTarget.style.transform = 'translateY(-2px)'
+                            e.currentTarget.style.boxShadow = '0 8px 20px rgba(245, 158, 11, 0.2)'
+                          }}
+                          onMouseOut={(e) => {
+                            e.currentTarget.style.background = '#fffbeb'
+                            e.currentTarget.style.transform = 'translateY(0)'
+                            e.currentTarget.style.boxShadow = 'none'
                           }}
                         >
                           <div style={{ fontSize: '32px', marginBottom: '8px' }}>📄</div>
-                          <p style={{ fontSize: '14px', color: '#1f2937', fontWeight: '600', margin: 0 }}>
+                          <p style={{ fontSize: '14px', color: '#1f2937', fontWeight: '600', marginBottom: '4px', margin: '0 0 4px 0' }}>
                             {doc.originalName || 'Document'}
+                          </p>
+                          <p style={{ fontSize: '12px', color: '#92400e', fontWeight: '500', margin: 0 }}>
+                            {doc.originalName?.split('.').pop()?.toUpperCase() || 'DOC'} • Click to open
                           </p>
                         </div>
                       ))}
