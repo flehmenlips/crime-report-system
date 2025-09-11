@@ -3,11 +3,19 @@ import { v2 as cloudinary } from 'cloudinary'
 import { prisma } from '@/lib/prisma'
 
 // Configure Cloudinary
-cloudinary.config({
+const cloudinaryConfig = {
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME || 'demo',
   api_key: process.env.CLOUDINARY_API_KEY || 'demo',
   api_secret: process.env.CLOUDINARY_API_SECRET || 'demo'
+}
+
+console.log('Cloudinary config:', {
+  cloud_name: cloudinaryConfig.cloud_name,
+  api_key: cloudinaryConfig.api_key ? 'SET' : 'NOT SET',
+  api_secret: cloudinaryConfig.api_secret ? 'SET' : 'NOT SET'
 })
+
+cloudinary.config(cloudinaryConfig)
 
 export async function POST(request: NextRequest) {
   try {
@@ -65,7 +73,13 @@ export async function POST(request: NextRequest) {
       // Upload to Cloudinary (or simulate if no credentials)
       let cloudinaryResult
       
-      if (process.env.CLOUDINARY_CLOUD_NAME === 'demo') {
+      console.log('Upload attempt - Cloud name:', process.env.CLOUDINARY_CLOUD_NAME)
+      console.log('API Key present:', !!process.env.CLOUDINARY_API_KEY)
+      console.log('API Secret present:', !!process.env.CLOUDINARY_API_SECRET)
+      
+      if (process.env.CLOUDINARY_CLOUD_NAME === 'demo' || 
+          process.env.CLOUDINARY_API_KEY === 'demo' || 
+          process.env.CLOUDINARY_API_KEY === 'YOUR_API_KEY_FROM_DASHBOARD') {
         // Simulate upload for demo purposes
         cloudinaryResult = {
           public_id: publicId,
@@ -75,6 +89,8 @@ export async function POST(request: NextRequest) {
         console.log('DEMO MODE: Simulated Cloudinary upload for:', file.name)
       } else {
         // Real Cloudinary upload
+        console.log('REAL CLOUDINARY: Attempting upload with public_id:', publicId)
+        
         cloudinaryResult = await new Promise((resolve, reject) => {
           cloudinary.uploader.upload_stream(
             {
@@ -85,8 +101,13 @@ export async function POST(request: NextRequest) {
               fetch_format: 'auto'
             },
             (error, result) => {
-              if (error) reject(error)
-              else resolve(result)
+              if (error) {
+                console.error('Cloudinary upload error:', error)
+                reject(error)
+              } else {
+                console.log('Cloudinary upload success:', result?.public_id, result?.secure_url)
+                resolve(result)
+              }
             }
           ).end(buffer)
         })

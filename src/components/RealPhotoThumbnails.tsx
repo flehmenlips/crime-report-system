@@ -38,18 +38,16 @@ export function RealPhotoThumbnails({ item, onImageClick }: RealPhotoThumbnailsP
   }
 
   const getCloudinaryThumbnailUrl = (cloudinaryId: string) => {
-    const cloudName = 'dhaacekdd' // Your cloud name
+    const cloudName = 'dhaacekdd'
     
     // Handle different cloudinaryId formats
     if (cloudinaryId.startsWith('demo/')) {
-      // For demo files, show a placeholder
       return `https://via.placeholder.com/120x80/6366f1/ffffff?text=Demo+File`
     }
     
-    // For real Cloudinary uploads, try different URL formats
-    // The issue might be the path structure, so let's try the raw public_id
-    const cleanId = cloudinaryId.replace(/^evidence\/item_\d+\//, '')
-    return `https://res.cloudinary.com/${cloudName}/image/upload/w_120,h_80,c_fill,f_auto,q_auto/${cleanId}`
+    // For real Cloudinary uploads, use the exact cloudinaryId as stored
+    // Cloudinary will automatically handle versioning
+    return `https://res.cloudinary.com/${cloudName}/image/upload/w_120,h_80,c_fill,f_auto,q_auto/${cloudinaryId}`
   }
 
   const photos = evidence.filter(e => e.type === 'photo')
