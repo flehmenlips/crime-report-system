@@ -4,7 +4,8 @@ import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { SimpleFileUpload } from '@/components/SimpleFileUpload'
-import { StolenItem } from '@/types'
+import { ModernItemForm } from '@/components/ModernItemForm'
+import { StolenItem, ItemFormData } from '@/types'
 import { getAllItems, getTotalValue, formatCurrency, formatDate, addItem } from '@/lib/data'
 
 export default function Home() {
@@ -15,6 +16,12 @@ export default function Home() {
   const [loading, setLoading] = useState(true)
   const [showSimpleUpload, setShowSimpleUpload] = useState(false)
   const [selectedItem, setSelectedItem] = useState<StolenItem | null>(null)
+  const [editingItem, setEditingItem] = useState<number | null>(null)
+  const [showActionMenu, setShowActionMenu] = useState<number | null>(null)
+  const [selectedItems, setSelectedItems] = useState<Set<number>>(new Set())
+  const [bulkMode, setBulkMode] = useState(false)
+  const [showModernForm, setShowModernForm] = useState(false)
+  const [editingFormItem, setEditingFormItem] = useState<StolenItem | null>(null)
 
   useEffect(() => {
     if (status === 'loading') return
@@ -39,6 +46,18 @@ export default function Home() {
 
     loadData()
   }, [session, status, router])
+
+  // Close action menus when clicking outside
+  useEffect(() => {
+    const handleClickOutside = () => {
+      setShowActionMenu(null)
+    }
+
+    if (showActionMenu !== null) {
+      document.addEventListener('click', handleClickOutside)
+      return () => document.removeEventListener('click', handleClickOutside)
+    }
+  }, [showActionMenu])
 
   const handleAddItem = async () => {
     const itemName = prompt('Enter item name:')
@@ -101,6 +120,218 @@ export default function Home() {
     } catch (error) {
       console.error('Error in handleAddItem:', error)
       alert(`❌ Error adding item: ${error instanceof Error ? error.message : String(error)}`)
+    }
+  }
+
+  const handleDeleteItem = async (item: StolenItem) => {
+    const confirmed = confirm(`Are you sure you want to delete "${item.name}"?\n\nThis will permanently remove the item and all associated evidence files.\n\nThis action cannot be undone.`)
+    
+    if (!confirmed) return
+
+    try {
+      console.log('Deleting item:', item.id, item.name)
+      
+      const response = await fetch(`/api/items?id=${item.id}`, {
+        method: 'DELETE'
+      })
+
+      if (response.ok) {
+        console.log('Item deleted successfully')
+        setAllItems(prev => prev.filter(i => i.id !== item.id))
+        setTotalValue(prev => prev - item.estimatedValue)
+        alert(`✅ "${item.name}" deleted successfully from database`)
+        
+        // Reload data to ensure consistency
+        const updatedItems = await getAllItems()
+        setAllItems(updatedItems)
+      } else {
+        const errorText = await response.text()
+        console.error('Delete failed:', errorText)
+        alert(`❌ Failed to delete item: ${errorText}`)
+      }
+    } catch (error) {
+      console.error('Error deleting item:', error)
+      alert(`❌ Error deleting item: ${error instanceof Error ? error.message : error}`)
+    }
+  }
+
+  const handleEditItem = async (item: StolenItem) => {
+    const newName = prompt(`Edit name for "${item.name}":`, item.name)
+    if (!newName || newName === item.name) return
+
+    const newDescription = prompt(`Edit description for "${item.name}":`, item.description)
+    if (!newDescription) return
+
+    const newEstimatedValue = prompt(`Edit estimated value for "${item.name}":`, item.estimatedValue.toString())
+    if (!newEstimatedValue) return
+
+    try {
+      console.log('Updating item:', item.id)
+      
+      const updateData = {
+        id: item.id,
+        name: newName,
+        description: newDescription,
+        serialNumber: item.serialNumber,
+        purchaseDate: item.purchaseDate,
+        purchaseCost: item.purchaseCost,
+        dateLastSeen: item.dateLastSeen,
+        locationLastSeen: item.locationLastSeen,
+        estimatedValue: parseFloat(newEstimatedValue)
+      }
+
+      const response = await fetch('/api/items', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updateData)
+      })
+
+      if (response.ok) {
+        const result = await response.json()
+        console.log('Item updated successfully:', result.item)
+        
+        // Update local state
+        setAllItems(prev => prev.map(i => i.id === item.id ? result.item : i))
+        setTotalValue(prev => prev - item.estimatedValue + result.item.estimatedValue)
+        alert(`✅ "${result.item.name}" updated successfully!`)
+      } else {
+        const errorText = await response.text()
+        console.error('Update failed:', errorText)
+        alert(`❌ Failed to update item: ${errorText}`)
+      }
+    } catch (error) {
+      console.error('Error updating item:', error)
+      alert(`❌ Error updating item: ${error instanceof Error ? error.message : error}`)
+    }
+  }
+
+  const handleDuplicateItem = async (item: StolenItem) => {
+    const newName = prompt(`Duplicate "${item.name}" as:`, `${item.name} (Copy)`)
+    if (!newName) return
+
+    try {
+      console.log('Duplicating item:', item.name)
+      
+      const ownerId = 'cmfeyn7es0000t6oil8p6d45c'
+      const duplicateData = {
+        name: newName,
+        description: item.description,
+        serialNumber: item.serialNumber ? `${item.serialNumber}-COPY` : '',
+        purchaseDate: item.purchaseDate,
+        purchaseCost: item.purchaseCost,
+        dateLastSeen: item.dateLastSeen,
+        locationLastSeen: item.locationLastSeen,
+        estimatedValue: item.estimatedValue
+      }
+      
+      const newItem = await addItem(duplicateData, ownerId)
+      
+      if (newItem) {
+        setAllItems(prev => [...prev, newItem])
+        setTotalValue(prev => prev + newItem.estimatedValue)
+        alert(`✅ "${newItem.name}" created as duplicate!`)
+        
+        const updatedItems = await getAllItems()
+        setAllItems(updatedItems)
+      }
+    } catch (error) {
+      console.error('Error duplicating item:', error)
+      alert(`❌ Error duplicating item: ${error instanceof Error ? error.message : error}`)
+    }
+  }
+
+  const toggleItemSelection = (itemId: number) => {
+    const newSelected = new Set(selectedItems)
+    if (newSelected.has(itemId)) {
+      newSelected.delete(itemId)
+    } else {
+      newSelected.add(itemId)
+    }
+    setSelectedItems(newSelected)
+  }
+
+  const handleBulkDelete = async () => {
+    if (selectedItems.size === 0) return
+
+    const confirmed = confirm(`Are you sure you want to delete ${selectedItems.size} items?\n\nThis will permanently remove all selected items and their evidence files.\n\nThis action cannot be undone.`)
+    if (!confirmed) return
+
+    try {
+      console.log('Bulk deleting items:', Array.from(selectedItems))
+      
+      for (const itemId of selectedItems) {
+        const response = await fetch(`/api/items?id=${itemId}`, {
+          method: 'DELETE'
+        })
+        
+        if (!response.ok) {
+          console.error(`Failed to delete item ${itemId}`)
+        }
+      }
+
+      // Reload data
+      const updatedItems = await getAllItems()
+      setAllItems(updatedItems)
+      setTotalValue(await getTotalValue())
+      setSelectedItems(new Set())
+      setBulkMode(false)
+      
+      alert(`✅ ${selectedItems.size} items deleted successfully!`)
+    } catch (error) {
+      console.error('Error in bulk delete:', error)
+      alert(`❌ Error deleting items: ${error}`)
+    }
+  }
+
+  const selectAllItems = () => {
+    setSelectedItems(new Set(allItems.map(item => item.id)))
+  }
+
+  const clearSelection = () => {
+    setSelectedItems(new Set())
+  }
+
+  const handleModernFormSubmit = async (formData: ItemFormData) => {
+    try {
+      console.log('Modern form submitted:', formData)
+      const ownerId = 'cmfeyn7es0000t6oil8p6d45c'
+      
+      if (editingFormItem) {
+        // Update existing item
+        const updateData = { ...formData, id: editingFormItem.id }
+        const response = await fetch('/api/items', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(updateData)
+        })
+
+        if (response.ok) {
+          const result = await response.json()
+          setAllItems(prev => prev.map(i => i.id === editingFormItem.id ? result.item : i))
+          setTotalValue(prev => prev - editingFormItem.estimatedValue + result.item.estimatedValue)
+          alert(`✅ "${result.item.name}" updated successfully!`)
+        }
+      } else {
+        // Create new item
+        const newItem = await addItem(formData, ownerId)
+        
+        if (newItem) {
+          setAllItems(prev => [...prev, newItem])
+          setTotalValue(prev => prev + newItem.estimatedValue)
+          alert(`✅ "${newItem.name}" created successfully!`)
+          
+          const updatedItems = await getAllItems()
+          setAllItems(updatedItems)
+        }
+      }
+      
+      setShowModernForm(false)
+      setEditingFormItem(null)
+    } catch (error) {
+      console.error('Error in form submission:', error)
+      alert(`❌ Error: ${error instanceof Error ? error.message : error}`)
     }
   }
 
@@ -324,7 +555,10 @@ export default function Home() {
               gap: '24px' 
             }}>
               <button
-                onClick={handleAddItem}
+                onClick={() => {
+                  setEditingFormItem(null)
+                  setShowModernForm(true)
+                }}
                 style={{
                   background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #d946ef 100%)',
                   color: 'white',
@@ -424,13 +658,154 @@ export default function Home() {
             boxShadow: '0 20px 40px rgba(0, 0, 0, 0.1)',
             border: '1px solid rgba(255, 255, 255, 0.2)'
           }}>
-            <div style={{ marginBottom: '48px' }}>
-              <h2 style={{ fontSize: '48px', fontWeight: '800', color: '#1f2937', marginBottom: '16px' }}>
-                Your Stolen Items
-              </h2>
-              <p style={{ fontSize: '20px', color: '#6b7280' }}>
-                {allItems.length} items documented • {formatCurrency(totalValue)} total value
-              </p>
+            <div style={{ marginBottom: '32px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
+                <div>
+                  <h2 style={{ fontSize: '48px', fontWeight: '800', color: '#1f2937', marginBottom: '16px' }}>
+                    Your Stolen Items
+                  </h2>
+                  <p style={{ fontSize: '20px', color: '#6b7280' }}>
+                    {allItems.length} items documented • {formatCurrency(totalValue)} total value
+                  </p>
+                </div>
+                <button
+                  onClick={() => setBulkMode(!bulkMode)}
+                  style={{
+                    background: bulkMode ? '#dc2626' : '#6b7280',
+                    color: 'white',
+                    border: 'none',
+                    padding: '12px 24px',
+                    borderRadius: '12px',
+                    fontSize: '16px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  {bulkMode ? '✕ Exit Bulk Mode' : '☑️ Bulk Select'}
+                </button>
+              </div>
+
+              {/* Bulk Operations Toolbar */}
+              {bulkMode && (
+                <div style={{
+                  background: 'linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%)',
+                  padding: '24px',
+                  borderRadius: '16px',
+                  marginBottom: '24px',
+                  border: '2px dashed #d1d5db'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+                    <div>
+                      <h3 style={{ fontSize: '20px', fontWeight: '700', color: '#1f2937', marginBottom: '4px' }}>
+                        Bulk Operations
+                      </h3>
+                      <p style={{ color: '#6b7280', fontSize: '16px' }}>
+                        {selectedItems.size} of {allItems.length} items selected
+                      </p>
+                    </div>
+                    <div style={{ display: 'flex', gap: '12px' }}>
+                      <button
+                        onClick={selectAllItems}
+                        style={{
+                          background: '#3b82f6',
+                          color: 'white',
+                          border: 'none',
+                          padding: '10px 20px',
+                          borderRadius: '10px',
+                          fontSize: '14px',
+                          fontWeight: '600',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        Select All
+                      </button>
+                      <button
+                        onClick={clearSelection}
+                        style={{
+                          background: '#6b7280',
+                          color: 'white',
+                          border: 'none',
+                          padding: '10px 20px',
+                          borderRadius: '10px',
+                          fontSize: '14px',
+                          fontWeight: '600',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        Clear
+                      </button>
+                    </div>
+                  </div>
+                  
+                  {selectedItems.size > 0 && (
+                    <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+                      <button
+                        onClick={() => {
+                          const selectedItemsData = allItems.filter(item => selectedItems.has(item.id))
+                          const totalValue = selectedItemsData.reduce((sum, item) => sum + item.estimatedValue, 0)
+                          alert(`Export ${selectedItems.size} items\nTotal value: ${formatCurrency(totalValue)}\n\nExport functionality coming soon!`)
+                        }}
+                        style={{
+                          background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                          color: 'white',
+                          border: 'none',
+                          padding: '12px 24px',
+                          borderRadius: '12px',
+                          fontSize: '14px',
+                          fontWeight: '600',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px'
+                        }}
+                      >
+                        📄 Export Selected
+                      </button>
+                      
+                      <button
+                        onClick={() => {
+                          alert(`Tag ${selectedItems.size} items\n\nBulk tagging functionality coming soon!`)
+                        }}
+                        style={{
+                          background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
+                          color: 'white',
+                          border: 'none',
+                          padding: '12px 24px',
+                          borderRadius: '12px',
+                          fontSize: '14px',
+                          fontWeight: '600',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px'
+                        }}
+                      >
+                        🏷️ Tag All
+                      </button>
+                      
+                      <button
+                        onClick={handleBulkDelete}
+                        style={{
+                          background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+                          color: 'white',
+                          border: 'none',
+                          padding: '12px 24px',
+                          borderRadius: '12px',
+                          fontSize: '14px',
+                          fontWeight: '600',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px'
+                        }}
+                      >
+                        🗑️ Delete Selected
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
             {allItems.length === 0 ? (
@@ -483,8 +858,8 @@ export default function Home() {
                     background: 'white',
                     borderRadius: '20px',
                     padding: '32px',
-                    boxShadow: '0 20px 40px rgba(0, 0, 0, 0.08)',
-                    border: '1px solid rgba(0, 0, 0, 0.05)',
+                    boxShadow: selectedItems.has(item.id) ? '0 32px 64px rgba(59, 130, 246, 0.2)' : '0 20px 40px rgba(0, 0, 0, 0.08)',
+                    border: selectedItems.has(item.id) ? '2px solid #3b82f6' : '1px solid rgba(0, 0, 0, 0.05)',
                     transition: 'all 0.4s ease',
                     position: 'relative'
                   }}
@@ -496,27 +871,180 @@ export default function Home() {
                     e.currentTarget.style.transform = 'translateY(0)'
                     e.currentTarget.style.boxShadow = '0 20px 40px rgba(0, 0, 0, 0.08)'
                   }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '24px' }}>
-                      <div style={{
-                        width: '64px',
-                        height: '64px',
-                        background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
-                        borderRadius: '16px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        boxShadow: '0 10px 25px rgba(59, 130, 246, 0.3)',
-                        fontSize: '24px',
-                        color: 'white',
-                        fontWeight: 'bold'
-                      }}>
-                        {item.name.charAt(0)}
+                    {/* Bulk Selection Checkbox */}
+                    {bulkMode && (
+                      <div style={{ position: 'absolute', top: '16px', left: '16px', zIndex: 5 }}>
+                        <input
+                          type="checkbox"
+                          checked={selectedItems.has(item.id)}
+                          onChange={() => toggleItemSelection(item.id)}
+                          style={{
+                            width: '20px',
+                            height: '20px',
+                            accentColor: '#3b82f6',
+                            cursor: 'pointer'
+                          }}
+                        />
                       </div>
-                      <div>
-                        <h3 style={{ fontSize: '24px', fontWeight: '700', color: '#1f2937', marginBottom: '4px' }}>
-                          {item.name}
-                        </h3>
-                        <p style={{ color: '#6b7280', fontSize: '14px' }}>ID: {item.id}</p>
+                    )}
+
+                    {/* Header with Action Menu */}
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                        <div style={{
+                          width: '64px',
+                          height: '64px',
+                          background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
+                          borderRadius: '16px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          boxShadow: '0 10px 25px rgba(59, 130, 246, 0.3)',
+                          fontSize: '24px',
+                          color: 'white',
+                          fontWeight: 'bold'
+                        }}>
+                          {item.name.charAt(0)}
+                        </div>
+                        <div>
+                          <h3 style={{ fontSize: '24px', fontWeight: '700', color: '#1f2937', marginBottom: '4px' }}>
+                            {item.name}
+                          </h3>
+                          <p style={{ color: '#6b7280', fontSize: '14px' }}>ID: {item.id} • Added {new Date().toLocaleDateString()}</p>
+                        </div>
+                      </div>
+                      
+                      {/* Action Menu Button */}
+                      <div style={{ position: 'relative' }}>
+                        <button
+                          onClick={() => setShowActionMenu(showActionMenu === item.id ? null : item.id)}
+                          style={{
+                            background: 'rgba(0, 0, 0, 0.05)',
+                            border: 'none',
+                            borderRadius: '12px',
+                            padding: '8px',
+                            cursor: 'pointer',
+                            transition: 'all 0.2s ease'
+                          }}
+                          onMouseOver={(e) => {
+                            e.currentTarget.style.background = 'rgba(0, 0, 0, 0.1)'
+                          }}
+                          onMouseOut={(e) => {
+                            e.currentTarget.style.background = 'rgba(0, 0, 0, 0.05)'
+                          }}
+                        >
+                          <svg style={{ width: '20px', height: '20px', color: '#6b7280' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+                          </svg>
+                        </button>
+                        
+                        {/* Action Menu Dropdown */}
+                        {showActionMenu === item.id && (
+                          <div style={{
+                            position: 'absolute',
+                            top: '100%',
+                            right: '0',
+                            marginTop: '8px',
+                            background: 'white',
+                            borderRadius: '12px',
+                            boxShadow: '0 10px 25px rgba(0, 0, 0, 0.15)',
+                            border: '1px solid rgba(0, 0, 0, 0.1)',
+                            zIndex: 10,
+                            minWidth: '200px'
+                          }}>
+                            <div style={{ padding: '8px' }}>
+                              <button
+                                onClick={() => {
+                                  setShowActionMenu(null)
+                                  setEditingFormItem(item)
+                                  setShowModernForm(true)
+                                }}
+                                style={{
+                                  width: '100%',
+                                  textAlign: 'left',
+                                  padding: '12px 16px',
+                                  border: 'none',
+                                  background: 'transparent',
+                                  borderRadius: '8px',
+                                  cursor: 'pointer',
+                                  transition: 'background 0.2s ease',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '12px'
+                                }}
+                                onMouseOver={(e) => {
+                                  e.currentTarget.style.background = '#f3f4f6'
+                                }}
+                                onMouseOut={(e) => {
+                                  e.currentTarget.style.background = 'transparent'
+                                }}
+                              >
+                                <span style={{ fontSize: '16px' }}>✏️</span>
+                                <span style={{ fontWeight: '500', color: '#374151' }}>Edit Item</span>
+                              </button>
+                              
+                              <button
+                                onClick={() => {
+                                  setShowActionMenu(null)
+                                  handleDuplicateItem(item)
+                                }}
+                                style={{
+                                  width: '100%',
+                                  textAlign: 'left',
+                                  padding: '12px 16px',
+                                  border: 'none',
+                                  background: 'transparent',
+                                  borderRadius: '8px',
+                                  cursor: 'pointer',
+                                  transition: 'background 0.2s ease',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '12px'
+                                }}
+                                onMouseOver={(e) => {
+                                  e.currentTarget.style.background = '#f3f4f6'
+                                }}
+                                onMouseOut={(e) => {
+                                  e.currentTarget.style.background = 'transparent'
+                                }}
+                              >
+                                <span style={{ fontSize: '16px' }}>📋</span>
+                                <span style={{ fontWeight: '500', color: '#374151' }}>Duplicate Item</span>
+                              </button>
+                              
+                              <div style={{ height: '1px', background: '#e5e7eb', margin: '8px 16px' }}></div>
+                              
+                              <button
+                                onClick={() => {
+                                  setShowActionMenu(null)
+                                  handleDeleteItem(item)
+                                }}
+                                style={{
+                                  width: '100%',
+                                  textAlign: 'left',
+                                  padding: '12px 16px',
+                                  border: 'none',
+                                  background: 'transparent',
+                                  borderRadius: '8px',
+                                  cursor: 'pointer',
+                                  transition: 'background 0.2s ease',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '12px'
+                                }}
+                                onMouseOver={(e) => {
+                                  e.currentTarget.style.background = '#fef2f2'
+                                }}
+                                onMouseOut={(e) => {
+                                  e.currentTarget.style.background = 'transparent'
+                                }}
+                              >
+                                <span style={{ fontSize: '16px' }}>🗑️</span>
+                                <span style={{ fontWeight: '500', color: '#dc2626' }}>Delete Item</span>
+                              </button>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
 
@@ -641,6 +1169,28 @@ export default function Home() {
               </div>
             )}
           </div>
+
+          {/* Modern Item Form Modal */}
+          {showModernForm && (
+            <ModernItemForm
+              mode={editingFormItem ? 'edit' : 'create'}
+              initialData={editingFormItem ? {
+                name: editingFormItem.name,
+                description: editingFormItem.description,
+                serialNumber: editingFormItem.serialNumber,
+                purchaseDate: editingFormItem.purchaseDate,
+                purchaseCost: editingFormItem.purchaseCost,
+                dateLastSeen: editingFormItem.dateLastSeen,
+                locationLastSeen: editingFormItem.locationLastSeen,
+                estimatedValue: editingFormItem.estimatedValue
+              } : undefined}
+              onClose={() => {
+                setShowModernForm(false)
+                setEditingFormItem(null)
+              }}
+              onSubmit={handleModernFormSubmit}
+            />
+          )}
 
           {/* File Upload Modal */}
           {showSimpleUpload && selectedItem && (

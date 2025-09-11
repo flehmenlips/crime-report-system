@@ -350,3 +350,58 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({ error: 'Failed to update item' }, { status: 500 })
   }
 }
+
+export async function DELETE(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url)
+    const itemId = searchParams.get('id')
+
+    if (!itemId) {
+      return NextResponse.json(
+        { error: 'Item ID is required' },
+        { status: 400 }
+      )
+    }
+
+    console.log('Deleting item with ID:', itemId)
+
+    // Check if item exists
+    const item = await prisma.stolenItem.findUnique({
+      where: { id: parseInt(itemId) },
+      include: { evidence: true }
+    })
+
+    if (!item) {
+      return NextResponse.json(
+        { error: 'Item not found' },
+        { status: 404 }
+      )
+    }
+
+    // Delete item (this will cascade delete evidence due to schema)
+    await prisma.stolenItem.delete({
+      where: {
+        id: parseInt(itemId)
+      }
+    })
+
+    console.log('Item deleted successfully:', item.name)
+
+    return NextResponse.json({
+      message: `Item "${item.name}" and ${item.evidence.length} evidence files deleted successfully`
+    })
+
+  } catch (error) {
+    console.error('Error deleting item:', error)
+    
+    const isProduction = process.env.NODE_ENV === 'production'
+    const errorMessage = isProduction
+      ? 'An error occurred while deleting the item'
+      : `Server error: ${error instanceof Error ? error.message : 'Unknown error'}`
+
+    return NextResponse.json(
+      { error: errorMessage },
+      { status: 500 }
+    )
+  }
+}
