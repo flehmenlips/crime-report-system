@@ -10,6 +10,7 @@ import { ItemCardThumbnails } from '@/components/ItemCardThumbnails'
 import { MockPhotoThumbnails } from '@/components/MockPhotoThumbnails'
 import { RealPhotoThumbnails } from '@/components/RealPhotoThumbnails'
 import { EvidenceManagement } from '@/components/EvidenceManagement'
+import { ItemCardIcon } from '@/components/ItemCardIcon'
 import { StolenItem, ItemFormData } from '@/types'
 import { getAllItems, getTotalValue, formatCurrency, formatDate, addItem } from '@/lib/data'
 
@@ -916,21 +917,7 @@ export default function Home() {
                     {/* Header with Action Menu */}
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                        <div style={{
-                          width: '64px',
-                          height: '64px',
-                          background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
-                          borderRadius: '16px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          boxShadow: '0 10px 25px rgba(59, 130, 246, 0.3)',
-                          fontSize: '24px',
-                          color: 'white',
-                          fontWeight: 'bold'
-                        }}>
-                          {item.name.charAt(0)}
-                        </div>
+                        <ItemCardIcon item={item} size={64} />
                         <div>
                           <h3 style={{ fontSize: '24px', fontWeight: '700', color: '#1f2937', marginBottom: '4px' }}>
                             {item.name}
@@ -1108,14 +1095,22 @@ export default function Home() {
                       {item.description}
                     </p>
 
-                    {/* Compact Photo Thumbnails */}
-                    <RealPhotoThumbnails 
-                      item={item}
-                      onImageClick={(cloudinaryId) => {
-                        console.log('Photo clicked:', cloudinaryId)
-                        // Don't show alert - just log for debugging
-                      }}
-                    />
+                    {/* Additional Photos Indicator */}
+                    {item.evidence.photos.length > 1 && (
+                      <div style={{
+                        background: '#f0f9ff',
+                        border: '1px solid #bfdbfe',
+                        borderRadius: '8px',
+                        padding: '8px 12px',
+                        marginBottom: '12px',
+                        fontSize: '12px',
+                        color: '#1e40af',
+                        fontWeight: '600',
+                        textAlign: 'center'
+                      }}>
+                        📷 {item.evidence.photos.length - 1} more photos available
+                      </div>
+                    )}
 
                     <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
                       {item.evidence.photos.length > 0 && (
