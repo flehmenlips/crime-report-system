@@ -25,6 +25,9 @@ async function getAllItems(): Promise<StolenItem[]> {
       dateLastSeen: item.dateLastSeen,
       locationLastSeen: item.locationLastSeen,
       estimatedValue: item.estimatedValue,
+      category: item.category || undefined,
+      tags: item.tags ? JSON.parse(item.tags) : undefined,
+      notes: item.notes || undefined,
       evidence: {
         photos: item.evidence.filter(e => e.type === 'photo').map(e => e.cloudinaryId),
         videos: item.evidence.filter(e => e.type === 'video').map(e => e.cloudinaryId),
@@ -93,6 +96,9 @@ async function searchItems(filters: SearchFilters): Promise<StolenItem[]> {
       dateLastSeen: item.dateLastSeen,
       locationLastSeen: item.locationLastSeen,
       estimatedValue: item.estimatedValue,
+      category: item.category || undefined,
+      tags: item.tags ? JSON.parse(item.tags) : undefined,
+      notes: item.notes || undefined,
       evidence: {
         photos: item.evidence.filter(e => e.type === 'photo').map(e => e.cloudinaryId),
         videos: item.evidence.filter(e => e.type === 'video').map(e => e.cloudinaryId),
@@ -280,6 +286,9 @@ export async function POST(request: NextRequest) {
       dateLastSeen: newItem.dateLastSeen,
       locationLastSeen: newItem.locationLastSeen,
       estimatedValue: newItem.estimatedValue,
+      category: newItem.category || undefined,
+      tags: newItem.tags ? JSON.parse(newItem.tags) : undefined,
+      notes: newItem.notes || undefined,
       evidence: {
         photos: newItem.evidence.filter(e => e.type === 'photo').map(e => e.cloudinaryId),
         videos: newItem.evidence.filter(e => e.type === 'video').map(e => e.cloudinaryId),
@@ -348,6 +357,9 @@ export async function PUT(request: NextRequest) {
       dateLastSeen: updatedItem.dateLastSeen,
       locationLastSeen: updatedItem.locationLastSeen,
       estimatedValue: updatedItem.estimatedValue,
+      category: updatedItem.category || undefined,
+      tags: updatedItem.tags ? JSON.parse(updatedItem.tags) : undefined,
+      notes: updatedItem.notes || undefined,
       evidence: {
         photos: updatedItem.evidence.filter(e => e.type === 'photo').map(e => e.cloudinaryId),
         videos: updatedItem.evidence.filter(e => e.type === 'video').map(e => e.cloudinaryId),

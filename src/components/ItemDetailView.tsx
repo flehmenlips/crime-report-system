@@ -348,13 +348,47 @@ export function ItemDetailView({ item, onClose, onEdit, onDelete, onDuplicate, o
             </div>
           </div>
 
-          {/* Category and Notes */}
-          {(item.serialNumber || item.notes) && (
+          {/* Category, Tags, and Notes */}
+          {(item.category || item.tags || item.notes) && (
             <div style={{ marginBottom: '32px' }}>
               <h2 style={{ fontSize: '24px', fontWeight: '700', color: '#1f2937', marginBottom: '16px' }}>
-                📋 Additional Information
+                📋 Organization & Notes
               </h2>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px' }}>
+                {item.category && (
+                  <div style={{ background: '#f0fdf4', padding: '20px', borderRadius: '16px', border: '2px solid #bbf7d0' }}>
+                    <div style={{ fontSize: '14px', color: '#6b7280', marginBottom: '8px', fontWeight: '600' }}>📂 Category</div>
+                    <div style={{
+                      fontSize: '18px',
+                      fontWeight: '600',
+                      color: '#166534',
+                      textTransform: 'capitalize'
+                    }}>
+                      {item.category}
+                    </div>
+                  </div>
+                )}
+
+                {item.tags && item.tags.length > 0 && (
+                  <div style={{ background: '#fef7ff', padding: '20px', borderRadius: '16px', border: '2px solid #e9d5ff' }}>
+                    <div style={{ fontSize: '14px', color: '#6b7280', marginBottom: '12px', fontWeight: '600' }}>🏷️ Tags</div>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                      {item.tags.map((tag, index) => (
+                        <span key={index} style={{
+                          background: '#ddd6fe',
+                          color: '#7c3aed',
+                          padding: '6px 16px',
+                          borderRadius: '20px',
+                          fontSize: '14px',
+                          fontWeight: '600'
+                        }}>
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 {item.notes && (
                   <div style={{ background: '#f0f9ff', padding: '20px', borderRadius: '16px', border: '2px solid #bfdbfe' }}>
                     <div style={{ fontSize: '14px', color: '#6b7280', marginBottom: '8px', fontWeight: '600' }}>📝 Additional Notes</div>

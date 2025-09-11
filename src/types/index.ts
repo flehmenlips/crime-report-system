@@ -15,6 +15,9 @@ export interface StolenItem {
   locationLastSeen: string;
   estimatedValue: number;
   evidence: Evidence;
+  category?: string;
+  tags?: string[];
+  notes?: string;
 }
 
 export interface SearchFilters {
