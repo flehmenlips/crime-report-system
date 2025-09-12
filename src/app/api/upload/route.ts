@@ -67,7 +67,15 @@ export async function POST(request: NextRequest) {
 
       // Create a unique public ID with clean path structure
       const timestamp = Date.now()
-      const sanitizedFileName = file.name.replace(/[^a-zA-Z0-9.]/g, '_')
+      // For documents, remove the extension from public_id to avoid double extensions
+      let sanitizedFileName
+      if (evidenceType === 'document') {
+        // Remove extension from filename for public_id, Cloudinary will add it back
+        const nameWithoutExt = file.name.replace(/\.[^/.]+$/, '').replace(/[^a-zA-Z0-9.-]/g, '_')
+        sanitizedFileName = nameWithoutExt
+      } else {
+        sanitizedFileName = file.name.replace(/[^a-zA-Z0-9.]/g, '_')
+      }
       const publicId = `CrimeReport/item_${itemId}/${timestamp}_${sanitizedFileName}`
 
       // Upload to Cloudinary (or simulate if no credentials)
@@ -102,8 +110,11 @@ export async function POST(request: NextRequest) {
             uploadOptions.resource_type = 'video'
             uploadOptions.quality = 'auto'
           } else if (evidenceType === 'document') {
-            uploadOptions.resource_type = 'raw' // Use 'raw' for documents to preserve original format
-            uploadOptions.format = 'auto'
+            // Use 'image' resource type for documents to avoid ACL restrictions
+            // We'll serve them with correct content-type via our proxy
+            uploadOptions.resource_type = 'image'
+            uploadOptions.quality = 'auto'
+            uploadOptions.flags = 'attachment' // Suggest download when accessed directly
           } else {
             uploadOptions.resource_type = 'image'
             uploadOptions.quality = 'auto'

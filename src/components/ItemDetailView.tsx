@@ -571,11 +571,32 @@ export function ItemDetailView({ item, onClose, onEdit, onDelete, onDuplicate, o
                           key={doc.id}
                           onClick={() => {
                             console.log('Document clicked:', doc)
-                            const documentUrl = doc.cloudinaryId.startsWith('https://') 
+                            let documentUrl = doc.cloudinaryId.startsWith('https://') 
                               ? doc.cloudinaryId 
                               : `https://res.cloudinary.com/dhaacekdd/raw/upload/${doc.cloudinaryId}`
-                            console.log('Opening document URL:', documentUrl)
-                            window.open(documentUrl, '_blank')
+                            
+                            // Convert raw URLs to image URLs to avoid ACL issues
+                            if (documentUrl.includes('/raw/upload/')) {
+                              documentUrl = documentUrl.replace('/raw/upload/', '/image/upload/')
+                              console.log('Converted to image URL for access:', documentUrl)
+                            }
+                            
+                            // Fix double extensions (.pdf.pdf, .doc.doc, etc.)
+                            documentUrl = documentUrl.replace(/(\.[a-zA-Z0-9]+)\.\1$/, '$1')
+                            console.log('URL after extension fix:', documentUrl)
+                            
+                            const originalName = doc.originalName || 'document'
+                            
+                            console.log('Opening document via proxy:', {
+                              url: documentUrl,
+                              filename: originalName
+                            })
+                            
+                            // Use document proxy to serve with proper content-type and filename
+                            const proxyUrl = `/api/document-proxy?url=${encodeURIComponent(documentUrl)}&filename=${encodeURIComponent(originalName)}`
+                            console.log('Proxy URL:', proxyUrl)
+                            
+                            window.open(proxyUrl, '_blank')
                           }}
                           style={{
                             background: '#fffbeb',
@@ -604,6 +625,45 @@ export function ItemDetailView({ item, onClose, onEdit, onDelete, onDuplicate, o
                           <p style={{ fontSize: '12px', color: '#92400e', fontWeight: '500', margin: 0 }}>
                             {doc.originalName?.split('.').pop()?.toUpperCase() || 'DOC'} • Click to open
                           </p>
+                          
+                          {/* Alternative access methods */}
+                          <div style={{ marginTop: '8px', display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                            <a
+                              href={`/api/download-document?id=${doc.id}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={(e) => e.stopPropagation()}
+                              style={{
+                                fontSize: '10px',
+                                color: '#10b981',
+                                textDecoration: 'underline',
+                                cursor: 'pointer',
+                                fontWeight: '600'
+                              }}
+                            >
+                              📥 Download
+                            </a>
+                            <a
+                              href={(() => {
+                                let url = doc.cloudinaryId.includes('/raw/upload/') 
+                                  ? doc.cloudinaryId.replace('/raw/upload/', '/image/upload/')
+                                  : doc.cloudinaryId
+                                // Fix double extensions
+                                return url.replace(/(\.[a-zA-Z0-9]+)\.\1$/, '$1')
+                              })()}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={(e) => e.stopPropagation()}
+                              style={{
+                                fontSize: '10px',
+                                color: '#3b82f6',
+                                textDecoration: 'underline',
+                                cursor: 'pointer'
+                              }}
+                            >
+                              🔗 Direct
+                            </a>
+                          </div>
                         </div>
                       ))}
                     </div>
