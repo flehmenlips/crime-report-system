@@ -1,4 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { v2 as cloudinary } from 'cloudinary'
+
+// Configure Cloudinary with admin access
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+})
 
 export async function GET(request: NextRequest) {
   try {
@@ -13,12 +21,22 @@ export async function GET(request: NextRequest) {
     console.log('Document proxy request for:', documentUrl)
     console.log('Requested filename:', filename)
 
-    // Handle different URL formats - try both raw and image endpoints
+    // Smart document location detection
     let actualDocumentUrl = documentUrl
     
-    // If it's a raw URL that might have ACL issues, try converting to image URL
-    if (documentUrl.includes('/raw/upload/')) {
-      actualDocumentUrl = documentUrl.replace('/raw/upload/', '/image/upload/')
+    // If it's already a full URL, use it directly (this handles documents in Home folder)
+    if (documentUrl.startsWith('https://res.cloudinary.com/')) {
+      actualDocumentUrl = documentUrl
+      console.log('Using direct Cloudinary URL:', actualDocumentUrl)
+    } else {
+      // For public_id format, try the CrimeReport structure first
+      actualDocumentUrl = `https://res.cloudinary.com/dhaacekdd/image/upload/${documentUrl}`
+      console.log('Constructed URL from public_id:', actualDocumentUrl)
+    }
+    
+    // Convert raw URLs to image URLs to avoid ACL issues
+    if (actualDocumentUrl.includes('/raw/upload/')) {
+      actualDocumentUrl = actualDocumentUrl.replace('/raw/upload/', '/image/upload/')
       console.log('Converted raw URL to image URL:', actualDocumentUrl)
     }
     
@@ -26,29 +44,83 @@ export async function GET(request: NextRequest) {
     actualDocumentUrl = actualDocumentUrl.replace(/(\.[a-zA-Z0-9]+)\.\1$/, '$1')
     console.log('URL after extension fix:', actualDocumentUrl)
 
-    // Fetch the document from Cloudinary with timeout
-    const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 30000) // 30 second timeout
-
-    const response = await fetch(actualDocumentUrl, {
-      headers: {
-        'User-Agent': 'CrimeReport-Document-Viewer/1.0'
-      },
-      signal: controller.signal
-    })
-
-    clearTimeout(timeoutId)
-
-    if (!response.ok) {
-      console.error('Failed to fetch document:', {
-        status: response.status,
-        statusText: response.statusText,
-        url: documentUrl
+    // Extract public_id from the URL for Cloudinary admin API access
+    let publicId = ''
+    try {
+      // Parse the Cloudinary URL to extract public_id
+      const urlParts = actualDocumentUrl.split('/')
+      const uploadIndex = urlParts.findIndex(part => part === 'upload')
+      if (uploadIndex !== -1 && uploadIndex + 2 < urlParts.length) {
+        // Skip version (vXXXXXXXXXX) and get the path
+        const pathStartIndex = uploadIndex + 2
+        publicId = urlParts.slice(pathStartIndex).join('/').replace(/\.[^/.]+$/, '') // Remove extension
+      }
+      
+      console.log('Extracted public_id:', publicId)
+      
+      // Use Cloudinary admin API to get the resource with authentication
+      const resource = await cloudinary.api.resource(publicId, {
+        resource_type: 'image', // Use image resource type since we're storing documents as images
+        type: 'upload'
       })
-      return NextResponse.json({ 
-        error: `Failed to fetch document: ${response.status} ${response.statusText}`,
-        url: documentUrl 
-      }, { status: response.status })
+      
+      console.log('Cloudinary resource found:', {
+        public_id: resource.public_id,
+        format: resource.format,
+        bytes: resource.bytes,
+        secure_url: resource.secure_url
+      })
+      
+      // Generate a signed URL that bypasses ACL restrictions
+      const signedUrl = cloudinary.utils.private_download_url(resource.public_id, resource.format, {
+        resource_type: 'image',
+        expires_at: Math.floor(Date.now() / 1000) + 3600 // 1 hour expiry
+      })
+      
+      console.log('Generated signed URL for document access')
+      
+      // Fetch the actual file using the signed URL
+      const response = await fetch(signedUrl, {
+        headers: {
+          'User-Agent': 'CrimeReport-Document-Viewer/1.0'
+        }
+      })
+
+      if (!response.ok) {
+        console.error('Failed to fetch document via admin API:', response.status)
+        return NextResponse.json({ 
+          error: `Failed to fetch document: ${response.status}`,
+          url: resource.secure_url 
+        }, { status: response.status })
+      }
+    } catch (cloudinaryError) {
+      console.error('Cloudinary admin API error:', cloudinaryError)
+      
+      // Fallback to direct fetch
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 30000)
+
+      const response = await fetch(actualDocumentUrl, {
+        headers: {
+          'User-Agent': 'CrimeReport-Document-Viewer/1.0'
+        },
+        signal: controller.signal
+      })
+
+      clearTimeout(timeoutId)
+
+      if (!response.ok) {
+        console.error('Failed to fetch document (fallback):', {
+          status: response.status,
+          statusText: response.statusText,
+          url: actualDocumentUrl
+        })
+        return NextResponse.json({ 
+          error: `Failed to fetch document: ${response.status} ${response.statusText}`,
+          url: actualDocumentUrl,
+          cloudinaryError: cloudinaryError instanceof Error ? cloudinaryError.message : 'Unknown'
+        }, { status: response.status })
+      }
     }
 
     // Get the document content

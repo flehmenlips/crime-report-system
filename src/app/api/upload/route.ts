@@ -60,23 +60,52 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Check for duplicate files (same name, type, and item)
+    const existingEvidence = await prisma.evidence.findFirst({
+      where: {
+        itemId: parseInt(itemId),
+        type: evidenceType,
+        originalName: file.name
+      }
+    })
+
+    if (existingEvidence) {
+      console.log('Duplicate file detected:', file.name)
+      return NextResponse.json({
+        success: false,
+        error: 'Duplicate file',
+        message: `A ${evidenceType} file named "${file.name}" already exists for this item.`,
+        existingEvidence: {
+          id: existingEvidence.id,
+          uploadedAt: existingEvidence.createdAt
+        }
+      }, { status: 409 }) // 409 Conflict
+    }
+
     try {
       // Convert file to buffer for Cloudinary upload
       const bytes = await file.arrayBuffer()
       const buffer = Buffer.from(bytes)
 
-      // Create a unique public ID with clean path structure
+      // Create a standardized, unique public ID with clean folder structure
       const timestamp = Date.now()
-      // For documents, remove the extension from public_id to avoid double extensions
-      let sanitizedFileName
+      const dateStr = new Date().toISOString().split('T')[0] // YYYY-MM-DD
+      
+      // Clean filename - remove special chars but preserve extension structure
+      const cleanFileName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_')
+      
+      // For documents, remove extension to avoid Cloudinary adding duplicates
+      let baseFileName
       if (evidenceType === 'document') {
-        // Remove extension from filename for public_id, Cloudinary will add it back
-        const nameWithoutExt = file.name.replace(/\.[^/.]+$/, '').replace(/[^a-zA-Z0-9.-]/g, '_')
-        sanitizedFileName = nameWithoutExt
+        baseFileName = cleanFileName.replace(/\.[^/.]+$/, '') // Remove extension
       } else {
-        sanitizedFileName = file.name.replace(/[^a-zA-Z0-9.]/g, '_')
+        baseFileName = cleanFileName
       }
-      const publicId = `CrimeReport/item_${itemId}/${timestamp}_${sanitizedFileName}`
+      
+      // Simplified folder structure that works with Cloudinary ACL restrictions
+      const publicId = `CrimeReport/item_${itemId}/${timestamp}_${baseFileName}`
+      
+      console.log('Standardized public_id:', publicId)
 
       // Upload to Cloudinary (or simulate if no credentials)
       let cloudinaryResult
@@ -111,10 +140,11 @@ export async function POST(request: NextRequest) {
             uploadOptions.quality = 'auto'
           } else if (evidenceType === 'document') {
             // Use 'image' resource type for documents to avoid ACL restrictions
-            // We'll serve them with correct content-type via our proxy
-            uploadOptions.resource_type = 'image'
+            // Store as auto-format to preserve content while making accessible
+            uploadOptions.resource_type = 'auto'
             uploadOptions.quality = 'auto'
             uploadOptions.flags = 'attachment' // Suggest download when accessed directly
+            uploadOptions.access_mode = 'public' // Ensure public access
           } else {
             uploadOptions.resource_type = 'image'
             uploadOptions.quality = 'auto'

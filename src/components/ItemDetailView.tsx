@@ -571,29 +571,18 @@ export function ItemDetailView({ item, onClose, onEdit, onDelete, onDuplicate, o
                           key={doc.id}
                           onClick={() => {
                             console.log('Document clicked:', doc)
-                            let documentUrl = doc.cloudinaryId.startsWith('https://') 
-                              ? doc.cloudinaryId 
-                              : `https://res.cloudinary.com/dhaacekdd/raw/upload/${doc.cloudinaryId}`
                             
-                            // Convert raw URLs to image URLs to avoid ACL issues
-                            if (documentUrl.includes('/raw/upload/')) {
-                              documentUrl = documentUrl.replace('/raw/upload/', '/image/upload/')
-                              console.log('Converted to image URL for access:', documentUrl)
-                            }
-                            
-                            // Fix double extensions (.pdf.pdf, .doc.doc, etc.)
-                            documentUrl = documentUrl.replace(/(\.[a-zA-Z0-9]+)\.\1$/, '$1')
-                            console.log('URL after extension fix:', documentUrl)
-                            
+                            // Simple approach: Just use the direct cloudinaryId as stored
+                            // The document proxy will handle URL format detection
                             const originalName = doc.originalName || 'document'
                             
                             console.log('Opening document via proxy:', {
-                              url: documentUrl,
+                              cloudinaryId: doc.cloudinaryId,
                               filename: originalName
                             })
                             
                             // Use document proxy to serve with proper content-type and filename
-                            const proxyUrl = `/api/document-proxy?url=${encodeURIComponent(documentUrl)}&filename=${encodeURIComponent(originalName)}`
+                            const proxyUrl = `/api/document-proxy?url=${encodeURIComponent(doc.cloudinaryId)}&filename=${encodeURIComponent(originalName)}`
                             console.log('Proxy URL:', proxyUrl)
                             
                             window.open(proxyUrl, '_blank')
