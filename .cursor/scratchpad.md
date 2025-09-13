@@ -1,9 +1,11 @@
 # CrimeReport - Birkenfeld Farm Theft Police Report Website
 
 ## Background and Motivation
-This project involves creating a comprehensive, secure, and user-friendly web application for presenting stolen items from the Birkenfeld farm theft. The website will serve law enforcement, investigators, attorneys, and other stakeholders by providing organized access to detailed item information, evidence, and documentation.
+This project involves creating and refining a comprehensive, secure, and user-friendly web application for presenting stolen items from the Birkenfeld farm theft. The website serves law enforcement, investigators, attorneys, and other stakeholders by providing organized access to detailed item information, evidence, and documentation.
 
-The application must handle sensitive data appropriately, provide robust search functionality, and ensure secure access to confidential information. The use of Next.js with TypeScript will ensure type safety and performance, while Cloudinary integration will provide efficient media management and delivery.
+The application must handle sensitive data appropriately, provide robust search functionality, and ensure secure access to confidential information. The use of Next.js with TypeScript ensures type safety and performance, while Cloudinary integration provides efficient media management for photos and videos.
+
+**Refinement Focus**: Switch to hybrid storage using PostgreSQL on Render.com for documents (to resolve Cloudinary issues) while keeping Cloudinary for media. Implement a phased roadmap of enhancements including tagging, analytics, notifications, multi-user features, mobile optimization, security, reporting, integrations, performance, and UI/UX polish.
 
 ## Key Challenges and Analysis
 - **Security**: Implementing authentication and authorization for sensitive police report data
@@ -12,6 +14,10 @@ The application must handle sensitive data appropriately, provide robust search 
 - **User Experience**: Creating intuitive navigation and search functionality for law enforcement users
 - **Performance**: Optimizing media loading and search performance across potentially large datasets
 - **Compliance**: Ensuring data handling meets legal and security requirements for police reports
+- **Database Migration**: Switching from SQLite to PostgreSQL without data loss, handling binary document storage
+- **Hybrid Storage**: Managing different storage systems for media vs documents, ensuring seamless integration
+- **Scalability**: Handling potentially large document sizes in database while maintaining query performance
+- **Cost Management**: Balancing storage costs between PostgreSQL and Cloudinary
 
 ## High-level Task Breakdown
 
@@ -107,6 +113,89 @@ The application must handle sensitive data appropriately, provide robust search 
     - Features: Multiple file upload, progress indicators, evidence categorization
     - Components: FileUpload, EvidenceManager, MediaOrganizer
 
+### Phase 8: Database Migration and Hybrid Storage
+1. **Set up PostgreSQL on Render.com**
+   - Success Criteria: New PostgreSQL instance created on Render.com, connection string obtained
+   - Steps: Follow Render.com docs to create database, note DATABASE_URL
+
+2. **Update Prisma Configuration**
+   - Success Criteria: prisma/schema.prisma updated for PostgreSQL, .env updated with DATABASE_URL, npx prisma generate succeeds
+   - Files: prisma/schema.prisma, .env
+
+3. **Migrate Existing Data**
+   - Success Criteria: All data from SQLite transferred to PostgreSQL, verified via Prisma Studio
+   - Steps: Export SQLite data, import to PostgreSQL using script or manual process
+
+4. **Update Evidence Model for Hybrid Storage**
+   - Success Criteria: Evidence model includes documentContent (bytea), mimeType, fileSize; Prisma migrate succeeds
+   - Files: prisma/schema.prisma
+
+5. **Modify Upload API for Documents**
+   - Success Criteria: /api/upload-evidence handles documents by storing in database as BYTEA, photos/videos to Cloudinary
+   - Files: src/app/api/upload-evidence/route.ts
+   - Validation: File size < 25MB, duplicate check
+
+6. **Implement Document Serving API**
+   - Success Criteria: New /api/serve-document endpoint serves BYTEA content with correct MIME type
+   - Files: src/app/api/serve-document/route.ts
+
+7. **Update Components for Hybrid Storage**
+   - Success Criteria: EvidenceViewer.tsx and ItemDetailView.tsx handle database-served documents properly
+   - Files: src/components/EvidenceViewer.tsx, src/components/ItemDetailView.tsx
+
+### Phase 9: Roadmap Enhancements
+Breakdown of suggested enhancements into small tasks:
+
+#### Enhanced Tagging System
+8. **Implement Item Tagging**
+   - Success Criteria: Items can have multiple tags, saved to database, searchable
+   - Files: prisma/schema.prisma, src/app/api/items/route.ts, components/ItemForm.tsx
+
+#### Analytics Dashboard
+9. **Add Basic Analytics**
+   - Success Criteria: New dashboard page shows item stats using Recharts
+   - Files: src/app/analytics/page.tsx, install recharts
+
+#### Notification System
+10. **Implement Email Notifications**
+    - Success Criteria: Send email on item updates using Nodemailer
+    - Files: src/lib/notifications.ts, install nodemailer
+
+#### Multi-User Collaboration
+11. **Add Comment System**
+    - Success Criteria: Users can add comments to items
+    - Files: prisma/schema.prisma, components/ItemDetailView.tsx
+
+#### Mobile Features
+12. **Implement PWA Support**
+    - Success Criteria: App installable as PWA
+    - Files: next.config.js, public/manifest.json
+
+#### Enhanced Security
+13. **Add Helmet.js**
+    - Success Criteria: Security headers added
+    - Files: src/app/layout.tsx, install helmet
+
+#### Reporting Improvements
+14. **Enhance PDF Exports**
+    - Success Criteria: PDFs include timestamps and signatures
+    - Files: src/components/PDFExport.tsx
+
+#### Integrations
+15. **Add Basic API Endpoints**
+    - Success Criteria: New public API for read-only access
+    - Files: src/app/api/public-items/route.ts
+
+#### Performance Optimizations
+16. **Implement Caching**
+    - Success Criteria: Redis caching for frequent queries
+    - Files: src/lib/cache.ts, install redis
+
+#### UI/UX Polish
+17. **Add Animations and Accessibility**
+    - Success Criteria: Framer Motion animations, ARIA attributes added
+    - Files: Various components, install framer-motion
+
 ## Project Status Board
 
 ### ✅ COMPLETED TASKS (Original Project)
@@ -139,11 +228,39 @@ The application must handle sensitive data appropriately, provide robust search 
 - [ ] Advanced search and filtering capabilities
 - [ ] Bulk operations for data management
 
+### 🚀 REFINEMENT TASKS (Phase 8-9)
+- [x] Set up PostgreSQL on Render.com
+- [x] Update Prisma Configuration
+- [ ] Migrate Existing Data
+- [ ] Update Evidence Model
+- [ ] Modify Upload API
+- [ ] Implement Serving API
+- [ ] Update Components for Hybrid
+- [ ] Implement Item Tagging
+- [ ] Add Basic Analytics
+- [ ] Implement Email Notifications
+- [ ] Add Comment System
+- [ ] Implement PWA Support
+- [ ] Add Helmet.js
+- [ ] Enhance PDF Exports
+- [ ] Add Basic API Endpoints
+- [ ] Implement Caching
+- [ ] Add Animations and Accessibility
+
 ## Current Status / Progress Tracking
-**Current Phase**: MODERNIZATION & CITIZEN REPORTING INTERFACE 🚀
-**Last Updated**: September 11, 2025
-**Overall Progress**: 14/14 original tasks completed (100%) + NEW DEVELOPMENT PHASE
-**Project Status**: Ready for Modern UI & Citizen Reporting Features
+**Current Phase**: PHASE 8 - DATABASE MIGRATION IN PROGRESS 🚀
+**Last Updated**: September 13, 2025
+**Overall Progress**: Phase 8 Tasks 1-2 complete; Preparing for data migration
+**Project Status**: Prisma configured for PostgreSQL; Ready for data transfer in Task 3
+
+**Next Steps**: Proceed to Task 3: Migrate existing data from SQLite to PostgreSQL. Will create migration script and run it.
+
+### 🎯 REFINEMENT PLAN SUMMARY:
+- Phase 8: Database migration to PostgreSQL and hybrid storage implementation (7 tasks)
+- Phase 9: Roadmap enhancements broken into 10 small, actionable tasks
+- Total New Tasks: 17 focused on reliability, features, and polish
+
+**Next Steps**: Review the updated plan in High-level Task Breakdown. If approved, switch to Executor mode to begin implementation starting with Phase 8 Task 1.
 
 ### **🎯 NEW DEVELOPMENT PRIORITIES:**
 1. **Modern UI/UX Design** - Transform the interface for better human experience
@@ -174,6 +291,11 @@ The application must handle sensitive data appropriately, provide robust search 
 - ✅ Comprehensive documentation and deployment preparation
 
 ## Executor's Feedback or Assistance Requests
+
+**🎯 Planner Update: Refinement Plan Complete!**
+- Comprehensive plan created for database migration, hybrid storage, and full roadmap implementation
+- Tasks broken into small, verifiable steps with success criteria
+- Ready for Executor to implement - please confirm if we should proceed to Executor mode
 
 ### **🎨 PHASE 7: MODERNIZATION COMPLETE! 🚀**
 
@@ -536,3 +658,15 @@ Please test all features by:
 - **Cloudinary Integration**: Use NEXT_PUBLIC_ prefix for client-side environment variables
 - **PDF Generation**: jsPDF works well for text-based reports but has limitations with images/media
 - **Modal Design**: Use fixed positioning with proper z-index for overlay components
+- **Database Migration**: Use Prisma migrate for schema changes; Backup data before switching providers
+- **Binary Storage**: Limit BYTEA field sizes to prevent performance issues
+- **Hybrid Systems**: Clearly separate logic for different storage types
+- **PostgreSQL Advantages**: Better for production than SQLite due to concurrency and scaling
+
+**✅ Task 2 Complete: Prisma Configuration Updated!**
+- schema.prisma updated to use postgresql provider
+- .env already updated by user with DATABASE_URL
+- Ran `npx prisma generate` successfully (output: Generated Prisma Client v6.16.0)
+- Success criteria met; Ready for Task 3
+
+**Request**: Please confirm if we should proceed with Task 3 (data migration). Note: This will transfer all existing data to the new PostgreSQL database. Backup your current SQLite DB first if needed!
