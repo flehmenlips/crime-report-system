@@ -176,19 +176,19 @@ export function InstantSearch({ items, onItemSelect, placeholder = "Search your 
                   </div>
                 </div>
                 <div className="flex items-center space-x-2">
-                  {item.evidence.photos.length > 0 && (
+                  {item.evidence?.filter(e => e.type === 'photo')?.length > 0 && (
                     <span className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-bold">
-                      📷
+                      📸 {item.evidence.filter(e => e.type === 'photo').length}
                     </span>
                   )}
-                  {item.evidence.videos.length > 0 && (
+                  {item.evidence?.filter(e => e.type === 'video')?.length > 0 && (
                     <span className="w-6 h-6 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-xs font-bold">
-                      🎥
+                      🎥 {item.evidence.filter(e => e.type === 'video').length}
                     </span>
                   )}
-                  {item.evidence.documents.length > 0 && (
+                  {item.evidence?.filter(e => e.type === 'document')?.length > 0 && (
                     <span className="w-6 h-6 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center text-xs font-bold">
-                      📄
+                      📄 {item.evidence.filter(e => e.type === 'document').length}
                     </span>
                   )}
                 </div>

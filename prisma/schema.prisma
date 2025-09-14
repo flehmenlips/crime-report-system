@@ -53,7 +53,8 @@ model StolenItem {
 model Evidence {
   id            Int        @id @default(autoincrement())
   type          String     // photo, video, document
-  cloudinaryId  String     // Cloudinary public ID
+  cloudinaryId  String?    // Cloudinary public ID (for photos/videos; null for documents stored in DB)
+  documentData  Bytes?     // Binary data for documents (PostgreSQL BYTEA; null for Cloudinary media)
   originalName  String?    // Original filename
   description   String?
   createdAt     DateTime   @default(now())

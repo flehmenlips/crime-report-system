@@ -28,10 +28,14 @@ export function DataVisualization({ items, totalValue }: DataVisualizationProps)
     { range: '$300K+', count: items.filter(i => i.estimatedValue >= 300000).length, color: 'bg-red-500' }
   ]
 
+  const photoCount = items.reduce((sum, item) => sum + item.evidence?.filter(e => e.type === 'photo')?.length, 0) ?? 0
+  const videoCount = items.reduce((sum, item) => sum + item.evidence?.filter(e => e.type === 'video')?.length, 0) ?? 0
+  const documentCount = items.reduce((sum, item) => sum + item.evidence?.filter(e => e.type === 'document')?.length, 0) ?? 0
+
   const evidenceStats = [
-    { type: 'Photos', count: items.reduce((sum, item) => sum + item.evidence.photos.length, 0), icon: '📷', color: 'blue' },
-    { type: 'Videos', count: items.reduce((sum, item) => sum + item.evidence.videos.length, 0), icon: '🎥', color: 'green' },
-    { type: 'Documents', count: items.reduce((sum, item) => sum + item.evidence.documents.length, 0), icon: '📄', color: 'orange' }
+    { type: 'Photos', count: photoCount, icon: '📷', color: 'blue' },
+    { type: 'Videos', count: videoCount, icon: '🎥', color: 'green' },
+    { type: 'Documents', count: documentCount, icon: '📄', color: 'orange' }
   ]
 
   return (
@@ -126,7 +130,9 @@ export function DataVisualization({ items, totalValue }: DataVisualizationProps)
               <div className="text-right">
                 <div className="font-bold text-green-600">${item.estimatedValue.toLocaleString()}</div>
                 <div className="text-xs text-gray-500">
-                  {item.evidence.photos.length + item.evidence.videos.length + item.evidence.documents.length} evidence
+                  {item.evidence?.filter(e => e.type === 'photo')?.length + 
+                   item.evidence?.filter(e => e.type === 'video')?.length + 
+                   item.evidence?.filter(e => e.type === 'document')?.length} evidence
                 </div>
               </div>
             </div>

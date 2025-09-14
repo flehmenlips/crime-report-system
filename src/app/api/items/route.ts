@@ -26,13 +26,13 @@ async function getAllItems(): Promise<StolenItem[]> {
       locationLastSeen: item.locationLastSeen,
       estimatedValue: item.estimatedValue,
       category: item.category || undefined,
-      tags: item.tags ? JSON.parse(item.tags) : undefined,
+      tags: item.tags ? JSON.parse(item.tags) : [],
       notes: item.notes || undefined,
-      evidence: {
-        photos: item.evidence.filter(e => e.type === 'photo').map(e => e.cloudinaryId),
-        videos: item.evidence.filter(e => e.type === 'video').map(e => e.cloudinaryId),
-        documents: item.evidence.filter(e => e.type === 'document').map(e => e.cloudinaryId)
-      }
+      evidence: item.evidence?.map(e => ({ 
+        ...e, 
+        createdAt: e.createdAt.toISOString(),
+        type: e.type as 'photo' | 'video' | 'document' 
+      })) ?? []
     }))
   } catch (error) {
     console.error('Error loading items from database:', error)
@@ -97,13 +97,13 @@ async function searchItems(filters: SearchFilters): Promise<StolenItem[]> {
       locationLastSeen: item.locationLastSeen,
       estimatedValue: item.estimatedValue,
       category: item.category || undefined,
-      tags: item.tags ? JSON.parse(item.tags) : undefined,
+      tags: item.tags ? JSON.parse(item.tags) : [],
       notes: item.notes || undefined,
-      evidence: {
-        photos: item.evidence.filter(e => e.type === 'photo').map(e => e.cloudinaryId),
-        videos: item.evidence.filter(e => e.type === 'video').map(e => e.cloudinaryId),
-        documents: item.evidence.filter(e => e.type === 'document').map(e => e.cloudinaryId)
-      }
+      evidence: item.evidence?.map(e => ({ 
+        ...e, 
+        createdAt: e.createdAt.toISOString(),
+        type: e.type as 'photo' | 'video' | 'document' 
+      })) ?? []
     }))
   } catch (error) {
     console.error('Error searching items in database:', error)
@@ -276,29 +276,14 @@ export async function POST(request: NextRequest) {
     })
 
     // Convert to frontend format
-    const formattedItem: StolenItem = {
-      id: newItem.id,
-      name: newItem.name,
-      description: newItem.description,
-      serialNumber: newItem.serialNumber || '',
-      purchaseDate: newItem.purchaseDate,
-      purchaseCost: newItem.purchaseCost,
-      dateLastSeen: newItem.dateLastSeen,
-      locationLastSeen: newItem.locationLastSeen,
-      estimatedValue: newItem.estimatedValue,
-      category: newItem.category || undefined,
-      tags: newItem.tags ? JSON.parse(newItem.tags) : undefined,
-      notes: newItem.notes || undefined,
-      evidence: {
-        photos: newItem.evidence.filter(e => e.type === 'photo').map(e => e.cloudinaryId),
-        videos: newItem.evidence.filter(e => e.type === 'video').map(e => e.cloudinaryId),
-        documents: newItem.evidence.filter(e => e.type === 'document').map(e => e.cloudinaryId)
-      }
-    }
-
-    return NextResponse.json({ 
-      item: formattedItem,
-      message: 'Item created successfully' 
+    return NextResponse.json({
+      ...newItem,
+      tags: newItem.tags ? JSON.parse(newItem.tags) : [],
+      evidence: newItem.evidence.map(e => ({ 
+        ...e, 
+        createdAt: e.createdAt.toISOString(),
+        type: e.type as 'photo' | 'video' | 'document' 
+      }))
     })
 
   } catch (error) {
@@ -347,27 +332,15 @@ export async function PUT(request: NextRequest) {
     
     console.log('Item updated in database:', updatedItem.name, 'Category:', updatedItem.category, 'Notes:', updatedItem.notes)
 
-    const formattedItem: StolenItem = {
-      id: updatedItem.id,
-      name: updatedItem.name,
-      description: updatedItem.description,
-      serialNumber: updatedItem.serialNumber || '',
-      purchaseDate: updatedItem.purchaseDate,
-      purchaseCost: updatedItem.purchaseCost,
-      dateLastSeen: updatedItem.dateLastSeen,
-      locationLastSeen: updatedItem.locationLastSeen,
-      estimatedValue: updatedItem.estimatedValue,
-      category: updatedItem.category || undefined,
-      tags: updatedItem.tags ? JSON.parse(updatedItem.tags) : undefined,
-      notes: updatedItem.notes || undefined,
-      evidence: {
-        photos: updatedItem.evidence.filter(e => e.type === 'photo').map(e => e.cloudinaryId),
-        videos: updatedItem.evidence.filter(e => e.type === 'video').map(e => e.cloudinaryId),
-        documents: updatedItem.evidence.filter(e => e.type === 'document').map(e => e.cloudinaryId)
-      }
-    }
-
-    return NextResponse.json({ item: formattedItem, message: 'Item updated successfully' })
+    return NextResponse.json({
+      ...updatedItem,
+      tags: updatedItem.tags ? JSON.parse(updatedItem.tags) : [],
+      evidence: updatedItem.evidence.map(e => ({ 
+        ...e, 
+        createdAt: e.createdAt.toISOString(),
+        type: e.type as 'photo' | 'video' | 'document' 
+      }))
+    })
 
   } catch (error) {
     console.error('Error updating item:', error)

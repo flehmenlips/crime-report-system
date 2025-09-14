@@ -68,17 +68,9 @@ export async function POST(request: NextRequest) {
     const evidence = await prisma.evidence.create({
       data: {
         type: 'document',
-        cloudinaryId: `database:${Date.now()}_${file.name}`, // Special prefix for database-stored docs
+        documentData: new Uint8Array(Buffer.from(base64Content, 'base64')),
         originalName: file.name,
-        description: `Document evidence for ${item.name} (stored in database)`,
         itemId: parseInt(itemId),
-        // We'll store the base64 content in a new field (need to add to schema)
-        metadata: JSON.stringify({
-          base64Content,
-          mimeType,
-          size: file.size,
-          storageType: 'database'
-        })
       }
     })
 

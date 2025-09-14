@@ -34,8 +34,8 @@ export async function POST(request: NextRequest) {
 
       allEvidence.forEach(evidence => {
         // Extract folder pattern
-        if (evidence.cloudinaryId.includes('/')) {
-          const pathParts = evidence.cloudinaryId.split('/')
+        if (evidence.cloudinaryId?.includes('/')) {
+          const pathParts = evidence.cloudinaryId?.split('/') || []
           if (pathParts.length > 2) {
             const folderPattern = pathParts.slice(-3, -1).join('/') // Get last 2 folder levels
             folderAnalysis.folderPatterns[folderPattern] = (folderAnalysis.folderPatterns[folderPattern] || 0) + 1
@@ -43,11 +43,11 @@ export async function POST(request: NextRequest) {
         }
 
         // Extract resource type
-        if (evidence.cloudinaryId.includes('/image/upload/')) {
+        if (evidence.cloudinaryId?.includes('/image/upload/')) {
           folderAnalysis.resourceTypes['image'] = (folderAnalysis.resourceTypes['image'] || 0) + 1
-        } else if (evidence.cloudinaryId.includes('/raw/upload/')) {
+        } else if (evidence.cloudinaryId?.includes('/raw/upload/')) {
           folderAnalysis.resourceTypes['raw'] = (folderAnalysis.resourceTypes['raw'] || 0) + 1
-        } else if (evidence.cloudinaryId.includes('demo/')) {
+        } else if (evidence.cloudinaryId?.includes('demo/')) {
           folderAnalysis.resourceTypes['demo'] = (folderAnalysis.resourceTypes['demo'] || 0) + 1
         }
 
@@ -90,10 +90,10 @@ export async function POST(request: NextRequest) {
       
       for (const evidence of allEvidence) {
         // Skip demo files
-        if (evidence.cloudinaryId.includes('demo/')) continue
+        if (evidence.cloudinaryId?.includes('demo/')) continue
 
         // Determine if this file needs restructuring
-        const currentPath = evidence.cloudinaryId
+        const currentPath = evidence.cloudinaryId ?? ''
         const shouldBeInCrimeReportFolder = !currentPath.includes('CrimeReport/')
         const hasInconsistentStructure = currentPath.includes('evidence/') || 
                                        !currentPath.includes(`item_${evidence.itemId}/`)

@@ -25,7 +25,7 @@ export function MediaGallery({ item, compact = false }: MediaGalleryProps) {
     }
   }
 
-  const totalEvidence = item.evidence.photos.length + item.evidence.videos.length + item.evidence.documents.length
+  const totalEvidence = item.evidence?.length ?? 0
 
   if (totalEvidence === 0) {
     return (
@@ -39,19 +39,19 @@ export function MediaGallery({ item, compact = false }: MediaGalleryProps) {
     return (
       <div className="flex items-center space-x-2">
         <div className="flex space-x-1">
-          {item.evidence.photos.length > 0 && (
+          {item.evidence?.filter(e => e.type === 'photo')?.length > 0 && (
             <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
-              📷 {item.evidence.photos.length}
+              📸 {item.evidence?.filter(e => e.type === 'photo')?.length ?? 0}
             </span>
           )}
-          {item.evidence.videos.length > 0 && (
+          {item.evidence?.filter(e => e.type === 'video')?.length > 0 && (
             <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
-              🎥 {item.evidence.videos.length}
+              🎥 {item.evidence?.filter(e => e.type === 'video')?.length ?? 0}
             </span>
           )}
-          {item.evidence.documents.length > 0 && (
+          {item.evidence?.filter(e => e.type === 'document')?.length > 0 && (
             <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-800">
-              📄 {item.evidence.documents.length}
+              📄 {item.evidence?.filter(e => e.type === 'document')?.length ?? 0}
             </span>
           )}
         </div>
@@ -66,6 +66,7 @@ export function MediaGallery({ item, compact = false }: MediaGalleryProps) {
           <EvidenceViewer
             item={item}
             onClose={() => setShowViewer(false)}
+            onUpdate={() => {}} // Or similar refresh
           />
         )}
       </div>
@@ -74,9 +75,9 @@ export function MediaGallery({ item, compact = false }: MediaGalleryProps) {
 
   // Full gallery view
   const allEvidence = [
-    ...item.evidence.photos.map(id => ({ id, type: 'photo' as const })),
-    ...item.evidence.videos.map(id => ({ id, type: 'video' as const })),
-    ...item.evidence.documents.map(id => ({ id, type: 'document' as const }))
+    ...item.evidence.filter(e => e.type === 'photo').map(e => ({ id: e.id, type: 'photo' })),
+    ...item.evidence.filter(e => e.type === 'video').map(e => ({ id: e.id, type: 'video' })),
+    ...item.evidence.filter(e => e.type === 'document').map(e => ({ id: e.id, type: 'document' }))
   ]
 
   return (
@@ -86,47 +87,35 @@ export function MediaGallery({ item, compact = false }: MediaGalleryProps) {
           <div key={evidence.id} className="relative">
             {evidence.type === 'photo' ? (
               <img
-                src={getCloudinaryUrl(evidence.id, 'photo')}
+                src={getCloudinaryUrl(String(evidence.id), 'photo')}
                 alt={`Evidence ${index + 1}`}
                 className="w-full h-16 object-cover rounded cursor-pointer hover:opacity-80 transition-opacity"
                 onClick={() => setShowViewer(true)}
               />
             ) : evidence.type === 'video' ? (
-              <div
-                className="w-full h-16 bg-gray-200 rounded flex items-center justify-center cursor-pointer hover:bg-gray-300 transition-colors"
+              <img
+                src={getCloudinaryUrl(String(evidence.id), 'video')}
+                alt={`Evidence ${index + 1}`}
+                className="w-full h-16 object-cover rounded cursor-pointer hover:opacity-80 transition-opacity"
                 onClick={() => setShowViewer(true)}
-              >
-                <span className="text-lg">🎥</span>
-              </div>
+              />
             ) : (
-              <div
-                className="w-full h-16 bg-gray-200 rounded flex items-center justify-center cursor-pointer hover:bg-gray-300 transition-colors"
+              <img
+                src={getCloudinaryUrl(String(evidence.id), 'document')}
+                alt={`Evidence ${index + 1}`}
+                className="w-full h-16 object-cover rounded cursor-pointer hover:opacity-80 transition-opacity"
                 onClick={() => setShowViewer(true)}
-              >
-                <span className="text-lg">📄</span>
-              </div>
+              />
             )}
           </div>
         ))}
-        {allEvidence.length > 4 && (
-          <div className="w-full h-16 bg-gray-100 rounded flex items-center justify-center cursor-pointer hover:bg-gray-200 transition-colors"
-               onClick={() => setShowViewer(true)}>
-            <span className="text-sm text-gray-600">+{allEvidence.length - 4} more</span>
-          </div>
-        )}
       </div>
-
-      <button
-        onClick={() => setShowViewer(true)}
-        className="text-sm text-blue-600 hover:text-blue-800 underline"
-      >
-        View all evidence ({totalEvidence} items)
-      </button>
 
       {showViewer && (
         <EvidenceViewer
           item={item}
           onClose={() => setShowViewer(false)}
+          onUpdate={() => {}} // Or similar refresh
         />
       )}
     </div>

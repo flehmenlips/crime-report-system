@@ -41,7 +41,9 @@ export function GenerateReport({ items, onClose }: GenerateReportProps) {
 
   const totalValue = items.reduce((sum, item) => sum + item.estimatedValue, 0)
   const totalEvidence = items.reduce((sum, item) => 
-    sum + item.evidence.photos.length + item.evidence.videos.length + item.evidence.documents.length, 0
+    sum + item.evidence?.filter(e => e.type === 'photo')?.length + 
+    item.evidence?.filter(e => e.type === 'video')?.length + 
+    item.evidence?.filter(e => e.type === 'document')?.length, 0
   )
 
   const generatePDF = async () => {
@@ -134,7 +136,7 @@ export function GenerateReport({ items, onClose }: GenerateReportProps) {
       yPosition += 8
       pdf.text(`Total Evidence Files: ${totalEvidence}`, 20, yPosition)
       yPosition += 8
-      pdf.text(`Items with Photos: ${items.filter(item => item.evidence.photos.length > 0).length}`, 20, yPosition)
+      pdf.text(`Items with Photos: ${items.filter(item => item.evidence?.filter(e => e.type === 'photo')?.length > 0).length}`, 20, yPosition)
       yPosition += 20
 
       if (reportOptions.includeContactInfo && reportOptions.department) {

@@ -20,6 +20,7 @@ interface Evidence {
   originalName: string | null
   description: string | null
   createdAt: string
+  documentData?: any  // Binary data for documents (Uint8Array or Buffer in frontend)
 }
 
 export function ItemDetailView({ item, onClose, onEdit, onDelete, onDuplicate, onUploadEvidence }: ItemDetailViewProps) {
@@ -572,20 +573,32 @@ export function ItemDetailView({ item, onClose, onEdit, onDelete, onDuplicate, o
                           onClick={() => {
                             console.log('Document clicked:', doc)
                             
-                            // Simple approach: Just use the direct cloudinaryId as stored
-                            // The document proxy will handle URL format detection
                             const originalName = doc.originalName || 'document'
                             
-                            console.log('Opening document via proxy:', {
-                              cloudinaryId: doc.cloudinaryId,
-                              filename: originalName
-                            })
+                            let viewUrl = ''
                             
-                            // Use document proxy to serve with proper content-type and filename
-                            const proxyUrl = `/api/document-proxy?url=${encodeURIComponent(doc.cloudinaryId)}&filename=${encodeURIComponent(originalName)}`
-                            console.log('Proxy URL:', proxyUrl)
+                            if (doc.documentData) {
+                              // New DB-stored document: Use serve-document for viewing
+                              console.log('Opening new DB document in popup via /api/serve-document')
+                              viewUrl = `/api/serve-document/${doc.id}?mode=view`
+                            } else if (doc.cloudinaryId) {
+                              // Legacy Cloudinary document: Use proxy for viewing
+                              console.log('Opening legacy document in popup via proxy')
+                              let url = doc.cloudinaryId
+                              if (url?.includes('/raw/upload/')) {
+                                url = url.replace('/raw/upload/', '/image/upload/')
+                              }
+                              url = url?.replace(/(\.[a-zA-Z0-9]+)\.\1$/, '$1') || '#'
+                              
+                              viewUrl = `/api/document-proxy?url=${encodeURIComponent(url)}&filename=${encodeURIComponent(originalName)}`
+                            } else {
+                              console.warn('Document has no data:', doc)
+                              alert('No document data available')
+                              return
+                            }
                             
-                            window.open(proxyUrl, '_blank')
+                            // Open in popup window (new tab)
+                            window.open(viewUrl, '_blank', 'width=800,height=600')
                           }}
                           style={{
                             background: '#fffbeb',
@@ -612,47 +625,10 @@ export function ItemDetailView({ item, onClose, onEdit, onDelete, onDuplicate, o
                             {doc.originalName || 'Document'}
                           </p>
                           <p style={{ fontSize: '12px', color: '#92400e', fontWeight: '500', margin: 0 }}>
-                            {doc.originalName?.split('.').pop()?.toUpperCase() || 'DOC'} • Click to open
+                            {doc.originalName?.split('.').pop()?.toUpperCase() || 'DOC'} • Click to view
                           </p>
                           
-                          {/* Alternative access methods */}
-                          <div style={{ marginTop: '8px', display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap' }}>
-                            <a
-                              href={`/api/download-document?id=${doc.id}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              onClick={(e) => e.stopPropagation()}
-                              style={{
-                                fontSize: '10px',
-                                color: '#10b981',
-                                textDecoration: 'underline',
-                                cursor: 'pointer',
-                                fontWeight: '600'
-                              }}
-                            >
-                              📥 Download
-                            </a>
-                            <a
-                              href={(() => {
-                                let url = doc.cloudinaryId.includes('/raw/upload/') 
-                                  ? doc.cloudinaryId.replace('/raw/upload/', '/image/upload/')
-                                  : doc.cloudinaryId
-                                // Fix double extensions
-                                return url.replace(/(\.[a-zA-Z0-9]+)\.\1$/, '$1')
-                              })()}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              onClick={(e) => e.stopPropagation()}
-                              style={{
-                                fontSize: '10px',
-                                color: '#3b82f6',
-                                textDecoration: 'underline',
-                                cursor: 'pointer'
-                              }}
-                            >
-                              🔗 Direct
-                            </a>
-                          </div>
+                          {/* Removed alternative access methods for cleanup */}
                         </div>
                       ))}
                     </div>

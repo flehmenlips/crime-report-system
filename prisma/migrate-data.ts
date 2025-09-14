@@ -1,69 +1,93 @@
 const { PrismaClient } = require('@prisma/client');
+const sqlite3 = require('sqlite3').verbose();
+const fs = require('fs').promises;
 
-// Old SQLite client (update path if needed)
-const oldPrisma = new PrismaClient({
-  datasources: {
-    db: {
-      url: 'file:./dev.db'  // Relative to prisma folder; adjust if necessary
-    }
-  }
-});
+// Explicitly load .env.local
+require('dotenv').config({ path: '.env.local' });
 
-// New PostgreSQL client (uses DATABASE_URL from .env)
+// Debug log BEFORE creating PrismaClient
+console.log('Loaded DATABASE_URL:', process.env.DATABASE_URL);
+
+// New PostgreSQL client
 const newPrisma = new PrismaClient();
 
 async function migrateData() {
   try {
     console.log('Starting data migration...');
 
-    // Step 1: Read from old DB
-    console.log('Reading data from SQLite...');
-    const users = await oldPrisma.user.findMany();
-    const items = await oldPrisma.stolenItem.findMany();
-    const evidence = await oldPrisma.evidence.findMany();
+    // Step 1: Read from SQLite using sqlite3 (no Prisma for old DB)
+    console.log('Reading data from SQLite using sqlite3...');
+    const db = new sqlite3.Database('prisma/dev.db');
+
+    const users = await new Promise<any[]>((resolve, reject) => {
+      db.all('SELECT * FROM users', (err: Error | null, rows: any[]) => {
+        if (err) reject(err);
+        else resolve(rows);
+      });
+    });
+
+    const items = await new Promise<any[]>((resolve, reject) => {
+      db.all('SELECT * FROM stolen_items', (err: Error | null, rows: any[]) => {
+        if (err) reject(err);
+        else resolve(rows);
+      });
+    });
+
+    const evidence = await new Promise<any[]>((resolve, reject) => {
+      db.all('SELECT * FROM evidence', (err: Error | null, rows: any[]) => {
+        if (err) reject(err);
+        else resolve(rows);
+      });
+    });
+
+    db.close();
 
     console.log(`Found ${users.length} users, ${items.length} items, ${evidence.length} evidence records.`);
 
-    // Step 2: Clear new DB (optional - comment out if you don't want to wipe existing data)
-    // await newPrisma.evidence.deleteMany();
-    // await newPrisma.stolenItem.deleteMany();
-    // await newPrisma.user.deleteMany();
+    // Convert timestamps to Dates
+    const convertedUsers = users.map(user => ({
+      ...user,
+      createdAt: new Date(user.createdAt),
+      updatedAt: new Date(user.updatedAt)
+    }));
 
-    // Step 3: Migrate Users (preserve IDs using createMany with skipDuplicates)
-    console.log('Migrating users...');
-    await newPrisma.user.createMany({
-      data: users,
-      skipDuplicates: true
-    });
+    const convertedItems = items.map(item => ({
+      ...item,
+      createdAt: new Date(item.createdAt),
+      updatedAt: new Date(item.updatedAt)
+    }));
 
-    // Step 4: Migrate Items
-    console.log('Migrating items...');
-    await newPrisma.stolenItem.createMany({
-      data: items,
-      skipDuplicates: true
-    });
+    const convertedEvidence = evidence.map(ev => ({
+      ...ev,
+      createdAt: new Date(ev.createdAt)
+    }));
 
-    // Step 5: Migrate Evidence
-    console.log('Migrating evidence...');
-    await newPrisma.evidence.createMany({
-      data: evidence,
-      skipDuplicates: true
-    });
+    // Save to JSON for review/backup
+    const data: { users: any[]; items: any[]; evidence: any[] } = { 
+      users: convertedUsers, 
+      items: convertedItems, 
+      evidence: convertedEvidence 
+    };
+    await fs.writeFile('prisma/exported-data.json', JSON.stringify(data, null, 2));
+    console.log('Exported data to prisma/exported-data.json for verification');
 
-    console.log('Migration complete! Verify data in new DB.');
+    // Step 2: Import to PostgreSQL using Prisma (skip duplicates)
+    console.log('Migrating to PostgreSQL...');
+    await newPrisma.user.createMany({ data: convertedUsers, skipDuplicates: true });
+    console.log('Users migrated.');
+    await newPrisma.stolenItem.createMany({ data: convertedItems, skipDuplicates: true });
+    console.log('Items migrated.');
+    await newPrisma.evidence.createMany({ data: convertedEvidence, skipDuplicates: true });
+    console.log('Evidence migrated.');
+
+    console.log('Migration complete! Verify with npx prisma studio.');
 
   } catch (error) {
     console.error('Migration failed:', error);
   } finally {
-    await oldPrisma.$disconnect();
     await newPrisma.$disconnect();
   }
 }
 
-// Wrap async function for CommonJS
-(async () => {
-  await migrateData();
-})().catch(e => {
-  console.error('Script failed:', e);
-  process.exit(1);
-});
+// Run the function
+migrateData();

@@ -1,13 +1,13 @@
 'use client'
 
 import { useState } from 'react'
-import { StolenItem } from '@/types'
+import { Evidence, StolenItem } from '@/types'
 import { FileUpload } from './FileUpload'
 
 interface EvidenceManagerProps {
-  item: StolenItem
+  item: StolenItem & { evidence: Evidence[] }
   onClose: () => void
-  onUpdate: (item: StolenItem) => void
+  onUpdate?: (item: StolenItem) => void // Make optional
 }
 
 export function EvidenceManager({ item, onClose, onUpdate }: EvidenceManagerProps) {
@@ -24,15 +24,21 @@ export function EvidenceManager({ item, onClose, onUpdate }: EvidenceManagerProp
       })
 
       // Update item evidence
-      const updatedItem = {
-        ...item,
-        evidence: {
-          ...item.evidence,
-          [activeTab]: [...item.evidence[activeTab], ...uploadedFiles]
-        }
-      }
+      let newPhotos = item.evidence.filter(e => e.type === 'photo')
+      let newVideos = item.evidence.filter(e => e.type === 'video')
+      let newDocuments = item.evidence.filter(e => e.type === 'document')
 
-      onUpdate(updatedItem)
+      const newUploaded = uploadedFiles.map(id => ({ id, type: activeTab.slice(0, -1) } as unknown as Evidence))
+
+      if (activeTab === 'photos') newPhotos = newPhotos.concat(newUploaded)
+      else if (activeTab === 'videos') newVideos = newVideos.concat(newUploaded)
+      else if (activeTab === 'documents') newDocuments = newDocuments.concat(newUploaded)
+
+      const updatedEvidence = [...newPhotos, ...newVideos, ...newDocuments]
+
+      const updatedItem = { ...item, evidence: updatedEvidence }
+
+      onUpdate?.(updatedItem)
       console.log(`Uploaded ${files.length} ${activeTab} files for item:`, item.name)
       
     } catch (error) {
@@ -44,14 +50,17 @@ export function EvidenceManager({ item, onClose, onUpdate }: EvidenceManagerProp
   }
 
   const removeEvidence = (type: 'photos' | 'videos' | 'documents', index: number) => {
-    const updatedItem = {
-      ...item,
-      evidence: {
-        ...item.evidence,
-        [type]: item.evidence[type].filter((_, i) => i !== index)
-      }
-    }
-    onUpdate(updatedItem)
+    let newPhotos = item.evidence.filter(e => e.type === 'photo')
+    let newVideos = item.evidence.filter(e => e.type === 'video')
+    let newDocuments = item.evidence.filter(e => e.type === 'document')
+
+    if (type === 'photos') newPhotos = newPhotos.filter((e, i) => i !== index)
+    else if (type === 'videos') newVideos = newVideos.filter((e, i) => i !== index)
+    else if (type === 'documents') newDocuments = newDocuments.filter((e, i) => i !== index)
+
+    const updatedEvidence = [...newPhotos, ...newVideos, ...newDocuments]
+    const updatedItem = { ...item, evidence: updatedEvidence }
+    onUpdate?.(updatedItem)
   }
 
   const getFileIcon = (type: 'photos' | 'videos' | 'documents') => {
@@ -62,10 +71,14 @@ export function EvidenceManager({ item, onClose, onUpdate }: EvidenceManagerProp
     }
   }
 
+  const photos = item.evidence.filter(e => e.type === 'photo')
+  const videos = item.evidence.filter(e => e.type === 'video')
+  const documents = item.evidence.filter(e => e.type === 'document')
+
   const tabs = [
-    { key: 'photos' as const, label: 'Photos', count: item.evidence.photos.length },
-    { key: 'videos' as const, label: 'Videos', count: item.evidence.videos.length },
-    { key: 'documents' as const, label: 'Documents', count: item.evidence.documents.length }
+    { key: 'photos' as const, label: 'Photos', count: photos.length },
+    { key: 'videos' as const, label: 'Videos', count: videos.length },
+    { key: 'documents' as const, label: 'Documents', count: documents.length }
   ]
 
   return (
@@ -128,49 +141,135 @@ export function EvidenceManager({ item, onClose, onUpdate }: EvidenceManagerProp
               {/* Existing Files */}
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                  Current {activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} ({item.evidence[activeTab].length})
+                  Current {activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} ({activeTab === 'photos' ? photos.length : activeTab === 'videos' ? videos.length : documents.length})
                 </h3>
                 
-                {item.evidence[activeTab].length === 0 ? (
-                  <div className="text-center py-8 text-gray-500">
-                    <div className="text-4xl mb-2">{getFileIcon(activeTab)}</div>
-                    <p>No {activeTab} uploaded yet</p>
-                    <p className="text-sm">Upload files using the area on the left</p>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    {item.evidence[activeTab].map((fileId, index) => (
-                      <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                        <div className="flex items-center space-x-3">
-                          <span className="text-lg">{getFileIcon(activeTab)}</span>
-                          <div>
-                            <p className="text-sm font-medium text-gray-900">
-                              {fileId.split('/').pop()?.replace(/_/g, ' ') || `${activeTab.slice(0, -1)} ${index + 1}`}
-                            </p>
-                            <p className="text-xs text-gray-500">Cloudinary ID: {fileId}</p>
+                {activeTab === 'photos' ? (
+                  photos.length === 0 ? (
+                    <div className="text-center py-8 text-gray-500">
+                      <div className="text-4xl mb-2">{getFileIcon(activeTab)}</div>
+                      <p>No {activeTab} uploaded yet</p>
+                      <p className="text-sm">Upload files using the area on the left</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {photos.map((file: Evidence, index: number) => (
+                        <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                          <div className="flex items-center space-x-3">
+                            <span className="text-lg">{getFileIcon(activeTab)}</span>
+                            <div>
+                              <p className="text-sm font-medium text-gray-900">
+                                {file.originalName || `${activeTab.slice(0, -1)} ${index + 1}`}
+                              </p>
+                              <p className="text-xs text-gray-500">Cloudinary ID: {file.cloudinaryId}</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <button
+                              onClick={() => {
+                                // In real app, this would open the file
+                                console.log('View file:', file.cloudinaryId)
+                                alert('In a real app, this would open the file for viewing')
+                              }}
+                              className="text-blue-600 hover:text-blue-800 text-sm"
+                            >
+                              View
+                            </button>
+                            <button
+                              onClick={() => removeEvidence(activeTab, index)}
+                              className="text-red-600 hover:text-red-800 text-sm"
+                            >
+                              Remove
+                            </button>
                           </div>
                         </div>
-                        <div className="flex items-center space-x-2">
-                          <button
-                            onClick={() => {
-                              // In real app, this would open the file
-                              console.log('View file:', fileId)
-                              alert('In a real app, this would open the file for viewing')
-                            }}
-                            className="text-blue-600 hover:text-blue-800 text-sm"
-                          >
-                            View
-                          </button>
-                          <button
-                            onClick={() => removeEvidence(activeTab, index)}
-                            className="text-red-600 hover:text-red-800 text-sm"
-                          >
-                            Remove
-                          </button>
+                      ))}
+                    </div>
+                  )
+                ) : activeTab === 'videos' ? (
+                  videos.length === 0 ? (
+                    <div className="text-center py-8 text-gray-500">
+                      <div className="text-4xl mb-2">{getFileIcon(activeTab)}</div>
+                      <p>No {activeTab} uploaded yet</p>
+                      <p className="text-sm">Upload files using the area on the left</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {videos.map((file: Evidence, index: number) => (
+                        <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                          <div className="flex items-center space-x-3">
+                            <span className="text-lg">{getFileIcon(activeTab)}</span>
+                            <div>
+                              <p className="text-sm font-medium text-gray-900">
+                                {file.originalName || `${activeTab.slice(0, -1)} ${index + 1}`}
+                              </p>
+                              <p className="text-xs text-gray-500">Cloudinary ID: {file.cloudinaryId}</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <button
+                              onClick={() => {
+                                // In real app, this would open the file
+                                console.log('View file:', file.cloudinaryId)
+                                alert('In a real app, this would open the file for viewing')
+                              }}
+                              className="text-blue-600 hover:text-blue-800 text-sm"
+                            >
+                              View
+                            </button>
+                            <button
+                              onClick={() => removeEvidence(activeTab, index)}
+                              className="text-red-600 hover:text-red-800 text-sm"
+                            >
+                              Remove
+                            </button>
+                          </div>
                         </div>
-                      </div>
-                    ))}
-                  </div>
+                      ))}
+                    </div>
+                  )
+                ) : (
+                  documents.length === 0 ? (
+                    <div className="text-center py-8 text-gray-500">
+                      <div className="text-4xl mb-2">{getFileIcon(activeTab)}</div>
+                      <p>No {activeTab} uploaded yet</p>
+                      <p className="text-sm">Upload files using the area on the left</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {documents.map((file: Evidence, index: number) => (
+                        <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                          <div className="flex items-center space-x-3">
+                            <span className="text-lg">{getFileIcon(activeTab)}</span>
+                            <div>
+                              <p className="text-sm font-medium text-gray-900">
+                                {file.originalName || `${activeTab.slice(0, -1)} ${index + 1}`}
+                              </p>
+                              <p className="text-xs text-gray-500">Cloudinary ID: {file.cloudinaryId}</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <button
+                              onClick={() => {
+                                // In real app, this would open the file
+                                console.log('View file:', file.cloudinaryId)
+                                alert('In a real app, this would open the file for viewing')
+                              }}
+                              className="text-blue-600 hover:text-blue-800 text-sm"
+                            >
+                              View
+                            </button>
+                            <button
+                              onClick={() => removeEvidence(activeTab, index)}
+                              className="text-red-600 hover:text-red-800 text-sm"
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )
                 )}
               </div>
             </div>
@@ -180,7 +279,7 @@ export function EvidenceManager({ item, onClose, onUpdate }: EvidenceManagerProp
           <div className="border-t border-gray-200 px-6 py-4 bg-gray-50">
             <div className="flex items-center justify-between">
               <div className="text-sm text-gray-600">
-                Total evidence files: {item.evidence.photos.length + item.evidence.videos.length + item.evidence.documents.length}
+                Total evidence files: {photos.length + videos.length + documents.length}
               </div>
               <button
                 onClick={onClose}

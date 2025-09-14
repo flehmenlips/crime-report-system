@@ -1,4 +1,5 @@
-import { StolenItem, SearchFilters } from '@/types';
+import { StolenItem, SearchFilters, Evidence } from '@/types';
+import { prisma } from '@/lib/prisma'
 
 /**
  * Fetch all stolen items from the API
@@ -51,7 +52,7 @@ export async function getTotalValue(): Promise<number> {
  */
 export async function getItemsByEvidenceType(type: 'photos' | 'videos' | 'documents'): Promise<StolenItem[]> {
   const items = await getAllItems();
-  return items.filter(item => item.evidence[type].length > 0);
+  return items.filter(item => (item.evidence[type as keyof typeof item.evidence] as unknown as Evidence[])?.length ?? 0 > 0);
 }
 
 /**
@@ -160,4 +161,20 @@ export async function deleteItem(itemId: number): Promise<boolean> {
     console.error('Error deleting item:', error)
     return false
   }
+}
+
+/**
+ * Get evidence count by type for a specific item
+ */
+export async function getEvidenceCountByType(itemId: number) {
+  const item = await prisma.stolenItem.findUnique({
+    where: { id: itemId },
+    include: { evidence: true }
+  })
+  if (!item) return { photos: 0, videos: 0, documents: 0 }
+  
+  const photos = item.evidence.filter((e: { type: string }) => e.type === 'photo').length
+  const videos = item.evidence.filter(e => e.type === 'video').length
+  const documents = item.evidence.filter(e => e.type === 'document').length
+  return { photos, videos, documents }
 }

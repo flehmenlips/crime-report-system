@@ -128,24 +128,12 @@ export function AdvancedSearch({ items, onClose, onResults }: AdvancedSearchProp
       }
 
       // Evidence filters
-      if (filters.hasPhotos === true && item.evidence.photos.length === 0) {
-        return false
-      }
-      if (filters.hasPhotos === false && item.evidence.photos.length > 0) {
-        return false
-      }
-      if (filters.hasVideos === true && item.evidence.videos.length === 0) {
-        return false
-      }
-      if (filters.hasVideos === false && item.evidence.videos.length > 0) {
-        return false
-      }
-      if (filters.hasDocuments === true && item.evidence.documents.length === 0) {
-        return false
-      }
-      if (filters.hasDocuments === false && item.evidence.documents.length > 0) {
-        return false
-      }
+      if (filters.hasPhotos === true && item.evidence?.filter(e => e.type === 'photo')?.length === 0) { return false }
+      if (filters.hasPhotos === false && item.evidence?.filter(e => e.type === 'photo')?.length > 0) { return false }
+      if (filters.hasVideos === true && item.evidence?.filter(e => e.type === 'video')?.length === 0) { return false }
+      if (filters.hasVideos === false && item.evidence?.filter(e => e.type === 'video')?.length > 0) { return false }
+      if (filters.hasDocuments === true && item.evidence?.filter(e => e.type === 'document')?.length === 0) { return false }
+      if (filters.hasDocuments === false && item.evidence?.filter(e => e.type === 'document')?.length > 0) { return false }
 
       return true
     })
@@ -702,19 +690,19 @@ export function AdvancedSearch({ items, onClose, onResults }: AdvancedSearchProp
                           </td>
                           <td style={{ padding: '12px 16px' }}>
                             <div style={{ display: 'flex', gap: '4px' }}>
-                              {item.evidence.photos.length > 0 && (
+                              {item.evidence?.filter(e => e.type === 'photo')?.length > 0 && (
                                 <span style={{ background: '#dbeafe', color: '#1e40af', padding: '2px 6px', borderRadius: '4px', fontSize: '11px', fontWeight: '600' }}>
-                                  📷 {item.evidence.photos.length}
+                                  📷 {item.evidence.filter(e => e.type === 'photo').length}
                                 </span>
                               )}
-                              {item.evidence.videos.length > 0 && (
+                              {item.evidence?.filter(e => e.type === 'video')?.length > 0 && (
                                 <span style={{ background: '#dcfce7', color: '#166534', padding: '2px 6px', borderRadius: '4px', fontSize: '11px', fontWeight: '600' }}>
-                                  🎥 {item.evidence.videos.length}
+                                  🎥 {item.evidence.filter(e => e.type === 'video').length}
                                 </span>
                               )}
-                              {item.evidence.documents.length > 0 && (
+                              {item.evidence?.filter(e => e.type === 'document')?.length > 0 && (
                                 <span style={{ background: '#fef3c7', color: '#92400e', padding: '2px 6px', borderRadius: '4px', fontSize: '11px', fontWeight: '600' }}>
-                                  📄 {item.evidence.documents.length}
+                                  📄 {item.evidence.filter(e => e.type === 'document').length}
                                 </span>
                               )}
                             </div>

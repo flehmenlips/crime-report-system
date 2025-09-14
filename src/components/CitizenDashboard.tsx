@@ -28,9 +28,11 @@ export function CitizenDashboard() {
   }, [])
 
   const totalValue = items.reduce((sum, item) => sum + item.estimatedValue, 0)
-  const totalEvidence = items.reduce((sum, item) => 
-    sum + item.evidence.photos.length + item.evidence.videos.length + item.evidence.documents.length, 0
-  )
+  const evidenceCount = items.reduce((total, item) => 
+    total + item.evidence?.filter(e => e.type === 'photo')?.length + 
+    item.evidence?.filter(e => e.type === 'video')?.length + 
+    item.evidence?.filter(e => e.type === 'document')?.length, 0
+  ) ?? 0
 
   const handleAddItem = async (formData: ItemFormData) => {
     try {
@@ -45,11 +47,7 @@ export function CitizenDashboard() {
         dateLastSeen: formData.dateLastSeen,
         locationLastSeen: formData.locationLastSeen,
         estimatedValue: formData.estimatedValue,
-        evidence: {
-          photos: [],
-          videos: [],
-          documents: []
-        }
+        evidence: []
       }
 
       // Add to local state (in real app, this would save to database)
@@ -104,7 +102,7 @@ export function CitizenDashboard() {
           <div className="text-sm text-green-600 mt-1">Insurance claim value</div>
         </div>
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-          <div className="text-3xl font-bold text-blue-600 mb-2">{totalEvidence}</div>
+          <div className="text-3xl font-bold text-blue-600 mb-2">{evidenceCount}</div>
           <div className="text-blue-800 font-medium">Evidence Files</div>
           <div className="text-sm text-blue-600 mt-1">Photos, videos, documents</div>
         </div>
@@ -173,19 +171,19 @@ export function CitizenDashboard() {
 
               <div className="flex items-center justify-between">
                 <div className="flex space-x-1">
-                  {item.evidence.photos.length > 0 && (
+                  {item.evidence?.filter(e => e.type === 'photo')?.length > 0 && (
                     <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">
-                      📷 {item.evidence.photos.length}
+                      📷 {item.evidence.filter(e => e.type === 'photo').length}
                     </span>
                   )}
-                  {item.evidence.videos.length > 0 && (
+                  {item.evidence?.filter(e => e.type === 'video')?.length > 0 && (
                     <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">
-                      🎥 {item.evidence.videos.length}
+                      🎥 {item.evidence.filter(e => e.type === 'video').length}
                     </span>
                   )}
-                  {item.evidence.documents.length > 0 && (
+                  {item.evidence?.filter(e => e.type === 'document')?.length > 0 && (
                     <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs">
-                      📄 {item.evidence.documents.length}
+                      📄 {item.evidence.filter(e => e.type === 'document').length}
                     </span>
                   )}
                 </div>

@@ -1,0 +1,221 @@
+{
+  "users": [
+    {
+      "id": "cmfeyn7es0000t6oil8p6d45c",
+      "email": "george@birkenfeldfarm.com",
+      "name": "George Page",
+      "username": "george",
+      "password": "password",
+      "role": "citizen",
+      "createdAt": "2025-09-11T05:21:01.252Z",
+      "updatedAt": "2025-09-11T05:21:01.252Z"
+    },
+    {
+      "id": "cmfeyn7ex0001t6oid2aaz7ew",
+      "email": "citizen@birkenfeldfarm.com",
+      "name": "George Page",
+      "username": "citizen",
+      "password": "password",
+      "role": "citizen",
+      "createdAt": "2025-09-11T05:21:01.257Z",
+      "updatedAt": "2025-09-11T05:21:01.257Z"
+    },
+    {
+      "id": "cmfeyn7ey0002t6oir6v03el2",
+      "email": "officer@police.gov",
+      "name": "Police Officer",
+      "username": "admin",
+      "password": "password",
+      "role": "law_enforcement",
+      "createdAt": "2025-09-11T05:21:01.258Z",
+      "updatedAt": "2025-09-11T05:21:01.258Z"
+    }
+  ],
+  "items": [
+    {
+      "id": 7,
+      "name": "ss scoop",
+      "description": "feed scoop",
+      "serialNumber": null,
+      "purchaseDate": "2020-04-09",
+      "purchaseCost": 50,
+      "dateLastSeen": "2025-07-25",
+      "locationLastSeen": "remise",
+      "estimatedValue": 55,
+      "category": null,
+      "tags": null,
+      "notes": null,
+      "createdAt": "2025-09-11T05:44:39.609Z",
+      "updatedAt": "2025-09-11T05:44:39.609Z",
+      "ownerId": "cmfeyn7es0000t6oil8p6d45c"
+    },
+    {
+      "id": 9,
+      "name": "Diesel Tank",
+      "description": "Yellow",
+      "serialNumber": "111",
+      "purchaseDate": "2019-01-01",
+      "purchaseCost": 800,
+      "dateLastSeen": "2025-03-18",
+      "locationLastSeen": "farm",
+      "estimatedValue": 800,
+      "category": null,
+      "tags": null,
+      "notes": null,
+      "createdAt": "2025-09-11T16:35:33.048Z",
+      "updatedAt": "2025-09-11T16:35:33.048Z",
+      "ownerId": "cmfeyn7es0000t6oil8p6d45c"
+    },
+    {
+      "id": 10,
+      "name": "Kubota KX057 Excavator",
+      "description": "6 Ton Excavator with cab, grading blade, 48\" muck bucket and thumb",
+      "serialNumber": "30701",
+      "purchaseDate": "2019-03-11",
+      "purchaseCost": 80000,
+      "dateLastSeen": "2025-07-10",
+      "locationLastSeen": "flatbed trailer on highway 202 Eastbound",
+      "estimatedValue": 76000,
+      "category": "tractors",
+      "tags": "[\"Kubota\"]",
+      "notes": "Jesse",
+      "createdAt": "2025-09-11T17:10:38.662Z",
+      "updatedAt": "2025-09-11T18:48:58.977Z",
+      "ownerId": "cmfeyn7es0000t6oil8p6d45c"
+    },
+    {
+      "id": 11,
+      "name": "Rain Gun Sprinkler",
+      "description": "1.5\" Long throw sprinkler gun on tripod with blue lay flat hose",
+      "serialNumber": "1001",
+      "purchaseDate": "2019-09-11",
+      "purchaseCost": 400,
+      "dateLastSeen": "2025-09-11",
+      "locationLastSeen": "near driveway",
+      "estimatedValue": 500,
+      "category": "equipment",
+      "tags": "[\"Irrigation\"]",
+      "notes": "1.5\" to 2\" lay flat hose adapter",
+      "createdAt": "2025-09-11T18:34:42.518Z",
+      "updatedAt": "2025-09-11T18:54:23.258Z",
+      "ownerId": "cmfeyn7es0000t6oil8p6d45c"
+    },
+    {
+      "id": 12,
+      "name": "Poultry Plucker",
+      "description": "Ashley SP-23, 23\" poultry plucker.  Aluminum.",
+      "serialNumber": "1990",
+      "purchaseDate": "2007-09-13",
+      "purchaseCost": 4000,
+      "dateLastSeen": "2025-03-18",
+      "locationLastSeen": "Near Chop shop on concrete pad",
+      "estimatedValue": 6000,
+      "category": "equipment",
+      "tags": "[\"Processing\"]",
+      "notes": "Unit was seen one day and gone the next.",
+      "createdAt": "2025-09-11T20:39:51.553Z",
+      "updatedAt": "2025-09-11T20:39:51.553Z",
+      "ownerId": "cmfeyn7es0000t6oil8p6d45c"
+    },
+    {
+      "id": 13,
+      "name": "Floor Jack",
+      "description": "No description provided",
+      "serialNumber": null,
+      "purchaseDate": "2025-09-12",
+      "purchaseCost": 300,
+      "dateLastSeen": "2025-09-12",
+      "locationLastSeen": "Location not specified",
+      "estimatedValue": 250,
+      "category": null,
+      "tags": "[]",
+      "notes": null,
+      "createdAt": "2025-09-12T00:27:16.031Z",
+      "updatedAt": "2025-09-12T00:27:16.031Z",
+      "ownerId": "cmfeyn7es0000t6oil8p6d45c"
+    }
+  ],
+  "evidence": [
+    {
+      "id": 35,
+      "type": "photo",
+      "cloudinaryId": "https://res.cloudinary.com/dhaacekdd/image/upload/v1757621497/CrimeReport/item_7/1757621496507_C9CE1CE5_B3AD_43B2_81BC_39C327AF6EE3_1_105_c.jpeg.jpg",
+      "originalName": "C9CE1CE5-B3AD-43B2-81BC-39C327AF6EE3_1_105_c.jpeg",
+      "description": "photo evidence for ss scoop",
+      "createdAt": "2025-09-11T20:11:38.508Z",
+      "itemId": 7
+    },
+    {
+      "id": 36,
+      "type": "photo",
+      "cloudinaryId": "https://res.cloudinary.com/dhaacekdd/image/upload/v1757621594/CrimeReport/item_11/1757621592642_4AFB2F78_2A8C_472E_A389_E01BACCD02CF_1_105_c.jpeg.jpg",
+      "originalName": "4AFB2F78-2A8C-472E-A389-E01BACCD02CF_1_105_c.jpeg",
+      "description": "photo evidence for Rain Gun Sprinkler",
+      "createdAt": "2025-09-11T20:13:15.337Z",
+      "itemId": 11
+    },
+    {
+      "id": 37,
+      "type": "photo",
+      "cloudinaryId": "https://res.cloudinary.com/dhaacekdd/image/upload/v1757622684/CrimeReport/item_9/1757622683291_062B1364_F234_4C22_81A4_9C5309B8073F_1_105_c.jpeg.jpg",
+      "originalName": "062B1364-F234-4C22-81A4-9C5309B8073F_1_105_c.jpeg",
+      "description": "photo evidence for Diesel Tank",
+      "createdAt": "2025-09-11T20:31:25.817Z",
+      "itemId": 9
+    },
+    {
+      "id": 38,
+      "type": "photo",
+      "cloudinaryId": "https://res.cloudinary.com/dhaacekdd/image/upload/v1757622813/CrimeReport/item_10/1757622812666_54488602_8781_481F_B696_904AA0DC18F7_1_105_c.jpeg.jpg",
+      "originalName": "54488602-8781-481F-B696-904AA0DC18F7_1_105_c.jpeg",
+      "description": "photo evidence for Kubota KX057 Excavator",
+      "createdAt": "2025-09-11T20:33:35.184Z",
+      "itemId": 10
+    },
+    {
+      "id": 39,
+      "type": "photo",
+      "cloudinaryId": "https://res.cloudinary.com/dhaacekdd/image/upload/v1757623228/CrimeReport/item_12/1757623227671_0A82CE31_0A88_414F_A9F3_93A83FB418AA_1_105_c.jpeg.jpg",
+      "originalName": "0A82CE31-0A88-414F-A9F3-93A83FB418AA_1_105_c.jpeg",
+      "description": "photo evidence for Poultry Plucker",
+      "createdAt": "2025-09-11T20:40:30.165Z",
+      "itemId": 12
+    },
+    {
+      "id": 40,
+      "type": "photo",
+      "cloudinaryId": "https://res.cloudinary.com/dhaacekdd/image/upload/v1757626314/CrimeReport/item_10/1757626313650_4E3957A7_D22D_4A8A_A6CC_60D7A30C838C_1_105_c.jpeg.jpg",
+      "originalName": "4E3957A7-D22D-4A8A-A6CC-60D7A30C838C_1_105_c.jpeg",
+      "description": "photo evidence for Kubota KX057 Excavator",
+      "createdAt": "2025-09-11T21:31:56.120Z",
+      "itemId": 10
+    },
+    {
+      "id": 41,
+      "type": "photo",
+      "cloudinaryId": "https://res.cloudinary.com/dhaacekdd/image/upload/v1757629019/CrimeReport/item_12/1757629018917_Plucker_plate.jpeg.jpg",
+      "originalName": "Plucker-plate.jpeg",
+      "description": "photo evidence for Poultry Plucker",
+      "createdAt": "2025-09-11T22:17:00.257Z",
+      "itemId": 12
+    },
+    {
+      "id": 58,
+      "type": "photo",
+      "cloudinaryId": "https://res.cloudinary.com/dhaacekdd/image/upload/v1757723532/CrimeReport/item_13/1757723530715_194A4788-8719-4286-BA8C-5A35B66F7E3B_1_105_c.jpeg.jpg",
+      "originalName": "194A4788-8719-4286-BA8C-5A35B66F7E3B_1_105_c.jpeg",
+      "description": "photo evidence for Floor Jack",
+      "createdAt": "2025-09-13T00:32:13.471Z",
+      "itemId": 13
+    },
+    {
+      "id": 62,
+      "type": "document",
+      "cloudinaryId": "https://res.cloudinary.com/dhaacekdd/image/upload/v1757734600/CrimeReport/item_10/1757734599793_821-8095918-000_Default_Letter.pdf",
+      "originalName": "821-8095918-000 Default Letter.pdf",
+      "description": "document evidence for Kubota KX057 Excavator",
+      "createdAt": "2025-09-13T03:36:41.128Z",
+      "itemId": 10
+    }
+  ]
+}

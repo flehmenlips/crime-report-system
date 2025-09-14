@@ -79,20 +79,19 @@ export async function GET(request: NextRequest) {
       
       console.log('Generated signed URL for document access')
       
-      // Fetch the actual file using the signed URL
-      const response = await fetch(signedUrl, {
-        headers: {
-          'User-Agent': 'CrimeReport-Document-Viewer/1.0'
-        }
-      })
+      // Admin
+      let response: Response = await fetch(signedUrl, {
+          headers: {
+            'User-Agent': 'CrimeReport-Document-Viewer/1.0'
+          }
+        })
+      if (!response.ok) throw new Error('Fetch failed')
 
-      if (!response.ok) {
-        console.error('Failed to fetch document via admin API:', response.status)
-        return NextResponse.json({ 
-          error: `Failed to fetch document: ${response.status}`,
-          url: resource.secure_url 
-        }, { status: response.status })
-      }
+      let documentBuffer: ArrayBuffer
+      let contentType: string
+      documentBuffer = await response.arrayBuffer()
+      contentType = response.headers.get('content-type') || 'application/octet-stream'
+
     } catch (cloudinaryError) {
       console.error('Cloudinary admin API error:', cloudinaryError)
       
@@ -100,12 +99,13 @@ export async function GET(request: NextRequest) {
       const controller = new AbortController()
       const timeoutId = setTimeout(() => controller.abort(), 30000)
 
-      const response = await fetch(actualDocumentUrl, {
-        headers: {
-          'User-Agent': 'CrimeReport-Document-Viewer/1.0'
-        },
-        signal: controller.signal
-      })
+      let response: Response = await fetch(actualDocumentUrl, {
+          headers: {
+            'User-Agent': 'CrimeReport-Document-Viewer/1.0'
+          },
+          signal: controller.signal
+        })
+      if (!response.ok) throw new Error('Fetch failed')
 
       clearTimeout(timeoutId)
 
@@ -122,16 +122,6 @@ export async function GET(request: NextRequest) {
         }, { status: response.status })
       }
     }
-
-    // Get the document content
-    const documentBuffer = await response.arrayBuffer()
-    const contentType = response.headers.get('content-type') || 'application/octet-stream'
-    
-    console.log('Document fetched successfully:', {
-      size: documentBuffer.byteLength,
-      contentType,
-      filename
-    })
 
     // Determine proper content type based on filename
     let finalContentType = contentType
@@ -158,7 +148,7 @@ export async function GET(request: NextRequest) {
       ? filename.replace(/\.(auto|jpg)$/, '') // Remove .auto or .jpg extensions
       : 'document'
 
-    return new NextResponse(documentBuffer, {
+    const finalResponse = new NextResponse(documentBuffer, {
       headers: {
         'Content-Type': finalContentType,
         'Content-Disposition': `inline; filename="${cleanFilename}"`,
@@ -166,6 +156,8 @@ export async function GET(request: NextRequest) {
         'Cache-Control': 'public, max-age=3600'
       }
     })
+
+    return finalResponse
 
   } catch (error) {
     console.error('Error in document proxy:', error)

@@ -68,7 +68,7 @@ export function generateStolenItemsReport(options: PDFExportOptions): void {
   // Summary statistics
   const totalValue = items.reduce((sum, item) => sum + item.estimatedValue, 0)
   const totalEvidence = items.reduce((sum, item) =>
-    sum + item.evidence.photos.length + item.evidence.videos.length + item.evidence.documents.length, 0
+    sum + item.evidence?.filter(e => e.type === 'photo')?.length + item.evidence?.filter(e => e.type === 'video')?.length + item.evidence?.filter(e => e.type === 'document')?.length, 0
   )
 
   yPosition += 10
@@ -113,17 +113,17 @@ export function generateStolenItemsReport(options: PDFExportOptions): void {
     yPosition += descriptionLines.length * 4
 
     // Evidence
-    if (includeEvidence && (item.evidence.photos.length > 0 || item.evidence.videos.length > 0 || item.evidence.documents.length > 0)) {
+    if (includeEvidence && (item.evidence?.filter(e => e.type === 'photo')?.length > 0 || item.evidence?.filter(e => e.type === 'video')?.length > 0 || item.evidence?.filter(e => e.type === 'document')?.length > 0)) {
       yPosition = addText('Evidence Files:', margin + 5, yPosition + 5)
 
-      if (item.evidence.photos.length > 0) {
-        yPosition = addText(`📷 Photos: ${item.evidence.photos.length} files`, margin + 10, yPosition + 4)
+      if (item.evidence?.filter(e => e.type === 'photo')?.length > 0) {
+        yPosition = addText(`📷 Photos: ${item.evidence.filter(e => e.type === 'photo').length} files`, margin + 10, yPosition + 4)
       }
-      if (item.evidence.videos.length > 0) {
-        yPosition = addText(`🎥 Videos: ${item.evidence.videos.length} files`, margin + 10, yPosition + 4)
+      if (item.evidence?.filter(e => e.type === 'video')?.length > 0) {
+        yPosition = addText(`🎥 Videos: ${item.evidence.filter(e => e.type === 'video').length} files`, margin + 10, yPosition + 4)
       }
-      if (item.evidence.documents.length > 0) {
-        yPosition = addText(`📄 Documents: ${item.evidence.documents.length} files`, margin + 10, yPosition + 4)
+      if (item.evidence?.filter(e => e.type === 'document')?.length > 0) {
+        yPosition = addText(`📄 Documents: ${item.evidence.filter(e => e.type === 'document').length} files`, margin + 10, yPosition + 4)
       }
     }
 
@@ -132,7 +132,7 @@ export function generateStolenItemsReport(options: PDFExportOptions): void {
   })
 
   // Footer
-  const totalPages = pdf.internal.getNumberOfPages()
+  const totalPages = (pdf as any).internal.getNumberOfPages()
   for (let i = 1; i <= totalPages; i++) {
     pdf.setPage(i)
     pdf.setFontSize(8)

@@ -260,7 +260,7 @@ export function AddItemForm({ onClose, onSubmit }: AddItemFormProps) {
                 <input
                   type="text"
                   value={formData.tags?.join(', ') || ''}
-                  onChange={(e) => handleChange('tags', e.target.value.split(',').map(tag => tag.trim()).filter(tag => tag))}
+                  onChange={(e) => handleChange('tags', e.target.value.split(',').map(tag => tag.trim()).filter(tag => tag) as any)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="e.g., heavy equipment, john deere, valuable"
                 />

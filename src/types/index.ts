@@ -1,7 +1,11 @@
 export interface Evidence {
-  photos: string[];
-  videos: string[];
-  documents: string[];
+  id: number
+  type: 'photo' | 'video' | 'document'
+  cloudinaryId: string | null
+  documentData?: Buffer | Uint8Array | null
+  originalName: string | null
+  description: string | null
+  createdAt: string
 }
 
 export interface StolenItem {
@@ -14,7 +18,7 @@ export interface StolenItem {
   dateLastSeen: string; // YYYY-MM-DD format
   locationLastSeen: string;
   estimatedValue: number;
-  evidence: Evidence;
+  evidence: Evidence[];
   category?: string;
   tags?: string[];
   notes?: string;
@@ -62,4 +66,20 @@ export interface ItemFormData {
   category?: string;
   tags?: string[];
   notes?: string;
+}
+
+// Extend NextAuth types
+import { DefaultSession, DefaultUser } from 'next-auth'
+
+declare module 'next-auth' {
+  interface Session {
+    user?: {
+      id: string
+      role: string
+    } & DefaultSession['user']
+  }
+
+  interface User extends DefaultUser {
+    role: string
+  }
 }

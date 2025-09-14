@@ -23,7 +23,10 @@ export function ItemTable({ items }: ItemTableProps) {
   }
 
   const getEvidenceCount = (item: StolenItem) => {
-    return item.evidence.photos.length + item.evidence.videos.length + item.evidence.documents.length
+    const photos = item.evidence?.filter(e => e.type === 'photo')?.length ?? 0
+    const videos = item.evidence?.filter(e => e.type === 'video')?.length ?? 0
+    const documents = item.evidence?.filter(e => e.type === 'document')?.length ?? 0
+    return { photos, videos, documents }
   }
 
   if (items.length === 0) {
@@ -63,6 +66,7 @@ export function ItemTable({ items }: ItemTableProps) {
           <tbody className="bg-white divide-y divide-gray-200">
             {items.map((item) => {
               const isExpanded = expandedRows.has(item.id)
+              const { photos, videos, documents } = getEvidenceCount(item)
               return (
                 <React.Fragment key={item.id}>
                   <tr className="hover:bg-gray-50">

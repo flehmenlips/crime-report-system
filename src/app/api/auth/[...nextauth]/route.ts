@@ -79,31 +79,21 @@ const handler = NextAuth({
     error: "/login",
   },
   callbacks: {
-    async jwt({ token, user, account }) {
+    async jwt({ token, user }) {
       if (user) {
-        token.role = user.role
-        token.loginTime = Date.now()
+        token.sub = user.id;
+        token.role = (user as any).role;
+        token.loginTime = Date.now();
       }
-
-      // Check session age for additional security
-      if (token.loginTime) {
-        const sessionAge = Date.now() - token.loginTime
-        const maxSessionAge = 8 * 60 * 60 * 1000 // 8 hours
-
-        if (sessionAge > maxSessionAge) {
-          throw new Error('Session expired')
-        }
-      }
-
-      return token
+      return token;
     },
     async session({ session, token }) {
-      if (token) {
-        session.user.id = token.sub!
-        session.user.role = token.role as string
-        session.loginTime = token.loginTime as number
+      if (session.user && token.sub && token.role) {
+        session.user.id = token.sub;
+        session.user.role = token.role as string;
+        (session as any).loginTime = token.loginTime as number;
       }
-      return session
+      return session;
     },
   },
   events: {

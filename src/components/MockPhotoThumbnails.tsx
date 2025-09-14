@@ -37,7 +37,12 @@ export function MockPhotoThumbnails({ item, onImageClick }: MockPhotoThumbnailsP
   }
 
   const mockPhotos = getMockPhotos()
-  const totalEvidence = item.evidence.photos.length + item.evidence.videos.length + item.evidence.documents.length
+  const totalEvidence = item.evidence?.filter(e => ['photo', 'video', 'document'].includes(e.type))?.length ?? 0
+
+  // If using counts
+  const photoCount = item.evidence?.filter(e => e.type === 'photo')?.length ?? 0
+
+  // Update badges accordingly
 
   return (
     <div style={{ marginBottom: '16px' }}>
@@ -110,7 +115,7 @@ export function MockPhotoThumbnails({ item, onImageClick }: MockPhotoThumbnailsP
       {/* Evidence Summary */}
       {totalEvidence > 0 && (
         <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-          {item.evidence.photos.length > 0 && (
+          {item.evidence?.filter(e => e.type === 'photo')?.length > 0 && (
             <div style={{
               background: '#dbeafe',
               color: '#1e40af',
@@ -119,10 +124,10 @@ export function MockPhotoThumbnails({ item, onImageClick }: MockPhotoThumbnailsP
               fontSize: '11px',
               fontWeight: '600'
             }}>
-              📷 {item.evidence.photos.length} Real
+              📷 {item.evidence?.filter(e => e.type === 'photo')?.length} Real
             </div>
           )}
-          {item.evidence.videos.length > 0 && (
+          {item.evidence?.filter(e => e.type === 'video')?.length > 0 && (
             <div style={{
               background: '#dcfce7',
               color: '#166534',
@@ -131,10 +136,10 @@ export function MockPhotoThumbnails({ item, onImageClick }: MockPhotoThumbnailsP
               fontSize: '11px',
               fontWeight: '600'
             }}>
-              🎥 {item.evidence.videos.length}
+              🎥 {item.evidence?.filter(e => e.type === 'video')?.length}
             </div>
           )}
-          {item.evidence.documents.length > 0 && (
+          {item.evidence?.filter(e => e.type === 'document')?.length > 0 && (
             <div style={{
               background: '#fef3c7',
               color: '#92400e',
@@ -143,7 +148,7 @@ export function MockPhotoThumbnails({ item, onImageClick }: MockPhotoThumbnailsP
               fontSize: '11px',
               fontWeight: '600'
             }}>
-              📄 {item.evidence.documents.length}
+              📄 {item.evidence?.filter(e => e.type === 'document')?.length}
             </div>
           )}
         </div>

@@ -38,6 +38,9 @@ export async function GET(request: NextRequest) {
     const originalName = evidence.originalName || 'document.pdf'
     const cleanName = originalName.replace(/\.(auto|jpg)$/, '')
     
+    let documentUrl = evidence.cloudinaryId ?? ''
+    documentUrl = documentUrl.replace('/raw/upload/', '/image/upload/').replace(/(\.[a-zA-Z0-9]+)\.\1$/, '$1')
+
     // Create a simple HTML page that explains the situation and provides the direct link
     const htmlContent = `
 <!DOCTYPE html>
@@ -96,10 +99,10 @@ export async function GET(request: NextRequest) {
     
     <div style="text-align: center; margin: 30px 0;">
         <p><strong>Access Options:</strong></p>
-        <a href="${evidence.cloudinaryId}" class="download-btn" target="_blank">
+        <a href="${documentUrl}" class="download-btn" target="_blank">
             💾 Download Document
         </a>
-        <a href="${evidence.cloudinaryId.replace('/raw/upload/', '/image/upload/').replace(/(\.[a-zA-Z0-9]+)\.\1$/, '$1')}" class="download-btn" target="_blank">
+        <a href="${documentUrl}" class="download-btn" target="_blank">
             👁️ Try Direct View
         </a>
     </div>
@@ -113,7 +116,7 @@ export async function GET(request: NextRequest) {
         // Auto-attempt download after 2 seconds
         setTimeout(() => {
             console.log('Auto-attempting document access...');
-            window.location.href = '${evidence.cloudinaryId.replace('/raw/upload/', '/image/upload/').replace(/(\.[a-zA-Z0-9]+)\.\1$/, '$1')}';
+            window.location.href = '${documentUrl}';
         }, 2000);
     </script>
 </body>

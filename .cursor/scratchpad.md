@@ -5,7 +5,7 @@ This project involves creating and refining a comprehensive, secure, and user-fr
 
 The application must handle sensitive data appropriately, provide robust search functionality, and ensure secure access to confidential information. The use of Next.js with TypeScript ensures type safety and performance, while Cloudinary integration provides efficient media management for photos and videos.
 
-**Refinement Focus**: Switch to hybrid storage using PostgreSQL on Render.com for documents (to resolve Cloudinary issues) while keeping Cloudinary for media. Implement a phased roadmap of enhancements including tagging, analytics, notifications, multi-user features, mobile optimization, security, reporting, integrations, performance, and UI/UX polish.
+**Full Roadmap Request (September 13, 2025):** Refine the app per the provided history. Primary focus: Resolve document issues with hybrid storage (PostgreSQL BYTEA for documents, Cloudinary for media). Migrate to PostgreSQL on Render.com. Implement all roadmap suggestions: tagging, analytics, notifications, multi-user collaboration, mobile features, security, reporting, integrations, performance, UI/UX polish. Deploy to production on Render.com. Integrate advanced auth for multi-role account management (property owners, law enforcement, insurance agents, brokers, bankers, asset managers, assistants, secretaries, managers, executive assistants, etc.).
 
 ## Key Challenges and Analysis
 - **Security**: Implementing authentication and authorization for sensitive police report data
@@ -143,58 +143,26 @@ The application must handle sensitive data appropriately, provide robust search 
    - Success Criteria: EvidenceViewer.tsx and ItemDetailView.tsx handle database-served documents properly
    - Files: src/components/EvidenceViewer.tsx, src/components/ItemDetailView.tsx
 
-### Phase 9: Roadmap Enhancements
-Breakdown of suggested enhancements into small tasks:
+### Phase 9: Production Deployment and Advanced Authentication
+- Task 1: Prepare app for production (optimize builds, set production env vars, security checks). Success: No linter errors, successful production build (npm run build).
+- Task 2: Deploy to Render.com (set up web service, connect PostgreSQL, configure domain/SSL). Success: App accessible at Render URL, no deployment errors, basic functionality works.
+- Task 3: Test production deployment. Success: Manual tests pass (login, upload, view items/documents).
 
-#### Enhanced Tagging System
-8. **Implement Item Tagging**
-   - Success Criteria: Items can have multiple tags, saved to database, searchable
-   - Files: prisma/schema.prisma, src/app/api/items/route.ts, components/ItemForm.tsx
-
-#### Analytics Dashboard
-9. **Add Basic Analytics**
-   - Success Criteria: New dashboard page shows item stats using Recharts
-   - Files: src/app/analytics/page.tsx, install recharts
-
-#### Notification System
-10. **Implement Email Notifications**
-    - Success Criteria: Send email on item updates using Nodemailer
-    - Files: src/lib/notifications.ts, install nodemailer
-
-#### Multi-User Collaboration
-11. **Add Comment System**
-    - Success Criteria: Users can add comments to items
-    - Files: prisma/schema.prisma, components/ItemDetailView.tsx
-
-#### Mobile Features
-12. **Implement PWA Support**
-    - Success Criteria: App installable as PWA
-    - Files: next.config.js, public/manifest.json
-
-#### Enhanced Security
-13. **Add Helmet.js**
-    - Success Criteria: Security headers added
-    - Files: src/app/layout.tsx, install helmet
-
-#### Reporting Improvements
-14. **Enhance PDF Exports**
-    - Success Criteria: PDFs include timestamps and signatures
-    - Files: src/components/PDFExport.tsx
-
-#### Integrations
-15. **Add Basic API Endpoints**
-    - Success Criteria: New public API for read-only access
-    - Files: src/app/api/public-items/route.ts
-
-#### Performance Optimizations
-16. **Implement Caching**
-    - Success Criteria: Redis caching for frequent queries
-    - Files: src/lib/cache.ts, install redis
-
-#### UI/UX Polish
-17. **Add Animations and Accessibility**
-    - Success Criteria: Framer Motion animations, ARIA attributes added
-    - Files: Various components, install framer-motion
+### Phase 10: Advanced Auth and Broader Refinements
+- Task 1: Implement RBAC with NextAuth (define roles/permissions for all stakeholder types, account creation/management). Success: Users can register/login with roles, permissions enforced (e.g., law enforcement read-only).
+- Task 2: Add user management features (invites, role assignment, self-registration with verification). Success: Admin can invite/manage users, self-reg works with email verification.
+- Task 3: Implement enhanced tagging system. Success: Items can be tagged/searched by tags.
+- Task 4: Add analytics dashboard with Recharts. Success: Dashboard shows stats/charts.
+- Task 5: Implement notification system with Nodemailer. Success: Emails sent on events (e.g., new evidence).
+- Task 6: Add multi-user collaboration (comments/notes). Success: Users can add/view comments on items.
+- Task 7: Make app PWA for mobile. Success: Installable, offline-capable.
+- Task 8: Enhance security (helmet.js, audit logs). Success: Headers set, logs recorded.
+- Task 9: Improve reporting (timestamps/signatures in PDFs). Success: Exports include new features.
+- Task 10: Add integrations (API endpoints). Success: External APIs can interact.
+- Task 11: Optimize performance (caching with Redis). Success: Faster loads/queries.
+- Task 12: Polish UI/UX (animations, accessibility). Success: Framer-motion added, a11y checks pass.
+- Task 13: Add testing with Jest/RTL. Success: Key components/routes tested, coverage >80%.
+- Task 14: Update README.md with setup/deployment instructions. Success: Docs complete.
 
 ## Project Status Board
 
@@ -231,8 +199,8 @@ Breakdown of suggested enhancements into small tasks:
 ### 🚀 REFINEMENT TASKS (Phase 8-9)
 - [x] Set up PostgreSQL on Render.com
 - [x] Update Prisma Configuration
-- [ ] Migrate Existing Data
-- [ ] Update Evidence Model
+- [x] Phase 8 Task 3: Migrate existing data from SQLite to PostgreSQL
+- [x] Phase 8 Task 4: Update Evidence Model - Serving API for documents from PostgreSQL BYTEA
 - [ ] Modify Upload API
 - [ ] Implement Serving API
 - [ ] Update Components for Hybrid
@@ -246,6 +214,23 @@ Breakdown of suggested enhancements into small tasks:
 - [ ] Add Basic API Endpoints
 - [ ] Implement Caching
 - [ ] Add Animations and Accessibility
+- [ ] Phase 9 Task 1: Prepare app for production
+- [ ] Phase 9 Task 2: Deploy to Render.com
+- [ ] Phase 9 Task 3: Test production deployment
+- [ ] Phase 10 Task 1: Implement RBAC with NextAuth
+- [ ] Phase 10 Task 2: Add user management features
+- [ ] Phase 10 Task 3: Implement enhanced tagging system
+- [ ] Phase 10 Task 4: Add analytics dashboard
+- [ ] Phase 10 Task 5: Implement notification system
+- [ ] Phase 10 Task 6: Add multi-user collaboration
+- [ ] Phase 10 Task 7: Make app PWA for mobile
+- [ ] Phase 10 Task 8: Enhance security
+- [ ] Phase 10 Task 9: Improve reporting
+- [ ] Phase 10 Task 10: Add integrations
+- [ ] Phase 10 Task 11: Optimize performance
+- [ ] Phase 10 Task 12: Polish UI/UX
+- [ ] Phase 10 Task 13: Add testing
+- [ ] Phase 10 Task 14: Update README.md
 
 ## Current Status / Progress Tracking
 **Current Phase**: PHASE 8 - DATABASE MIGRATION IN PROGRESS 🚀
@@ -662,6 +647,10 @@ Please test all features by:
 - **Binary Storage**: Limit BYTEA field sizes to prevent performance issues
 - **Hybrid Systems**: Clearly separate logic for different storage types
 - **PostgreSQL Advantages**: Better for production than SQLite due to concurrency and scaling
+- When running Prisma CLI commands like `prisma migrate dev`, use a `.env` file (not just `.env.local`) to provide DATABASE_URL, as CLI defaults to `.env`.
+- During SQLite to PostgreSQL migration, convert integer timestamps (milliseconds) to Date objects for DateTime fields to avoid validation errors.
+- Always apply schema with `prisma migrate dev` to create tables in a new database before importing data.
+- Use Buffer.from() to handle binary data when inserting to Prisma Bytes fields (maps to BYTEA in PostgreSQL); convert back with .toString() for reading.
 
 **✅ Task 2 Complete: Prisma Configuration Updated!**
 - schema.prisma updated to use postgresql provider
@@ -670,3 +659,13 @@ Please test all features by:
 - Success criteria met; Ready for Task 3
 
 **Request**: Please confirm if we should proceed with Task 3 (data migration). Note: This will transfer all existing data to the new PostgreSQL database. Backup your current SQLite DB first if needed!
+
+**Migration Success (September 13, 2025):** Data migration completed successfully. Script read from SQLite, converted timestamps to Dates, exported JSON backup, and imported 3 users, 6 items, and 9 evidence records to PostgreSQL on Render.com. Ready for verification.
+
+**Request for Manual Verification:** Please test with `npx prisma studio` and app functionality to confirm data integrity before proceeding to next tasks.
+
+**Hybrid Upload Test Success (September 13, 2025):** TDD script confirmed API logic: Photo uses cloudinaryId, document uses documentData (binary stored/read correctly as Uint8Array). Cleanup worked; no errors.
+
+**Serving API Test Success (September 13, 2025):** New /api/serve-document/[id] endpoint tested with curl; successfully downloaded test document (33 bytes) with proper headers. No errors.
+
+**Hybrid Integration Complete (September 13, 2025):** Manual test confirmed: Uploaded new PDF to item, stored in documentData (BYTEA), downloaded successfully via /api/serve-document. Legacy items work via proxy. Ready for cleanup (remove debug links, add popup viewer).

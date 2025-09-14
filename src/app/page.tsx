@@ -403,7 +403,11 @@ export default function Home() {
   }
 
   const userRole = (session.user as any)?.role || 'law_enforcement'
-  const evidenceCount = allItems.reduce((total, item) => total + item.evidence.photos.length + item.evidence.videos.length + item.evidence.documents.length, 0)
+  const evidenceCount = allItems.reduce((total, item) => 
+    total + item.evidence?.filter(e => e.type === 'photo')?.length + 
+    item.evidence?.filter(e => e.type === 'video')?.length + 
+    item.evidence?.filter(e => e.type === 'document')?.length, 0
+  ) ?? 0
   
   // Use filtered items if search is active, otherwise use all items
   const displayItems = isFiltered ? filteredItems : allItems
@@ -1214,7 +1218,7 @@ export default function Home() {
                     </p>
 
                     {/* Additional Photos Indicator */}
-                    {item.evidence.photos.length > 1 && (
+                    {item.evidence?.filter(e => e.type === 'photo')?.length > 1 && (
                       <div style={{
                         background: '#f0f9ff',
                         border: '1px solid #bfdbfe',
@@ -1226,12 +1230,12 @@ export default function Home() {
                         fontWeight: '600',
                         textAlign: 'center'
                       }}>
-                        📷 {item.evidence.photos.length - 1} more photos available
+                        📷 {item.evidence.filter(e => e.type === 'photo').length - 1} more photos available
                       </div>
                     )}
 
                     <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
-                      {item.evidence.photos.length > 0 && (
+                      {item.evidence?.filter(e => e.type === 'photo')?.length > 0 && (
                         <div style={{
                           background: '#dbeafe',
                           color: '#1e40af',
@@ -1240,10 +1244,10 @@ export default function Home() {
                           fontSize: '14px',
                           fontWeight: '600'
                         }}>
-                          📷 {item.evidence.photos.length}
+                          📷 {item.evidence.filter(e => e.type === 'photo').length}
                         </div>
                       )}
-                      {item.evidence.videos.length > 0 && (
+                      {item.evidence?.filter(e => e.type === 'video')?.length > 0 && (
                         <div style={{
                           background: '#dcfce7',
                           color: '#166534',
@@ -1252,10 +1256,10 @@ export default function Home() {
                           fontSize: '14px',
                           fontWeight: '600'
                         }}>
-                          🎥 {item.evidence.videos.length}
+                          🎥 {item.evidence.filter(e => e.type === 'video').length}
                         </div>
                       )}
-                      {item.evidence.documents.length > 0 && (
+                      {item.evidence?.filter(e => e.type === 'document')?.length > 0 && (
                         <div style={{
                           background: '#fef3c7',
                           color: '#92400e',
@@ -1264,7 +1268,7 @@ export default function Home() {
                           fontSize: '14px',
                           fontWeight: '600'
                         }}>
-                          📄 {item.evidence.documents.length}
+                          📄 {item.evidence.filter(e => e.type === 'document').length}
                         </div>
                       )}
                     </div>
@@ -1443,7 +1447,7 @@ export default function Home() {
                         </td>
                         <td style={{ padding: '16px' }}>
                           <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
-                            {item.evidence.photos.length > 0 && (
+                            {item.evidence?.filter(e => e.type === 'photo')?.length > 0 && (
                               <span style={{
                                 background: '#dbeafe',
                                 color: '#1e40af',
@@ -1452,10 +1456,10 @@ export default function Home() {
                                 fontSize: '11px',
                                 fontWeight: '600'
                               }}>
-                                📷 {item.evidence.photos.length}
+                                📷 {item.evidence.filter(e => e.type === 'photo').length}
                               </span>
                             )}
-                            {item.evidence.videos.length > 0 && (
+                            {item.evidence?.filter(e => e.type === 'video')?.length > 0 && (
                               <span style={{
                                 background: '#dcfce7',
                                 color: '#166534',
@@ -1464,10 +1468,10 @@ export default function Home() {
                                 fontSize: '11px',
                                 fontWeight: '600'
                               }}>
-                                🎥 {item.evidence.videos.length}
+                                🎥 {item.evidence.filter(e => e.type === 'video').length}
                               </span>
                             )}
-                            {item.evidence.documents.length > 0 && (
+                            {item.evidence?.filter(e => e.type === 'document')?.length > 0 && (
                               <span style={{
                                 background: '#fef3c7',
                                 color: '#92400e',
@@ -1476,7 +1480,7 @@ export default function Home() {
                                 fontSize: '11px',
                                 fontWeight: '600'
                               }}>
-                                📄 {item.evidence.documents.length}
+                                📄 {item.evidence.filter(e => e.type === 'document').length}
                               </span>
                             )}
                           </div>
@@ -1794,7 +1798,7 @@ export default function Home() {
             boxShadow: '0 10px 25px rgba(234, 88, 12, 0.3)'
           }}>
             <div style={{ fontSize: '48px', fontWeight: '900', color: 'white', marginBottom: '12px' }}>
-              {allItems.filter(item => item.evidence.photos.length > 0).length}
+              {allItems.filter(item => item.evidence?.filter(e => e.type === 'photo')?.length > 0).length}
             </div>
             <div style={{ color: 'white', fontSize: '18px', fontWeight: '600' }}>Items w/ Photos</div>
           </div>
@@ -1998,7 +2002,7 @@ export default function Home() {
                       </td>
                       <td style={{ padding: '16px' }}>
                         <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
-                          {item.evidence.photos.length > 0 && (
+                          {item.evidence?.filter(e => e.type === 'photo')?.length > 0 && (
                             <span style={{
                               background: '#dbeafe',
                               color: '#1e40af',
@@ -2007,10 +2011,10 @@ export default function Home() {
                               fontSize: '11px',
                               fontWeight: '600'
                             }}>
-                              📷 {item.evidence.photos.length}
+                              📷 {item.evidence.filter(e => e.type === 'photo').length}
                             </span>
                           )}
-                          {item.evidence.videos.length > 0 && (
+                          {item.evidence?.filter(e => e.type === 'video')?.length > 0 && (
                             <span style={{
                               background: '#dcfce7',
                               color: '#166534',
@@ -2019,10 +2023,10 @@ export default function Home() {
                               fontSize: '11px',
                               fontWeight: '600'
                             }}>
-                              🎥 {item.evidence.videos.length}
+                              🎥 {item.evidence.filter(e => e.type === 'video').length}
                             </span>
                           )}
-                          {item.evidence.documents.length > 0 && (
+                          {item.evidence?.filter(e => e.type === 'document')?.length > 0 && (
                             <span style={{
                               background: '#fef3c7',
                               color: '#92400e',
@@ -2031,7 +2035,7 @@ export default function Home() {
                               fontSize: '11px',
                               fontWeight: '600'
                             }}>
-                              📄 {item.evidence.documents.length}
+                              📄 {item.evidence.filter(e => e.type === 'document').length}
                             </span>
                           )}
                         </div>

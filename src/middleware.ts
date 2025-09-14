@@ -1,42 +1,33 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { securityMiddleware, apiSecurityMiddleware } from './middleware/security'
 
+// Security middleware for production headers
 export function middleware(request: NextRequest) {
-  // Apply general security middleware
-  const response = securityMiddleware(request)
-
-  // Apply API-specific security for API routes
-  if (request.nextUrl.pathname.startsWith('/api/')) {
-    return apiSecurityMiddleware(request)
-  }
-
-  // Additional route-specific security
-  if (request.nextUrl.pathname === '/login') {
-    // Ensure login page is not cached
-    response.headers.set('Cache-Control', 'no-cache, no-store, must-revalidate')
-    response.headers.set('Pragma', 'no-cache')
-    response.headers.set('Expires', '0')
-  }
-
-  // Redirect HTTP to HTTPS in production
-  if (process.env.NODE_ENV === 'production' && !request.url.startsWith('https://')) {
-    const url = request.url.replace('http://', 'https://')
-    return NextResponse.redirect(url, 301)
-  }
-
+  const response = NextResponse.next()
+  
+  // Content-Security-Policy (adjust sources as needed for your app)
+  response.headers.set('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://res.cloudinary.com;")
+  
+  // Prevent MIME sniffing
+  response.headers.set('X-Content-Type-Options', 'nosniff')
+  
+  // Prevent clickjacking
+  response.headers.set('X-Frame-Options', 'DENY')
+  
+  // Strict referrer policy
+  response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
+  
   return response
 }
 
+// Matcher: Apply to all routes except static files/internal Next.js paths
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - api (API routes)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public files with extensions
-     */
-    '/((?!api|_next/static|_next/image|favicon.ico|.*\\.).*)',
+    {
+      source: '/((?!_next/static|_next/image|favicon.ico).*)',
+      missing: [
+        { type: 'header', key: 'next-router-prefetch' },
+        { type: 'header', key: 'purpose', value: 'prefetch' },
+      ],
+    },
   ],
 }
