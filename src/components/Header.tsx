@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { User, getRoleDisplayName } from '@/lib/auth'
+import { UserProfile } from './UserProfile'
 
 export function Header() {
   const [user, setUser] = useState<User | null>(null)
@@ -64,31 +65,17 @@ export function Header() {
 
           {user && (
             <div className="flex items-center space-x-4">
-              <div className="hidden sm:flex items-center space-x-3 px-4 py-2 bg-white/20 backdrop-blur-sm rounded-xl">
-                <div className="w-8 h-8 bg-gradient-to-br from-green-400 to-blue-500 rounded-full flex items-center justify-center shadow-lg">
-                  <span className="text-white text-sm font-bold">
-                    {user?.name?.charAt(0) || 'U'}
-                  </span>
-                </div>
-                <div>
-                  <p className="text-white font-medium text-sm">
-                    {user?.name || 'User'}
-                  </p>
-                  <p className="text-white/70 text-xs">
-                    {user ? getRoleDisplayName(user.role) : 'User'}
-                  </p>
-                </div>
-              </div>
+              <UserProfile className="hidden sm:flex" />
               
+              {/* Mobile logout button */}
               <button
                 onClick={handleLogout}
-                className="btn-secondary group"
+                className="btn-secondary group sm:hidden"
               >
                 <svg className="w-4 h-4 mr-2 group-hover:rotate-12 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                 </svg>
-                <span className="hidden sm:inline">Sign Out</span>
-                <span className="sm:hidden">Exit</span>
+                <span>Exit</span>
               </button>
             </div>
           )}
