@@ -20,39 +20,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           timestamp: new Date().toISOString()
         })
 
-        // Multi-user authentication for testing
-        const users = [
-          {
-            username: 'admin',
-            password: 'password',
-            user: {
-              id: "1",
-              name: "Police Officer",
-              email: "officer@police.gov",
-              role: "law_enforcement"
-            }
-          },
-          {
-            username: 'citizen',
-            password: 'password',
-            user: {
-              id: "2",
-              name: "George Page",
-              email: "george@birkenfeldfarm.com",
-              role: "citizen"
-            }
-          },
-          {
-            username: 'george',
-            password: 'password',
-            user: {
-              id: "3",
-              name: "George Page",
-              email: "george@birkenfeldfarm.com",
-              role: "citizen"
-            }
-          }
-        ]
+        // Use the new RBAC user database
+        const { users } = await import('./lib/auth')
 
         const matchedUser = users.find(u => 
           u.username === typedCredentials?.username && 
@@ -60,8 +29,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         )
 
         if (matchedUser) {
-          console.log('✅ Authentication successful for:', matchedUser.user.role, matchedUser.user.name)
-          return matchedUser.user as User
+          console.log('✅ Authentication successful for:', matchedUser.role, matchedUser.name)
+          return {
+            id: matchedUser.id,
+            name: matchedUser.name,
+            email: matchedUser.email,
+            role: matchedUser.role
+          } as User
         }
 
         console.log('❌ Authentication failed - no matching user found')
