@@ -180,12 +180,20 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
   if (!user) {
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-xl p-8 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">Create Account</h2>
+        <div className="bg-gradient-to-br from-white to-gray-50 rounded-2xl p-8 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-200">
+          <div className="flex justify-between items-center mb-8">
+            <div className="flex items-center space-x-4">
+              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+                <span className="text-white text-xl">📝</span>
+              </div>
+              <div>
+                <h2 className="text-3xl font-bold text-gray-900">Create Account</h2>
+                <p className="text-gray-600">Join the Crime Report System</p>
+              </div>
+            </div>
             <button
               onClick={onClose}
-              className="text-gray-500 hover:text-gray-700 text-2xl"
+              className="text-gray-400 hover:text-gray-600 text-3xl transition-colors"
             >
               ×
             </button>
@@ -203,7 +211,7 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
                   required
                   value={registrationData.username}
                   onChange={(e) => setRegistrationData({...registrationData, username: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                 />
               </div>
               <div>
@@ -215,7 +223,7 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
                   required
                   value={registrationData.email}
                   onChange={(e) => setRegistrationData({...registrationData, email: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                 />
               </div>
             </div>
@@ -243,7 +251,7 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
                   required
                   value={registrationData.password}
                   onChange={(e) => setRegistrationData({...registrationData, password: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                 />
               </div>
               <div>
@@ -255,7 +263,7 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
                   required
                   value={registrationData.confirmPassword}
                   onChange={(e) => setRegistrationData({...registrationData, confirmPassword: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                 />
               </div>
             </div>
@@ -304,7 +312,7 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
               <button
                 type="submit"
                 disabled={loading}
-                className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+                className="px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 font-semibold shadow-lg transition-all duration-200 transform hover:scale-105"
               >
                 {loading ? 'Creating...' : 'Create Account'}
               </button>
@@ -317,20 +325,28 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl p-6 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+      <div className="bg-gradient-to-br from-white to-gray-50 rounded-2xl p-8 max-w-5xl w-full mx-4 max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-200">
         {/* Header */}
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">Account Management</h2>
+        <div className="flex justify-between items-center mb-8">
+          <div className="flex items-center space-x-4">
+            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+              <span className="text-white text-xl">👤</span>
+            </div>
+            <div>
+              <h2 className="text-3xl font-bold text-gray-900">Account Management</h2>
+              <p className="text-gray-600">Manage your profile and account settings</p>
+            </div>
+          </div>
           <button
             onClick={onClose}
-            className="text-gray-500 hover:text-gray-700 text-2xl"
+            className="text-gray-400 hover:text-gray-600 text-3xl transition-colors"
           >
             ×
           </button>
         </div>
 
         {/* Tabs */}
-        <div className="flex space-x-1 mb-6 bg-gray-100 p-1 rounded-lg">
+        <div className="flex space-x-2 mb-8 bg-gradient-to-r from-gray-100 to-gray-200 p-2 rounded-2xl">
           {[
             { id: 'profile', label: 'Profile', icon: '👤' },
             { id: 'password', label: 'Password', icon: '🔒' },
@@ -339,10 +355,10 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
-              className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+              className={`flex-1 py-3 px-6 rounded-xl text-sm font-semibold transition-all duration-200 ${
                 activeTab === tab.id
-                  ? 'bg-white text-blue-600 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
+                  ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg transform scale-105'
+                  : 'text-gray-600 hover:text-gray-900 hover:bg-white/50'
               }`}
             >
               <span className="mr-2">{tab.icon}</span>
@@ -365,7 +381,7 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
                     required
                     value={profileData.name}
                     onChange={(e) => setProfileData({...profileData, name: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                   />
                 </div>
                 <div>
@@ -377,7 +393,7 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
                     required
                     value={profileData.email}
                     onChange={(e) => setProfileData({...profileData, email: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                   />
                 </div>
               </div>
@@ -391,7 +407,7 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
                     type="tel"
                     value={profileData.phone || ''}
                     onChange={(e) => setProfileData({...profileData, phone: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                   />
                 </div>
                 <div>
@@ -402,7 +418,7 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
                     type="text"
                     value={profileData.company || ''}
                     onChange={(e) => setProfileData({...profileData, company: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                   />
                 </div>
               </div>
@@ -415,7 +431,7 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
                   type="text"
                   value={profileData.address || ''}
                   onChange={(e) => setProfileData({...profileData, address: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                 />
               </div>
 
@@ -428,7 +444,7 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
                     type="text"
                     value={profileData.city || ''}
                     onChange={(e) => setProfileData({...profileData, city: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                   />
                 </div>
                 <div>
@@ -439,7 +455,7 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
                     type="text"
                     value={profileData.state || ''}
                     onChange={(e) => setProfileData({...profileData, state: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                   />
                 </div>
                 <div>
@@ -450,7 +466,7 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
                     type="text"
                     value={profileData.zipCode || ''}
                     onChange={(e) => setProfileData({...profileData, zipCode: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                   />
                 </div>
               </div>
@@ -464,7 +480,7 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
                     type="text"
                     value={profileData.country || ''}
                     onChange={(e) => setProfileData({...profileData, country: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                   />
                 </div>
                 <div>
@@ -475,7 +491,7 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
                     type="text"
                     value={profileData.title || ''}
                     onChange={(e) => setProfileData({...profileData, title: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                   />
                 </div>
               </div>
@@ -488,7 +504,7 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
                   rows={3}
                   value={profileData.bio || ''}
                   onChange={(e) => setProfileData({...profileData, bio: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                   placeholder="Tell us about yourself..."
                 />
               </div>
@@ -513,13 +529,13 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
                 >
                   Cancel
                 </button>
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
-                >
-                  {loading ? 'Updating...' : 'Update Profile'}
-                </button>
+              <button
+                type="submit"
+                disabled={loading}
+                className="px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 font-semibold shadow-lg transition-all duration-200 transform hover:scale-105"
+              >
+                {loading ? 'Updating...' : 'Update Profile'}
+              </button>
               </div>
             </form>
           )}
@@ -535,7 +551,7 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
                   required
                   value={passwordData.currentPassword}
                   onChange={(e) => setPasswordData({...passwordData, currentPassword: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                 />
               </div>
 
@@ -549,7 +565,7 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
                     required
                     value={passwordData.newPassword}
                     onChange={(e) => setPasswordData({...passwordData, newPassword: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                   />
                 </div>
                 <div>
@@ -561,7 +577,7 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
                     required
                     value={passwordData.confirmPassword}
                     onChange={(e) => setPasswordData({...passwordData, confirmPassword: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                   />
                 </div>
               </div>
@@ -589,7 +605,7 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
                 <button
                   type="submit"
                   disabled={loading}
-                  className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+                  className="px-8 py-3 bg-gradient-to-r from-red-500 to-pink-600 text-white rounded-xl hover:from-red-600 hover:to-pink-700 disabled:opacity-50 font-semibold shadow-lg transition-all duration-200 transform hover:scale-105"
                 >
                   {loading ? 'Changing...' : 'Change Password'}
                 </button>

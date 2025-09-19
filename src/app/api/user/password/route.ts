@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getCurrentUser } from '@/lib/auth-server'
-import { prisma } from '@/lib/prisma'
+import { users } from '@/lib/auth'
 
 export async function PUT(request: NextRequest) {
   try {
@@ -19,18 +19,14 @@ export async function PUT(request: NextRequest) {
       )
     }
 
-    // Get user from database to verify current password
-    const dbUser = await prisma.user.findUnique({
-      where: { id: user.id },
-      select: { password: true }
-    })
-
-    if (!dbUser) {
+    // Find user in hardcoded array
+    const userIndex = users.findIndex(u => u.id === user.id)
+    if (userIndex === -1) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 })
     }
 
     // Verify current password (in a real app, you'd hash this)
-    if (dbUser.password !== currentPassword) {
+    if (users[userIndex].password !== currentPassword) {
       return NextResponse.json(
         { error: 'Current password is incorrect' },
         { status: 400 }
@@ -45,14 +41,9 @@ export async function PUT(request: NextRequest) {
       )
     }
 
-    // Update password (in a real app, you'd hash this)
-    await prisma.user.update({
-      where: { id: user.id },
-      data: {
-        password: newPassword,
-        updatedAt: new Date()
-      }
-    })
+    // Update password in hardcoded array
+    users[userIndex].password = newPassword
+    users[userIndex].updatedAt = new Date().toISOString()
 
     return NextResponse.json({ success: true })
 

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
+import { users, Role } from '@/lib/auth'
 
 export async function POST(request: NextRequest) {
   try {
@@ -22,10 +22,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if username already exists
-    const existingUsername = await prisma.user.findUnique({
-      where: { username }
-    })
-
+    const existingUsername = users.find(u => u.username === username)
     if (existingUsername) {
       return NextResponse.json(
         { error: 'Username is already taken' },
@@ -34,10 +31,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if email already exists
-    const existingEmail = await prisma.user.findUnique({
-      where: { email }
-    })
-
+    const existingEmail = users.find(u => u.email === email)
     if (existingEmail) {
       return NextResponse.json(
         { error: 'Email is already registered' },
@@ -45,33 +39,42 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Create new user
-    const newUser = await prisma.user.create({
-      data: {
-        username,
-        email,
-        name,
-        password, // In a real app, you'd hash this
-        role,
-        emailVerified: false,
-        isActive: true
-      },
-      select: {
-        id: true,
-        username: true,
-        email: true,
-        name: true,
-        role: true,
-        createdAt: true
-      }
-    })
+    // Create new user (generate new ID)
+    const newId = (Math.max(...users.map(u => parseInt(u.id)), 0) + 1).toString()
+    const newUser = {
+      id: newId,
+      username,
+      email,
+      name,
+      password, // In a real app, you'd hash this
+      role: role as Role,
+      permissions: ['read:own', 'write:own'], // Default permissions
+      phone: '',
+      address: '',
+      city: '',
+      state: '',
+      zipCode: '',
+      country: '',
+      company: '',
+      title: '',
+      bio: '',
+      avatar: '',
+      emailVerified: false,
+      isActive: true,
+      lastLoginAt: '',
+      preferences: '',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    }
 
+    // Add to hardcoded users array
+    users.push(newUser)
+
+    // Return user without password
+    const { password: _, ...userWithoutPassword } = newUser
     return NextResponse.json({
       success: true,
-      user: {
-        ...newUser,
-        createdAt: newUser.createdAt.toISOString()
-      }
+      user: userWithoutPassword
     })
 
   } catch (error) {

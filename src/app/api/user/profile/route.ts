@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getCurrentUser } from '@/lib/auth-server'
-import { prisma } from '@/lib/prisma'
+import { users } from '@/lib/auth'
 
 export async function GET() {
   try {
@@ -10,46 +10,16 @@ export async function GET() {
       return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
     }
 
-    // Get full user data from database
-    const dbUser = await prisma.user.findUnique({
-      where: { id: user.id },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        username: true,
-        role: true,
-        phone: true,
-        address: true,
-        city: true,
-        state: true,
-        zipCode: true,
-        country: true,
-        company: true,
-        title: true,
-        bio: true,
-        avatar: true,
-        emailVerified: true,
-        isActive: true,
-        lastLoginAt: true,
-        preferences: true,
-        createdAt: true,
-        updatedAt: true
-      }
-    })
-
-    if (!dbUser) {
+    // Get full user data from hardcoded users array
+    const fullUser = users.find(u => u.id === user.id)
+    
+    if (!fullUser) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 })
     }
 
-    return NextResponse.json({
-      user: {
-        ...dbUser,
-        createdAt: dbUser.createdAt.toISOString(),
-        updatedAt: dbUser.updatedAt.toISOString(),
-        lastLoginAt: dbUser.lastLoginAt?.toISOString() || null
-      }
-    })
+    // Return user without password
+    const { password, ...userWithoutPassword } = fullUser
+    return NextResponse.json({ user: userWithoutPassword })
 
   } catch (error) {
     console.error('Error fetching user profile:', error)
@@ -78,14 +48,14 @@ export async function PUT(request: NextRequest) {
       )
     }
 
-    // Check if email is already taken by another user
-    const existingUser = await prisma.user.findFirst({
-      where: {
-        email: profileData.email,
-        id: { not: user.id }
-      }
-    })
+    // Find the user in the hardcoded array
+    const userIndex = users.findIndex(u => u.id === user.id)
+    if (userIndex === -1) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 })
+    }
 
+    // Check if email is already taken by another user
+    const existingUser = users.find(u => u.email === profileData.email && u.id !== user.id)
     if (existingUser) {
       return NextResponse.json(
         { error: 'Email is already in use by another account' },
@@ -93,57 +63,29 @@ export async function PUT(request: NextRequest) {
       )
     }
 
-    // Update user profile
-    const updatedUser = await prisma.user.update({
-      where: { id: user.id },
-      data: {
-        name: profileData.name,
-        email: profileData.email,
-        phone: profileData.phone || null,
-        address: profileData.address || null,
-        city: profileData.city || null,
-        state: profileData.state || null,
-        zipCode: profileData.zipCode || null,
-        country: profileData.country || null,
-        company: profileData.company || null,
-        title: profileData.title || null,
-        bio: profileData.bio || null,
-        avatar: profileData.avatar || null,
-        updatedAt: new Date()
-      },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        username: true,
-        role: true,
-        phone: true,
-        address: true,
-        city: true,
-        state: true,
-        zipCode: true,
-        country: true,
-        company: true,
-        title: true,
-        bio: true,
-        avatar: true,
-        emailVerified: true,
-        isActive: true,
-        lastLoginAt: true,
-        preferences: true,
-        createdAt: true,
-        updatedAt: true
-      }
-    })
+    // Update user profile in the hardcoded array
+    users[userIndex] = {
+      ...users[userIndex],
+      name: profileData.name,
+      email: profileData.email,
+      phone: profileData.phone || '',
+      address: profileData.address || '',
+      city: profileData.city || '',
+      state: profileData.state || '',
+      zipCode: profileData.zipCode || '',
+      country: profileData.country || '',
+      company: profileData.company || '',
+      title: profileData.title || '',
+      bio: profileData.bio || '',
+      updatedAt: new Date().toISOString(),
+      createdAt: users[userIndex].createdAt || new Date().toISOString()
+    }
 
-    return NextResponse.json({
-      user: {
-        ...updatedUser,
-        createdAt: updatedUser.createdAt.toISOString(),
-        updatedAt: updatedUser.updatedAt.toISOString(),
-        lastLoginAt: updatedUser.lastLoginAt?.toISOString() || null
-      }
-    })
+    const updatedUser = users[userIndex]
+
+    // Return user without password
+    const { password, ...userWithoutPassword } = updatedUser
+    return NextResponse.json({ user: userWithoutPassword })
 
   } catch (error) {
     console.error('Error updating user profile:', error)
