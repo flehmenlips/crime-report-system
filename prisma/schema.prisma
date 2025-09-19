@@ -23,6 +23,28 @@ enum Role {
   executive_assistant
 }
 
+enum AccessLevel {
+  owner          // Property owner - full control
+  staff          // Internal staff - read/write access
+  stakeholder    // External stakeholders - read/search/add notes
+  view_only      // View only access
+}
+
+model Tenant {
+  id          String   @id @default(uuid())
+  name        String   // e.g., "Birkenfeld Farm", "Smith Property", etc.
+  description String?  // Optional description
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  users       User[]
+  items       StolenItem[]
+  
+  @@map("tenants")
+}
+
 model User {
   id          String   @id @default(uuid())
   email       String   @unique
@@ -30,6 +52,7 @@ model User {
   username    String   @unique
   password    String
   role        Role     @default(property_owner)
+  accessLevel AccessLevel @default(owner) // Access level within tenant
   
   // Extended profile fields
   phone       String?
@@ -52,6 +75,10 @@ model User {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   
+  // Tenant relationship
+  tenantId    String
+  tenant      Tenant   @relation(fields: [tenantId], references: [id])
+  
   // Relations
   items       StolenItem[]
   
@@ -73,6 +100,10 @@ model StolenItem {
   notes             String?
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
+  
+  // Tenant isolation
+  tenantId          String
+  tenant            Tenant   @relation(fields: [tenantId], references: [id])
   
   // Relations
   ownerId           String

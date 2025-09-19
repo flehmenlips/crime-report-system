@@ -32,6 +32,8 @@ The application must handle sensitive data appropriately, provide robust search 
 - **Hybrid Storage**: Managing different storage systems for media vs documents, ensuring seamless integration
 - **Scalability**: Handling potentially large document sizes in database while maintaining query performance
 - **Cost Management**: Balancing storage costs between PostgreSQL and Cloudinary
+- **Multi-Tenant Architecture**: Implementing property owner isolation with stakeholder access controls
+- **Data Isolation**: Ensuring each property owner has independent data while allowing controlled stakeholder access
 
 ## High-level Task Breakdown
 

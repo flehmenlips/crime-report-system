@@ -1,4 +1,14 @@
 export type Role = 'property_owner' | 'law_enforcement' | 'insurance_agent' | 'broker' | 'banker' | 'asset_manager' | 'assistant' | 'secretary' | 'manager' | 'executive_assistant'
+export type AccessLevel = 'owner' | 'staff' | 'stakeholder' | 'view_only'
+
+export interface Tenant {
+  id: string
+  name: string
+  description?: string
+  isActive: boolean
+  createdAt: string
+  updatedAt: string
+}
 
 export interface User {
   id: string
@@ -6,6 +16,7 @@ export interface User {
   email: string
   username: string
   role: Role
+  accessLevel: AccessLevel
   permissions?: string[]
   
   // Extended profile fields
@@ -26,13 +37,29 @@ export interface User {
   lastLoginAt?: string
   preferences?: string
   
+  // Tenant relationship
+  tenantId: string
+  tenant: Tenant
+  
   createdAt: string
   updatedAt: string
 }
 
+// Tenant database - each property owner gets their own tenant
+export const tenants = [
+  {
+    id: "tenant-1",
+    name: "Birkenfeld Farm",
+    description: "Original Birkenfeld Farm theft case",
+    isActive: true,
+    createdAt: "2023-09-01T00:00:00Z",
+    updatedAt: "2023-09-19T00:00:00Z"
+  }
+]
+
 // Enhanced user database with all stakeholder roles
 export const users = [
-  // Law Enforcement
+  // Law Enforcement - has access to all tenants
   {
     id: "1",
     name: "Police Officer",
@@ -40,6 +67,7 @@ export const users = [
     username: "admin",
     password: "password",
     role: "law_enforcement" as Role,
+    accessLevel: "stakeholder" as AccessLevel,
     permissions: ["read:all", "write:all", "admin:users", "admin:system"],
     phone: "+1 (555) 911-0000",
     address: "Police Station",
@@ -50,6 +78,8 @@ export const users = [
     company: "Birkenfeld Police Department",
     title: "Detective",
     bio: "Lead investigator for the Birkenfeld Farm theft case.",
+    tenantId: "tenant-1",
+    tenant: tenants[0],
     createdAt: "2023-09-01T00:00:00Z",
     updatedAt: "2023-09-19T00:00:00Z"
   },
@@ -58,9 +88,14 @@ export const users = [
     name: "Detective Smith",
     email: "detective@police.gov", 
     role: "law_enforcement" as Role,
+    accessLevel: "stakeholder" as AccessLevel,
     username: "detective",
     password: "password",
-    permissions: ["read:all", "write:all", "admin:users"]
+    permissions: ["read:all", "write:all", "admin:users"],
+    tenantId: "tenant-1",
+    tenant: tenants[0],
+    createdAt: "2023-09-01T00:00:00Z",
+    updatedAt: "2023-09-19T00:00:00Z"
   },
   
   // Property Owners
@@ -71,6 +106,7 @@ export const users = [
     username: "george",
     password: "password",
     role: "property_owner" as Role,
+    accessLevel: "owner" as AccessLevel,
     permissions: ["read:own", "write:own", "upload:evidence", "generate:reports"],
     phone: "+1 (555) 123-4567",
     address: "123 Farm Road",
@@ -81,6 +117,8 @@ export const users = [
     company: "Birkenfeld Farm",
     title: "Property Owner",
     bio: "Owner of Birkenfeld Farm, specializing in organic produce and livestock.",
+    tenantId: "tenant-1",
+    tenant: tenants[0],
     createdAt: "2023-09-01T00:00:00Z",
     updatedAt: "2023-09-19T00:00:00Z"
   },

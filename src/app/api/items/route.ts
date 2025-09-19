@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getCurrentUser } from '@/lib/auth-server'
 import { prisma } from '@/lib/prisma'
 import { StolenItem, SearchFilters } from '@/types'
 
-async function getAllItems(): Promise<StolenItem[]> {
+async function getAllItems(userTenantId?: string): Promise<StolenItem[]> {
   try {
+    // Temporary: Use hardcoded data until database migration is complete
     const items = await prisma.stolenItem.findMany({
       include: {
         evidence: true,
@@ -30,6 +32,16 @@ async function getAllItems(): Promise<StolenItem[]> {
       notes: item.notes || undefined,
       createdAt: item.createdAt.toISOString(),
       updatedAt: item.updatedAt.toISOString(),
+      // Temporary: Add hardcoded tenant info until database migration
+      tenantId: "tenant-1",
+      tenant: {
+        id: "tenant-1",
+        name: "Birkenfeld Farm",
+        description: "Original Birkenfeld Farm theft case",
+        isActive: true,
+        createdAt: "2023-09-01T00:00:00Z",
+        updatedAt: "2023-09-19T00:00:00Z"
+      },
       evidence: item.evidence?.map(e => ({ 
         ...e, 
         createdAt: e.createdAt.toISOString(),
@@ -42,9 +54,12 @@ async function getAllItems(): Promise<StolenItem[]> {
   }
 }
 
-async function searchItems(filters: SearchFilters): Promise<StolenItem[]> {
+async function searchItems(filters: SearchFilters, userTenantId?: string): Promise<StolenItem[]> {
   try {
-    const whereClause: any = {}
+    const whereClause: any = {
+      // Temporary: Skip tenant filtering until database migration
+      // ...(userTenantId && { tenantId: userTenantId })
+    }
 
     // Text search
     if (filters.query) {
@@ -103,6 +118,16 @@ async function searchItems(filters: SearchFilters): Promise<StolenItem[]> {
       notes: item.notes || undefined,
       createdAt: item.createdAt.toISOString(),
       updatedAt: item.updatedAt.toISOString(),
+      // Temporary: Add hardcoded tenant info until database migration
+      tenantId: "tenant-1",
+      tenant: {
+        id: "tenant-1",
+        name: "Birkenfeld Farm",
+        description: "Original Birkenfeld Farm theft case",
+        isActive: true,
+        createdAt: "2023-09-01T00:00:00Z",
+        updatedAt: "2023-09-19T00:00:00Z"
+      },
       evidence: item.evidence?.map(e => ({ 
         ...e, 
         createdAt: e.createdAt.toISOString(),
@@ -117,6 +142,15 @@ async function searchItems(filters: SearchFilters): Promise<StolenItem[]> {
 
 export async function GET(request: NextRequest) {
   try {
+    // Get current user for tenant filtering
+    const user = await getCurrentUser()
+    if (!user) {
+      return NextResponse.json(
+        { error: 'Authentication required' },
+        { status: 401 }
+      )
+    }
+
     const { searchParams } = new URL(request.url)
 
     // Input validation and sanitization
@@ -193,7 +227,7 @@ export async function GET(request: NextRequest) {
       dateRange: dateStart && dateEnd ? { start: dateStart, end: dateEnd } : undefined
     }
 
-    const items = await searchItems(filters)
+    const items = await searchItems(filters, user.tenantId)
 
     return NextResponse.json({
       items,

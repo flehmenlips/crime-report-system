@@ -78,7 +78,18 @@ export async function PUT(request: NextRequest) {
       title: profileData.title || '',
       bio: profileData.bio || '',
       updatedAt: new Date().toISOString(),
-      createdAt: users[userIndex].createdAt || new Date().toISOString()
+      createdAt: users[userIndex].createdAt || new Date().toISOString(),
+      // Ensure all required fields are present
+      accessLevel: users[userIndex].accessLevel || 'owner',
+      tenantId: users[userIndex].tenantId || 'tenant-1',
+      tenant: users[userIndex].tenant || {
+        id: 'tenant-1',
+        name: 'Birkenfeld Farm',
+        description: 'Original Birkenfeld Farm theft case',
+        isActive: true,
+        createdAt: '2023-09-01T00:00:00Z',
+        updatedAt: '2023-09-19T00:00:00Z'
+      }
     }
 
     const updatedUser = users[userIndex]

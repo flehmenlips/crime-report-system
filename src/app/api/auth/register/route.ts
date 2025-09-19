@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { users, Role } from '@/lib/auth'
+import { users, tenants, Role, AccessLevel } from '@/lib/auth'
 
 export async function POST(request: NextRequest) {
   try {
@@ -41,6 +41,25 @@ export async function POST(request: NextRequest) {
 
     // Create new user (generate new ID)
     const newId = (Math.max(...users.map(u => parseInt(u.id)), 0) + 1).toString()
+    
+    // Create new tenant for property owners, use existing for others
+    const defaultTenant = tenants[0] // Use Birkenfeld Farm as default
+    let userTenant = defaultTenant
+    
+    if (role === 'property_owner') {
+      // Create new tenant for new property owner
+      const newTenantId = `tenant-${Date.now()}`
+      userTenant = {
+        id: newTenantId,
+        name: `${name}'s Property`,
+        description: `Property managed by ${name}`,
+        isActive: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      }
+      tenants.push(userTenant)
+    }
+    
     const newUser = {
       id: newId,
       username,
@@ -48,6 +67,7 @@ export async function POST(request: NextRequest) {
       name,
       password, // In a real app, you'd hash this
       role: role as Role,
+      accessLevel: (role === 'property_owner' ? 'owner' : 'stakeholder') as AccessLevel,
       permissions: ['read:own', 'write:own'], // Default permissions
       phone: '',
       address: '',
@@ -63,6 +83,8 @@ export async function POST(request: NextRequest) {
       isActive: true,
       lastLoginAt: '',
       preferences: '',
+      tenantId: userTenant.id,
+      tenant: userTenant,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     }

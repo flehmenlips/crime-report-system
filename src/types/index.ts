@@ -24,6 +24,10 @@ export interface StolenItem {
   notes?: string;
   createdAt: string; // ISO date string
   updatedAt: string; // ISO date string
+  
+  // Tenant isolation
+  tenantId: string;
+  tenant: Tenant;
 }
 
 export interface SearchFilters {
@@ -50,12 +54,24 @@ export interface AuthCredentials {
 
 export type Role = 'property_owner' | 'law_enforcement' | 'insurance_agent' | 'broker' | 'banker' | 'asset_manager' | 'assistant' | 'secretary' | 'manager' | 'executive_assistant'
 
+export type AccessLevel = 'owner' | 'staff' | 'stakeholder' | 'view_only'
+
+export interface Tenant {
+  id: string;
+  name: string;
+  description?: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface User {
   id: string;
   name: string;
   email: string;
   username: string;
   role: Role;
+  accessLevel: AccessLevel;
   permissions?: string[];
   
   // Extended profile fields
@@ -75,6 +91,10 @@ export interface User {
   isActive?: boolean;
   lastLoginAt?: string;
   preferences?: string; // JSON string
+  
+  // Tenant relationship
+  tenantId: string;
+  tenant: Tenant;
   
   createdAt: string;
   updatedAt: string;

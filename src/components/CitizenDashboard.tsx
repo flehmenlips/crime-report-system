@@ -49,7 +49,16 @@ export function CitizenDashboard() {
         estimatedValue: formData.estimatedValue,
         evidence: [],
         createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        updatedAt: new Date().toISOString(),
+        tenantId: "tenant-1", // Default tenant for now
+        tenant: {
+          id: "tenant-1",
+          name: "Birkenfeld Farm",
+          description: "Original Birkenfeld Farm theft case",
+          isActive: true,
+          createdAt: "2023-09-01T00:00:00Z",
+          updatedAt: "2023-09-19T00:00:00Z"
+        }
       }
 
       // Add to local state (in real app, this would save to database)
