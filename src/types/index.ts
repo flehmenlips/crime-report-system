@@ -68,18 +68,4 @@ export interface ItemFormData {
   notes?: string;
 }
 
-// Extend NextAuth types
-import { DefaultSession } from 'next-auth'
-
-declare module 'next-auth' {
-  interface Session {
-    user?: {
-      id: string
-      role: string
-    } & DefaultSession['user']
-  }
-
-  interface User {
-    role: string
-  }
-}
+// NextAuth types disabled - using custom authentication
