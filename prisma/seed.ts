@@ -14,7 +14,7 @@ async function main() {
       email: 'george@birkenfeldfarm.com',
       name: 'George Page',
       password: 'password',
-      role: 'citizen'
+      role: 'property_owner'
     }
   })
 
@@ -26,7 +26,7 @@ async function main() {
       email: 'citizen@birkenfeldfarm.com',
       name: 'George Page',
       password: 'password',
-      role: 'citizen'
+      role: 'property_owner'
     }
   })
 
