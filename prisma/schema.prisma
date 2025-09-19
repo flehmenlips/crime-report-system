@@ -10,13 +10,26 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  property_owner
+  law_enforcement
+  insurance_agent
+  broker
+  banker
+  asset_manager
+  assistant
+  secretary
+  manager
+  executive_assistant
+}
+
 model User {
-  id          String   @id @default(cuid())
+  id          String   @id @default(uuid())
   email       String   @unique
   name        String
   username    String   @unique
   password    String
-  role        String   @default("citizen") // citizen, law_enforcement, admin
+  role        Role     @default(property_owner) // citizen, law_enforcement, admin
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   

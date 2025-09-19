@@ -9,6 +9,9 @@ cloudinary.config({
 })
 
 export async function GET(request: NextRequest) {
+  let documentBuffer: ArrayBuffer | null = null
+  let contentType: string = 'application/octet-stream'
+  
   try {
     const { searchParams } = new URL(request.url)
     const documentUrl = searchParams.get('url')
@@ -80,15 +83,13 @@ export async function GET(request: NextRequest) {
       console.log('Generated signed URL for document access')
       
       // Admin
-      let response: Response = await fetch(signedUrl, {
+      const response: Response = await fetch(signedUrl, {
           headers: {
             'User-Agent': 'CrimeReport-Document-Viewer/1.0'
           }
         })
       if (!response.ok) throw new Error('Fetch failed')
 
-      let documentBuffer: ArrayBuffer
-      let contentType: string
       documentBuffer = await response.arrayBuffer()
       contentType = response.headers.get('content-type') || 'application/octet-stream'
 
@@ -99,30 +100,34 @@ export async function GET(request: NextRequest) {
       const controller = new AbortController()
       const timeoutId = setTimeout(() => controller.abort(), 30000)
 
-      let response: Response = await fetch(actualDocumentUrl, {
-          headers: {
-            'User-Agent': 'CrimeReport-Document-Viewer/1.0'
-          },
-          signal: controller.signal
-        })
-      if (!response.ok) throw new Error('Fetch failed')
+      // Fallback
+      try {
+        const response = await fetch(actualDocumentUrl, {
+            headers: {
+              'User-Agent': 'CrimeReport-Document-Viewer/1.0'
+            },
+            signal: controller.signal
+          })
+        if (!response.ok) throw new Error('Fetch failed')
+
+        documentBuffer = await response.arrayBuffer()
+        contentType = response.headers.get('content-type') || 'application/octet-stream'
+      } catch (error) {
+        console.error('Fallback error:', error)
+        return NextResponse.json({ error: 'Failed to fetch' }, { status: 500 })
+      }
 
       clearTimeout(timeoutId)
 
-      if (!response.ok) {
-        console.error('Failed to fetch document (fallback):', {
-          status: response.status,
-          statusText: response.statusText,
-          url: actualDocumentUrl
-        })
-        return NextResponse.json({ 
-          error: `Failed to fetch document: ${response.status} ${response.statusText}`,
-          url: actualDocumentUrl,
-          cloudinaryError: cloudinaryError instanceof Error ? cloudinaryError.message : 'Unknown'
-        }, { status: response.status })
-      }
+      if (!documentBuffer) return NextResponse.json({ error: 'No data' }, { status: 404 })
+
+      const finalResponse = new NextResponse(documentBuffer)
+      finalResponse.headers.set('Content-Type', contentType)
+
+      return finalResponse
     }
 
+    // If we reach here, we have documentBuffer and contentType
     // Determine proper content type based on filename
     let finalContentType = contentType
     if (filename) {
@@ -148,7 +153,11 @@ export async function GET(request: NextRequest) {
       ? filename.replace(/\.(auto|jpg)$/, '') // Remove .auto or .jpg extensions
       : 'document'
 
-    const finalResponse = new NextResponse(documentBuffer, {
+    if (!documentBuffer) {
+      return NextResponse.json({ error: 'Failed to fetch document' }, { status: 500 })
+    }
+    
+    const finalResponse = new NextResponse(Buffer.from(documentBuffer), {
       headers: {
         'Content-Type': finalContentType,
         'Content-Disposition': `inline; filename="${cleanFilename}"`,

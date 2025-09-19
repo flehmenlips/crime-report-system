@@ -1,15 +1,37 @@
 'use client'
 
-import { signOut, useSession } from 'next-auth/react'
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 
 export function Header() {
-  const { data: session } = useSession()
+  const [user, setUser] = useState<any>(null)
+  const router = useRouter()
 
-  const handleLogout = () => {
-    signOut({ callbackUrl: '/login' })
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const response = await fetch('/api/auth/me')
+        if (response.ok) {
+          const userData = await response.json()
+          setUser(userData.user)
+        }
+      } catch (error) {
+        console.error('Auth check failed:', error)
+      }
+    }
+    checkAuth()
+  }, [])
+
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' })
+      router.push('/login-simple')
+    } catch (error) {
+      console.error('Logout failed:', error)
+    }
   }
 
-  const userRole = (session?.user as any)?.role || 'law_enforcement'
+  const userRole = user?.role || 'law_enforcement'
   const isCitizen = userRole === 'citizen'
 
   return (
@@ -36,17 +58,17 @@ export function Header() {
             </div>
           </div>
 
-          {session && (
+          {user && (
             <div className="flex items-center space-x-4">
               <div className="hidden sm:flex items-center space-x-3 px-4 py-2 bg-white/20 backdrop-blur-sm rounded-xl">
                 <div className="w-8 h-8 bg-gradient-to-br from-green-400 to-blue-500 rounded-full flex items-center justify-center shadow-lg">
                   <span className="text-white text-sm font-bold">
-                    {session.user?.name?.charAt(0) || 'U'}
+                    {user?.name?.charAt(0) || 'U'}
                   </span>
                 </div>
                 <div>
                   <p className="text-white font-medium text-sm">
-                    {session.user?.name || 'User'}
+                    {user?.name || 'User'}
                   </p>
                   <p className="text-white/70 text-xs">
                     {isCitizen ? 'Property Owner' : 'Law Enforcement'}

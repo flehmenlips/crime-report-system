@@ -1,20 +1,14 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { signIn, getSession, getCsrfToken } from 'next-auth/react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
-export default function LoginPage() {
+export default function SimpleLoginPage() {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-  const [csrfToken, setCsrfToken] = useState('')
   const router = useRouter()
-
-  useEffect(() => {
-    getCsrfToken().then(setCsrfToken)
-  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -22,38 +16,21 @@ export default function LoginPage() {
     setError('')
 
     try {
-      const result = await signIn('credentials', {
-        username,
-        password,
-        csrfToken,
-        redirect: false,
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password }),
       })
 
-      if (result?.error) {
-        // Try to parse JSON error message for rate limiting
-        try {
-          const errorData = JSON.parse(result.error)
-          if (errorData.message && errorData.remaining !== undefined) {
-            const resetDate = new Date(errorData.resetTime)
-            const minutesLeft = Math.ceil((resetDate.getTime() - Date.now()) / (1000 * 60))
-            setError(`${errorData.message} ${minutesLeft} minutes remaining.`)
-          } else {
-            setError(errorData.message || 'Authentication failed')
-          }
-        } catch {
-          // If not JSON, treat as regular error message
-          if (result.error.includes('Too many')) {
-            setError(result.error)
-          } else {
-            setError('Invalid credentials. Please check your username and password.')
-          }
-        }
+      const data = await response.json()
+
+      if (response.ok) {
+        // Login successful, redirect to dashboard
+        router.push('/')
       } else {
-        // Check if session was created successfully
-        const session = await getSession()
-        if (session) {
-          router.push('/')
-        }
+        setError(data.error || 'Login failed')
       }
     } catch (error) {
       console.error('Login error:', error)
@@ -82,7 +59,6 @@ export default function LoginPage() {
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
           <form className="space-y-6" onSubmit={handleSubmit}>
-            <input name="csrfToken" type="hidden" defaultValue={csrfToken} />
             <div>
               <label htmlFor="username" className="block text-sm font-medium text-gray-700">
                 Username

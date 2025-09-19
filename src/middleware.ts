@@ -1,22 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getCurrentUser } from '@/lib/auth'
 
 // Security middleware for production headers
-export function middleware(request: NextRequest) {
-  const response = NextResponse.next()
+export async function middleware(req: NextRequest) {
+  // Allow access to auth pages and login without authentication
+  if (req.nextUrl.pathname.startsWith('/api/auth') || 
+      req.nextUrl.pathname.startsWith('/login')) {
+    return NextResponse.next()
+  }
   
-  // Content-Security-Policy (adjust sources as needed for your app)
-  response.headers.set('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://res.cloudinary.com;")
+  // Check for user session
+  const user = await getCurrentUser()
   
-  // Prevent MIME sniffing
-  response.headers.set('X-Content-Type-Options', 'nosniff')
+  // Redirect to login if not authenticated
+  if (!user) {
+    return NextResponse.redirect(new URL('/login-simple', req.url))
+  }
   
-  // Prevent clickjacking
-  response.headers.set('X-Frame-Options', 'DENY')
+  // Role-based access control
+  if (req.nextUrl.pathname.startsWith('/law-enforcement') && user.role !== 'law_enforcement') {
+    return NextResponse.redirect(new URL('/unauthorized', req.url))
+  }
   
-  // Strict referrer policy
-  response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
-  
-  return response
+  return NextResponse.next()
 }
 
 // Matcher: Apply to all routes except static files/internal Next.js paths

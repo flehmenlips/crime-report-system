@@ -116,7 +116,7 @@ export async function GET(request: NextRequest) {
         // Auto-attempt download after 2 seconds
         setTimeout(() => {
             console.log('Auto-attempting document access...');
-            window.location.href = '${documentUrl}';
+            window.location.href = window.location.origin + documentUrl;
         }, 2000);
     </script>
 </body>

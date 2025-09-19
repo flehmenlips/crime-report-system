@@ -52,7 +52,7 @@ export async function getTotalValue(): Promise<number> {
  */
 export async function getItemsByEvidenceType(type: 'photos' | 'videos' | 'documents'): Promise<StolenItem[]> {
   const items = await getAllItems();
-  return items.filter(item => (item.evidence[type as keyof typeof item.evidence] as unknown as Evidence[])?.length ?? 0 > 0);
+  return items.filter(item => ((item.evidence[type as keyof typeof item.evidence] as unknown) as Evidence[])?.length ?? 0 > 0);
 }
 
 /**

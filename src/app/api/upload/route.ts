@@ -144,7 +144,7 @@ export async function POST(request: NextRequest) {
     } catch (dbError: unknown) {
       console.error('Database save error:', dbError)
       return NextResponse.json(
-        { error: 'Failed to save', details: (dbError as Error).message },
+        { error: 'Failed to save', details: dbError instanceof Error ? dbError.message : 'Unknown error' },
         { status: 500 }
       )
     }

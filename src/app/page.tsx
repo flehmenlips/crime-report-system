@@ -1,6 +1,6 @@
 'use client'
 
-import { useSession } from 'next-auth/react'
+// import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { SimpleFileUpload } from '@/components/SimpleFileUpload'
@@ -18,7 +18,6 @@ import { StolenItem, ItemFormData } from '@/types'
 import { getAllItems, getTotalValue, formatCurrency, formatDate, addItem } from '@/lib/data'
 
 export default function Home() {
-  const { data: session, status } = useSession()
   const router = useRouter()
   const [allItems, setAllItems] = useState<StolenItem[]>([])
   const [totalValue, setTotalValue] = useState(0)
@@ -42,29 +41,53 @@ export default function Home() {
   const [filteredItems, setFilteredItems] = useState<StolenItem[]>([])
   const [isFiltered, setIsFiltered] = useState(false)
 
-  useEffect(() => {
-    if (status === 'loading') return
+  // Temporary: Use custom auth instead of NextAuth
+  const [user, setUser] = useState<any>(null)
+  const role = user?.role
 
-    if (!session) {
-      router.push('/login')
-      return
+  useEffect(() => {
+    // Check for user session
+    const checkAuth = async () => {
+      try {
+        const response = await fetch('/api/auth/me')
+        if (response.ok) {
+          const userData = await response.json()
+          setUser(userData.user)
+        } else {
+          router.push('/login-simple')
+          return
+        }
+      } catch (error) {
+        console.error('Auth check failed:', error)
+        router.push('/login-simple')
+        return
+      }
     }
+
+    checkAuth()
 
     const loadData = async () => {
       try {
+        console.log('Loading data...')
         const loadedItems = await getAllItems()
+        console.log('Loaded items:', loadedItems.length)
         const total = await getTotalValue()
+        console.log('Total value:', total)
         setAllItems(loadedItems)
         setTotalValue(total)
         setLoading(false)
+        console.log('Data loading complete')
       } catch (error) {
         console.error('Error loading data:', error)
+        // Set some default data to prevent infinite loading
+        setAllItems([])
+        setTotalValue(0)
         setLoading(false)
       }
     }
 
     loadData()
-  }, [session, status, router])
+  }, [])
 
   // Close action menus when clicking outside
   useEffect(() => {
@@ -370,7 +393,7 @@ export default function Home() {
     }
   }
 
-  if (status === 'loading' || loading) {
+  if (!user || loading) {
     return (
       <div style={{
         minHeight: '100vh',
@@ -398,11 +421,11 @@ export default function Home() {
     )
   }
 
-  if (!session) {
+  if (!user) {
     return null
   }
 
-  const userRole = (session.user as any)?.role || 'law_enforcement'
+  const userRole = user?.role
   const evidenceCount = allItems.reduce((total, item) => 
     total + item.evidence?.filter(e => e.type === 'photo')?.length + 
     item.evidence?.filter(e => e.type === 'video')?.length + 
