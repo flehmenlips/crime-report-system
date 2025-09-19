@@ -1735,30 +1735,9 @@ export default function Home() {
                 </p>
               </div>
             </div>
-            <button
-              onClick={() => router.push('/login')}
-              style={{
-                background: 'rgba(255, 255, 255, 0.1)',
-                backdropFilter: 'blur(10px)',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
-                color: 'white',
-                padding: '12px 24px',
-                borderRadius: '12px',
-                cursor: 'pointer',
-                fontWeight: '600',
-                transition: 'all 0.3s ease'
-              }}
-              onMouseOver={(e) => {
-                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)'
-                e.currentTarget.style.transform = 'translateY(-2px)'
-              }}
-              onMouseOut={(e) => {
-                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)'
-                e.currentTarget.style.transform = 'translateY(0)'
-              }}
-            >
-              Sign Out
-            </button>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <UserProfile showDetails={true} />
+            </div>
           </div>
         </div>
       </div>
