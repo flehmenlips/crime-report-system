@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
       )
     }
     
-    console.log('Setting user session for:', user.username, user.role)
+    console.log('Setting user session for:', user.name, user.role)
     await setUserSession(user)
     console.log('Session set successfully')
     
