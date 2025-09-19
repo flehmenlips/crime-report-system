@@ -47,7 +47,9 @@ export function CitizenDashboard() {
         dateLastSeen: formData.dateLastSeen,
         locationLastSeen: formData.locationLastSeen,
         estimatedValue: formData.estimatedValue,
-        evidence: []
+        evidence: [],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
       }
 
       // Add to local state (in real app, this would save to database)

@@ -28,6 +28,8 @@ async function getAllItems(): Promise<StolenItem[]> {
       category: item.category || undefined,
       tags: item.tags ? JSON.parse(item.tags) : [],
       notes: item.notes || undefined,
+      createdAt: item.createdAt.toISOString(),
+      updatedAt: item.updatedAt.toISOString(),
       evidence: item.evidence?.map(e => ({ 
         ...e, 
         createdAt: e.createdAt.toISOString(),
@@ -99,6 +101,8 @@ async function searchItems(filters: SearchFilters): Promise<StolenItem[]> {
       category: item.category || undefined,
       tags: item.tags ? JSON.parse(item.tags) : [],
       notes: item.notes || undefined,
+      createdAt: item.createdAt.toISOString(),
+      updatedAt: item.updatedAt.toISOString(),
       evidence: item.evidence?.map(e => ({ 
         ...e, 
         createdAt: e.createdAt.toISOString(),

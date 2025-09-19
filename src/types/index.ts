@@ -22,6 +22,8 @@ export interface StolenItem {
   category?: string;
   tags?: string[];
   notes?: string;
+  createdAt: string; // ISO date string
+  updatedAt: string; // ISO date string
 }
 
 export interface SearchFilters {
@@ -46,12 +48,14 @@ export interface AuthCredentials {
   password: string;
 }
 
+export type Role = 'property_owner' | 'law_enforcement' | 'insurance_agent' | 'broker' | 'banker' | 'asset_manager' | 'assistant' | 'secretary' | 'manager' | 'executive_assistant'
+
 export interface User {
   id: string;
   name: string;
   email: string;
-  role: 'citizen' | 'law_enforcement' | 'admin';
-  permissions: string[];
+  role: Role;
+  permissions?: string[];
 }
 
 export interface ItemFormData {
