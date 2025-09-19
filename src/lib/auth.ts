@@ -11,7 +11,7 @@ export interface User {
 }
 
 // Enhanced user database with all stakeholder roles
-const users = [
+export const users = [
   // Law Enforcement
   {
     id: "1",

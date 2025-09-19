@@ -1,14 +1,12 @@
 import { NextResponse } from 'next/server'
+import { users } from '@/lib/auth'
 
 // Debug endpoint to check available users (remove in production)
 export async function GET() {
   try {
-    // Import the users array dynamically to ensure we get the latest version
-    const { users } = await import('@/lib/auth')
-    
     return NextResponse.json({
       totalUsers: users.length,
-      users: users.map(u => ({
+      users: users.map((u: any) => ({
         username: u.username,
         role: u.role,
         name: u.name,

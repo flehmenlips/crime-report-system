@@ -50,7 +50,7 @@ export default function Home() {
   const canAddItems = () => canWriteAll(user) || user?.permissions?.includes('write:own')
   const canBulkUpload = () => canWriteAll(user) || user?.permissions?.includes('write:own')
   const canGenerateReports = () => canReadAll(user) || user?.permissions?.includes('generate:reports')
-  const canAccessAdmin = () => canAccessAdmin(user)
+  const canAccessAdminFeatures = () => canAccessAdmin(user)
 
   useEffect(() => {
     // Check for user session
@@ -443,7 +443,7 @@ export default function Home() {
   const displayItems = isFiltered ? filteredItems : allItems
   const displayTotalValue = displayItems.reduce((sum, item) => sum + item.estimatedValue, 0)
 
-  if (userRole === 'citizen') {
+  if (userRole === 'property_owner') {
     return (
       <div style={{
         minHeight: '100vh',
