@@ -38,7 +38,7 @@ export const users = [
     role: "property_owner" as Role,
     username: "george",
     password: "password",
-    permissions: ["read:own", "write:own", "upload:evidence"]
+    permissions: ["read:own", "write:own", "upload:evidence", "generate:reports"]
   },
   {
     id: "4",
@@ -47,7 +47,7 @@ export const users = [
     role: "property_owner" as Role,
     username: "owner",
     password: "password",
-    permissions: ["read:own", "write:own", "upload:evidence"]
+    permissions: ["read:own", "write:own", "upload:evidence", "generate:reports"]
   },
 
   // Insurance Agents

@@ -48,21 +48,9 @@ export default function Home() {
   const role = user?.role
 
   // RBAC helper functions
-  const canAddItems = () => {
-    const result = canWriteAll(user) || user?.permissions?.includes('write:own')
-    console.log('canAddItems check:', { user: user?.name, permissions: user?.permissions, canWriteAll: canWriteAll(user), hasWriteOwn: user?.permissions?.includes('write:own'), result })
-    return result
-  }
-  const canBulkUpload = () => {
-    const result = canWriteAll(user) || user?.permissions?.includes('write:own')
-    console.log('canBulkUpload check:', { user: user?.name, permissions: user?.permissions, canWriteAll: canWriteAll(user), hasWriteOwn: user?.permissions?.includes('write:own'), result })
-    return result
-  }
-  const canGenerateReports = () => {
-    const result = canReadAll(user) || user?.permissions?.includes('generate:reports')
-    console.log('canGenerateReports check:', { user: user?.name, permissions: user?.permissions, canReadAll: canReadAll(user), hasGenerateReports: user?.permissions?.includes('generate:reports'), result })
-    return result
-  }
+  const canAddItems = () => canWriteAll(user) || user?.permissions?.includes('write:own')
+  const canBulkUpload = () => canWriteAll(user) || user?.permissions?.includes('write:own')
+  const canGenerateReports = () => canReadAll(user) || user?.permissions?.includes('generate:reports')
   const canAccessAdminFeatures = () => canAccessAdmin(user)
 
   useEffect(() => {
