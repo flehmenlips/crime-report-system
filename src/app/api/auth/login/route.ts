@@ -26,7 +26,9 @@ export async function POST(request: NextRequest) {
       )
     }
     
+    console.log('Setting user session for:', user.username, user.role)
     await setUserSession(user)
+    console.log('Session set successfully')
     
     return NextResponse.json({ 
       success: true, 

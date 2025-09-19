@@ -30,9 +30,11 @@ export async function middleware(req: NextRequest) {
   
   // Check for user session
   const user = await getCurrentUser()
+  console.log('Middleware - User check for path:', pathname, 'User:', user ? `${user.username} (${user.role})` : 'null')
   
   // Redirect to login if not authenticated
   if (!user) {
+    console.log('Middleware - No user found, redirecting to login-simple')
     return NextResponse.redirect(new URL('/login-simple', req.url))
   }
   
