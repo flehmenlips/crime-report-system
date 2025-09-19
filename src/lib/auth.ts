@@ -115,25 +115,6 @@ export const users = [
   }
 ]
 
-export async function authenticateUser(username: string, password: string): Promise<User | null> {
-  console.log('=== AUTH DEBUG ===')
-  console.log('Attempting to authenticate user:', username)
-  console.log('Total users in database:', users.length)
-  console.log('Available users:', users.map(u => ({ username: u.username, role: u.role })))
-  console.log('Looking for exact match:', { username, password })
-  
-  const user = users.find(u => u.username === username && u.password === password)
-  if (user) {
-    console.log('✅ User found:', { username: user.username, role: user.role })
-    // Return user without password
-    const { password: _, username: __, ...userWithoutCredentials } = user
-    return userWithoutCredentials as User
-  }
-  
-  console.log('❌ No user found for:', username)
-  console.log('=== END AUTH DEBUG ===')
-  return null
-}
 
 
 // RBAC Helper Functions

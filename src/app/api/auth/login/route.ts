@@ -4,8 +4,11 @@ import { authenticateUser, setUserSession } from '@/lib/auth-server'
 export async function POST(request: NextRequest) {
   try {
     const { username, password } = await request.json()
+    console.log('=== LOGIN API DEBUG ===')
+    console.log('Received login request:', { username, password: '***' })
     
     if (!username || !password) {
+      console.log('Missing username or password')
       return NextResponse.json(
         { error: 'Username and password are required' },
         { status: 400 }
@@ -13,8 +16,10 @@ export async function POST(request: NextRequest) {
     }
     
     const user = await authenticateUser(username, password)
+    console.log('Authentication result:', user ? 'SUCCESS' : 'FAILED')
     
     if (!user) {
+      console.log('=== END LOGIN API DEBUG ===')
       return NextResponse.json(
         { error: 'Invalid credentials' },
         { status: 401 }
