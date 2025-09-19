@@ -48,9 +48,21 @@ export default function Home() {
   const role = user?.role
 
   // RBAC helper functions
-  const canAddItems = () => canWriteAll(user) || user?.permissions?.includes('write:own')
-  const canBulkUpload = () => canWriteAll(user) || user?.permissions?.includes('write:own')
-  const canGenerateReports = () => canReadAll(user) || user?.permissions?.includes('generate:reports')
+  const canAddItems = () => {
+    const result = canWriteAll(user) || user?.permissions?.includes('write:own')
+    console.log('canAddItems check:', { user: user?.name, permissions: user?.permissions, canWriteAll: canWriteAll(user), hasWriteOwn: user?.permissions?.includes('write:own'), result })
+    return result
+  }
+  const canBulkUpload = () => {
+    const result = canWriteAll(user) || user?.permissions?.includes('write:own')
+    console.log('canBulkUpload check:', { user: user?.name, permissions: user?.permissions, canWriteAll: canWriteAll(user), hasWriteOwn: user?.permissions?.includes('write:own'), result })
+    return result
+  }
+  const canGenerateReports = () => {
+    const result = canReadAll(user) || user?.permissions?.includes('generate:reports')
+    console.log('canGenerateReports check:', { user: user?.name, permissions: user?.permissions, canReadAll: canReadAll(user), hasGenerateReports: user?.permissions?.includes('generate:reports'), result })
+    return result
+  }
   const canAccessAdminFeatures = () => canAccessAdmin(user)
 
   useEffect(() => {
@@ -1816,16 +1828,34 @@ export default function Home() {
               Investigation Tools
             </h2>
             <div style={{ display: 'flex', gap: '12px' }}>
-              <button style={{
-                background: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
-                color: 'white',
-                border: 'none',
-                padding: '12px 24px',
-                borderRadius: '12px',
-                fontWeight: '600',
-                cursor: 'pointer',
-                fontSize: '14px'
-              }}>
+              <button 
+                onClick={() => setShowAdvancedSearch(true)}
+                style={{
+                  background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+                  color: 'white',
+                  border: 'none',
+                  padding: '12px 24px',
+                  borderRadius: '12px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  fontSize: '14px'
+                }}
+              >
+                🔍 Advanced Search
+              </button>
+              <button 
+                onClick={() => setShowGenerateReport(true)}
+                style={{
+                  background: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
+                  color: 'white',
+                  border: 'none',
+                  padding: '12px 24px',
+                  borderRadius: '12px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  fontSize: '14px'
+                }}
+              >
                 📄 Generate Report
               </button>
               <button style={{
