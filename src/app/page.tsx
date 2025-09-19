@@ -18,6 +18,7 @@ import { StolenItem, ItemFormData } from '@/types'
 import { getAllItems, getTotalValue, formatCurrency, formatDate, addItem } from '@/lib/data'
 import { User, getDashboardTitle, getRoleDisplayName, canWriteAll, canReadAll, canManageUsers, canAccessAdmin } from '@/lib/auth'
 import { UserProfile } from '@/components/UserProfile'
+import { AnalyticsDashboard } from '@/components/AnalyticsDashboard'
 
 export default function Home() {
   const router = useRouter()
@@ -40,6 +41,7 @@ export default function Home() {
   const [viewMode, setViewMode] = useState<'cards' | 'list'>('cards')
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false)
   const [showGenerateReport, setShowGenerateReport] = useState(false)
+  const [showAnalytics, setShowAnalytics] = useState(false)
   const [filteredItems, setFilteredItems] = useState<StolenItem[]>([])
   const [isFiltered, setIsFiltered] = useState(false)
 
@@ -743,6 +745,38 @@ export default function Home() {
                 Generate Report
               </button>
               )}
+              
+              {/* Analytics Dashboard - Available to all authenticated users */}
+              <button
+                onClick={() => setShowAnalytics(true)}
+                style={{
+                  background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 50%, #6d28d9 100%)',
+                  color: 'white',
+                  border: 'none',
+                  padding: '20px 32px',
+                  borderRadius: '16px',
+                  cursor: 'pointer',
+                  fontWeight: '600',
+                  fontSize: '18px',
+                  boxShadow: '0 10px 25px rgba(139, 92, 246, 0.3)',
+                  transition: 'all 0.3s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '12px'
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-4px)'
+                  e.currentTarget.style.boxShadow = '0 20px 40px rgba(139, 92, 246, 0.4)'
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)'
+                  e.currentTarget.style.boxShadow = '0 10px 25px rgba(139, 92, 246, 0.3)'
+                }}
+              >
+                <span style={{ fontSize: '20px' }}>📊</span>
+                Analytics
+              </button>
             </div>
           </div>
 
@@ -1678,6 +1712,14 @@ export default function Home() {
               onClose={() => setShowGenerateReport(false)}
             />
           )}
+
+          {/* Analytics Dashboard Modal */}
+          {showAnalytics && (
+            <AnalyticsDashboard
+              items={isFiltered ? filteredItems : allItems}
+              onClose={() => setShowAnalytics(false)}
+            />
+          )}
         </div>
       </div>
     )
@@ -1845,6 +1887,21 @@ export default function Home() {
                 }}
               >
                 📄 Generate Report
+              </button>
+              <button 
+                onClick={() => setShowAnalytics(true)}
+                style={{
+                  background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
+                  color: 'white',
+                  border: 'none',
+                  padding: '12px 24px',
+                  borderRadius: '12px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  fontSize: '14px'
+                }}
+              >
+                📊 Analytics
               </button>
               <button style={{
                 background: 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)',
