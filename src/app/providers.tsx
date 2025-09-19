@@ -1,11 +1,10 @@
 'use client'
 
-import { SessionProvider } from 'next-auth/react'
-
+// NextAuth SessionProvider disabled - using custom authentication
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <SessionProvider>
+    <>
       {children}
-    </SessionProvider>
+    </>
   )
 }

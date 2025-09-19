@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { useSession } from 'next-auth/react'
+import { useState, useEffect } from 'react'
+import { User } from '@/lib/auth'
 
 interface SidebarProps {
   currentView: string
@@ -13,10 +13,25 @@ interface SidebarProps {
 
 export function ModernSidebar({ currentView, onViewChange, itemCount, totalValue, evidenceCount }: SidebarProps) {
   const [collapsed, setCollapsed] = useState(false)
-  const { data: session } = useSession()
+  const [user, setUser] = useState<User | null>(null)
 
-  const userRole = (session?.user as any)?.role || 'law_enforcement'
-  const isCitizen = userRole === 'citizen'
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const response = await fetch('/api/auth/me')
+        if (response.ok) {
+          const userData = await response.json()
+          setUser(userData.user)
+        }
+      } catch (error) {
+        console.error('Auth check failed:', error)
+      }
+    }
+    checkAuth()
+  }, [])
+
+  const userRole = user?.role || 'law_enforcement'
+  const isPropertyOwner = userRole === 'property_owner'
 
   const menuItems = [
     {
@@ -98,15 +113,15 @@ export function ModernSidebar({ currentView, onViewChange, itemCount, totalValue
           <div className="flex items-center space-x-3 p-3 bg-white/10 rounded-xl">
             <div className="w-12 h-12 bg-gradient-to-br from-green-400 to-blue-500 rounded-full flex items-center justify-center shadow-lg">
               <span className="text-white font-bold">
-                {session?.user?.name?.charAt(0) || 'U'}
+                {user?.name?.charAt(0) || 'U'}
               </span>
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-white font-semibold truncate">
-                {session?.user?.name || 'User'}
+                {user?.name || 'User'}
               </p>
               <p className="text-white/70 text-sm">
-                {isCitizen ? 'Property Owner' : 'Law Enforcement'}
+                {isPropertyOwner ? 'Property Owner' : 'Law Enforcement'}
               </p>
             </div>
           </div>
