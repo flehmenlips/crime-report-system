@@ -33,7 +33,7 @@ export async function getCurrentUser(): Promise<User | null> {
     const user = JSON.parse(userCookie.value) as User
     
     // Validate role - if it's the old 'citizen' role, clear the session
-    if (user.role === 'citizen') {
+    if ((user.role as string) === 'citizen') {
       console.log('Found old citizen role, clearing session')
       await clearUserSession()
       return null
