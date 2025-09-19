@@ -12,8 +12,8 @@ export async function authenticateUser(username: string, password: string): Prom
   if (user) {
     console.log('✅ User found:', { username: user.username, role: user.role })
     // Return user without password
-    const { password: _, username: __, ...userWithoutCredentials } = user
-    return userWithoutCredentials as User
+    const { password: _, ...userWithoutPassword } = user
+    return userWithoutPassword as User
   }
   
   console.log('❌ No user found for:', username)

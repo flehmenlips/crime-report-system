@@ -2,12 +2,14 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { UserProfileManagement } from '@/components/UserProfileManagement'
 
 export default function SimpleLoginPage() {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [showRegistration, setShowRegistration] = useState(false)
   const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -124,8 +126,26 @@ export default function SimpleLoginPage() {
               </div>
             </div>
           </div>
+
+          <div className="mt-6">
+            <button
+              type="button"
+              onClick={() => setShowRegistration(true)}
+              className="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              📝 Create New Account
+            </button>
+          </div>
         </div>
       </div>
+
+      {/* Registration Modal */}
+      {showRegistration && (
+        <UserProfileManagement
+          user={null}
+          onClose={() => setShowRegistration(false)}
+        />
+      )}
     </div>
   )
 }

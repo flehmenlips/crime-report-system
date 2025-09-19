@@ -54,8 +54,60 @@ export interface User {
   id: string;
   name: string;
   email: string;
+  username: string;
   role: Role;
   permissions?: string[];
+  
+  // Extended profile fields
+  phone?: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  zipCode?: string;
+  country?: string;
+  company?: string;
+  title?: string;
+  bio?: string;
+  avatar?: string;
+  
+  // Account settings
+  emailVerified?: boolean;
+  isActive?: boolean;
+  lastLoginAt?: string;
+  preferences?: string; // JSON string
+  
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface UserProfile {
+  name: string;
+  email: string;
+  phone?: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  zipCode?: string;
+  country?: string;
+  company?: string;
+  title?: string;
+  bio?: string;
+  avatar?: string;
+}
+
+export interface PasswordChangeRequest {
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+}
+
+export interface UserRegistration {
+  username: string;
+  email: string;
+  name: string;
+  password: string;
+  confirmPassword: string;
+  role?: Role;
 }
 
 export interface ItemFormData {

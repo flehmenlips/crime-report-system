@@ -29,7 +29,26 @@ model User {
   name        String
   username    String   @unique
   password    String
-  role        Role     @default(property_owner) // citizen, law_enforcement, admin
+  role        Role     @default(property_owner)
+  
+  // Extended profile fields
+  phone       String?
+  address     String?
+  city        String?
+  state       String?
+  zipCode     String?
+  country     String?
+  company     String?
+  title       String?
+  bio         String?
+  avatar      String?  // URL to avatar image
+  
+  // Account settings
+  emailVerified Boolean @default(false)
+  isActive      Boolean @default(true)
+  lastLoginAt   DateTime?
+  preferences   String? // JSON string for user preferences
+  
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   

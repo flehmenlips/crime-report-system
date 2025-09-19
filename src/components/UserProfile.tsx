@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { User, getRoleDisplayName, canReadAll, canWriteAll, canManageUsers, canAccessAdmin } from '@/lib/auth'
+import { UserProfileManagement } from './UserProfileManagement'
 
 interface UserProfileProps {
   className?: string
@@ -11,6 +12,11 @@ interface UserProfileProps {
 export function UserProfile({ className = '', showDetails = true }: UserProfileProps) {
   const [user, setUser] = useState<User | null>(null)
   const [isExpanded, setIsExpanded] = useState(false)
+  const [showProfileManagement, setShowProfileManagement] = useState(false)
+
+  const handleProfileUpdate = (updatedUser: User) => {
+    setUser(updatedUser)
+  }
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -186,31 +192,48 @@ export function UserProfile({ className = '', showDetails = true }: UserProfileP
               {/* Quick Actions */}
               <div className="border-t border-gray-200 pt-3">
                 <h4 className="font-semibold text-gray-900 text-sm mb-2">Quick Actions</h4>
-                <div className="flex space-x-2">
+                <div className="space-y-2">
                   <button 
-                    onClick={() => setIsExpanded(false)}
-                    className="flex-1 px-3 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors"
+                    onClick={() => setShowProfileManagement(true)}
+                    className="w-full px-3 py-2 bg-blue-100 text-blue-700 rounded-lg text-sm font-medium hover:bg-blue-200 transition-colors"
                   >
-                    Close
+                    📝 Manage Profile
                   </button>
-                  <button 
-                    onClick={async () => {
-                      try {
-                        await fetch('/api/auth/logout', { method: 'POST' })
-                        window.location.href = '/login-simple'
-                      } catch (error) {
-                        console.error('Logout failed:', error)
-                      }
-                    }}
-                    className="flex-1 px-3 py-2 bg-red-100 text-red-700 rounded-lg text-sm font-medium hover:bg-red-200 transition-colors"
-                  >
-                    Sign Out
-                  </button>
+                  <div className="flex space-x-2">
+                    <button 
+                      onClick={() => setIsExpanded(false)}
+                      className="flex-1 px-3 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors"
+                    >
+                      Close
+                    </button>
+                    <button 
+                      onClick={async () => {
+                        try {
+                          await fetch('/api/auth/logout', { method: 'POST' })
+                          window.location.href = '/login-simple'
+                        } catch (error) {
+                          console.error('Logout failed:', error)
+                        }
+                      }}
+                      className="flex-1 px-3 py-2 bg-red-100 text-red-700 rounded-lg text-sm font-medium hover:bg-red-200 transition-colors"
+                    >
+                      Sign Out
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
+      )}
+
+      {/* Profile Management Modal */}
+      {showProfileManagement && (
+        <UserProfileManagement
+          user={user}
+          onClose={() => setShowProfileManagement(false)}
+          onProfileUpdate={handleProfileUpdate}
+        />
       )}
     </div>
   )

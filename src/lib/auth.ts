@@ -4,8 +4,30 @@ export interface User {
   id: string
   name: string
   email: string
+  username: string
   role: Role
   permissions?: string[]
+  
+  // Extended profile fields
+  phone?: string
+  address?: string
+  city?: string
+  state?: string
+  zipCode?: string
+  country?: string
+  company?: string
+  title?: string
+  bio?: string
+  avatar?: string
+  
+  // Account settings
+  emailVerified?: boolean
+  isActive?: boolean
+  lastLoginAt?: string
+  preferences?: string
+  
+  createdAt: string
+  updatedAt: string
 }
 
 // Enhanced user database with all stakeholder roles
@@ -15,10 +37,21 @@ export const users = [
     id: "1",
     name: "Police Officer",
     email: "officer@police.gov",
-    role: "law_enforcement" as Role,
     username: "admin",
     password: "password",
-    permissions: ["read:all", "write:all", "admin:users", "admin:system"]
+    role: "law_enforcement" as Role,
+    permissions: ["read:all", "write:all", "admin:users", "admin:system"],
+    phone: "+1 (555) 911-0000",
+    address: "Police Station",
+    city: "Birkenfeld",
+    state: "Oregon",
+    zipCode: "97015",
+    country: "United States",
+    company: "Birkenfeld Police Department",
+    title: "Detective",
+    bio: "Lead investigator for the Birkenfeld Farm theft case.",
+    createdAt: "2023-09-01T00:00:00Z",
+    updatedAt: "2023-09-19T00:00:00Z"
   },
   {
     id: "2",
@@ -35,10 +68,21 @@ export const users = [
     id: "3", 
     name: "George Page",
     email: "george@birkenfeldfarm.com",
-    role: "property_owner" as Role,
     username: "george",
     password: "password",
-    permissions: ["read:own", "write:own", "upload:evidence", "generate:reports"]
+    role: "property_owner" as Role,
+    permissions: ["read:own", "write:own", "upload:evidence", "generate:reports"],
+    phone: "+1 (555) 123-4567",
+    address: "123 Farm Road",
+    city: "Birkenfeld",
+    state: "Oregon",
+    zipCode: "97015",
+    country: "United States",
+    company: "Birkenfeld Farm",
+    title: "Property Owner",
+    bio: "Owner of Birkenfeld Farm, specializing in organic produce and livestock.",
+    createdAt: "2023-09-01T00:00:00Z",
+    updatedAt: "2023-09-19T00:00:00Z"
   },
   {
     id: "4",
