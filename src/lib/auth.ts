@@ -1,5 +1,3 @@
-import { cookies } from 'next/headers'
-
 export type Role = 'property_owner' | 'law_enforcement' | 'insurance_agent' | 'broker' | 'banker' | 'asset_manager' | 'assistant' | 'secretary' | 'manager' | 'executive_assistant'
 
 export interface User {
@@ -137,36 +135,6 @@ export async function authenticateUser(username: string, password: string): Prom
   return null
 }
 
-export async function getCurrentUser(): Promise<User | null> {
-  try {
-    const cookieStore = await cookies()
-    const userCookie = cookieStore.get('user')
-    
-    if (!userCookie) {
-      return null
-    }
-    
-    return JSON.parse(userCookie.value) as User
-  } catch (error) {
-    console.error('Error getting current user:', error)
-    return null
-  }
-}
-
-export async function setUserSession(user: User): Promise<void> {
-  const cookieStore = await cookies()
-  cookieStore.set('user', JSON.stringify(user), {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    maxAge: 60 * 60 * 24 * 7 // 7 days
-  })
-}
-
-export async function clearUserSession(): Promise<void> {
-  const cookieStore = await cookies()
-  cookieStore.delete('user')
-}
 
 // RBAC Helper Functions
 export function hasPermission(user: User | null, permission: string): boolean {

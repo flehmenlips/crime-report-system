@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { clearUserSession } from '@/lib/auth'
+import { clearUserSession } from '@/lib/auth-server'
 
 export async function POST() {
   try {

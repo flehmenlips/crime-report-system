@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getCurrentUser, canReadAll, canWriteAll, canManageUsers, canAccessAdmin, Role } from '@/lib/auth'
+import { getCurrentUser } from '@/lib/auth-server'
+import { canReadAll, canWriteAll, canManageUsers, canAccessAdmin, Role } from '@/lib/auth'
 
 // Define route access rules
 const ROUTE_PERMISSIONS = {
