@@ -52,7 +52,7 @@ model User {
   username    String   @unique
   password    String
   role        Role     @default(property_owner)
-  accessLevel AccessLevel @default(owner) // Access level within tenant
+  accessLevel AccessLevel? @default(owner) // Access level within tenant
   
   // Extended profile fields
   phone       String?
@@ -76,8 +76,8 @@ model User {
   updatedAt   DateTime @updatedAt
   
   // Tenant relationship
-  tenantId    String
-  tenant      Tenant   @relation(fields: [tenantId], references: [id])
+  tenantId    String?  @default("tenant-1")
+  tenant      Tenant?  @relation(fields: [tenantId], references: [id])
   
   // Relations
   items       StolenItem[]
@@ -102,8 +102,8 @@ model StolenItem {
   updatedAt         DateTime @updatedAt
   
   // Tenant isolation
-  tenantId          String
-  tenant            Tenant   @relation(fields: [tenantId], references: [id])
+  tenantId          String?  @default("tenant-1")
+  tenant            Tenant?  @relation(fields: [tenantId], references: [id])
   
   // Relations
   ownerId           String

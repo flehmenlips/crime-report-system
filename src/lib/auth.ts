@@ -16,7 +16,7 @@ export interface User {
   email: string
   username: string
   role: Role
-  accessLevel: AccessLevel
+  accessLevel?: AccessLevel
   permissions?: string[]
   
   // Extended profile fields
@@ -37,9 +37,9 @@ export interface User {
   lastLoginAt?: string
   preferences?: string
   
-  // Tenant relationship
-  tenantId: string
-  tenant: Tenant
+  // Tenant relationship (temporarily optional during migration)
+  tenantId?: string
+  tenant?: Tenant
   
   createdAt: string
   updatedAt: string

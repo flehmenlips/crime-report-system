@@ -25,9 +25,9 @@ export interface StolenItem {
   createdAt: string; // ISO date string
   updatedAt: string; // ISO date string
   
-  // Tenant isolation
-  tenantId: string;
-  tenant: Tenant;
+  // Tenant isolation (temporarily optional during migration)
+  tenantId?: string;
+  tenant?: Tenant;
 }
 
 export interface SearchFilters {
@@ -71,7 +71,7 @@ export interface User {
   email: string;
   username: string;
   role: Role;
-  accessLevel: AccessLevel;
+  accessLevel?: AccessLevel;
   permissions?: string[];
   
   // Extended profile fields
@@ -92,9 +92,9 @@ export interface User {
   lastLoginAt?: string;
   preferences?: string; // JSON string
   
-  // Tenant relationship
-  tenantId: string;
-  tenant: Tenant;
+  // Tenant relationship (temporarily optional during migration)
+  tenantId?: string;
+  tenant?: Tenant;
   
   createdAt: string;
   updatedAt: string;

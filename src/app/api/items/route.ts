@@ -32,10 +32,10 @@ async function getAllItems(userTenantId?: string): Promise<StolenItem[]> {
       notes: item.notes || undefined,
       createdAt: item.createdAt.toISOString(),
       updatedAt: item.updatedAt.toISOString(),
-      // Temporary: Add hardcoded tenant info until database migration
-      tenantId: "tenant-1",
+      // Tenant info (use actual tenantId if available, fallback to default)
+      tenantId: (item as any).tenantId || "tenant-1",
       tenant: {
-        id: "tenant-1",
+        id: (item as any).tenantId || "tenant-1",
         name: "Birkenfeld Farm",
         description: "Original Birkenfeld Farm theft case",
         isActive: true,
@@ -118,10 +118,10 @@ async function searchItems(filters: SearchFilters, userTenantId?: string): Promi
       notes: item.notes || undefined,
       createdAt: item.createdAt.toISOString(),
       updatedAt: item.updatedAt.toISOString(),
-      // Temporary: Add hardcoded tenant info until database migration
-      tenantId: "tenant-1",
+      // Tenant info (use actual tenantId if available, fallback to default)
+      tenantId: (item as any).tenantId || "tenant-1",
       tenant: {
-        id: "tenant-1",
+        id: (item as any).tenantId || "tenant-1",
         name: "Birkenfeld Farm",
         description: "Original Birkenfeld Farm theft case",
         isActive: true,

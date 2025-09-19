@@ -13,7 +13,8 @@
     "prebuild": "npm run type-check",
     "postbuild": "echo \"Build completed successfully\"",
     "deploy:vercel": "vercel --prod",
-    "preview": "next build && next start"
+    "preview": "next build && next start",
+    "migrate:tenants": "node prisma/migrate-to-tenants.js"
   },
   "dependencies": {
     "@cloudinary/react": "^1.14.3",
