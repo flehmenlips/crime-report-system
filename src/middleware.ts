@@ -1,11 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getCurrentUser } from '@/lib/auth'
+import { getCurrentUser, canReadAll, canWriteAll, canManageUsers, canAccessAdmin, Role } from '@/lib/auth'
 
-// Security middleware for production headers
+// Define route access rules
+const ROUTE_PERMISSIONS = {
+  '/admin': ['admin:system'],
+  '/law-enforcement': ['law_enforcement'],
+  '/insurance': ['insurance_agent'],
+  '/broker': ['broker'],
+  '/banking': ['banker'],
+  '/assets': ['asset_manager'],
+  '/assistant': ['assistant', 'secretary', 'executive_assistant'],
+  '/management': ['manager'],
+} as const
+
+// Security middleware with enhanced RBAC
 export async function middleware(req: NextRequest) {
+  const { pathname } = req.nextUrl
+  
   // Allow access to auth pages and login without authentication
-  if (req.nextUrl.pathname.startsWith('/api/auth') || 
-      req.nextUrl.pathname.startsWith('/login')) {
+  if (pathname.startsWith('/api/auth') || 
+      pathname.startsWith('/login') ||
+      pathname.startsWith('/unauthorized') ||
+      pathname.startsWith('/_next') ||
+      pathname.startsWith('/api/serve-document') ||
+      pathname.startsWith('/api/document-proxy')) {
     return NextResponse.next()
   }
   
@@ -17,9 +35,45 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL('/login-simple', req.url))
   }
   
-  // Role-based access control
-  if (req.nextUrl.pathname.startsWith('/law-enforcement') && user.role !== 'law_enforcement') {
-    return NextResponse.redirect(new URL('/unauthorized', req.url))
+  // Enhanced Role-based access control
+  for (const [route, permissions] of Object.entries(ROUTE_PERMISSIONS)) {
+    if (pathname.startsWith(route)) {
+      // Check if user has required permissions or role
+      const hasAccess = permissions.some(permission => {
+        if (permission.includes(':')) {
+          // It's a permission string
+          return user.permissions?.includes(permission) || false
+        } else {
+          // It's a role string
+          return user.role === permission
+        }
+      })
+      
+      if (!hasAccess) {
+        return NextResponse.redirect(new URL('/unauthorized', req.url))
+      }
+      break
+    }
+  }
+  
+  // API route protection
+  if (pathname.startsWith('/api/')) {
+    // Admin-only API routes
+    if (pathname.startsWith('/api/admin') && !canAccessAdmin(user)) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
+    }
+    
+    // User management API routes
+    if (pathname.startsWith('/api/users') && !canManageUsers(user)) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
+    }
+    
+    // Write operations require write permissions
+    if (req.method === 'POST' || req.method === 'PUT' || req.method === 'DELETE') {
+      if (!canWriteAll(user) && !user.permissions?.includes('write:own')) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
+      }
+    }
   }
   
   return NextResponse.next()

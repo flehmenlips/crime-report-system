@@ -16,6 +16,7 @@ import { AdvancedSearch } from '@/components/AdvancedSearch'
 import { GenerateReport } from '@/components/GenerateReport'
 import { StolenItem, ItemFormData } from '@/types'
 import { getAllItems, getTotalValue, formatCurrency, formatDate, addItem } from '@/lib/data'
+import { User, getDashboardTitle, getRoleDisplayName, canWriteAll, canReadAll, canManageUsers, canAccessAdmin } from '@/lib/auth'
 
 export default function Home() {
   const router = useRouter()
@@ -41,9 +42,15 @@ export default function Home() {
   const [filteredItems, setFilteredItems] = useState<StolenItem[]>([])
   const [isFiltered, setIsFiltered] = useState(false)
 
-  // Temporary: Use custom auth instead of NextAuth
-  const [user, setUser] = useState<any>(null)
+  // Enhanced RBAC user state
+  const [user, setUser] = useState<User | null>(null)
   const role = user?.role
+
+  // RBAC helper functions
+  const canAddItems = () => canWriteAll(user) || user?.permissions?.includes('write:own')
+  const canBulkUpload = () => canWriteAll(user) || user?.permissions?.includes('write:own')
+  const canGenerateReports = () => canReadAll(user) || user?.permissions?.includes('generate:reports')
+  const canAccessAdmin = () => canAccessAdmin(user)
 
   useEffect(() => {
     // Check for user session
@@ -481,7 +488,7 @@ export default function Home() {
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent'
                   }}>
-                    Property Owner Portal
+                    {getDashboardTitle(user)}
                   </h1>
                   <p style={{ color: 'rgba(255, 255, 255, 0.8)', margin: 0, fontWeight: '500' }}>
                     Birkenfeld Farm Theft • Case #2023-12020
@@ -620,6 +627,8 @@ export default function Home() {
               gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', 
               gap: '24px' 
             }}>
+              {/* Add New Item - Only for users who can write */}
+              {canAddItems() && (
               <button
                 onClick={() => {
                   setEditingFormItem(null)
@@ -653,7 +662,10 @@ export default function Home() {
                 <span style={{ fontSize: '20px' }}>➕</span>
                 Add New Item
               </button>
+              )}
               
+              {/* Bulk Upload - Only for users who can write */}
+              {canBulkUpload() && (
               <button
                 onClick={() => setShowBulkUpload(true)}
                 style={{
@@ -684,7 +696,9 @@ export default function Home() {
                 <span style={{ fontSize: '20px' }}>📤</span>
                 Bulk Upload
               </button>
+              )}
               
+              {/* Advanced Search - Available to all authenticated users */}
               <button
                 onClick={() => setShowAdvancedSearch(true)}
                 style={{
@@ -716,6 +730,8 @@ export default function Home() {
                 Advanced Search
               </button>
               
+              {/* Generate Report - Only for users who can generate reports */}
+              {canGenerateReports() && (
               <button
                 onClick={() => setShowGenerateReport(true)}
                 style={{
@@ -746,6 +762,7 @@ export default function Home() {
                 <span style={{ fontSize: '20px' }}>📄</span>
                 Generate Report
               </button>
+              )}
             </div>
           </div>
 
