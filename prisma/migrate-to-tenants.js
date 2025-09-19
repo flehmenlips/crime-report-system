@@ -8,26 +8,37 @@ async function migrateToTenants() {
   try {
     // Step 1: Create the default "Birkenfeld Farm" tenant
     console.log('📝 Creating default tenant...')
-    const defaultTenant = await prisma.tenant.upsert({
-      where: { id: 'tenant-1' },
-      update: {},
-      create: {
+    const defaultTenant = await prisma.tenant.create({
+      data: {
         id: 'tenant-1',
         name: 'Birkenfeld Farm',
         description: 'Original Birkenfeld Farm theft case',
         isActive: true
       }
+    }).catch(async (error) => {
+      if (error.code === 'P2002') {
+        // Tenant already exists, just fetch it
+        console.log('📝 Tenant already exists, fetching...')
+        return await prisma.tenant.findUnique({
+          where: { id: 'tenant-1' }
+        })
+      }
+      throw error
     })
-    console.log('✅ Created tenant:', defaultTenant.name)
+    console.log('✅ Tenant ready:', defaultTenant.name)
 
     // Step 2: Update all existing users to use the default tenant
     console.log('👥 Updating users...')
     const updatedUsers = await prisma.user.updateMany({
       where: {
-        tenantId: null
+        OR: [
+          { tenantId: null },
+          { tenantId: '' }
+        ]
       },
       data: {
-        tenantId: 'tenant-1'
+        tenantId: 'tenant-1',
+        accessLevel: 'owner'
       }
     })
     console.log(`✅ Updated ${updatedUsers.count} users`)
@@ -36,25 +47,16 @@ async function migrateToTenants() {
     console.log('📦 Updating stolen items...')
     const updatedItems = await prisma.stolenItem.updateMany({
       where: {
-        tenantId: null
+        OR: [
+          { tenantId: null },
+          { tenantId: '' }
+        ]
       },
       data: {
         tenantId: 'tenant-1'
       }
     })
     console.log(`✅ Updated ${updatedItems.count} stolen items`)
-
-    // Step 4: Add accessLevel to users (default to 'owner' for existing users)
-    console.log('🔐 Adding access levels...')
-    const updatedAccessLevels = await prisma.user.updateMany({
-      where: {
-        accessLevel: null
-      },
-      data: {
-        accessLevel: 'owner'
-      }
-    })
-    console.log(`✅ Updated access levels for ${updatedAccessLevels.count} users`)
 
     console.log('🎉 Migration completed successfully!')
     

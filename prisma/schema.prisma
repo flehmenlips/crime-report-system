@@ -38,10 +38,6 @@ model Tenant {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   
-  // Relations
-  users       User[]
-  items       StolenItem[]
-  
   @@map("tenants")
 }
 
@@ -75,9 +71,8 @@ model User {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   
-  // Tenant relationship
+  // Tenant relationship (temporarily without foreign key constraint)
   tenantId    String?  @default("tenant-1")
-  tenant      Tenant?  @relation(fields: [tenantId], references: [id])
   
   // Relations
   items       StolenItem[]
@@ -101,9 +96,8 @@ model StolenItem {
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
   
-  // Tenant isolation
+  // Tenant isolation (temporarily without foreign key constraint)
   tenantId          String?  @default("tenant-1")
-  tenant            Tenant?  @relation(fields: [tenantId], references: [id])
   
   // Relations
   ownerId           String

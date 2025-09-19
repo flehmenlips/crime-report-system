@@ -10,7 +10,7 @@
     "lint:fix": "next lint --fix",
     "type-check": "tsc --noEmit",
     "test": "echo \"No tests specified\" && exit 0",
-    "prebuild": "npm run type-check",
+    "prebuild": "npm run type-check && npm run migrate:tenants",
     "postbuild": "echo \"Build completed successfully\"",
     "deploy:vercel": "vercel --prod",
     "preview": "next build && next start",
