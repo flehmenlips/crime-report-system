@@ -324,29 +324,104 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-gradient-to-br from-white to-gray-50 rounded-2xl p-8 max-w-5xl w-full mx-4 max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-200">
+    <div style={{
+      position: 'fixed',
+      inset: '0',
+      background: 'rgba(0, 0, 0, 0.8)',
+      backdropFilter: 'blur(12px)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      zIndex: 1000,
+      padding: '24px',
+      fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif'
+    }}>
+      <div style={{
+        background: 'rgba(255, 255, 255, 0.95)',
+        backdropFilter: 'blur(20px)',
+        borderRadius: '24px',
+        padding: '32px',
+        maxWidth: '1000px',
+        width: '100%',
+        maxHeight: '90vh',
+        overflow: 'hidden',
+        boxShadow: '0 32px 64px rgba(0, 0, 0, 0.3)',
+        border: '1px solid rgba(255, 255, 255, 0.2)',
+        display: 'flex',
+        flexDirection: 'column'
+      }}>
         {/* Header */}
-        <div className="flex justify-between items-center mb-8">
-          <div className="flex items-center space-x-4">
-            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
-              <span className="text-white text-xl">👤</span>
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '32px'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <div style={{
+              width: '48px',
+              height: '48px',
+              background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
+              borderRadius: '16px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 10px 25px rgba(59, 130, 246, 0.3)'
+            }}>
+              <span style={{ fontSize: '24px' }}>👤</span>
             </div>
             <div>
-              <h2 className="text-3xl font-bold text-gray-900">Account Management</h2>
-              <p className="text-gray-600">Manage your profile and account settings</p>
+              <h2 style={{
+                fontSize: '32px',
+                fontWeight: 'bold',
+                color: '#1f2937',
+                margin: '0 0 4px 0'
+              }}>
+                Account Management
+              </h2>
+              <p style={{
+                color: '#6b7280',
+                fontSize: '16px',
+                margin: '0'
+              }}>
+                Manage your profile and account settings
+              </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 text-3xl transition-colors"
+            style={{
+              background: 'rgba(107, 114, 128, 0.1)',
+              border: 'none',
+              borderRadius: '12px',
+              padding: '12px',
+              cursor: 'pointer',
+              color: '#6b7280',
+              fontSize: '24px',
+              transition: 'all 0.2s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.background = 'rgba(107, 114, 128, 0.2)'
+              e.target.style.color = '#374151'
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.background = 'rgba(107, 114, 128, 0.1)'
+              e.target.style.color = '#6b7280'
+            }}
           >
             ×
           </button>
         </div>
 
         {/* Tabs */}
-        <div className="flex space-x-2 mb-8 bg-gradient-to-r from-gray-100 to-gray-200 p-2 rounded-2xl">
+        <div style={{
+          display: 'flex',
+          gap: '8px',
+          marginBottom: '32px',
+          background: 'rgba(107, 114, 128, 0.1)',
+          padding: '8px',
+          borderRadius: '16px'
+        }}>
           {[
             { id: 'profile', label: 'Profile', icon: '👤' },
             { id: 'password', label: 'Password', icon: '🔒' },
@@ -355,25 +430,62 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
-              className={`flex-1 py-3 px-6 rounded-xl text-sm font-semibold transition-all duration-200 ${
-                activeTab === tab.id
-                  ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg transform scale-105'
-                  : 'text-gray-600 hover:text-gray-900 hover:bg-white/50'
-              }`}
+              style={{
+                flex: 1,
+                padding: '12px 24px',
+                borderRadius: '12px',
+                fontSize: '14px',
+                fontWeight: '600',
+                transition: 'all 0.2s ease',
+                border: 'none',
+                cursor: 'pointer',
+                background: activeTab === tab.id 
+                  ? 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)' 
+                  : 'transparent',
+                color: activeTab === tab.id ? 'white' : '#6b7280',
+                boxShadow: activeTab === tab.id ? '0 8px 16px rgba(59, 130, 246, 0.3)' : 'none',
+                transform: activeTab === tab.id ? 'scale(1.05)' : 'scale(1)'
+              }}
+              onMouseEnter={(e) => {
+                if (activeTab !== tab.id) {
+                  e.target.style.background = 'rgba(255, 255, 255, 0.5)'
+                  e.target.style.color = '#374151'
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (activeTab !== tab.id) {
+                  e.target.style.background = 'transparent'
+                  e.target.style.color = '#6b7280'
+                }
+              }}
             >
-              <span className="mr-2">{tab.icon}</span>
+              <span style={{ marginRight: '8px' }}>{tab.icon}</span>
               {tab.label}
             </button>
           ))}
         </div>
 
         {/* Content */}
-        <div className="space-y-6">
+        <div style={{ 
+          flex: 1, 
+          overflow: 'auto',
+          paddingRight: '8px'
+        }}>
           {activeTab === 'profile' && (
-            <form onSubmit={handleProfileUpdate} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <form onSubmit={handleProfileUpdate} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+                gap: '24px'
+              }}>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label style={{
+                    display: 'block',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    color: '#374151',
+                    marginBottom: '8px'
+                  }}>
                     Full Name *
                   </label>
                   <input
@@ -381,11 +493,37 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
                     required
                     value={profileData.name}
                     onChange={(e) => setProfileData({...profileData, name: e.target.value})}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                    style={{
+                      width: '100%',
+                      padding: '16px',
+                      background: 'rgba(255, 255, 255, 0.8)',
+                      border: '1px solid rgba(107, 114, 128, 0.2)',
+                      borderRadius: '16px',
+                      fontSize: '16px',
+                      outline: 'none',
+                      transition: 'all 0.3s ease',
+                      boxSizing: 'border-box'
+                    }}
+                    onFocus={(e) => {
+                      e.target.style.borderColor = 'rgba(59, 130, 246, 0.5)'
+                      e.target.style.boxShadow = '0 0 0 4px rgba(59, 130, 246, 0.1)'
+                      e.target.style.background = 'rgba(255, 255, 255, 0.95)'
+                    }}
+                    onBlur={(e) => {
+                      e.target.style.borderColor = 'rgba(107, 114, 128, 0.2)'
+                      e.target.style.boxShadow = 'none'
+                      e.target.style.background = 'rgba(255, 255, 255, 0.8)'
+                    }}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label style={{
+                    display: 'block',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    color: '#374151',
+                    marginBottom: '8px'
+                  }}>
                     Email *
                   </label>
                   <input
@@ -393,149 +531,494 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
                     required
                     value={profileData.email}
                     onChange={(e) => setProfileData({...profileData, email: e.target.value})}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                    style={{
+                      width: '100%',
+                      padding: '16px',
+                      background: 'rgba(255, 255, 255, 0.8)',
+                      border: '1px solid rgba(107, 114, 128, 0.2)',
+                      borderRadius: '16px',
+                      fontSize: '16px',
+                      outline: 'none',
+                      transition: 'all 0.3s ease',
+                      boxSizing: 'border-box'
+                    }}
+                    onFocus={(e) => {
+                      e.target.style.borderColor = 'rgba(59, 130, 246, 0.5)'
+                      e.target.style.boxShadow = '0 0 0 4px rgba(59, 130, 246, 0.1)'
+                      e.target.style.background = 'rgba(255, 255, 255, 0.95)'
+                    }}
+                    onBlur={(e) => {
+                      e.target.style.borderColor = 'rgba(107, 114, 128, 0.2)'
+                      e.target.style.boxShadow = 'none'
+                      e.target.style.background = 'rgba(255, 255, 255, 0.8)'
+                    }}
                   />
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+                gap: '24px'
+              }}>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label style={{
+                    display: 'block',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    color: '#374151',
+                    marginBottom: '8px'
+                  }}>
                     Phone
                   </label>
                   <input
                     type="tel"
                     value={profileData.phone || ''}
                     onChange={(e) => setProfileData({...profileData, phone: e.target.value})}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                    style={{
+                      width: '100%',
+                      padding: '16px',
+                      background: 'rgba(255, 255, 255, 0.8)',
+                      border: '1px solid rgba(107, 114, 128, 0.2)',
+                      borderRadius: '16px',
+                      fontSize: '16px',
+                      outline: 'none',
+                      transition: 'all 0.3s ease',
+                      boxSizing: 'border-box'
+                    }}
+                    onFocus={(e) => {
+                      e.target.style.borderColor = 'rgba(59, 130, 246, 0.5)'
+                      e.target.style.boxShadow = '0 0 0 4px rgba(59, 130, 246, 0.1)'
+                      e.target.style.background = 'rgba(255, 255, 255, 0.95)'
+                    }}
+                    onBlur={(e) => {
+                      e.target.style.borderColor = 'rgba(107, 114, 128, 0.2)'
+                      e.target.style.boxShadow = 'none'
+                      e.target.style.background = 'rgba(255, 255, 255, 0.8)'
+                    }}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label style={{
+                    display: 'block',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    color: '#374151',
+                    marginBottom: '8px'
+                  }}>
                     Company
                   </label>
                   <input
                     type="text"
                     value={profileData.company || ''}
                     onChange={(e) => setProfileData({...profileData, company: e.target.value})}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                    style={{
+                      width: '100%',
+                      padding: '16px',
+                      background: 'rgba(255, 255, 255, 0.8)',
+                      border: '1px solid rgba(107, 114, 128, 0.2)',
+                      borderRadius: '16px',
+                      fontSize: '16px',
+                      outline: 'none',
+                      transition: 'all 0.3s ease',
+                      boxSizing: 'border-box'
+                    }}
+                    onFocus={(e) => {
+                      e.target.style.borderColor = 'rgba(59, 130, 246, 0.5)'
+                      e.target.style.boxShadow = '0 0 0 4px rgba(59, 130, 246, 0.1)'
+                      e.target.style.background = 'rgba(255, 255, 255, 0.95)'
+                    }}
+                    onBlur={(e) => {
+                      e.target.style.borderColor = 'rgba(107, 114, 128, 0.2)'
+                      e.target.style.boxShadow = 'none'
+                      e.target.style.background = 'rgba(255, 255, 255, 0.8)'
+                    }}
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  color: '#374151',
+                  marginBottom: '8px'
+                }}>
                   Address
                 </label>
                 <input
                   type="text"
                   value={profileData.address || ''}
                   onChange={(e) => setProfileData({...profileData, address: e.target.value})}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  style={{
+                    width: '100%',
+                    padding: '16px',
+                    background: 'rgba(255, 255, 255, 0.8)',
+                    border: '1px solid rgba(107, 114, 128, 0.2)',
+                    borderRadius: '16px',
+                    fontSize: '16px',
+                    outline: 'none',
+                    transition: 'all 0.3s ease',
+                    boxSizing: 'border-box'
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.borderColor = 'rgba(59, 130, 246, 0.5)'
+                    e.target.style.boxShadow = '0 0 0 4px rgba(59, 130, 246, 0.1)'
+                    e.target.style.background = 'rgba(255, 255, 255, 0.95)'
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = 'rgba(107, 114, 128, 0.2)'
+                    e.target.style.boxShadow = 'none'
+                    e.target.style.background = 'rgba(255, 255, 255, 0.8)'
+                  }}
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                gap: '24px'
+              }}>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label style={{
+                    display: 'block',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    color: '#374151',
+                    marginBottom: '8px'
+                  }}>
                     City
                   </label>
                   <input
                     type="text"
                     value={profileData.city || ''}
                     onChange={(e) => setProfileData({...profileData, city: e.target.value})}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                    style={{
+                      width: '100%',
+                      padding: '16px',
+                      background: 'rgba(255, 255, 255, 0.8)',
+                      border: '1px solid rgba(107, 114, 128, 0.2)',
+                      borderRadius: '16px',
+                      fontSize: '16px',
+                      outline: 'none',
+                      transition: 'all 0.3s ease',
+                      boxSizing: 'border-box'
+                    }}
+                    onFocus={(e) => {
+                      e.target.style.borderColor = 'rgba(59, 130, 246, 0.5)'
+                      e.target.style.boxShadow = '0 0 0 4px rgba(59, 130, 246, 0.1)'
+                      e.target.style.background = 'rgba(255, 255, 255, 0.95)'
+                    }}
+                    onBlur={(e) => {
+                      e.target.style.borderColor = 'rgba(107, 114, 128, 0.2)'
+                      e.target.style.boxShadow = 'none'
+                      e.target.style.background = 'rgba(255, 255, 255, 0.8)'
+                    }}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label style={{
+                    display: 'block',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    color: '#374151',
+                    marginBottom: '8px'
+                  }}>
                     State
                   </label>
                   <input
                     type="text"
                     value={profileData.state || ''}
                     onChange={(e) => setProfileData({...profileData, state: e.target.value})}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                    style={{
+                      width: '100%',
+                      padding: '16px',
+                      background: 'rgba(255, 255, 255, 0.8)',
+                      border: '1px solid rgba(107, 114, 128, 0.2)',
+                      borderRadius: '16px',
+                      fontSize: '16px',
+                      outline: 'none',
+                      transition: 'all 0.3s ease',
+                      boxSizing: 'border-box'
+                    }}
+                    onFocus={(e) => {
+                      e.target.style.borderColor = 'rgba(59, 130, 246, 0.5)'
+                      e.target.style.boxShadow = '0 0 0 4px rgba(59, 130, 246, 0.1)'
+                      e.target.style.background = 'rgba(255, 255, 255, 0.95)'
+                    }}
+                    onBlur={(e) => {
+                      e.target.style.borderColor = 'rgba(107, 114, 128, 0.2)'
+                      e.target.style.boxShadow = 'none'
+                      e.target.style.background = 'rgba(255, 255, 255, 0.8)'
+                    }}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label style={{
+                    display: 'block',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    color: '#374151',
+                    marginBottom: '8px'
+                  }}>
                     ZIP Code
                   </label>
                   <input
                     type="text"
                     value={profileData.zipCode || ''}
                     onChange={(e) => setProfileData({...profileData, zipCode: e.target.value})}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                    style={{
+                      width: '100%',
+                      padding: '16px',
+                      background: 'rgba(255, 255, 255, 0.8)',
+                      border: '1px solid rgba(107, 114, 128, 0.2)',
+                      borderRadius: '16px',
+                      fontSize: '16px',
+                      outline: 'none',
+                      transition: 'all 0.3s ease',
+                      boxSizing: 'border-box'
+                    }}
+                    onFocus={(e) => {
+                      e.target.style.borderColor = 'rgba(59, 130, 246, 0.5)'
+                      e.target.style.boxShadow = '0 0 0 4px rgba(59, 130, 246, 0.1)'
+                      e.target.style.background = 'rgba(255, 255, 255, 0.95)'
+                    }}
+                    onBlur={(e) => {
+                      e.target.style.borderColor = 'rgba(107, 114, 128, 0.2)'
+                      e.target.style.boxShadow = 'none'
+                      e.target.style.background = 'rgba(255, 255, 255, 0.8)'
+                    }}
                   />
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+                gap: '24px'
+              }}>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label style={{
+                    display: 'block',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    color: '#374151',
+                    marginBottom: '8px'
+                  }}>
                     Country
                   </label>
                   <input
                     type="text"
                     value={profileData.country || ''}
                     onChange={(e) => setProfileData({...profileData, country: e.target.value})}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                    style={{
+                      width: '100%',
+                      padding: '16px',
+                      background: 'rgba(255, 255, 255, 0.8)',
+                      border: '1px solid rgba(107, 114, 128, 0.2)',
+                      borderRadius: '16px',
+                      fontSize: '16px',
+                      outline: 'none',
+                      transition: 'all 0.3s ease',
+                      boxSizing: 'border-box'
+                    }}
+                    onFocus={(e) => {
+                      e.target.style.borderColor = 'rgba(59, 130, 246, 0.5)'
+                      e.target.style.boxShadow = '0 0 0 4px rgba(59, 130, 246, 0.1)'
+                      e.target.style.background = 'rgba(255, 255, 255, 0.95)'
+                    }}
+                    onBlur={(e) => {
+                      e.target.style.borderColor = 'rgba(107, 114, 128, 0.2)'
+                      e.target.style.boxShadow = 'none'
+                      e.target.style.background = 'rgba(255, 255, 255, 0.8)'
+                    }}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label style={{
+                    display: 'block',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    color: '#374151',
+                    marginBottom: '8px'
+                  }}>
                     Job Title
                   </label>
                   <input
                     type="text"
                     value={profileData.title || ''}
                     onChange={(e) => setProfileData({...profileData, title: e.target.value})}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                    style={{
+                      width: '100%',
+                      padding: '16px',
+                      background: 'rgba(255, 255, 255, 0.8)',
+                      border: '1px solid rgba(107, 114, 128, 0.2)',
+                      borderRadius: '16px',
+                      fontSize: '16px',
+                      outline: 'none',
+                      transition: 'all 0.3s ease',
+                      boxSizing: 'border-box'
+                    }}
+                    onFocus={(e) => {
+                      e.target.style.borderColor = 'rgba(59, 130, 246, 0.5)'
+                      e.target.style.boxShadow = '0 0 0 4px rgba(59, 130, 246, 0.1)'
+                      e.target.style.background = 'rgba(255, 255, 255, 0.95)'
+                    }}
+                    onBlur={(e) => {
+                      e.target.style.borderColor = 'rgba(107, 114, 128, 0.2)'
+                      e.target.style.boxShadow = 'none'
+                      e.target.style.background = 'rgba(255, 255, 255, 0.8)'
+                    }}
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  color: '#374151',
+                  marginBottom: '8px'
+                }}>
                   Bio
                 </label>
                 <textarea
-                  rows={3}
+                  rows={4}
                   value={profileData.bio || ''}
                   onChange={(e) => setProfileData({...profileData, bio: e.target.value})}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                   placeholder="Tell us about yourself..."
+                  style={{
+                    width: '100%',
+                    padding: '16px',
+                    background: 'rgba(255, 255, 255, 0.8)',
+                    border: '1px solid rgba(107, 114, 128, 0.2)',
+                    borderRadius: '16px',
+                    fontSize: '16px',
+                    outline: 'none',
+                    transition: 'all 0.3s ease',
+                    boxSizing: 'border-box',
+                    resize: 'none',
+                    fontFamily: 'inherit'
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.borderColor = 'rgba(59, 130, 246, 0.5)'
+                    e.target.style.boxShadow = '0 0 0 4px rgba(59, 130, 246, 0.1)'
+                    e.target.style.background = 'rgba(255, 255, 255, 0.95)'
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = 'rgba(107, 114, 128, 0.2)'
+                    e.target.style.boxShadow = 'none'
+                    e.target.style.background = 'rgba(255, 255, 255, 0.8)'
+                  }}
                 />
               </div>
 
               {error && (
-                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-                  {error}
+                <div style={{
+                  background: 'rgba(239, 68, 68, 0.1)',
+                  border: '1px solid rgba(239, 68, 68, 0.3)',
+                  borderRadius: '16px',
+                  padding: '16px',
+                  color: '#dc2626'
+                }}>
+                  <div style={{
+                    fontSize: '14px',
+                    display: 'flex',
+                    alignItems: 'center'
+                  }}>
+                    <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20" style={{ marginRight: '12px', flexShrink: 0 }}>
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                    </svg>
+                    {error}
+                  </div>
                 </div>
               )}
 
               {success && (
-                <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
-                  {success}
+                <div style={{
+                  background: 'rgba(16, 185, 129, 0.1)',
+                  border: '1px solid rgba(16, 185, 129, 0.3)',
+                  borderRadius: '16px',
+                  padding: '16px',
+                  color: '#059669'
+                }}>
+                  <div style={{
+                    fontSize: '14px',
+                    display: 'flex',
+                    alignItems: 'center'
+                  }}>
+                    <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20" style={{ marginRight: '12px', flexShrink: 0 }}>
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    {success}
+                  </div>
                 </div>
               )}
 
-              <div className="flex justify-end space-x-4">
+              <div style={{
+                display: 'flex',
+                justifyContent: 'flex-end',
+                gap: '16px',
+                marginTop: '24px'
+              }}>
                 <button
                   type="button"
                   onClick={onClose}
-                  className="px-4 py-2 text-gray-600 hover:text-gray-800"
+                  style={{
+                    padding: '12px 24px',
+                    background: 'rgba(107, 114, 128, 0.1)',
+                    border: '1px solid rgba(107, 114, 128, 0.2)',
+                    borderRadius: '16px',
+                    color: '#6b7280',
+                    fontSize: '16px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.background = 'rgba(107, 114, 128, 0.2)'
+                    e.target.style.color = '#374151'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.background = 'rgba(107, 114, 128, 0.1)'
+                    e.target.style.color = '#6b7280'
+                  }}
                 >
                   Cancel
                 </button>
-              <button
-                type="submit"
-                disabled={loading}
-                className="px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 font-semibold shadow-lg transition-all duration-200 transform hover:scale-105"
-              >
-                {loading ? 'Updating...' : 'Update Profile'}
-              </button>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  style={{
+                    padding: '16px 32px',
+                    background: loading ? 'rgba(59, 130, 246, 0.7)' : 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)',
+                    border: 'none',
+                    borderRadius: '16px',
+                    color: 'white',
+                    fontSize: '16px',
+                    fontWeight: '600',
+                    cursor: loading ? 'not-allowed' : 'pointer',
+                    transition: 'all 0.3s ease',
+                    boxShadow: '0 10px 25px rgba(59, 130, 246, 0.3)',
+                    opacity: loading ? 0.7 : 1
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!loading) {
+                      e.target.style.transform = 'translateY(-2px)'
+                      e.target.style.boxShadow = '0 15px 35px rgba(59, 130, 246, 0.4)'
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!loading) {
+                      e.target.style.transform = 'translateY(0)'
+                      e.target.style.boxShadow = '0 10px 25px rgba(59, 130, 246, 0.3)'
+                    }
+                  }}
+                >
+                  {loading ? 'Updating...' : 'Update Profile'}
+                </button>
               </div>
             </form>
           )}
