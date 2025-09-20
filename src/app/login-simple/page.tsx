@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { UserProfileManagement } from '@/components/UserProfileManagement'
+import { RegistrationModal } from '@/components/RegistrationModal'
 
 export default function SimpleLoginPage() {
   const [username, setUsername] = useState('')
@@ -463,11 +463,14 @@ export default function SimpleLoginPage() {
         </div>
       </div>
 
-      {/* Registration Modal */}
+      {/* Beautiful Registration Modal */}
       {showRegistration && (
-        <UserProfileManagement
-          user={null}
+        <RegistrationModal
           onClose={() => setShowRegistration(false)}
+          onSuccess={() => {
+            // Optional: Show a success message or redirect
+            console.log('Registration successful!')
+          }}
         />
       )}
     </div>
