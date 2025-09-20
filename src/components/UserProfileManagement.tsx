@@ -401,12 +401,14 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
               transition: 'all 0.2s ease'
             }}
             onMouseEnter={(e) => {
-              e.target.style.background = 'rgba(107, 114, 128, 0.2)'
-              e.target.style.color = '#374151'
+              const target = e.target as HTMLButtonElement
+              target.style.background = 'rgba(107, 114, 128, 0.2)'
+              target.style.color = '#374151'
             }}
             onMouseLeave={(e) => {
-              e.target.style.background = 'rgba(107, 114, 128, 0.1)'
-              e.target.style.color = '#6b7280'
+              const target = e.target as HTMLButtonElement
+              target.style.background = 'rgba(107, 114, 128, 0.1)'
+              target.style.color = '#6b7280'
             }}
           >
             ×
@@ -448,14 +450,16 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
               }}
               onMouseEnter={(e) => {
                 if (activeTab !== tab.id) {
-                  e.target.style.background = 'rgba(255, 255, 255, 0.5)'
-                  e.target.style.color = '#374151'
+                  const target = e.target as HTMLButtonElement
+                  target.style.background = 'rgba(255, 255, 255, 0.5)'
+                  target.style.color = '#374151'
                 }
               }}
               onMouseLeave={(e) => {
                 if (activeTab !== tab.id) {
-                  e.target.style.background = 'transparent'
-                  e.target.style.color = '#6b7280'
+                  const target = e.target as HTMLButtonElement
+                  target.style.background = 'transparent'
+                  target.style.color = '#6b7280'
                 }
               }}
             >
@@ -978,12 +982,14 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
                     transition: 'all 0.2s ease'
                   }}
                   onMouseEnter={(e) => {
-                    e.target.style.background = 'rgba(107, 114, 128, 0.2)'
-                    e.target.style.color = '#374151'
+                    const target = e.target as HTMLButtonElement
+                    target.style.background = 'rgba(107, 114, 128, 0.2)'
+                    target.style.color = '#374151'
                   }}
                   onMouseLeave={(e) => {
-                    e.target.style.background = 'rgba(107, 114, 128, 0.1)'
-                    e.target.style.color = '#6b7280'
+                    const target = e.target as HTMLButtonElement
+                    target.style.background = 'rgba(107, 114, 128, 0.1)'
+                    target.style.color = '#6b7280'
                   }}
                 >
                   Cancel
@@ -1006,14 +1012,16 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
                   }}
                   onMouseEnter={(e) => {
                     if (!loading) {
-                      e.target.style.transform = 'translateY(-2px)'
-                      e.target.style.boxShadow = '0 15px 35px rgba(59, 130, 246, 0.4)'
+                      const target = e.target as HTMLButtonElement
+                      target.style.transform = 'translateY(-2px)'
+                      target.style.boxShadow = '0 15px 35px rgba(59, 130, 246, 0.4)'
                     }
                   }}
                   onMouseLeave={(e) => {
                     if (!loading) {
-                      e.target.style.transform = 'translateY(0)'
-                      e.target.style.boxShadow = '0 10px 25px rgba(59, 130, 246, 0.3)'
+                      const target = e.target as HTMLButtonElement
+                      target.style.transform = 'translateY(0)'
+                      target.style.boxShadow = '0 10px 25px rgba(59, 130, 246, 0.3)'
                     }
                   }}
                 >
