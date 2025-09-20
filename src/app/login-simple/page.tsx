@@ -149,14 +149,15 @@ export default function SimpleLoginPage() {
                   onChange={(e) => setUsername(e.target.value)}
                   style={{
                     width: '100%',
-                    padding: '16px 16px 16px 48px',
+                    padding: '16px 16px 16px 52px',
                     background: 'rgba(255, 255, 255, 0.1)',
                     border: '1px solid rgba(255, 255, 255, 0.2)',
                     borderRadius: '16px',
                     color: 'white',
                     fontSize: '16px',
                     outline: 'none',
-                    transition: 'all 0.3s ease'
+                    transition: 'all 0.3s ease',
+                    boxSizing: 'border-box'
                   }}
                   placeholder="Enter your username"
                   onFocus={(e) => {
@@ -170,12 +171,16 @@ export default function SimpleLoginPage() {
                 />
                 <div style={{
                   position: 'absolute',
-                  left: '16px',
+                  left: '18px',
                   top: '50%',
                   transform: 'translateY(-50%)',
-                  color: 'rgba(255, 255, 255, 0.4)'
+                  color: 'rgba(255, 255, 255, 0.4)',
+                  pointerEvents: 'none',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
                 }}>
-                  <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                   </svg>
                 </div>
@@ -204,14 +209,15 @@ export default function SimpleLoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   style={{
                     width: '100%',
-                    padding: '16px 48px 16px 48px',
+                    padding: '16px 52px 16px 52px',
                     background: 'rgba(255, 255, 255, 0.1)',
                     border: '1px solid rgba(255, 255, 255, 0.2)',
                     borderRadius: '16px',
                     color: 'white',
                     fontSize: '16px',
                     outline: 'none',
-                    transition: 'all 0.3s ease'
+                    transition: 'all 0.3s ease',
+                    boxSizing: 'border-box'
                   }}
                   placeholder="Enter your password"
                   onFocus={(e) => {
@@ -225,12 +231,16 @@ export default function SimpleLoginPage() {
                 />
                 <div style={{
                   position: 'absolute',
-                  left: '16px',
+                  left: '18px',
                   top: '50%',
                   transform: 'translateY(-50%)',
-                  color: 'rgba(255, 255, 255, 0.4)'
+                  color: 'rgba(255, 255, 255, 0.4)',
+                  pointerEvents: 'none',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
                 }}>
-                  <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                   </svg>
                 </div>
@@ -239,22 +249,34 @@ export default function SimpleLoginPage() {
                   onClick={() => setShowPassword(!showPassword)}
                   style={{
                     position: 'absolute',
-                    right: '16px',
+                    right: '18px',
                     top: '50%',
                     transform: 'translateY(-50%)',
                     background: 'none',
                     border: 'none',
                     color: 'rgba(255, 255, 255, 0.4)',
                     cursor: 'pointer',
-                    padding: '4px'
+                    padding: '4px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    transition: 'color 0.2s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    const target = e.target as HTMLButtonElement
+                    target.style.color = 'rgba(255, 255, 255, 0.7)'
+                  }}
+                  onMouseLeave={(e) => {
+                    const target = e.target as HTMLButtonElement
+                    target.style.color = 'rgba(255, 255, 255, 0.4)'
                   }}
                 >
                   {showPassword ? (
-                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
                     </svg>
                   ) : (
-                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                     </svg>
