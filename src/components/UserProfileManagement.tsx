@@ -493,7 +493,7 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
                     display: 'block',
                     fontSize: '14px',
                     fontWeight: '600',
-                    color: '#374151',
+                    color: 'rgba(255, 255, 255, 0.9)',
                     marginBottom: '8px'
                   }}>
                     Full Name *
@@ -506,25 +506,26 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
                     style={{
                       width: '100%',
                       padding: '16px',
-                      background: 'rgba(255, 255, 255, 0.1)',
-                      backdropFilter: 'blur(10px)',
-                      border: '1px solid rgba(255, 255, 255, 0.2)',
+                      background: 'rgba(255, 255, 255, 0.05)',
+                      backdropFilter: 'blur(20px)',
+                      border: '1px solid rgba(255, 255, 255, 0.15)',
                       borderRadius: '16px',
                       fontSize: '16px',
-                      color: '#1f2937',
+                      color: 'white',
                       outline: 'none',
                       transition: 'all 0.3s ease',
-                      boxSizing: 'border-box'
+                      boxSizing: 'border-box',
+                      boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.1)'
                     }}
                     onFocus={(e) => {
-                      e.target.style.borderColor = 'rgba(59, 130, 246, 0.5)'
-                      e.target.style.boxShadow = '0 0 0 4px rgba(59, 130, 246, 0.1)'
-                      e.target.style.background = 'rgba(255, 255, 255, 0.2)'
+                      e.target.style.borderColor = 'rgba(59, 130, 246, 0.6)'
+                      e.target.style.boxShadow = '0 0 0 4px rgba(59, 130, 246, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
+                      e.target.style.background = 'rgba(255, 255, 255, 0.1)'
                     }}
                     onBlur={(e) => {
-                      e.target.style.borderColor = 'rgba(255, 255, 255, 0.2)'
-                      e.target.style.boxShadow = 'none'
-                      e.target.style.background = 'rgba(255, 255, 255, 0.1)'
+                      e.target.style.borderColor = 'rgba(255, 255, 255, 0.15)'
+                      e.target.style.boxShadow = 'inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                      e.target.style.background = 'rgba(255, 255, 255, 0.05)'
                     }}
                   />
                 </div>
@@ -533,7 +534,7 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
                     display: 'block',
                     fontSize: '14px',
                     fontWeight: '600',
-                    color: '#374151',
+                    color: 'rgba(255, 255, 255, 0.9)',
                     marginBottom: '8px'
                   }}>
                     Email *
@@ -546,25 +547,26 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
                     style={{
                       width: '100%',
                       padding: '16px',
-                      background: 'rgba(255, 255, 255, 0.1)',
-                      backdropFilter: 'blur(10px)',
-                      border: '1px solid rgba(255, 255, 255, 0.2)',
+                      background: 'rgba(255, 255, 255, 0.05)',
+                      backdropFilter: 'blur(20px)',
+                      border: '1px solid rgba(255, 255, 255, 0.15)',
                       borderRadius: '16px',
                       fontSize: '16px',
-                      color: '#1f2937',
+                      color: 'white',
                       outline: 'none',
                       transition: 'all 0.3s ease',
-                      boxSizing: 'border-box'
+                      boxSizing: 'border-box',
+                      boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.1)'
                     }}
                     onFocus={(e) => {
-                      e.target.style.borderColor = 'rgba(59, 130, 246, 0.5)'
-                      e.target.style.boxShadow = '0 0 0 4px rgba(59, 130, 246, 0.1)'
-                      e.target.style.background = 'rgba(255, 255, 255, 0.2)'
+                      e.target.style.borderColor = 'rgba(59, 130, 246, 0.6)'
+                      e.target.style.boxShadow = '0 0 0 4px rgba(59, 130, 246, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
+                      e.target.style.background = 'rgba(255, 255, 255, 0.1)'
                     }}
                     onBlur={(e) => {
-                      e.target.style.borderColor = 'rgba(255, 255, 255, 0.2)'
-                      e.target.style.boxShadow = 'none'
-                      e.target.style.background = 'rgba(255, 255, 255, 0.1)'
+                      e.target.style.borderColor = 'rgba(255, 255, 255, 0.15)'
+                      e.target.style.boxShadow = 'inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                      e.target.style.background = 'rgba(255, 255, 255, 0.05)'
                     }}
                   />
                 </div>
@@ -580,7 +582,7 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
                     display: 'block',
                     fontSize: '14px',
                     fontWeight: '600',
-                    color: '#374151',
+                    color: 'rgba(255, 255, 255, 0.9)',
                     marginBottom: '8px'
                   }}>
                     Phone
@@ -592,25 +594,26 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
                     style={{
                       width: '100%',
                       padding: '16px',
-                      background: 'rgba(255, 255, 255, 0.1)',
-                      backdropFilter: 'blur(10px)',
-                      border: '1px solid rgba(255, 255, 255, 0.2)',
+                      background: 'rgba(255, 255, 255, 0.05)',
+                      backdropFilter: 'blur(20px)',
+                      border: '1px solid rgba(255, 255, 255, 0.15)',
                       borderRadius: '16px',
                       fontSize: '16px',
-                      color: '#1f2937',
+                      color: 'white',
                       outline: 'none',
                       transition: 'all 0.3s ease',
-                      boxSizing: 'border-box'
+                      boxSizing: 'border-box',
+                      boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.1)'
                     }}
                     onFocus={(e) => {
-                      e.target.style.borderColor = 'rgba(59, 130, 246, 0.5)'
-                      e.target.style.boxShadow = '0 0 0 4px rgba(59, 130, 246, 0.1)'
-                      e.target.style.background = 'rgba(255, 255, 255, 0.2)'
+                      e.target.style.borderColor = 'rgba(59, 130, 246, 0.6)'
+                      e.target.style.boxShadow = '0 0 0 4px rgba(59, 130, 246, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
+                      e.target.style.background = 'rgba(255, 255, 255, 0.1)'
                     }}
                     onBlur={(e) => {
-                      e.target.style.borderColor = 'rgba(255, 255, 255, 0.2)'
-                      e.target.style.boxShadow = 'none'
-                      e.target.style.background = 'rgba(255, 255, 255, 0.1)'
+                      e.target.style.borderColor = 'rgba(255, 255, 255, 0.15)'
+                      e.target.style.boxShadow = 'inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                      e.target.style.background = 'rgba(255, 255, 255, 0.05)'
                     }}
                   />
                 </div>
@@ -619,7 +622,7 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
                     display: 'block',
                     fontSize: '14px',
                     fontWeight: '600',
-                    color: '#374151',
+                    color: 'rgba(255, 255, 255, 0.9)',
                     marginBottom: '8px'
                   }}>
                     Company
@@ -631,25 +634,26 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
                     style={{
                       width: '100%',
                       padding: '16px',
-                      background: 'rgba(255, 255, 255, 0.1)',
-                      backdropFilter: 'blur(10px)',
-                      border: '1px solid rgba(255, 255, 255, 0.2)',
+                      background: 'rgba(255, 255, 255, 0.05)',
+                      backdropFilter: 'blur(20px)',
+                      border: '1px solid rgba(255, 255, 255, 0.15)',
                       borderRadius: '16px',
                       fontSize: '16px',
-                      color: '#1f2937',
+                      color: 'white',
                       outline: 'none',
                       transition: 'all 0.3s ease',
-                      boxSizing: 'border-box'
+                      boxSizing: 'border-box',
+                      boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.1)'
                     }}
                     onFocus={(e) => {
-                      e.target.style.borderColor = 'rgba(59, 130, 246, 0.5)'
-                      e.target.style.boxShadow = '0 0 0 4px rgba(59, 130, 246, 0.1)'
-                      e.target.style.background = 'rgba(255, 255, 255, 0.2)'
+                      e.target.style.borderColor = 'rgba(59, 130, 246, 0.6)'
+                      e.target.style.boxShadow = '0 0 0 4px rgba(59, 130, 246, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
+                      e.target.style.background = 'rgba(255, 255, 255, 0.1)'
                     }}
                     onBlur={(e) => {
-                      e.target.style.borderColor = 'rgba(255, 255, 255, 0.2)'
-                      e.target.style.boxShadow = 'none'
-                      e.target.style.background = 'rgba(255, 255, 255, 0.1)'
+                      e.target.style.borderColor = 'rgba(255, 255, 255, 0.15)'
+                      e.target.style.boxShadow = 'inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                      e.target.style.background = 'rgba(255, 255, 255, 0.05)'
                     }}
                   />
                 </div>
@@ -703,7 +707,7 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
                     display: 'block',
                     fontSize: '14px',
                     fontWeight: '600',
-                    color: '#374151',
+                    color: 'rgba(255, 255, 255, 0.9)',
                     marginBottom: '8px'
                   }}>
                     City
@@ -715,25 +719,26 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
                     style={{
                       width: '100%',
                       padding: '16px',
-                      background: 'rgba(255, 255, 255, 0.1)',
-                      backdropFilter: 'blur(10px)',
-                      border: '1px solid rgba(255, 255, 255, 0.2)',
+                      background: 'rgba(255, 255, 255, 0.05)',
+                      backdropFilter: 'blur(20px)',
+                      border: '1px solid rgba(255, 255, 255, 0.15)',
                       borderRadius: '16px',
                       fontSize: '16px',
-                      color: '#1f2937',
+                      color: 'white',
                       outline: 'none',
                       transition: 'all 0.3s ease',
-                      boxSizing: 'border-box'
+                      boxSizing: 'border-box',
+                      boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.1)'
                     }}
                     onFocus={(e) => {
-                      e.target.style.borderColor = 'rgba(59, 130, 246, 0.5)'
-                      e.target.style.boxShadow = '0 0 0 4px rgba(59, 130, 246, 0.1)'
-                      e.target.style.background = 'rgba(255, 255, 255, 0.2)'
+                      e.target.style.borderColor = 'rgba(59, 130, 246, 0.6)'
+                      e.target.style.boxShadow = '0 0 0 4px rgba(59, 130, 246, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
+                      e.target.style.background = 'rgba(255, 255, 255, 0.1)'
                     }}
                     onBlur={(e) => {
-                      e.target.style.borderColor = 'rgba(255, 255, 255, 0.2)'
-                      e.target.style.boxShadow = 'none'
-                      e.target.style.background = 'rgba(255, 255, 255, 0.1)'
+                      e.target.style.borderColor = 'rgba(255, 255, 255, 0.15)'
+                      e.target.style.boxShadow = 'inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                      e.target.style.background = 'rgba(255, 255, 255, 0.05)'
                     }}
                   />
                 </div>
@@ -742,7 +747,7 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
                     display: 'block',
                     fontSize: '14px',
                     fontWeight: '600',
-                    color: '#374151',
+                    color: 'rgba(255, 255, 255, 0.9)',
                     marginBottom: '8px'
                   }}>
                     State
@@ -754,25 +759,26 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
                     style={{
                       width: '100%',
                       padding: '16px',
-                      background: 'rgba(255, 255, 255, 0.1)',
-                      backdropFilter: 'blur(10px)',
-                      border: '1px solid rgba(255, 255, 255, 0.2)',
+                      background: 'rgba(255, 255, 255, 0.05)',
+                      backdropFilter: 'blur(20px)',
+                      border: '1px solid rgba(255, 255, 255, 0.15)',
                       borderRadius: '16px',
                       fontSize: '16px',
-                      color: '#1f2937',
+                      color: 'white',
                       outline: 'none',
                       transition: 'all 0.3s ease',
-                      boxSizing: 'border-box'
+                      boxSizing: 'border-box',
+                      boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.1)'
                     }}
                     onFocus={(e) => {
-                      e.target.style.borderColor = 'rgba(59, 130, 246, 0.5)'
-                      e.target.style.boxShadow = '0 0 0 4px rgba(59, 130, 246, 0.1)'
-                      e.target.style.background = 'rgba(255, 255, 255, 0.2)'
+                      e.target.style.borderColor = 'rgba(59, 130, 246, 0.6)'
+                      e.target.style.boxShadow = '0 0 0 4px rgba(59, 130, 246, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
+                      e.target.style.background = 'rgba(255, 255, 255, 0.1)'
                     }}
                     onBlur={(e) => {
-                      e.target.style.borderColor = 'rgba(255, 255, 255, 0.2)'
-                      e.target.style.boxShadow = 'none'
-                      e.target.style.background = 'rgba(255, 255, 255, 0.1)'
+                      e.target.style.borderColor = 'rgba(255, 255, 255, 0.15)'
+                      e.target.style.boxShadow = 'inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                      e.target.style.background = 'rgba(255, 255, 255, 0.05)'
                     }}
                   />
                 </div>
@@ -781,7 +787,7 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
                     display: 'block',
                     fontSize: '14px',
                     fontWeight: '600',
-                    color: '#374151',
+                    color: 'rgba(255, 255, 255, 0.9)',
                     marginBottom: '8px'
                   }}>
                     ZIP Code
@@ -793,25 +799,26 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
                     style={{
                       width: '100%',
                       padding: '16px',
-                      background: 'rgba(255, 255, 255, 0.1)',
-                      backdropFilter: 'blur(10px)',
-                      border: '1px solid rgba(255, 255, 255, 0.2)',
+                      background: 'rgba(255, 255, 255, 0.05)',
+                      backdropFilter: 'blur(20px)',
+                      border: '1px solid rgba(255, 255, 255, 0.15)',
                       borderRadius: '16px',
                       fontSize: '16px',
-                      color: '#1f2937',
+                      color: 'white',
                       outline: 'none',
                       transition: 'all 0.3s ease',
-                      boxSizing: 'border-box'
+                      boxSizing: 'border-box',
+                      boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.1)'
                     }}
                     onFocus={(e) => {
-                      e.target.style.borderColor = 'rgba(59, 130, 246, 0.5)'
-                      e.target.style.boxShadow = '0 0 0 4px rgba(59, 130, 246, 0.1)'
-                      e.target.style.background = 'rgba(255, 255, 255, 0.2)'
+                      e.target.style.borderColor = 'rgba(59, 130, 246, 0.6)'
+                      e.target.style.boxShadow = '0 0 0 4px rgba(59, 130, 246, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
+                      e.target.style.background = 'rgba(255, 255, 255, 0.1)'
                     }}
                     onBlur={(e) => {
-                      e.target.style.borderColor = 'rgba(255, 255, 255, 0.2)'
-                      e.target.style.boxShadow = 'none'
-                      e.target.style.background = 'rgba(255, 255, 255, 0.1)'
+                      e.target.style.borderColor = 'rgba(255, 255, 255, 0.15)'
+                      e.target.style.boxShadow = 'inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                      e.target.style.background = 'rgba(255, 255, 255, 0.05)'
                     }}
                   />
                 </div>
@@ -827,7 +834,7 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
                     display: 'block',
                     fontSize: '14px',
                     fontWeight: '600',
-                    color: '#374151',
+                    color: 'rgba(255, 255, 255, 0.9)',
                     marginBottom: '8px'
                   }}>
                     Country
@@ -839,25 +846,26 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
                     style={{
                       width: '100%',
                       padding: '16px',
-                      background: 'rgba(255, 255, 255, 0.1)',
-                      backdropFilter: 'blur(10px)',
-                      border: '1px solid rgba(255, 255, 255, 0.2)',
+                      background: 'rgba(255, 255, 255, 0.05)',
+                      backdropFilter: 'blur(20px)',
+                      border: '1px solid rgba(255, 255, 255, 0.15)',
                       borderRadius: '16px',
                       fontSize: '16px',
-                      color: '#1f2937',
+                      color: 'white',
                       outline: 'none',
                       transition: 'all 0.3s ease',
-                      boxSizing: 'border-box'
+                      boxSizing: 'border-box',
+                      boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.1)'
                     }}
                     onFocus={(e) => {
-                      e.target.style.borderColor = 'rgba(59, 130, 246, 0.5)'
-                      e.target.style.boxShadow = '0 0 0 4px rgba(59, 130, 246, 0.1)'
-                      e.target.style.background = 'rgba(255, 255, 255, 0.2)'
+                      e.target.style.borderColor = 'rgba(59, 130, 246, 0.6)'
+                      e.target.style.boxShadow = '0 0 0 4px rgba(59, 130, 246, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
+                      e.target.style.background = 'rgba(255, 255, 255, 0.1)'
                     }}
                     onBlur={(e) => {
-                      e.target.style.borderColor = 'rgba(255, 255, 255, 0.2)'
-                      e.target.style.boxShadow = 'none'
-                      e.target.style.background = 'rgba(255, 255, 255, 0.1)'
+                      e.target.style.borderColor = 'rgba(255, 255, 255, 0.15)'
+                      e.target.style.boxShadow = 'inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                      e.target.style.background = 'rgba(255, 255, 255, 0.05)'
                     }}
                   />
                 </div>
@@ -866,7 +874,7 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
                     display: 'block',
                     fontSize: '14px',
                     fontWeight: '600',
-                    color: '#374151',
+                    color: 'rgba(255, 255, 255, 0.9)',
                     marginBottom: '8px'
                   }}>
                     Job Title
@@ -878,25 +886,26 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
                     style={{
                       width: '100%',
                       padding: '16px',
-                      background: 'rgba(255, 255, 255, 0.1)',
-                      backdropFilter: 'blur(10px)',
-                      border: '1px solid rgba(255, 255, 255, 0.2)',
+                      background: 'rgba(255, 255, 255, 0.05)',
+                      backdropFilter: 'blur(20px)',
+                      border: '1px solid rgba(255, 255, 255, 0.15)',
                       borderRadius: '16px',
                       fontSize: '16px',
-                      color: '#1f2937',
+                      color: 'white',
                       outline: 'none',
                       transition: 'all 0.3s ease',
-                      boxSizing: 'border-box'
+                      boxSizing: 'border-box',
+                      boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.1)'
                     }}
                     onFocus={(e) => {
-                      e.target.style.borderColor = 'rgba(59, 130, 246, 0.5)'
-                      e.target.style.boxShadow = '0 0 0 4px rgba(59, 130, 246, 0.1)'
-                      e.target.style.background = 'rgba(255, 255, 255, 0.2)'
+                      e.target.style.borderColor = 'rgba(59, 130, 246, 0.6)'
+                      e.target.style.boxShadow = '0 0 0 4px rgba(59, 130, 246, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
+                      e.target.style.background = 'rgba(255, 255, 255, 0.1)'
                     }}
                     onBlur={(e) => {
-                      e.target.style.borderColor = 'rgba(255, 255, 255, 0.2)'
-                      e.target.style.boxShadow = 'none'
-                      e.target.style.background = 'rgba(255, 255, 255, 0.1)'
+                      e.target.style.borderColor = 'rgba(255, 255, 255, 0.15)'
+                      e.target.style.boxShadow = 'inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                      e.target.style.background = 'rgba(255, 255, 255, 0.05)'
                     }}
                   />
                 </div>
@@ -920,25 +929,28 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
                   style={{
                     width: '100%',
                     padding: '16px',
-                    background: 'rgba(255, 255, 255, 0.8)',
-                    border: '1px solid rgba(107, 114, 128, 0.2)',
+                    background: 'rgba(255, 255, 255, 0.05)',
+                    backdropFilter: 'blur(20px)',
+                    border: '1px solid rgba(255, 255, 255, 0.15)',
                     borderRadius: '16px',
                     fontSize: '16px',
+                    color: 'white',
                     outline: 'none',
                     transition: 'all 0.3s ease',
                     boxSizing: 'border-box',
                     resize: 'none',
-                    fontFamily: 'inherit'
+                    fontFamily: 'inherit',
+                    boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.1)'
                   }}
                   onFocus={(e) => {
-                    e.target.style.borderColor = 'rgba(59, 130, 246, 0.5)'
-                    e.target.style.boxShadow = '0 0 0 4px rgba(59, 130, 246, 0.1)'
-                    e.target.style.background = 'rgba(255, 255, 255, 0.95)'
+                    e.target.style.borderColor = 'rgba(59, 130, 246, 0.6)'
+                    e.target.style.boxShadow = '0 0 0 4px rgba(59, 130, 246, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
+                    e.target.style.background = 'rgba(255, 255, 255, 0.1)'
                   }}
                   onBlur={(e) => {
-                    e.target.style.borderColor = 'rgba(107, 114, 128, 0.2)'
-                    e.target.style.boxShadow = 'none'
-                    e.target.style.background = 'rgba(255, 255, 255, 0.8)'
+                    e.target.style.borderColor = 'rgba(255, 255, 255, 0.15)'
+                    e.target.style.boxShadow = 'inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                    e.target.style.background = 'rgba(255, 255, 255, 0.05)'
                   }}
                 />
               </div>
