@@ -44,7 +44,7 @@ export default function SimpleLoginPage() {
   }
 
   return (
-    <div className="min-h-screen modern-bg flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative overflow-hidden">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-blue-500/20 to-purple-600/20 rounded-full blur-3xl animate-pulse"></div>
@@ -56,14 +56,14 @@ export default function SimpleLoginPage() {
         <div className="text-center">
           {/* Enhanced Logo */}
           <div className="relative mb-8">
-            <div className="w-24 h-24 bg-gradient-to-br from-blue-500 via-purple-600 to-pink-600 rounded-3xl flex items-center justify-center mx-auto shadow-2xl floating-icon">
-              <span className="text-white text-4xl">🛡️</span>
+            <div className="w-20 h-20 bg-gradient-to-br from-blue-500 via-purple-600 to-pink-600 rounded-3xl flex items-center justify-center mx-auto shadow-2xl animate-bounce">
+              <span className="text-white text-3xl">🛡️</span>
             </div>
-            <div className="absolute inset-0 w-24 h-24 bg-gradient-to-br from-blue-500 via-purple-600 to-pink-600 rounded-3xl mx-auto blur-xl opacity-30 animate-pulse"></div>
+            <div className="absolute inset-0 w-20 h-20 bg-gradient-to-br from-blue-500 via-purple-600 to-pink-600 rounded-3xl mx-auto blur-xl opacity-30 animate-pulse"></div>
           </div>
 
           {/* Enhanced Typography */}
-          <h1 className="text-5xl font-black text-white mb-3 modern-text-gradient">
+          <h1 className="text-4xl font-bold text-white mb-3">
             Crime Report System
           </h1>
           <div className="inline-flex items-center px-4 py-2 bg-white/10 backdrop-blur-lg rounded-full border border-white/20 mb-6">
@@ -80,7 +80,7 @@ export default function SimpleLoginPage() {
       </div>
 
       <div className="mt-12 relative z-10 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="glass-card py-10 px-8 shadow-2xl border border-white/20 relative overflow-hidden">
+        <div className="bg-white/10 backdrop-blur-lg py-10 px-8 shadow-2xl rounded-3xl border border-white/20 relative overflow-hidden">
           {/* Card Background Pattern */}
           <div className="absolute inset-0 opacity-5">
             <div className="absolute inset-0" style={{
@@ -172,7 +172,7 @@ export default function SimpleLoginPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="btn-primary w-full py-4 px-6 text-lg font-semibold rounded-2xl shadow-xl hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98]"
+                className="w-full py-4 px-6 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-lg font-semibold rounded-2xl shadow-xl hover:shadow-2xl hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus:ring-4 focus:ring-blue-500/30"
               >
                 {loading ? (
                   <div className="flex items-center justify-center">
@@ -206,7 +206,7 @@ export default function SimpleLoginPage() {
             <button
               type="button"
               onClick={() => setShowRegistration(true)}
-              className="btn-secondary w-full py-4 px-6 text-lg font-semibold rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98]"
+              className="w-full py-4 px-6 bg-white/10 backdrop-blur-lg border border-white/20 text-white text-lg font-semibold rounded-2xl shadow-lg hover:shadow-xl hover:bg-white/20 transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus:ring-4 focus:ring-blue-500/30"
             >
               <div className="flex items-center justify-center">
                 <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
