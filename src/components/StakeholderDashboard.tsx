@@ -8,6 +8,7 @@ import { AdvancedSearch } from './AdvancedSearch'
 import { GenerateReport } from './GenerateReport'
 import { AnalyticsDashboard } from './AnalyticsDashboard'
 import { UserProfile } from './UserProfile'
+import { TenantInfo } from './TenantInfo'
 import { getRoleDisplayName, getDashboardTitle } from '@/lib/auth'
 
 interface StakeholderDashboardProps {
@@ -187,7 +188,8 @@ export function StakeholderDashboard({ user, items, onItemsUpdate }: Stakeholder
                 </p>
               </div>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+              <TenantInfo user={user} />
               <UserProfile showDetails={true} />
             </div>
           </div>

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { User, getRoleDisplayName, canReadAll, canWriteAll, canManageUsers, canAccessAdmin } from '@/lib/auth'
+import { User, getRoleDisplayName, canReadAll, canWriteAll, canManageUsers, canAccessAdmin, getRoleIcon, getRoleColor, isStakeholder, isPropertyOwner } from '@/lib/auth'
 import { UserProfileManagement } from './UserProfileManagement'
 
 interface UserProfileProps {
@@ -45,55 +45,17 @@ export function UserProfile({ className = '', showDetails = true }: UserProfileP
     )
   }
 
-  const getRoleIcon = (role: string) => {
-    switch (role) {
-      case 'law_enforcement':
-        return '🛡️'
-      case 'property_owner':
-        return '🏠'
-      case 'insurance_agent':
-        return '🏢'
-      case 'broker':
-        return '🤝'
-      case 'banker':
-        return '🏦'
-      case 'asset_manager':
-        return '📊'
-      case 'assistant':
-      case 'secretary':
-      case 'executive_assistant':
-        return '👤'
-      case 'manager':
-        return '👔'
-      default:
-        return '👤'
-    }
-  }
+  // Enhanced tenant and access information
+  const tenantInfo = user.tenant ? {
+    name: user.tenant.name,
+    description: user.tenant.description || 'No description available',
+    isActive: user.tenant.isActive
+  } : null
 
-  const getRoleColor = (role: string) => {
-    switch (role) {
-      case 'law_enforcement':
-        return 'from-red-500 to-red-700'
-      case 'property_owner':
-        return 'from-blue-500 to-indigo-600'
-      case 'insurance_agent':
-        return 'from-green-500 to-green-700'
-      case 'broker':
-        return 'from-purple-500 to-purple-700'
-      case 'banker':
-        return 'from-yellow-500 to-yellow-700'
-      case 'asset_manager':
-        return 'from-teal-500 to-teal-700'
-      case 'assistant':
-      case 'secretary':
-      case 'executive_assistant':
-        return 'from-gray-500 to-gray-700'
-      case 'manager':
-        return 'from-orange-500 to-orange-700'
-      default:
-        return 'from-gray-500 to-gray-700'
-    }
-  }
+  const accessLevelInfo = user.accessLevel ? {
+    level: user.accessLevel,
+    displayName: user.accessLevel.charAt(0).toUpperCase() + user.accessLevel.slice(1).replace('_', ' ')
+  } : null
 
   const permissions = [
     ...(canReadAll(user) ? ['Read All Data'] : []),
@@ -169,6 +131,66 @@ export function UserProfile({ className = '', showDetails = true }: UserProfileP
                     <span className="text-gray-600">Role:</span>
                     <span className="text-gray-900 font-medium">{getRoleDisplayName(user.role)}</span>
                   </div>
+                  {accessLevelInfo && (
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Access Level:</span>
+                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                        accessLevelInfo.level === 'owner' ? 'bg-purple-100 text-purple-800' :
+                        accessLevelInfo.level === 'staff' ? 'bg-blue-100 text-blue-800' :
+                        accessLevelInfo.level === 'stakeholder' ? 'bg-green-100 text-green-800' :
+                        'bg-gray-100 text-gray-800'
+                      }`}>
+                        {accessLevelInfo.displayName}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Tenant Information */}
+              {tenantInfo && (
+                <div className="border-t border-gray-200 pt-3">
+                  <h4 className="font-semibold text-gray-900 text-sm mb-2">Tenant Information</h4>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Property:</span>
+                      <span className="text-gray-900 font-medium">{tenantInfo.name}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Status:</span>
+                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                        tenantInfo.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                      }`}>
+                        {tenantInfo.isActive ? 'Active' : 'Inactive'}
+                      </span>
+                    </div>
+                    {tenantInfo.description && (
+                      <div className="mt-2">
+                        <span className="text-gray-600 text-xs block mb-1">Description:</span>
+                        <span className="text-gray-700 text-xs leading-relaxed">{tenantInfo.description}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Access Type Indicator */}
+              <div className="border-t border-gray-200 pt-3">
+                <h4 className="font-semibold text-gray-900 text-sm mb-2">Access Type</h4>
+                <div className="flex items-center space-x-2">
+                  {isPropertyOwner(user) ? (
+                    <>
+                      <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                      <span className="text-sm text-blue-700 font-medium">Property Owner</span>
+                      <span className="text-xs text-gray-500">Full control over your property data</span>
+                    </>
+                  ) : (
+                    <>
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      <span className="text-sm text-green-700 font-medium">Stakeholder Access</span>
+                      <span className="text-xs text-gray-500">Controlled access to property data</span>
+                    </>
+                  )}
                 </div>
               </div>
 

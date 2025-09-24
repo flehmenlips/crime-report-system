@@ -20,6 +20,7 @@ import { User, getDashboardTitle, getRoleDisplayName, canWriteAll, canReadAll, c
 import { UserProfile } from '@/components/UserProfile'
 import { AnalyticsDashboard } from '@/components/AnalyticsDashboard'
 import { StakeholderDashboard } from '@/components/StakeholderDashboard'
+import { TenantInfo } from '@/components/TenantInfo'
 
 export default function Home() {
   const router = useRouter()
@@ -499,7 +500,8 @@ export default function Home() {
                   </p>
                 </div>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                <TenantInfo user={user} />
                 <UserProfile showDetails={true} />
               </div>
             </div>
