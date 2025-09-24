@@ -49,7 +49,7 @@ const nextConfig = {
   },
   // Enable experimental features for better PWA support
   experimental: {
-    optimizeCss: true,
+    // optimizeCss: true, // Disabled due to critters compatibility issues
   },
 }
 
