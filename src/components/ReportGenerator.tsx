@@ -228,7 +228,7 @@ export function ReportGenerator({ items, user, onClose, className = '' }: Report
         yPos += 6
         
         item.evidence.forEach(evidence => {
-          doc.text(`• ${evidence.type.toUpperCase()}: ${evidence.filename || 'Unknown'}`, 25, yPos)
+          doc.text(`• ${evidence.type.toUpperCase()}: ${evidence.originalName || 'Unknown'}`, 25, yPos)
           yPos += 5
         })
       } else {
