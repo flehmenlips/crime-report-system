@@ -5,6 +5,14 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { EnhancedEvidenceUpload } from '@/components/EnhancedEvidenceUpload'
 import { EnhancedEvidenceManager } from '@/components/EnhancedEvidenceManager'
+import { PWAServiceWorker } from '@/components/PWAServiceWorker'
+import { MobileNavigation } from '@/components/MobileNavigation'
+import { MobileOptimizedView } from '@/components/MobileOptimizedView'
+import { ResponsiveLayout } from '@/components/ResponsiveLayout'
+import { NotificationBell } from '@/components/NotificationBell'
+import { NotificationContainer } from '@/components/NotificationContainer'
+import { NotificationManager } from '@/components/NotificationManager'
+import { createNotificationHelpers } from '@/components/NotificationManager'
 import { ModernItemForm } from '@/components/ModernItemForm'
 import { ItemDetailView } from '@/components/ItemDetailView'
 import { ItemCardThumbnails } from '@/components/ItemCardThumbnails'
@@ -60,6 +68,11 @@ export default function Home() {
   // Enhanced RBAC user state
   const [user, setUser] = useState<User | null>(null)
   const role = user?.role
+
+  // Mobile and PWA state
+  const [isMobile, setIsMobile] = useState(false)
+  const [showMobileMenu, setShowMobileMenu] = useState(false)
+  const [showUserProfile, setShowUserProfile] = useState(false)
 
   // RBAC helper functions
   const canAddItems = () => canWriteAll(user) || user?.permissions?.includes('write:own')
@@ -136,6 +149,17 @@ export default function Home() {
       return () => document.removeEventListener('click', handleClickOutside)
     }
   }, [showActionMenu])
+
+  // Mobile detection
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
 
   const handleAddItem = async () => {
     const itemName = prompt('Enter item name:')
@@ -405,7 +429,9 @@ export default function Home() {
           const result = await response.json()
           setAllItems(prev => prev.map(i => i.id === editingFormItem.id ? result.item : i))
           setTotalValue(prev => prev - editingFormItem.estimatedValue + result.item.estimatedValue)
-          alert(`✅ "${result.item.name}" updated successfully!`)
+          const { useNotifications } = await import('@/contexts/NotificationContext')
+          const notificationHelpers = createNotificationHelpers(useNotifications().addNotification)
+          notificationHelpers.itemUpdated(result.item.name)
         }
       } else {
         // Create new item
@@ -414,7 +440,9 @@ export default function Home() {
         if (newItem) {
           setAllItems(prev => [...prev, newItem])
           setTotalValue(prev => prev + newItem.estimatedValue)
-          alert(`✅ "${newItem.name}" created successfully!`)
+          const { useNotifications } = await import('@/contexts/NotificationContext')
+          const notificationHelpers = createNotificationHelpers(useNotifications().addNotification)
+          notificationHelpers.itemCreated(newItem.name)
           
           const updatedItems = await getAllItems()
           setAllItems(updatedItems)
@@ -426,6 +454,45 @@ export default function Home() {
     } catch (error) {
       console.error('Error in form submission:', error)
       alert(`❌ Error: ${error instanceof Error ? error.message : error}`)
+    }
+  }
+
+  // Mobile action handlers
+  const handleMobileAction = (action: string) => {
+    switch (action) {
+      case 'add':
+        setShowModernForm(true)
+        break
+      case 'bulk':
+        setShowBulkUpload(true)
+        break
+      case 'reports':
+        setShowGenerateReport(true)
+        break
+      case 'search':
+        setShowAdvancedSearch(true)
+        break
+      case 'analytics':
+        setShowAnalytics(true)
+        break
+      case 'export':
+        setShowExportManager(true)
+        break
+      case 'profile':
+        setShowUserProfile(true)
+        break
+      case 'logout':
+        handleLogout()
+        break
+    }
+  }
+
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' })
+      router.push('/login-simple')
+    } catch (error) {
+      console.error('Logout error:', error)
     }
   }
 
@@ -471,12 +538,62 @@ export default function Home() {
 
   if (userRole === 'property_owner') {
     return (
-      <div style={{
-        minHeight: '100vh',
-        background: 'linear-gradient(135deg, #0f0f23 0%, #1e1b4b 50%, #312e81 100%)',
-        fontFamily: 'Inter, -apple-system, sans-serif',
-        color: 'white'
-      }}>
+      <ResponsiveLayout user={user}>
+        {/* PWA Service Worker */}
+        <PWAServiceWorker />
+        
+        {/* Notification System */}
+        <NotificationManager user={user} items={displayItems} />
+        <NotificationContainer />
+        
+        {/* Mobile Navigation */}
+        {isMobile && (
+          <MobileNavigation
+            user={user}
+            onMenuToggle={() => setShowMobileMenu(!showMobileMenu)}
+            onAction={handleMobileAction}
+            canAddItems={canAddItems() || false}
+            canBulkUpload={canBulkUpload() || false}
+            canGenerateReports={canGenerateReports() || false}
+            canAccessAdminFeatures={canAccessAdminFeatures() || false}
+          />
+        )}
+
+        {/* Mobile Optimized View */}
+        {isMobile ? (
+          <MobileOptimizedView
+            items={displayItems}
+            user={user}
+            onItemClick={(item) => {
+              setDetailViewItem(item)
+              setShowDetailView(true)
+            }}
+            onAddItem={() => setShowModernForm(true)}
+            onUploadEvidence={(item) => {
+              setSelectedItem(item)
+              setShowSimpleUpload(true)
+            }}
+            onManageEvidence={(item) => {
+              setEvidenceManagementItem(item)
+              setShowEvidenceManagement(true)
+            }}
+            onEditItem={(item) => {
+              setEditingFormItem(item)
+              setShowModernForm(true)
+            }}
+            onDeleteItem={handleDeleteItem}
+            canEdit={canAddItems() || false}
+            canDelete={canAddItems() || false}
+            canUpload={canAddItems() || false}
+            loading={loading}
+          />
+        ) : (
+          <div style={{
+            minHeight: '100vh',
+            background: 'linear-gradient(135deg, #0f0f23 0%, #1e1b4b 50%, #312e81 100%)',
+            fontFamily: 'Inter, -apple-system, sans-serif',
+            color: 'white'
+          }}>
         {/* Modern Header */}
         <div style={{
           background: 'rgba(255, 255, 255, 0.1)',
@@ -522,6 +639,7 @@ export default function Home() {
                 </div>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                <NotificationBell />
                 <TenantInfo user={user} />
                 <UserProfile showDetails={true} />
               </div>
@@ -1919,19 +2037,42 @@ export default function Home() {
             />
           )}
         </div>
-      </div>
+        )}
+      </ResponsiveLayout>
     )
   }
 
   // Stakeholder dashboard for all non-property owners
   return (
-    <StakeholderDashboard 
-      user={user} 
-      items={allItems} 
-      onItemsUpdate={(updatedItems) => setAllItems(updatedItems)}
-      loading={loading}
-      error={error}
-      onRefresh={handleRefresh}
-    />
+      <ResponsiveLayout user={user}>
+        {/* PWA Service Worker */}
+        <PWAServiceWorker />
+        
+        {/* Notification System */}
+        <NotificationManager user={user} items={allItems} />
+        <NotificationContainer />
+        
+        {/* Mobile Navigation */}
+      {isMobile && (
+        <MobileNavigation
+          user={user}
+          onMenuToggle={() => setShowMobileMenu(!showMobileMenu)}
+          onAction={handleMobileAction}
+          canAddItems={canAddItems() || false}
+          canBulkUpload={canBulkUpload() || false}
+          canGenerateReports={canGenerateReports() || false}
+          canAccessAdminFeatures={canAccessAdminFeatures() || false}
+        />
+      )}
+      
+      <StakeholderDashboard 
+        user={user} 
+        items={allItems} 
+        onItemsUpdate={(updatedItems) => setAllItems(updatedItems)}
+        loading={loading}
+        error={error}
+        onRefresh={handleRefresh}
+      />
+    </ResponsiveLayout>
   )
 }
