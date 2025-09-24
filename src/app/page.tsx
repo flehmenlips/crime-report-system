@@ -3,7 +3,8 @@
 // import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { SimpleFileUpload } from '@/components/SimpleFileUpload'
+import { EnhancedEvidenceUpload } from '@/components/EnhancedEvidenceUpload'
+import { EnhancedEvidenceManager } from '@/components/EnhancedEvidenceManager'
 import { ModernItemForm } from '@/components/ModernItemForm'
 import { ItemDetailView } from '@/components/ItemDetailView'
 import { ItemCardThumbnails } from '@/components/ItemCardThumbnails'
@@ -34,6 +35,7 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null)
   const [refreshing, setRefreshing] = useState(false)
   const [showSimpleUpload, setShowSimpleUpload] = useState(false)
+  const [showEvidenceManager, setShowEvidenceManager] = useState(false)
   const [selectedItem, setSelectedItem] = useState<StolenItem | null>(null)
   const [editingItem, setEditingItem] = useState<number | null>(null)
   const [showActionMenu, setShowActionMenu] = useState<number | null>(null)
@@ -1804,9 +1806,9 @@ export default function Home() {
             />
           )}
 
-          {/* Evidence Management Modal */}
+          {/* Enhanced Evidence Management Modal */}
           {showEvidenceManagement && evidenceManagementItem && (
-            <EvidenceManagement
+            <EnhancedEvidenceManager
               item={evidenceManagementItem}
               onClose={() => {
                 setShowEvidenceManagement(false)
@@ -1816,13 +1818,15 @@ export default function Home() {
                 // Reload items to show updated evidence counts
                 const updatedItems = await getAllItems()
                 setAllItems(updatedItems)
+                setShowEvidenceManagement(false)
+                setEvidenceManagementItem(null)
               }}
             />
           )}
 
-          {/* File Upload Modal */}
+          {/* Enhanced Evidence Upload Modal */}
           {showSimpleUpload && selectedItem && (
-            <SimpleFileUpload
+            <EnhancedEvidenceUpload
               item={selectedItem}
               onClose={() => {
                 setShowSimpleUpload(false)
@@ -1832,6 +1836,23 @@ export default function Home() {
                 const updatedItems = await getAllItems()
                 setAllItems(updatedItems)
                 setShowSimpleUpload(false)
+                setSelectedItem(null)
+              }}
+            />
+          )}
+
+          {/* Enhanced Evidence Manager Modal */}
+          {showEvidenceManager && selectedItem && (
+            <EnhancedEvidenceManager
+              item={selectedItem}
+              onClose={() => {
+                setShowEvidenceManager(false)
+                setSelectedItem(null)
+              }}
+              onUpdate={async (updatedItem) => {
+                const updatedItems = await getAllItems()
+                setAllItems(updatedItems)
+                setShowEvidenceManager(false)
                 setSelectedItem(null)
               }}
             />
