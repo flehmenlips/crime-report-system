@@ -20,6 +20,7 @@
     "@cloudinary/react": "^1.14.3",
     "@cloudinary/url-gen": "^1.22.0",
     "@prisma/client": "^6.16.1",
+    "@tailwindcss/postcss": "^4.1.13",
     "@types/node": "latest",
     "@types/react": "latest",
     "@types/react-dom": "latest",
