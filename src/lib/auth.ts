@@ -286,3 +286,106 @@ export function getRoleDisplayName(role: Role): string {
       return 'User'
   }
 }
+
+// Enhanced stakeholder access control functions
+export function canGenerateReports(user: User | null): boolean {
+  if (!user) return false
+  return ['law_enforcement', 'insurance_agent', 'banker', 'asset_manager'].includes(user.role)
+}
+
+export function canAddNotes(user: User | null): boolean {
+  if (!user) return false
+  return ['law_enforcement', 'insurance_agent', 'broker', 'banker', 'asset_manager'].includes(user.role)
+}
+
+export function canExportData(user: User | null): boolean {
+  if (!user) return false
+  return ['law_enforcement', 'insurance_agent', 'banker'].includes(user.role)
+}
+
+export function canAccessAnalytics(user: User | null): boolean {
+  if (!user) return false
+  // All authenticated users can access analytics
+  return true
+}
+
+export function canViewEvidence(user: User | null): boolean {
+  if (!user) return false
+  // All authenticated users can view evidence
+  return true
+}
+
+export function canEditItems(user: User | null): boolean {
+  if (!user) return false
+  return user.role === 'property_owner' || user.role === 'law_enforcement'
+}
+
+export function canDeleteItems(user: User | null): boolean {
+  if (!user) return false
+  return user.role === 'property_owner' || user.role === 'law_enforcement'
+}
+
+export function canUploadEvidence(user: User | null): boolean {
+  if (!user) return false
+  return user.role === 'property_owner' || user.role === 'law_enforcement'
+}
+
+export function isStakeholder(user: User | null): boolean {
+  if (!user) return false
+  return user.role !== 'property_owner'
+}
+
+export function isPropertyOwner(user: User | null): boolean {
+  if (!user) return false
+  return user.role === 'property_owner'
+}
+
+export function getRoleIcon(role: Role): string {
+  switch (role) {
+    case 'law_enforcement':
+      return '🚔'
+    case 'property_owner':
+      return '🏠'
+    case 'insurance_agent':
+      return '🏢'
+    case 'broker':
+      return '🤝'
+    case 'banker':
+      return '🏦'
+    case 'asset_manager':
+      return '📊'
+    case 'assistant':
+    case 'secretary':
+    case 'executive_assistant':
+      return '👤'
+    case 'manager':
+      return '👔'
+    default:
+      return '👤'
+  }
+}
+
+export function getRoleColor(role: Role): string {
+  switch (role) {
+    case 'law_enforcement':
+      return 'from-red-500 to-red-700'
+    case 'property_owner':
+      return 'from-blue-500 to-indigo-600'
+    case 'insurance_agent':
+      return 'from-green-500 to-green-700'
+    case 'broker':
+      return 'from-purple-500 to-purple-700'
+    case 'banker':
+      return 'from-yellow-500 to-yellow-700'
+    case 'asset_manager':
+      return 'from-teal-500 to-teal-700'
+    case 'assistant':
+    case 'secretary':
+    case 'executive_assistant':
+      return 'from-gray-500 to-gray-700'
+    case 'manager':
+      return 'from-orange-500 to-orange-700'
+    default:
+      return 'from-gray-500 to-gray-700'
+  }
+}
