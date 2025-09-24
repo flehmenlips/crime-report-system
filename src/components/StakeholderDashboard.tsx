@@ -9,15 +9,19 @@ import { GenerateReport } from './GenerateReport'
 import { AnalyticsDashboard } from './AnalyticsDashboard'
 import { UserProfile } from './UserProfile'
 import { TenantInfo } from './TenantInfo'
+import { DashboardLoading, StatsLoading, ErrorState, EmptyState } from './LoadingState'
 import { getRoleDisplayName, getDashboardTitle } from '@/lib/auth'
 
 interface StakeholderDashboardProps {
   user: User
   items: StolenItem[]
   onItemsUpdate?: (items: StolenItem[]) => void
+  loading?: boolean
+  error?: string | null
+  onRefresh?: () => void
 }
 
-export function StakeholderDashboard({ user, items, onItemsUpdate }: StakeholderDashboardProps) {
+export function StakeholderDashboard({ user, items, onItemsUpdate, loading = false, error = null, onRefresh }: StakeholderDashboardProps) {
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false)
   const [showGenerateReport, setShowGenerateReport] = useState(false)
   const [showAnalytics, setShowAnalytics] = useState(false)
@@ -136,6 +140,31 @@ export function StakeholderDashboard({ user, items, onItemsUpdate }: Stakeholder
     (item.evidence?.filter(e => e.type === 'video')?.length || 0) + 
     (item.evidence?.filter(e => e.type === 'document')?.length || 0), 0
   )
+
+  // Show loading state
+  if (loading) {
+    return <DashboardLoading />
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #0f0f23 0%, #1e1b4b 50%, #312e81 100%)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontFamily: 'Inter, -apple-system, sans-serif'
+      }}>
+        <ErrorState 
+          message={error}
+          onRetry={onRefresh}
+          className="bg-white/95 backdrop-blur-md rounded-2xl p-8 shadow-2xl"
+        />
+      </div>
+    )
+  }
 
   return (
     <div style={{

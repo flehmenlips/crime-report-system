@@ -21,12 +21,15 @@ import { UserProfile } from '@/components/UserProfile'
 import { AnalyticsDashboard } from '@/components/AnalyticsDashboard'
 import { StakeholderDashboard } from '@/components/StakeholderDashboard'
 import { TenantInfo } from '@/components/TenantInfo'
+import { DashboardLoading, StatsLoading, ItemsLoading, ErrorState, EmptyState } from '@/components/LoadingState'
 
 export default function Home() {
   const router = useRouter()
   const [allItems, setAllItems] = useState<StolenItem[]>([])
   const [totalValue, setTotalValue] = useState(0)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [refreshing, setRefreshing] = useState(false)
   const [showSimpleUpload, setShowSimpleUpload] = useState(false)
   const [selectedItem, setSelectedItem] = useState<StolenItem | null>(null)
   const [editingItem, setEditingItem] = useState<number | null>(null)
@@ -78,24 +81,39 @@ export default function Home() {
 
     checkAuth()
 
-    const loadData = async () => {
+    const loadData = async (isRefresh = false) => {
       try {
+        if (isRefresh) {
+          setRefreshing(true)
+        } else {
+          setLoading(true)
+        }
+        setError(null)
+        
         console.log('Loading data...')
         const loadedItems = await getAllItems()
         console.log('Loaded items:', loadedItems.length)
         const total = await getTotalValue()
         console.log('Total value:', total)
+        
         setAllItems(loadedItems)
         setTotalValue(total)
         setLoading(false)
+        setRefreshing(false)
         console.log('Data loading complete')
       } catch (error) {
         console.error('Error loading data:', error)
-        // Set some default data to prevent infinite loading
+        const errorMessage = error instanceof Error ? error.message : 'Failed to load data'
+        setError(errorMessage)
         setAllItems([])
         setTotalValue(0)
         setLoading(false)
+        setRefreshing(false)
       }
+    }
+
+    const handleRefresh = () => {
+      loadData(true)
     }
 
     loadData()
@@ -405,7 +423,13 @@ export default function Home() {
     }
   }
 
+  // Show loading state while authenticating or loading data
   if (!user || loading) {
+    return <DashboardLoading />
+  }
+
+  // Show error state if there's an error
+  if (error) {
     return (
       <div style={{
         minHeight: '100vh',
@@ -413,22 +437,13 @@ export default function Home() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        color: 'white',
         fontFamily: 'Inter, -apple-system, sans-serif'
       }}>
-        <div style={{ textAlign: 'center' }}>
-          <div style={{
-            width: '64px',
-            height: '64px',
-            border: '4px solid rgba(255,255,255,0.3)',
-            borderTop: '4px solid white',
-            borderRadius: '50%',
-            animation: 'spin 1s linear infinite',
-            margin: '0 auto 24px'
-          }}></div>
-          <h2 style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '8px' }}>Loading Your Portal</h2>
-          <p style={{ opacity: 0.8 }}>Preparing your stolen property database...</p>
-        </div>
+        <ErrorState 
+          message={error}
+          onRetry={handleRefresh}
+          className="bg-white/95 backdrop-blur-md rounded-2xl p-8 shadow-2xl"
+        />
       </div>
     )
   }
@@ -509,6 +524,55 @@ export default function Home() {
         </div>
 
         <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px 48px' }}>
+          {/* Refresh Button */}
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'flex-end', 
+            marginBottom: '24px' 
+          }}>
+            <button
+              onClick={handleRefresh}
+              disabled={refreshing}
+              style={{
+                background: 'rgba(255, 255, 255, 0.1)',
+                backdropFilter: 'blur(20px)',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                borderRadius: '12px',
+                padding: '12px 24px',
+                color: 'white',
+                fontSize: '14px',
+                fontWeight: '600',
+                cursor: refreshing ? 'not-allowed' : 'pointer',
+                opacity: refreshing ? 0.7 : 1,
+                transition: 'all 0.3s ease',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}
+            >
+              {refreshing ? (
+                <>
+                  <div style={{
+                    width: '16px',
+                    height: '16px',
+                    border: '2px solid rgba(255,255,255,0.3)',
+                    borderTop: '2px solid white',
+                    borderRadius: '50%',
+                    animation: 'spin 1s linear infinite'
+                  }}></div>
+                  Refreshing...
+                </>
+              ) : (
+                <>
+                  <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                  Refresh Data
+                </>
+              )}
+            </button>
+          </div>
+
           {/* Hero Stats */}
           <div style={{ 
             display: 'grid', 
@@ -1014,43 +1078,66 @@ export default function Home() {
             </div>
 
             {displayItems.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '80px 0' }}>
-                <div style={{
-                  width: '128px',
-                  height: '128px',
-                  background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
-                  borderRadius: '50%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  margin: '0 auto 32px',
-                  fontSize: '64px',
-                  boxShadow: '0 20px 40px rgba(59, 130, 246, 0.3)'
-                }}>
-                  📦
-                </div>
-                <h3 style={{ fontSize: '36px', fontWeight: '700', color: '#1f2937', marginBottom: '16px' }}>
-                  No items documented yet
-                </h3>
-                <p style={{ fontSize: '20px', color: '#6b7280', marginBottom: '40px', maxWidth: '500px', margin: '0 auto 40px' }}>
-                  Start building your professional stolen property database for law enforcement
-                </p>
-                <button
-                  onClick={handleAddItem}
-                  style={{
-                    background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #d946ef 100%)',
-                    color: 'white',
-                    border: 'none',
-                    padding: '16px 32px',
-                    borderRadius: '16px',
-                    cursor: 'pointer',
-                    fontWeight: '600',
-                    fontSize: '18px',
-                    boxShadow: '0 10px 25px rgba(99, 102, 241, 0.3)'
-                  }}
-                >
-                  Get Started
-                </button>
+              <div style={{ 
+                background: 'white', 
+                borderRadius: '24px', 
+                padding: '48px',
+                boxShadow: '0 20px 40px rgba(0, 0, 0, 0.1)',
+                border: '1px solid rgba(255, 255, 255, 0.2)'
+              }}>
+                <EmptyState
+                  title={isFiltered ? "No items found" : "No items documented yet"}
+                  message={isFiltered 
+                    ? "Try adjusting your search criteria to find items."
+                    : "Start building your professional stolen property database for law enforcement"
+                  }
+                  icon="📦"
+                  action={
+                    <div style={{ display: 'flex', gap: '16px', justifyContent: 'center' }}>
+                      {isFiltered ? (
+                        <button
+                          onClick={() => {
+                            setIsFiltered(false)
+                            setFilteredItems([])
+                          }}
+                          style={{
+                            background: 'linear-gradient(135deg, #6b7280 0%, #4b5563 100%)',
+                            color: 'white',
+                            border: 'none',
+                            padding: '12px 24px',
+                            borderRadius: '12px',
+                            cursor: 'pointer',
+                            fontWeight: '600',
+                            fontSize: '16px',
+                            boxShadow: '0 8px 20px rgba(107, 114, 128, 0.3)'
+                          }}
+                        >
+                          Clear Filters
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => {
+                            setEditingFormItem(null)
+                            setShowModernForm(true)
+                          }}
+                          style={{
+                            background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #d946ef 100%)',
+                            color: 'white',
+                            border: 'none',
+                            padding: '16px 32px',
+                            borderRadius: '16px',
+                            cursor: 'pointer',
+                            fontWeight: '600',
+                            fontSize: '18px',
+                            boxShadow: '0 10px 25px rgba(99, 102, 241, 0.3)'
+                          }}
+                        >
+                          Add First Item
+                        </button>
+                      )}
+                    </div>
+                  }
+                />
               </div>
             ) : viewMode === 'cards' ? (
               <div style={{ 
@@ -1733,7 +1820,10 @@ export default function Home() {
     <StakeholderDashboard 
       user={user} 
       items={allItems} 
-      onItemsUpdate={(updatedItems) => setAllItems(updatedItems)} 
+      onItemsUpdate={(updatedItems) => setAllItems(updatedItems)}
+      loading={loading}
+      error={error}
+      onRefresh={handleRefresh}
     />
   )
 }
