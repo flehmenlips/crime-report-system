@@ -91,10 +91,10 @@ export function EnhancedSearch({ items, user, onResults, onClose }: EnhancedSear
 
     // Value range filter
     if (filters.minValue !== '') {
-      filtered = filtered.filter(item => item.estimatedValue >= filters.minValue)
+      filtered = filtered.filter(item => item.estimatedValue >= Number(filters.minValue))
     }
     if (filters.maxValue !== '') {
-      filtered = filtered.filter(item => item.estimatedValue <= filters.maxValue)
+      filtered = filtered.filter(item => item.estimatedValue <= Number(filters.maxValue))
     }
 
     // Evidence filters

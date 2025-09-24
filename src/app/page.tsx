@@ -60,6 +60,41 @@ export default function Home() {
   const canGenerateReports = () => canReadAll(user) || user?.permissions?.includes('generate:reports')
   const canAccessAdminFeatures = () => canAccessAdmin(user)
 
+  const loadData = async (isRefresh = false) => {
+    try {
+      if (isRefresh) {
+        setRefreshing(true)
+      } else {
+        setLoading(true)
+      }
+      setError(null)
+      
+      console.log('Loading data...')
+      const loadedItems = await getAllItems()
+      console.log('Loaded items:', loadedItems.length)
+      const total = await getTotalValue()
+      console.log('Total value:', total)
+      
+      setAllItems(loadedItems)
+      setTotalValue(total)
+      setLoading(false)
+      setRefreshing(false)
+      console.log('Data loading complete')
+    } catch (error) {
+      console.error('Error loading data:', error)
+      const errorMessage = error instanceof Error ? error.message : 'Failed to load data'
+      setError(errorMessage)
+      setAllItems([])
+      setTotalValue(0)
+      setLoading(false)
+      setRefreshing(false)
+    }
+  }
+
+  const handleRefresh = () => {
+    loadData(true)
+  }
+
   useEffect(() => {
     // Check for user session
     const checkAuth = async () => {
@@ -80,42 +115,6 @@ export default function Home() {
     }
 
     checkAuth()
-
-    const loadData = async (isRefresh = false) => {
-      try {
-        if (isRefresh) {
-          setRefreshing(true)
-        } else {
-          setLoading(true)
-        }
-        setError(null)
-        
-        console.log('Loading data...')
-        const loadedItems = await getAllItems()
-        console.log('Loaded items:', loadedItems.length)
-        const total = await getTotalValue()
-        console.log('Total value:', total)
-        
-        setAllItems(loadedItems)
-        setTotalValue(total)
-        setLoading(false)
-        setRefreshing(false)
-        console.log('Data loading complete')
-      } catch (error) {
-        console.error('Error loading data:', error)
-        const errorMessage = error instanceof Error ? error.message : 'Failed to load data'
-        setError(errorMessage)
-        setAllItems([])
-        setTotalValue(0)
-        setLoading(false)
-        setRefreshing(false)
-      }
-    }
-
-    const handleRefresh = () => {
-      loadData(true)
-    }
-
     loadData()
   }, [])
 
