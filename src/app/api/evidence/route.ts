@@ -1,8 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { getCurrentUser } from '@/lib/auth-server'
 
 export async function GET(request: NextRequest) {
   try {
+    // Get current user for tenant isolation
+    const user = await getCurrentUser()
+    if (!user) {
+      return NextResponse.json(
+        { error: 'Authentication required' },
+        { status: 401 }
+      )
+    }
+
     const { searchParams } = new URL(request.url)
     const itemId = searchParams.get('itemId')
 
@@ -11,6 +21,20 @@ export async function GET(request: NextRequest) {
         { error: 'Item ID is required' },
         { status: 400 }
       )
+    }
+
+    // First, verify the item belongs to the user's tenant (unless they're law enforcement)
+    const item = await prisma.stolenItem.findUnique({
+      where: { id: parseInt(itemId) }
+    })
+
+    if (!item) {
+      return NextResponse.json({ error: 'Item not found' }, { status: 404 })
+    }
+
+    // Check tenant isolation (law enforcement can access any item's evidence)
+    if (user.role !== 'law_enforcement' && item.tenantId !== user.tenantId) {
+      return NextResponse.json({ error: 'Unauthorized to access this item\'s evidence' }, { status: 403 })
     }
 
     // Get evidence for the item
@@ -39,6 +63,15 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    // Get current user for tenant isolation
+    const user = await getCurrentUser()
+    if (!user) {
+      return NextResponse.json(
+        { error: 'Authentication required' },
+        { status: 401 }
+      )
+    }
+
     const body = await request.json()
     
     // Validate required fields
@@ -47,6 +80,20 @@ export async function POST(request: NextRequest) {
         { error: 'Missing required fields: itemId, type, cloudinaryId' },
         { status: 400 }
       )
+    }
+
+    // First, verify the item belongs to the user's tenant (unless they're law enforcement)
+    const targetItem = await prisma.stolenItem.findUnique({
+      where: { id: parseInt(body.itemId) }
+    })
+
+    if (!targetItem) {
+      return NextResponse.json({ error: 'Item not found' }, { status: 404 })
+    }
+
+    // Check tenant isolation (law enforcement can add evidence to any item)
+    if (user.role !== 'law_enforcement' && targetItem.tenantId !== user.tenantId) {
+      return NextResponse.json({ error: 'Unauthorized to add evidence to this item' }, { status: 403 })
     }
 
     // Validate evidence type

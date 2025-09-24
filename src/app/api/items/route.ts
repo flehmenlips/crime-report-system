@@ -3,10 +3,14 @@ import { getCurrentUser } from '@/lib/auth-server'
 import { prisma } from '@/lib/prisma'
 import { StolenItem, SearchFilters } from '@/types'
 
-async function getAllItems(userTenantId?: string): Promise<StolenItem[]> {
+async function getAllItems(userTenantId?: string, userRole?: string): Promise<StolenItem[]> {
   try {
-    // Temporary: Use hardcoded data until database migration is complete
+    // CRITICAL: Filter by tenantId for proper data isolation
+    // Law enforcement can access all tenants, others only their own
+    const whereClause = (userRole !== 'law_enforcement' && userTenantId) ? { tenantId: userTenantId } : {}
+    
     const items = await prisma.stolenItem.findMany({
+      where: whereClause,
       include: {
         evidence: true,
         owner: true
@@ -54,11 +58,12 @@ async function getAllItems(userTenantId?: string): Promise<StolenItem[]> {
   }
 }
 
-async function searchItems(filters: SearchFilters, userTenantId?: string): Promise<StolenItem[]> {
+async function searchItems(filters: SearchFilters, userTenantId?: string, userRole?: string): Promise<StolenItem[]> {
   try {
     const whereClause: any = {
-      // Temporary: Skip tenant filtering until database migration
-      // ...(userTenantId && { tenantId: userTenantId })
+      // CRITICAL: Filter by tenantId for proper data isolation
+      // Law enforcement can access all tenants, others only their own
+      ...(userRole !== 'law_enforcement' && userTenantId && { tenantId: userTenantId })
     }
 
     // Text search
@@ -227,7 +232,7 @@ export async function GET(request: NextRequest) {
       dateRange: dateStart && dateEnd ? { start: dateStart, end: dateEnd } : undefined
     }
 
-    const items = await searchItems(filters, user.tenantId)
+    const items = await searchItems(filters, user.tenantId, user.role)
 
     return NextResponse.json({
       items,
@@ -273,6 +278,15 @@ function sanitizeString(input: string): string {
 
 export async function POST(request: NextRequest) {
   try {
+    // Get current user for tenant isolation
+    const user = await getCurrentUser()
+    if (!user) {
+      return NextResponse.json(
+        { error: 'Authentication required' },
+        { status: 401 }
+      )
+    }
+
     const body = await request.json()
     
     // Validate required fields - only name and ownerId are required for quick entry
@@ -305,7 +319,8 @@ export async function POST(request: NextRequest) {
         category: body.category ? sanitizeString(body.category) : null,
         tags: body.tags ? JSON.stringify(body.tags) : null,
         notes: body.notes ? sanitizeString(body.notes) : null,
-        ownerId: body.ownerId
+        ownerId: body.ownerId,
+        tenantId: user.tenantId // CRITICAL: Set tenantId for proper data isolation
       },
       include: {
         evidence: true,
@@ -341,10 +356,33 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
+    // Get current user for tenant isolation
+    const user = await getCurrentUser()
+    if (!user) {
+      return NextResponse.json(
+        { error: 'Authentication required' },
+        { status: 401 }
+      )
+    }
+
     const body = await request.json()
     
     if (!body.id) {
       return NextResponse.json({ error: 'Item ID is required' }, { status: 400 })
+    }
+
+    // First, verify the item belongs to the user's tenant (unless they're law enforcement)
+    const existingItem = await prisma.stolenItem.findUnique({
+      where: { id: parseInt(body.id) }
+    })
+
+    if (!existingItem) {
+      return NextResponse.json({ error: 'Item not found' }, { status: 404 })
+    }
+
+    // Check tenant isolation (law enforcement can update any item)
+    if (user.role !== 'law_enforcement' && existingItem.tenantId !== user.tenantId) {
+      return NextResponse.json({ error: 'Unauthorized to update this item' }, { status: 403 })
     }
 
     console.log('Updating item with data:', body)
@@ -388,6 +426,15 @@ export async function PUT(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
+    // Get current user for tenant isolation
+    const user = await getCurrentUser()
+    if (!user) {
+      return NextResponse.json(
+        { error: 'Authentication required' },
+        { status: 401 }
+      )
+    }
+
     const { searchParams } = new URL(request.url)
     const itemId = searchParams.get('id')
 
@@ -411,6 +458,11 @@ export async function DELETE(request: NextRequest) {
         { error: 'Item not found' },
         { status: 404 }
       )
+    }
+
+    // Check tenant isolation (law enforcement can delete any item)
+    if (user.role !== 'law_enforcement' && item.tenantId !== user.tenantId) {
+      return NextResponse.json({ error: 'Unauthorized to delete this item' }, { status: 403 })
     }
 
     // Delete item (this will cascade delete evidence due to schema)
