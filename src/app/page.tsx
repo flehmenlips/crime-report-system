@@ -22,6 +22,9 @@ import { AnalyticsDashboard } from '@/components/AnalyticsDashboard'
 import { StakeholderDashboard } from '@/components/StakeholderDashboard'
 import { TenantInfo } from '@/components/TenantInfo'
 import { DashboardLoading, StatsLoading, ItemsLoading, ErrorState, EmptyState } from '@/components/LoadingState'
+import { ExportManager } from '@/components/ExportManager'
+import { QuickExport } from '@/components/QuickExport'
+import { ReportGenerator } from '@/components/ReportGenerator'
 
 export default function Home() {
   const router = useRouter()
@@ -47,6 +50,8 @@ export default function Home() {
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false)
   const [showGenerateReport, setShowGenerateReport] = useState(false)
   const [showAnalytics, setShowAnalytics] = useState(false)
+  const [showExportManager, setShowExportManager] = useState(false)
+  const [showReportGenerator, setShowReportGenerator] = useState(false)
   const [filteredItems, setFilteredItems] = useState<StolenItem[]>([])
   const [isFiltered, setIsFiltered] = useState(false)
 
@@ -600,7 +605,8 @@ export default function Home() {
                 {allItems.length}
               </div>
               <div style={{ color: 'white', fontSize: '24px', fontWeight: '600' }}>Items Stolen</div>
-              <div style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: '16px', marginTop: '8px' }}>From your property</div>
+              <div style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: '16px', marginTop: '8px', marginBottom: '16px' }}>From your property</div>
+              <QuickExport items={allItems} user={user} />
             </div>
             
             <div style={{
@@ -811,6 +817,70 @@ export default function Home() {
                 Generate Report
               </button>
               )}
+
+              {/* Export Data - Available to all authenticated users */}
+              <button
+                onClick={() => setShowExportManager(true)}
+                style={{
+                  background: 'linear-gradient(135deg, #059669 0%, #047857 50%, #065f46 100%)',
+                  color: 'white',
+                  border: 'none',
+                  padding: '20px 32px',
+                  borderRadius: '16px',
+                  cursor: 'pointer',
+                  fontWeight: '600',
+                  fontSize: '18px',
+                  boxShadow: '0 10px 25px rgba(5, 150, 105, 0.3)',
+                  transition: 'all 0.3s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '12px'
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-4px)'
+                  e.currentTarget.style.boxShadow = '0 20px 40px rgba(5, 150, 105, 0.4)'
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)'
+                  e.currentTarget.style.boxShadow = '0 10px 25px rgba(5, 150, 105, 0.3)'
+                }}
+              >
+                <span style={{ fontSize: '20px' }}>📊</span>
+                Export Data
+              </button>
+
+              {/* Professional Report Generator - Available to all authenticated users */}
+              <button
+                onClick={() => setShowReportGenerator(true)}
+                style={{
+                  background: 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 50%, #5b21b6 100%)',
+                  color: 'white',
+                  border: 'none',
+                  padding: '20px 32px',
+                  borderRadius: '16px',
+                  cursor: 'pointer',
+                  fontWeight: '600',
+                  fontSize: '18px',
+                  boxShadow: '0 10px 25px rgba(124, 58, 237, 0.3)',
+                  transition: 'all 0.3s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '12px'
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-4px)'
+                  e.currentTarget.style.boxShadow = '0 20px 40px rgba(124, 58, 237, 0.4)'
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)'
+                  e.currentTarget.style.boxShadow = '0 10px 25px rgba(124, 58, 237, 0.3)'
+                }}
+              >
+                <span style={{ fontSize: '20px' }}>📋</span>
+                Professional Report
+              </button>
               
               {/* Analytics Dashboard - Available to all authenticated users */}
               <button
@@ -1807,6 +1877,24 @@ export default function Home() {
             <AnalyticsDashboard
               items={isFiltered ? filteredItems : allItems}
               onClose={() => setShowAnalytics(false)}
+            />
+          )}
+
+          {/* Export Manager Modal */}
+          {showExportManager && (
+            <ExportManager
+              items={isFiltered ? filteredItems : allItems}
+              user={user}
+              onClose={() => setShowExportManager(false)}
+            />
+          )}
+
+          {/* Professional Report Generator Modal */}
+          {showReportGenerator && (
+            <ReportGenerator
+              items={isFiltered ? filteredItems : allItems}
+              user={user}
+              onClose={() => setShowReportGenerator(false)}
             />
           )}
         </div>

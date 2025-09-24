@@ -10,6 +10,9 @@ import { AnalyticsDashboard } from './AnalyticsDashboard'
 import { UserProfile } from './UserProfile'
 import { TenantInfo } from './TenantInfo'
 import { DashboardLoading, StatsLoading, ErrorState, EmptyState } from './LoadingState'
+import { ExportManager } from './ExportManager'
+import { QuickExport } from './QuickExport'
+import { ReportGenerator } from './ReportGenerator'
 import { getRoleDisplayName, getDashboardTitle } from '@/lib/auth'
 
 interface StakeholderDashboardProps {
@@ -25,6 +28,8 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false)
   const [showGenerateReport, setShowGenerateReport] = useState(false)
   const [showAnalytics, setShowAnalytics] = useState(false)
+  const [showExportManager, setShowExportManager] = useState(false)
+  const [showReportGenerator, setShowReportGenerator] = useState(false)
   const [showDetailView, setShowDetailView] = useState(false)
   const [detailViewItem, setDetailViewItem] = useState<StolenItem | null>(null)
   const [filteredItems, setFilteredItems] = useState<StolenItem[]>([])
