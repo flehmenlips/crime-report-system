@@ -1,0 +1,25 @@
+
+<svg width="152" height="152" viewBox="0 0 152 152" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1e40af;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="icon" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f8fafc;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background circle -->
+  <circle cx="76" cy="76" r="74" fill="url(#bg)" stroke="#1e40af" stroke-width="2"/>
+  
+  <!-- Shield icon -->
+  <g transform="translate(38, 38) scale(4.75)">
+    <path d="M12 2l8 4v6c0 5.55-3.84 10.74-9 12-5.16-1.26-9-6.45-9-12V6l8-4z" fill="url(#icon)" stroke="#ffffff" stroke-width="0.5"/>
+    <path d="M12 8l-2 2 4 4 6-6-2-2-4 4z" fill="#3b82f6"/>
+  </g>
+  
+  <!-- Crime Report text -->
+  <text x="76" y="133" text-anchor="middle" font-family="Arial, sans-serif" font-size="12.666666666666666" font-weight="bold" fill="white">CR</text>
+</svg>

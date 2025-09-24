@@ -18,11 +18,13 @@ const ROUTE_PERMISSIONS = {
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl
   
-  // Allow access to auth pages and login without authentication
+  // Allow access to auth pages, static assets, and login without authentication
   if (pathname.startsWith('/api/auth') || 
       pathname.startsWith('/login') ||
       pathname.startsWith('/unauthorized') ||
       pathname.startsWith('/_next') ||
+      pathname.startsWith('/icons/') ||
+      pathname.startsWith('/screenshots/') ||
       pathname.startsWith('/api/serve-document') ||
       pathname.startsWith('/api/document-proxy')) {
     return NextResponse.next()
@@ -30,7 +32,11 @@ export async function middleware(req: NextRequest) {
   
   // Check for user session
   const user = await getCurrentUser()
-  console.log('Middleware - User check for path:', pathname, 'User:', user ? `${user.name} (${user.role})` : 'null')
+  
+  // Only log for non-static assets to reduce console noise
+  if (!pathname.includes('.') || pathname.endsWith('.html')) {
+    console.log('Middleware - User check for path:', pathname, 'User:', user ? `${user.name} (${user.role})` : 'null')
+  }
   
   // Redirect to login if not authenticated
   if (!user) {
@@ -85,12 +91,7 @@ export async function middleware(req: NextRequest) {
 // Matcher: Apply to all routes except static files/internal Next.js paths
 export const config = {
   matcher: [
-    {
-      source: '/((?!_next/static|_next/image|favicon.ico).*)',
-      missing: [
-        { type: 'header', key: 'next-router-prefetch' },
-        { type: 'header', key: 'purpose', value: 'prefetch' },
-      ],
-    },
+    // Match all routes except static files
+    '/((?!_next/static|_next/image|favicon.ico|icons/|screenshots/).*)',
   ],
 }
