@@ -546,48 +546,7 @@ export default function Home() {
         <NotificationManager user={user} items={displayItems} />
         <NotificationContainer />
         
-        {/* Mobile Navigation */}
-        {isMobile && (
-          <MobileNavigation
-            user={user}
-            onMenuToggle={() => setShowMobileMenu(!showMobileMenu)}
-            onAction={handleMobileAction}
-            canAddItems={canAddItems() || false}
-            canBulkUpload={canBulkUpload() || false}
-            canGenerateReports={canGenerateReports() || false}
-            canAccessAdminFeatures={canAccessAdminFeatures() || false}
-          />
-        )}
-
-        {/* Mobile Optimized View */}
-        {isMobile ? (
-          <MobileOptimizedView
-            items={displayItems}
-            user={user}
-            onItemClick={(item) => {
-              setDetailViewItem(item)
-              setShowDetailView(true)
-            }}
-            onAddItem={() => setShowModernForm(true)}
-            onUploadEvidence={(item) => {
-              setSelectedItem(item)
-              setShowSimpleUpload(true)
-            }}
-            onManageEvidence={(item) => {
-              setEvidenceManagementItem(item)
-              setShowEvidenceManagement(true)
-            }}
-            onEditItem={(item) => {
-              setEditingFormItem(item)
-              setShowModernForm(true)
-            }}
-            onDeleteItem={handleDeleteItem}
-            canEdit={canAddItems() || false}
-            canDelete={canAddItems() || false}
-            canUpload={canAddItems() || false}
-            loading={loading}
-          />
-        ) : (
+        {/* Desktop View */}
           <div style={{
             minHeight: '100vh',
             background: 'linear-gradient(135deg, #0f0f23 0%, #1e1b4b 50%, #312e81 100%)',
@@ -2037,7 +1996,7 @@ export default function Home() {
             />
           )}
         </div>
-        )}
+        </div>
       </ResponsiveLayout>
     )
   }
@@ -2052,18 +2011,7 @@ export default function Home() {
         <NotificationManager user={user} items={allItems} />
         <NotificationContainer />
         
-        {/* Mobile Navigation */}
-      {isMobile && (
-        <MobileNavigation
-          user={user}
-          onMenuToggle={() => setShowMobileMenu(!showMobileMenu)}
-          onAction={handleMobileAction}
-          canAddItems={canAddItems() || false}
-          canBulkUpload={canBulkUpload() || false}
-          canGenerateReports={canGenerateReports() || false}
-          canAccessAdminFeatures={canAccessAdminFeatures() || false}
-        />
-      )}
+        {/* Desktop View */}
       
       <StakeholderDashboard 
         user={user} 
