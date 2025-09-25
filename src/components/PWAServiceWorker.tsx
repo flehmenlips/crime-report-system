@@ -14,7 +14,7 @@ export function PWAServiceWorker() {
   const [pwaState, setPwaState] = useState<PWAState>({
     isInstallable: false,
     isInstalled: false,
-    isOnline: navigator.onLine,
+    isOnline: true, // Default to true for SSR consistency
     updateAvailable: false,
     registration: null
   })
@@ -23,6 +23,9 @@ export function PWAServiceWorker() {
   const [showInstallPrompt, setShowInstallPrompt] = useState(false)
 
   useEffect(() => {
+    // Set initial online state after hydration
+    setPwaState(prev => ({ ...prev, isOnline: navigator.onLine }))
+    
     // Temporarily disable service worker to debug manifest issues
     console.log('Service Worker registration temporarily disabled for debugging')
     return
