@@ -43,7 +43,6 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null)
   const [refreshing, setRefreshing] = useState(false)
   const [showSimpleUpload, setShowSimpleUpload] = useState(false)
-  const [showEvidenceManager, setShowEvidenceManager] = useState(false)
   const [selectedItem, setSelectedItem] = useState<StolenItem | null>(null)
   const [editingItem, setEditingItem] = useState<number | null>(null)
   const [showActionMenu, setShowActionMenu] = useState<number | null>(null)
@@ -1918,22 +1917,6 @@ export default function Home() {
             />
           )}
 
-          {/* Enhanced Evidence Manager Modal */}
-          {showEvidenceManager && selectedItem && (
-            <EnhancedEvidenceManager
-              item={selectedItem}
-              onClose={() => {
-                setShowEvidenceManager(false)
-                setSelectedItem(null)
-              }}
-              onUpdate={async (updatedItem) => {
-                const updatedItems = await getAllItems()
-                setAllItems(updatedItems)
-                setShowEvidenceManager(false)
-                setSelectedItem(null)
-              }}
-            />
-          )}
 
           {/* Bulk Upload Modal */}
           {showBulkUpload && (

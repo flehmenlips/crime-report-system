@@ -33,8 +33,8 @@ export async function middleware(req: NextRequest) {
   // Check for user session
   const user = await getCurrentUser()
   
-  // Only log for non-static assets to reduce console noise
-  if (!pathname.includes('.') || pathname.endsWith('.html')) {
+  // Only log for page routes, not API calls or static assets to reduce console noise
+  if (!pathname.startsWith('/api/') && (!pathname.includes('.') || pathname.endsWith('.html'))) {
     console.log('Middleware - User check for path:', pathname, 'User:', user ? `${user.name} (${user.role})` : 'null')
   }
   
