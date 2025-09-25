@@ -1,4 +1,4 @@
-const CACHE_NAME = 'crime-report-v1.0.1'
+const CACHE_NAME = 'crime-report-v1.0.2-disabled'
 const STATIC_CACHE_NAME = 'crime-report-static-v1.0.1'
 const DYNAMIC_CACHE_NAME = 'crime-report-dynamic-v1.0.1'
 
