@@ -11,10 +11,14 @@ interface ResponsiveLayoutProps {
 export function ResponsiveLayout({ children, user }: ResponsiveLayoutProps) {
   const [isMobile, setIsMobile] = useState(false)
   const [isTablet, setIsTablet] = useState(false)
-  const [isDesktop, setIsDesktop] = useState(false)
-  const [screenSize, setScreenSize] = useState({ width: 0, height: 0 })
+  const [isDesktop, setIsDesktop] = useState(true) // Default to desktop for SSR
+  const [screenSize, setScreenSize] = useState({ width: 1024, height: 768 }) // Default desktop size
+  const [isHydrated, setIsHydrated] = useState(false)
 
   useEffect(() => {
+    // Mark as hydrated to prevent hydration mismatch
+    setIsHydrated(true)
+    
     const checkScreenSize = () => {
       const width = window.innerWidth
       const height = window.innerHeight
@@ -44,6 +48,9 @@ export function ResponsiveLayout({ children, user }: ResponsiveLayoutProps) {
 
   // Add responsive classes to body
   useEffect(() => {
+    // Only run after hydration to prevent hydration mismatch
+    if (!isHydrated) return
+    
     const body = document.body
     
     // Remove existing responsive classes
@@ -105,7 +112,7 @@ export function ResponsiveLayout({ children, user }: ResponsiveLayoutProps) {
     return () => {
       body.classList.remove('mobile', 'tablet', 'desktop')
     }
-  }, [isMobile, isTablet, isDesktop])
+  }, [isMobile, isTablet, isDesktop, isHydrated])
 
   // Create responsive styles
   const responsiveStyles = `
@@ -287,8 +294,8 @@ export function ResponsiveLayout({ children, user }: ResponsiveLayoutProps) {
           fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif'
         }}
       >
-        {/* Debug info (only in development) */}
-        {process.env.NODE_ENV === 'development' && (
+        {/* Debug info (only in development and after hydration) */}
+        {process.env.NODE_ENV === 'development' && isHydrated && (
           <div style={{
             position: 'fixed',
             top: '10px',
