@@ -446,10 +446,12 @@ export default function Home() {
 
         if (response.ok) {
           const result = await response.json()
-          setAllItems(prev => prev.map(i => i.id === editingFormItem.id ? result.item : i))
-          setTotalValue(prev => prev - editingFormItem.estimatedValue + result.item.estimatedValue)
+          // API returns the item directly, not wrapped in an 'item' property
+          const updatedItem = result
+          setAllItems(prev => prev.map(i => i.id === editingFormItem.id ? updatedItem : i))
+          setTotalValue(prev => prev - editingFormItem.estimatedValue + updatedItem.estimatedValue)
           // Notification will be handled by the NotificationManager component
-          console.log('Item updated:', result.item.name)
+          console.log('Item updated:', updatedItem.name)
         }
       } else {
         // Create new item
