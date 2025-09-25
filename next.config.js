@@ -51,10 +51,10 @@ const nextConfig = {
   experimental: {
     // optimizeCss: true, // Disabled due to critters compatibility issues
   },
-  // Disable build ID generation completely to use default behavior
-  // generateBuildId: async () => {
-  //   return 'cache-bust-' + Math.random().toString(36).substring(7) + '-' + Date.now()
-  // },
+  // Force fresh deployment to resolve chunk loading regression
+  generateBuildId: async () => {
+    return 'fix-chunks-' + Math.random().toString(36).substring(7) + '-' + Date.now()
+  },
 }
 
 module.exports = nextConfig
