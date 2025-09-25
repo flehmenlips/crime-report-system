@@ -340,12 +340,22 @@ export default function Home() {
       const newItem = await addItem(duplicateData, ownerId)
       
       if (newItem) {
+        // Update local state immediately
         setAllItems(prev => [...prev, newItem])
         setTotalValue(prev => prev + newItem.estimatedValue)
         alert(`✅ "${newItem.name}" created as duplicate!`)
         
-        const updatedItems = await getAllItems()
-        setAllItems(updatedItems)
+        // Refresh data from server to ensure consistency
+        setTimeout(async () => {
+          try {
+            const updatedItems = await getAllItems()
+            const updatedTotal = updatedItems.reduce((sum, item) => sum + item.estimatedValue, 0)
+            setAllItems(updatedItems)
+            setTotalValue(updatedTotal)
+          } catch (error) {
+            console.error('Error refreshing items after duplicate:', error)
+          }
+        }, 1000) // Wait 1 second for database consistency
       }
     } catch (error) {
       console.error('Error duplicating item:', error)

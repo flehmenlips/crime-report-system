@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -8,6 +5,84 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+model Tenant {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("tenants")
+}
+
+model User {
+  id            String       @id @default(uuid())
+  email         String       @unique
+  name          String
+  username      String       @unique
+  password      String
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  role          Role         @default(property_owner)
+  address       String?
+  avatar        String?
+  bio           String?
+  city          String?
+  company       String?
+  country       String?
+  emailVerified Boolean      @default(false)
+  isActive      Boolean      @default(true)
+  lastLoginAt   DateTime?
+  phone         String?
+  preferences   String?
+  state         String?
+  title         String?
+  zipCode       String?
+  accessLevel   AccessLevel? @default(owner)
+  tenantId      String?      @default("tenant-1")
+  items         StolenItem[]
+
+  @@map("users")
+}
+
+model StolenItem {
+  id               Int        @id @default(autoincrement())
+  name             String
+  description      String
+  serialNumber     String?
+  purchaseDate     String
+  purchaseCost     Float
+  dateLastSeen     String
+  locationLastSeen String
+  estimatedValue   Float
+  category         String?
+  tags             String?
+  notes            String?
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+  ownerId          String
+  tenantId         String?    @default("tenant-1")
+  evidence         Evidence[]
+  owner            User       @relation(fields: [ownerId], references: [id])
+
+  @@map("stolen_items")
+}
+
+model Evidence {
+  id           Int        @id @default(autoincrement())
+  type         String
+  cloudinaryId String?
+  originalName String?
+  description  String?
+  createdAt    DateTime   @default(now())
+  itemId       Int
+  documentData Bytes?
+  item         StolenItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  @@map("evidence")
 }
 
 enum Role {
@@ -24,101 +99,8 @@ enum Role {
 }
 
 enum AccessLevel {
-  owner          // Property owner - full control
-  staff          // Internal staff - read/write access
-  stakeholder    // External stakeholders - read/search/add notes
-  view_only      // View only access
-}
-
-model Tenant {
-  id          String   @id @default(uuid())
-  name        String   // e.g., "Birkenfeld Farm", "Smith Property", etc.
-  description String?  // Optional description
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
-  @@map("tenants")
-}
-
-model User {
-  id          String   @id @default(uuid())
-  email       String   @unique
-  name        String
-  username    String   @unique
-  password    String
-  role        Role     @default(property_owner)
-  accessLevel AccessLevel? @default(owner) // Access level within tenant
-  
-  // Extended profile fields
-  phone       String?
-  address     String?
-  city        String?
-  state       String?
-  zipCode     String?
-  country     String?
-  company     String?
-  title       String?
-  bio         String?
-  avatar      String?  // URL to avatar image
-  
-  // Account settings
-  emailVerified Boolean @default(false)
-  isActive      Boolean @default(true)
-  lastLoginAt   DateTime?
-  preferences   String? // JSON string for user preferences
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
-  // Tenant relationship (temporarily without foreign key constraint)
-  tenantId    String?  @default("tenant-1")
-  
-  // Relations
-  items       StolenItem[]
-  
-  @@map("users")
-}
-
-model StolenItem {
-  id                Int      @id @default(autoincrement())
-  name              String
-  description       String
-  serialNumber      String?
-  purchaseDate      String
-  purchaseCost      Float
-  dateLastSeen      String
-  locationLastSeen  String
-  estimatedValue    Float
-  category          String?
-  tags              String?  // JSON string of tags array
-  notes             String?
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
-  
-  // Tenant isolation (temporarily without foreign key constraint)
-  tenantId          String?  @default("tenant-1")
-  
-  // Relations
-  ownerId           String
-  owner             User     @relation(fields: [ownerId], references: [id])
-  evidence          Evidence[]
-  
-  @@map("stolen_items")
-}
-
-model Evidence {
-  id            Int        @id @default(autoincrement())
-  type          String     // photo, video, document
-  cloudinaryId  String?    // Cloudinary public ID (for photos/videos; null for documents stored in DB)
-  documentData  Bytes?     // Binary data for documents (PostgreSQL BYTEA; null for Cloudinary media)
-  originalName  String?    // Original filename
-  description   String?
-  createdAt     DateTime   @default(now())
-  
-  // Relations
-  itemId        Int
-  item          StolenItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
-  
-  @@map("evidence")
+  owner
+  staff
+  stakeholder
+  view_only
 }
