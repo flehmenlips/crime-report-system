@@ -1997,8 +1997,8 @@ export default function Home() {
         {/* PWA Service Worker - TESTING REINTRODUCTION */}
         <PWAServiceWorker />
         
-        {/* Notification System - TEMPORARILY DISABLED FOR DEBUGGING */}
-        {/* <NotificationManager user={user} items={allItems} /> */}
+        {/* Notification System - TESTING REINTRODUCTION */}
+        <NotificationManager user={user} items={allItems} />
         {/* <NotificationContainer /> */}
         
         {/* Desktop View */}
