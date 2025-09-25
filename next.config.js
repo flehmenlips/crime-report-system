@@ -11,7 +11,7 @@ const nextConfig = {
     // your project has ESLint errors.
     ignoreDuringBuilds: true,
   },
-  // PWA Configuration with aggressive cache busting
+  // PWA Configuration with standard caching
   async headers() {
     return [
       {
@@ -32,21 +32,12 @@ const nextConfig = {
         headers: [
           {
             key: 'Cache-Control',
-            value: 'public, max-age=0, must-revalidate',
+            value: 'public, max-age=31536000, immutable',
           },
         ],
       },
       {
         source: '/offline.html',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=0, must-revalidate',
-          },
-        ],
-      },
-      {
-        source: '/_next/static/:path*',
         headers: [
           {
             key: 'Cache-Control',
@@ -60,10 +51,10 @@ const nextConfig = {
   experimental: {
     // optimizeCss: true, // Disabled due to critters compatibility issues
   },
-  // Force completely new build ID to bust all caches
-  generateBuildId: async () => {
-    return 'cache-bust-' + Math.random().toString(36).substring(7) + '-' + Date.now()
-  },
+  // Disable build ID generation completely to use default behavior
+  // generateBuildId: async () => {
+  //   return 'cache-bust-' + Math.random().toString(36).substring(7) + '-' + Date.now()
+  // },
 }
 
 module.exports = nextConfig
