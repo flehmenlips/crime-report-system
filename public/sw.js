@@ -1,6 +1,6 @@
-const CACHE_NAME = 'crime-report-v1.0.0'
-const STATIC_CACHE_NAME = 'crime-report-static-v1.0.0'
-const DYNAMIC_CACHE_NAME = 'crime-report-dynamic-v1.0.0'
+const CACHE_NAME = 'crime-report-v1.0.1'
+const STATIC_CACHE_NAME = 'crime-report-static-v1.0.1'
+const DYNAMIC_CACHE_NAME = 'crime-report-dynamic-v1.0.1'
 
 // Static assets to cache
 const STATIC_ASSETS = [
@@ -81,12 +81,33 @@ self.addEventListener('fetch', (event) => {
         // Return cached version if available
         if (cachedResponse) {
           console.log('Serving from cache:', request.url)
+          // Special debugging for manifest.json
+          if (request.url.includes('manifest.json')) {
+            console.log('Manifest.json being served from cache')
+            cachedResponse.clone().text().then(text => {
+              console.log('Cached manifest.json content preview:', text.substring(0, 200))
+            }).catch(err => {
+              console.error('Error reading cached manifest.json:', err)
+            })
+          }
           return cachedResponse
         }
         
         // Otherwise, fetch from network
         return fetch(request)
           .then((networkResponse) => {
+            // Special debugging for manifest.json
+            if (request.url.includes('manifest.json')) {
+              console.log('Fetching manifest.json from network, status:', networkResponse.status)
+              if (networkResponse.ok) {
+                networkResponse.clone().text().then(text => {
+                  console.log('Network manifest.json content preview:', text.substring(0, 200))
+                }).catch(err => {
+                  console.error('Error reading network manifest.json:', err)
+                })
+              }
+            }
+            
             // Check if response is valid
             if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
               return networkResponse

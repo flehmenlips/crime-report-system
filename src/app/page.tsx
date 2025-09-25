@@ -47,6 +47,7 @@ export default function Home() {
   const [showActionMenu, setShowActionMenu] = useState<number | null>(null)
   const [selectedItems, setSelectedItems] = useState<Set<number>>(new Set())
   const [bulkMode, setBulkMode] = useState(false)
+  const [isHydrated, setIsHydrated] = useState(false)
   const [showModernForm, setShowModernForm] = useState(false)
   const [editingFormItem, setEditingFormItem] = useState<StolenItem | null>(null)
   const [showDetailView, setShowDetailView] = useState(false)
@@ -114,6 +115,10 @@ export default function Home() {
   }
 
   useEffect(() => {
+    // Mark as hydrated to prevent hydration mismatch
+    setIsHydrated(true)
+    console.log('Main page hydrated')
+    
     // Check for user session
     const checkAuth = async () => {
       try {

@@ -23,6 +23,10 @@ export function PWAServiceWorker() {
   const [showInstallPrompt, setShowInstallPrompt] = useState(false)
 
   useEffect(() => {
+    // Temporarily disable service worker to debug manifest issues
+    console.log('Service Worker registration temporarily disabled for debugging')
+    return
+    
     // Register service worker
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/sw.js')
