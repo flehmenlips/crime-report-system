@@ -51,10 +51,10 @@ const nextConfig = {
   experimental: {
     // optimizeCss: true, // Disabled due to critters compatibility issues
   },
-  // Force fresh deployment to fix chunk loading issues
-  generateBuildId: async () => {
-    return 'build-' + Date.now() + '-fixed'
-  },
+  // Disable build ID generation to use default chunk naming
+  // generateBuildId: async () => {
+  //   return 'build-' + Date.now() + '-fixed'
+  // },
 }
 
 module.exports = nextConfig
