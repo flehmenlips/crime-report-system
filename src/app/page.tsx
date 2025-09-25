@@ -12,7 +12,6 @@ import { ResponsiveLayout } from '@/components/ResponsiveLayout'
 import { NotificationBell } from '@/components/NotificationBell'
 import { NotificationContainer } from '@/components/NotificationContainer'
 import { NotificationManager } from '@/components/NotificationManager'
-import { createNotificationHelpers } from '@/components/NotificationManager'
 import { ModernItemForm } from '@/components/ModernItemForm'
 import { ItemDetailView } from '@/components/ItemDetailView'
 import { ItemCardThumbnails } from '@/components/ItemCardThumbnails'
@@ -428,9 +427,8 @@ export default function Home() {
           const result = await response.json()
           setAllItems(prev => prev.map(i => i.id === editingFormItem.id ? result.item : i))
           setTotalValue(prev => prev - editingFormItem.estimatedValue + result.item.estimatedValue)
-          const { useNotifications } = await import('@/contexts/NotificationContext')
-          const notificationHelpers = createNotificationHelpers(useNotifications().addNotification)
-          notificationHelpers.itemUpdated(result.item.name)
+          // Notification will be handled by the NotificationManager component
+          console.log('Item updated:', result.item.name)
         }
       } else {
         // Create new item
@@ -439,9 +437,8 @@ export default function Home() {
         if (newItem) {
           setAllItems(prev => [...prev, newItem])
           setTotalValue(prev => prev + newItem.estimatedValue)
-          const { useNotifications } = await import('@/contexts/NotificationContext')
-          const notificationHelpers = createNotificationHelpers(useNotifications().addNotification)
-          notificationHelpers.itemCreated(newItem.name)
+          // Notification will be handled by the NotificationManager component
+          console.log('Item created:', newItem.name)
           
           const updatedItems = await getAllItems()
           setAllItems(updatedItems)
