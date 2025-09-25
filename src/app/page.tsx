@@ -545,7 +545,7 @@ export default function Home() {
 
   if (userRole === 'property_owner') {
     return (
-      <ResponsiveLayout user={user}>
+      <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)' }}>
         {/* PWA Service Worker */}
         <PWAServiceWorker />
         
@@ -1987,13 +1987,13 @@ export default function Home() {
           )}
         </div>
         </div>
-      </ResponsiveLayout>
+      </div>
     )
   }
 
   // Stakeholder dashboard for all non-property owners
   return (
-      <ResponsiveLayout user={user}>
+      <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)' }}>
         {/* PWA Service Worker */}
         <PWAServiceWorker />
         
@@ -2011,6 +2011,6 @@ export default function Home() {
         error={error}
         onRefresh={handleRefresh}
       />
-    </ResponsiveLayout>
+    </div>
   )
 }
