@@ -25,6 +25,9 @@ export async function middleware(req: NextRequest) {
       pathname.startsWith('/_next') ||
       pathname.startsWith('/icons/') ||
       pathname.startsWith('/screenshots/') ||
+      pathname === '/manifest.json' ||
+      pathname === '/sw.js' ||
+      pathname === '/offline.html' ||
       pathname.startsWith('/api/serve-document') ||
       pathname.startsWith('/api/document-proxy')) {
     return NextResponse.next()
@@ -92,6 +95,6 @@ export async function middleware(req: NextRequest) {
 export const config = {
   matcher: [
     // Match all routes except static files
-    '/((?!_next/static|_next/image|favicon.ico|icons/|screenshots/).*)',
+    '/((?!_next/static|_next/image|favicon.ico|icons/|screenshots/|manifest.json|sw.js|offline.html).*)',
   ],
 }
