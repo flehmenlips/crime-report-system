@@ -542,7 +542,6 @@ export default function Home() {
         <PWAServiceWorker />
         
         {/* Notification System */}
-        <NotificationManager user={user} items={displayItems} />
         <NotificationContainer />
         
         {/* Desktop View */}

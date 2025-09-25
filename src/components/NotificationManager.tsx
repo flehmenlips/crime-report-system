@@ -16,7 +16,7 @@ export function NotificationManager({ user, items }: NotificationManagerProps) {
   useEffect(() => {
     if (!user) return
 
-    // Welcome notification for new users
+    // Welcome notification for new users (only show once)
     if (user.role === 'property_owner' && items.length === 0) {
       addNotification({
         type: 'info',
@@ -36,7 +36,7 @@ export function NotificationManager({ user, items }: NotificationManagerProps) {
       })
     }
 
-    // High-value item alert
+    // High-value item alert (only show once per session)
     const highValueItems = items.filter(item => item.estimatedValue > 5000)
     if (highValueItems.length > 0) {
       addNotification({
@@ -56,7 +56,7 @@ export function NotificationManager({ user, items }: NotificationManagerProps) {
       })
     }
 
-    // Evidence reminder
+    // Evidence reminder (only show once per session)
     const itemsWithoutEvidence = items.filter(item => 
       !item.evidence || item.evidence.length === 0
     )
@@ -102,7 +102,7 @@ export function NotificationManager({ user, items }: NotificationManagerProps) {
       })
     }
 
-  }, [user, items, addNotification])
+  }, [user?.id, items.length, addNotification]) // Only depend on user ID and items count to prevent infinite loops
 
   // Network status notifications
   useEffect(() => {
