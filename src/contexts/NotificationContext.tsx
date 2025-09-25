@@ -132,6 +132,9 @@ export function NotificationProvider({ children, user }: NotificationProviderPro
 
   // Load notifications from localStorage on mount
   useEffect(() => {
+    // Only run on client side to prevent hydration mismatch
+    if (typeof window === 'undefined') return
+    
     const savedNotifications = localStorage.getItem('notifications')
     if (savedNotifications) {
       try {
@@ -149,6 +152,9 @@ export function NotificationProvider({ children, user }: NotificationProviderPro
 
   // Save notifications to localStorage when they change
   useEffect(() => {
+    // Only run on client side to prevent hydration mismatch
+    if (typeof window === 'undefined') return
+    
     localStorage.setItem('notifications', JSON.stringify(notifications))
   }, [notifications])
 

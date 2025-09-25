@@ -138,6 +138,9 @@ export default function Home() {
 
   // Close action menus when clicking outside
   useEffect(() => {
+    // Only run on client side to prevent hydration mismatch
+    if (typeof window === 'undefined') return
+    
     const handleClickOutside = () => {
       setShowActionMenu(null)
     }
@@ -150,6 +153,9 @@ export default function Home() {
 
   // Mobile detection
   useEffect(() => {
+    // Only run on client side to prevent hydration mismatch
+    if (typeof window === 'undefined') return
+    
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768)
     }

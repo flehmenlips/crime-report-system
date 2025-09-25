@@ -78,13 +78,14 @@ export function NotificationManager({ user, items }: NotificationManagerProps) {
       })
     }
 
-    // Backup reminder
-    const lastBackup = localStorage.getItem('lastBackup')
-    const daysSinceBackup = lastBackup 
-      ? (Date.now() - parseInt(lastBackup)) / (1000 * 60 * 60 * 24)
-      : Infinity
+    // Backup reminder (only on client side)
+    if (typeof window !== 'undefined') {
+      const lastBackup = localStorage.getItem('lastBackup')
+      const daysSinceBackup = lastBackup 
+        ? (Date.now() - parseInt(lastBackup)) / (1000 * 60 * 60 * 24)
+        : Infinity
 
-    if (daysSinceBackup > 7) {
+      if (daysSinceBackup > 7) {
       addNotification({
         type: 'info',
         title: 'Backup Recommended',
@@ -100,6 +101,7 @@ export function NotificationManager({ user, items }: NotificationManagerProps) {
           }
         ]
       })
+      }
     }
 
   }, [user?.id, items.length, addNotification]) // Only depend on user ID and items count to prevent infinite loops
@@ -173,7 +175,7 @@ export function NotificationManager({ user, items }: NotificationManagerProps) {
 
   // Security notifications
   useEffect(() => {
-    if (!user) return
+    if (!user || typeof window === 'undefined') return
 
     // Session timeout warning
     const sessionTimeout = 30 * 60 * 1000 // 30 minutes
