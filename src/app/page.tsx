@@ -546,11 +546,11 @@ export default function Home() {
   if (userRole === 'property_owner') {
     return (
       <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)' }}>
-        {/* PWA Service Worker */}
-        <PWAServiceWorker />
+        {/* PWA Service Worker - TEMPORARILY DISABLED FOR DEBUGGING */}
+        {/* <PWAServiceWorker /> */}
         
-        {/* Notification System */}
-        <NotificationContainer />
+        {/* Notification System - TEMPORARILY DISABLED FOR DEBUGGING */}
+        {/* <NotificationContainer /> */}
         
         {/* Desktop View */}
           <div style={{
@@ -604,7 +604,7 @@ export default function Home() {
                 </div>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                <NotificationBell />
+                {/* <NotificationBell /> */}
                 <TenantInfo user={user} />
                 <UserProfile showDetails={true} />
               </div>
@@ -1994,12 +1994,12 @@ export default function Home() {
   // Stakeholder dashboard for all non-property owners
   return (
       <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)' }}>
-        {/* PWA Service Worker */}
-        <PWAServiceWorker />
+        {/* PWA Service Worker - TEMPORARILY DISABLED FOR DEBUGGING */}
+        {/* <PWAServiceWorker /> */}
         
-        {/* Notification System */}
-        <NotificationManager user={user} items={allItems} />
-        <NotificationContainer />
+        {/* Notification System - TEMPORARILY DISABLED FOR DEBUGGING */}
+        {/* <NotificationManager user={user} items={allItems} /> */}
+        {/* <NotificationContainer /> */}
         
         {/* Desktop View */}
       
