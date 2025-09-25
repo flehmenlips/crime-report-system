@@ -6,8 +6,8 @@ const DYNAMIC_CACHE_NAME = 'crime-report-dynamic-v1.0.0'
 const STATIC_ASSETS = [
   '/',
   '/manifest.json',
-  '/icons/icon-192x192.png',
-  '/icons/icon-512x512.png',
+  '/icons/icon-192x192.svg',
+  '/icons/icon-512x512.svg',
   '/offline.html'
 ]
 
@@ -163,8 +163,8 @@ self.addEventListener('push', (event) => {
   
   const options = {
     body: event.data ? event.data.text() : 'New notification from Crime Report System',
-    icon: '/icons/icon-192x192.png',
-    badge: '/icons/icon-72x72.png',
+    icon: '/icons/icon-192x192.svg',
+    badge: '/icons/icon-72x72.svg',
     vibrate: [100, 50, 100],
     data: {
       dateOfArrival: Date.now(),
@@ -174,12 +174,12 @@ self.addEventListener('push', (event) => {
       {
         action: 'explore',
         title: 'View Details',
-        icon: '/icons/view-icon.png'
+        icon: '/icons/icon-192x192.svg'
       },
       {
         action: 'close',
         title: 'Close',
-        icon: '/icons/close-icon.png'
+        icon: '/icons/icon-192x192.svg'
       }
     ]
   }

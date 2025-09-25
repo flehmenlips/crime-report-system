@@ -73,7 +73,7 @@ export function NotificationProvider({ children, user }: NotificationProviderPro
     if ('Notification' in window && Notification.permission === 'granted') {
       new Notification(notification.title, {
         body: notification.message,
-        icon: '/icons/icon-192x192.png',
+        icon: '/icons/icon-192x192.svg',
         tag: notification.id,
         requireInteraction: notification.persistent
       })

@@ -98,9 +98,9 @@ export function ResponsiveLayout({ children, user }: ResponsiveLayoutProps) {
     }
 
     addPWALinkTag('manifest', '/manifest.json')
-    addPWALinkTag('apple-touch-icon', '/icons/icon-192x192.png')
-    addPWALinkTag('icon', '/icons/icon-192x192.png', '192x192')
-    addPWALinkTag('icon', '/icons/icon-512x512.png', '512x512')
+    addPWALinkTag('apple-touch-icon', '/icons/icon-192x192.svg')
+    addPWALinkTag('icon', '/icons/icon-192x192.svg', '192x192')
+    addPWALinkTag('icon', '/icons/icon-512x512.svg', '512x512')
 
     return () => {
       body.classList.remove('mobile', 'tablet', 'desktop')
