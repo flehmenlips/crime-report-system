@@ -546,8 +546,8 @@ export default function Home() {
   if (userRole === 'property_owner') {
     return (
       <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)' }}>
-        {/* PWA Service Worker - TESTING REINTRODUCTION */}
-        <PWAServiceWorker />
+        {/* PWA Service Worker - DISABLED FOR DEBUGGING */}
+        {/* <PWAServiceWorker /> */}
         
         {/* Notification System - ALL DISABLED FOR DEBUGGING */}
         {/* <NotificationContainer /> */}
@@ -1994,8 +1994,8 @@ export default function Home() {
   // Stakeholder dashboard for all non-property owners
   return (
       <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)' }}>
-        {/* PWA Service Worker - TESTING REINTRODUCTION */}
-        <PWAServiceWorker />
+        {/* PWA Service Worker - DISABLED FOR DEBUGGING */}
+        {/* <PWAServiceWorker /> */}
         
         {/* Notification System - ALL DISABLED FOR DEBUGGING */}
         {/* <NotificationManager user={user} items={allItems} /> */}
