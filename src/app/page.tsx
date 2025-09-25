@@ -549,8 +549,8 @@ export default function Home() {
         {/* PWA Service Worker - TESTING REINTRODUCTION */}
         <PWAServiceWorker />
         
-        {/* Notification System - TESTING NOTIFICATIONCONTAINER */}
-        <NotificationContainer />
+        {/* Notification System - ALL DISABLED FOR DEBUGGING */}
+        {/* <NotificationContainer /> */}
         
         {/* Desktop View */}
           <div style={{
@@ -604,7 +604,7 @@ export default function Home() {
                 </div>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                <NotificationBell />
+                {/* <NotificationBell /> */}
                 <TenantInfo user={user} />
                 <UserProfile showDetails={true} />
               </div>
@@ -1997,9 +1997,9 @@ export default function Home() {
         {/* PWA Service Worker - TESTING REINTRODUCTION */}
         <PWAServiceWorker />
         
-        {/* Notification System - NOTIFICATIONMANAGER CAUSES HYDRATION ISSUES */}
+        {/* Notification System - ALL DISABLED FOR DEBUGGING */}
         {/* <NotificationManager user={user} items={allItems} /> */}
-        <NotificationContainer />
+        {/* <NotificationContainer /> */}
         
         {/* Desktop View */}
       
