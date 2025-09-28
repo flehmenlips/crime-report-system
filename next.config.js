@@ -51,9 +51,9 @@ const nextConfig = {
   experimental: {
     // optimizeCss: true, // Disabled due to critters compatibility issues
   },
-  // Force fresh deployment to resolve chunk loading regression
+  // Force fresh deployment to resolve chunk loading regression (again)
   generateBuildId: async () => {
-    return 'fix-chunks-' + Math.random().toString(36).substring(7) + '-' + Date.now()
+    return 'fix-chunks-v2-' + Math.random().toString(36).substring(7) + '-' + Date.now()
   },
 }
 
