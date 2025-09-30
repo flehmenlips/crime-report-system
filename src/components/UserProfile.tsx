@@ -101,7 +101,7 @@ export function UserProfile({ className = '', showDetails = true, onProfileUpdat
       {isExpanded && (
         <div className="absolute top-full right-0 mt-2 w-80 bg-white/95 backdrop-blur-xl rounded-xl shadow-2xl border border-white/20 z-50 overflow-hidden" style={{ width: '320px', minWidth: '320px', maxWidth: '320px' }}>
           <div className="p-6">
-            {/* Header - Modern, clean design */}
+            {/* Header - Modern, clean design - TESTING DEPLOYMENT */}
             <div className="text-center mb-6">
               <div className={`w-16 h-16 bg-gradient-to-br ${getRoleColor(user.role)} rounded-full flex items-center justify-center shadow-lg mx-auto mb-3`}>
                 <span className="text-white text-2xl">
@@ -114,6 +114,9 @@ export function UserProfile({ className = '', showDetails = true, onProfileUpdat
               <p className="text-gray-600 text-sm">
                 {getRoleDisplayName(user.role)}
               </p>
+              <div className="mt-2 px-3 py-1 bg-red-100 text-red-800 rounded-full text-xs font-medium">
+                🚀 DEPLOYMENT TEST - If you see this, changes are working!
+              </div>
             </div>
 
             {/* User Details - Modern Card Design */}
