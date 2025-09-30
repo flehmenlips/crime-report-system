@@ -326,7 +326,19 @@ export default function Home() {
     if (!newName) return
 
     try {
-      console.log('Duplicating item:', item.name)
+      console.log('🚀 DUPLICATING ITEM:', item.name)
+      console.log('📊 ITEM DATA:', {
+        id: item.id,
+        name: item.name,
+        evidenceCount: item.evidence?.length || 0,
+        estimatedValue: item.estimatedValue
+      })
+      
+      // Check for evidence size (stress test consideration)
+      const evidenceCount = item.evidence?.length || 0
+      if (evidenceCount > 20) {
+        console.warn(`⚠️ LARGE ITEM DUPLICATION: ${evidenceCount} evidence items`)
+      }
       
       const ownerId = 'cmfeyn7es0000t6oil8p6d45c'
       const duplicateData = {
@@ -340,9 +352,15 @@ export default function Home() {
         estimatedValue: item.estimatedValue
       }
       
+      const startTime = performance.now()
       const newItem = await addItem(duplicateData, ownerId)
+      const endTime = performance.now()
+      
+      console.log(`⏱️ DUPLICATION TIME: ${(endTime - startTime).toFixed(2)}ms`)
       
       if (newItem) {
+        console.log('✅ DUPLICATE CREATED:', newItem.name)
+        
         // Update local state immediately
         setAllItems(prev => [...prev, newItem])
         setTotalValue(prev => prev + newItem.estimatedValue)
@@ -351,18 +369,21 @@ export default function Home() {
         // Refresh data from server to ensure consistency
         setTimeout(async () => {
           try {
+            console.log('🔄 REFRESHING ITEMS AFTER DUPLICATE...')
             const updatedItems = await getAllItems()
             const updatedTotal = updatedItems.reduce((sum, item) => sum + item.estimatedValue, 0)
             setAllItems(updatedItems)
             setTotalValue(updatedTotal)
+            console.log('✅ ITEMS REFRESHED:', updatedItems.length, 'total items')
           } catch (error) {
-            console.error('Error refreshing items after duplicate:', error)
+            console.error('❌ ERROR REFRESHING ITEMS AFTER DUPLICATE:', error)
           }
         }, 1000) // Wait 1 second for database consistency
       }
     } catch (error) {
-      console.error('Error duplicating item:', error)
-      alert(`❌ Error duplicating item: ${error instanceof Error ? error.message : error}`)
+      console.error('❌ ERROR DUPLICATING ITEM:', error)
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+      alert(`❌ Error duplicating item: ${errorMessage}`)
     }
   }
 
@@ -374,6 +395,111 @@ export default function Home() {
       newSelected.add(itemId)
     }
     setSelectedItems(newSelected)
+  }
+
+  // Bulk duplicate operation for stress testing
+  const handleBulkDuplicate = async () => {
+    const selectedItemsArray = allItems.filter(item => selectedItems.has(item.id))
+    if (selectedItemsArray.length === 0) {
+      alert('Please select items to duplicate')
+      return
+    }
+
+    if (!confirm(`Duplicate ${selectedItemsArray.length} selected items? This may take a while for large datasets.`)) {
+      return
+    }
+
+    console.log(`🚀 STARTING BULK DUPLICATE: ${selectedItemsArray.length} items`)
+    const startTime = performance.now()
+    
+    let successCount = 0
+    let errorCount = 0
+    const errors: string[] = []
+
+    // Process items in batches to prevent overwhelming the server
+    const batchSize = 3
+    for (let i = 0; i < selectedItemsArray.length; i += batchSize) {
+      const batch = selectedItemsArray.slice(i, i + batchSize)
+      console.log(`📦 PROCESSING BATCH ${Math.floor(i / batchSize) + 1}: ${batch.length} items`)
+
+      // Process batch concurrently
+      const batchPromises = batch.map(async (item) => {
+        try {
+          const duplicateData = {
+            name: `${item.name} (Copy)`,
+            description: item.description,
+            serialNumber: item.serialNumber ? `${item.serialNumber}-COPY` : '',
+            purchaseDate: item.purchaseDate,
+            purchaseCost: item.purchaseCost,
+            dateLastSeen: item.dateLastSeen,
+            locationLastSeen: item.locationLastSeen,
+            estimatedValue: item.estimatedValue
+          }
+          
+          const newItem = await addItem(duplicateData, 'cmfeyn7es0000t6oil8p6d45c')
+          if (newItem) {
+            successCount++
+            console.log(`✅ BULK DUPLICATE SUCCESS: ${item.name} → ${newItem.name}`)
+            return newItem
+          }
+          return null
+        } catch (error) {
+          errorCount++
+          const errorMsg = `Failed to duplicate ${item.name}: ${error instanceof Error ? error.message : 'Unknown error'}`
+          errors.push(errorMsg)
+          console.error(`❌ BULK DUPLICATE FAILED: ${item.name}`, error)
+          return null
+        }
+      })
+
+      // Wait for batch to complete
+      const batchResults = await Promise.allSettled(batchPromises)
+      
+      // Add successful items to state
+      batchResults.forEach((result) => {
+        if (result.status === 'fulfilled' && result.value) {
+          const newItem = result.value
+          setAllItems(prev => [...prev, newItem])
+          setTotalValue(prev => prev + newItem.estimatedValue)
+        }
+      })
+
+      // Small delay between batches
+      if (i + batchSize < selectedItemsArray.length) {
+        await new Promise(resolve => setTimeout(resolve, 500))
+      }
+    }
+
+    const endTime = performance.now()
+    const totalTime = endTime - startTime
+
+    console.log(`🎉 BULK DUPLICATE COMPLETE: ${successCount} success, ${errorCount} errors in ${totalTime.toFixed(2)}ms`)
+
+    // Show results
+    let message = `Bulk duplicate completed!\n\n✅ Successfully duplicated: ${successCount} items\n`
+    if (errorCount > 0) {
+      message += `❌ Failed: ${errorCount} items\n\nErrors:\n${errors.slice(0, 3).join('\n')}`
+      if (errors.length > 3) {
+        message += `\n... and ${errors.length - 3} more errors`
+      }
+    }
+    alert(message)
+
+    // Clear selection
+    setSelectedItems(new Set())
+
+    // Refresh data from server
+    setTimeout(async () => {
+      try {
+        const updatedItems = await getAllItems()
+        const updatedTotal = updatedItems.reduce((sum, item) => sum + item.estimatedValue, 0)
+        setAllItems(updatedItems)
+        setTotalValue(updatedTotal)
+        console.log('✅ BULK DUPLICATE: Items refreshed from server')
+      } catch (error) {
+        console.error('❌ ERROR REFRESHING AFTER BULK DUPLICATE:', error)
+      }
+    }, 2000)
   }
 
   const handleBulkDelete = async () => {
@@ -1366,6 +1492,25 @@ export default function Home() {
                         }}
                       >
                         🏷️ Tag All
+                      </button>
+                      
+                      <button
+                        onClick={handleBulkDuplicate}
+                        style={{
+                          background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+                          color: 'white',
+                          border: 'none',
+                          padding: '12px 24px',
+                          borderRadius: '12px',
+                          fontSize: '14px',
+                          fontWeight: '600',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px'
+                        }}
+                      >
+                        📋 Duplicate Selected
                       </button>
                       
                       <button
