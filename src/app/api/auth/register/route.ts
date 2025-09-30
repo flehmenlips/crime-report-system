@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { users, tenants, Role, AccessLevel } from '@/lib/auth'
+import { Role, AccessLevel } from '@/lib/auth'
+import { prisma } from '@/lib/prisma'
 
 function getDefaultPermissions(role: Role): string[] {
   switch (role) {
@@ -28,6 +29,9 @@ export async function POST(request: NextRequest) {
   try {
     const { username, email, name, password, role = 'property_owner', propertyName } = await request.json()
 
+    console.log('=== REGISTRATION API DEBUG ===')
+    console.log('Received registration request:', { username, email, name, role, propertyName })
+
     // Validate required fields
     if (!username || !email || !name || !password) {
       return NextResponse.json(
@@ -44,77 +48,86 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Check if username already exists
-    const existingUsername = users.find(u => u.username === username)
+    // Check if username already exists in database
+    const existingUsername = await prisma.user.findUnique({
+      where: { username }
+    })
     if (existingUsername) {
+      console.log('Username already exists:', username)
       return NextResponse.json(
         { error: 'Username is already taken' },
         { status: 400 }
       )
     }
 
-    // Check if email already exists
-    const existingEmail = users.find(u => u.email === email)
+    // Check if email already exists in database
+    const existingEmail = await prisma.user.findUnique({
+      where: { email }
+    })
     if (existingEmail) {
+      console.log('Email already exists:', email)
       return NextResponse.json(
         { error: 'Email is already registered' },
         { status: 400 }
       )
     }
 
-    // Create new user (generate new ID)
-    const newId = (Math.max(...users.map(u => parseInt(u.id)), 0) + 1).toString()
+    // Create new tenant for ALL users to ensure proper isolation
+    const tenantName = role === 'property_owner' && propertyName 
+      ? propertyName 
+      : role === 'property_owner' 
+        ? `${name}'s Property` 
+        : `${name}'s Account`
     
-        // Create new tenant for ALL users to ensure proper isolation
-        // Each user gets their own tenant for complete data separation
-        const newTenantId = `tenant-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
-        let userTenant = {
-          id: newTenantId,
-          name: role === 'property_owner' && propertyName 
-            ? propertyName 
-            : role === 'property_owner' 
-              ? `${name}'s Property` 
-              : `${name}'s Account`,
-          description: role === 'property_owner' 
-            ? `Property managed by ${name}` 
-            : `Account for ${name} (${role})`,
-          isActive: true,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
-        }
-    tenants.push(userTenant)
-    
-    const newUser = {
-      id: newId,
-      username,
-      email,
-      name,
-      password, // In a real app, you'd hash this
-      role: role as Role,
-      accessLevel: (role === 'property_owner' ? 'owner' : 'stakeholder') as AccessLevel,
-      permissions: getDefaultPermissions(role as Role), // Role-specific permissions
-      phone: '',
-      address: '',
-      city: '',
-      state: '',
-      zipCode: '',
-      country: '',
-      company: '',
-      title: '',
-      bio: '',
-      avatar: '',
-      emailVerified: false,
-      isActive: true,
-      lastLoginAt: '',
-      preferences: '',
-      tenantId: userTenant.id,
-      tenant: userTenant,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    }
+    const tenantDescription = role === 'property_owner' 
+      ? `Property managed by ${name}` 
+      : `Account for ${name} (${role})`
 
-    // Add to hardcoded users array
-    users.push(newUser)
+    console.log('Creating tenant:', { name: tenantName, description: tenantDescription })
+
+    // Create tenant in database
+    const newTenant = await prisma.tenant.create({
+      data: {
+        name: tenantName,
+        description: tenantDescription,
+        isActive: true,
+      }
+    })
+
+    console.log('Tenant created with ID:', newTenant.id)
+
+    // Create user in database
+    const newUser = await prisma.user.create({
+      data: {
+        username,
+        email,
+        name,
+        password, // In a real app, you'd hash this
+        role: role as Role,
+        accessLevel: (role === 'property_owner' ? 'owner' : 'stakeholder') as AccessLevel,
+        // permissions: getDefaultPermissions(role as Role), // Role-specific permissions - not in DB schema
+        phone: '',
+        address: '',
+        city: '',
+        state: '',
+        zipCode: '',
+        country: '',
+        company: '',
+        title: '',
+        bio: '',
+        avatar: '',
+        emailVerified: false,
+        isActive: true,
+        preferences: '',
+        tenantId: newTenant.id,
+      },
+      include: {
+        tenant: true
+      }
+    })
+
+    console.log('User created with ID:', newUser.id)
+    console.log('=== REGISTRATION API DEBUG COMPLETE ===')
 
     // Return user without password
     const { password: _, ...userWithoutPassword } = newUser
