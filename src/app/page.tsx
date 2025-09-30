@@ -34,6 +34,7 @@ import { ExportManager } from '@/components/ExportManager'
 import { QuickExport } from '@/components/QuickExport'
 import { ReportGenerator } from '@/components/ReportGenerator'
 import { CSVImport } from '@/components/CSVImport'
+import { TenantIsolationStressTest } from '@/components/TenantIsolationStressTest'
 
 export default function Home() {
   const router = useRouter()
@@ -57,6 +58,7 @@ export default function Home() {
   const [evidenceManagementItem, setEvidenceManagementItem] = useState<StolenItem | null>(null)
   const [showBulkUpload, setShowBulkUpload] = useState(false)
   const [showCSVImport, setShowCSVImport] = useState(false)
+  const [showTenantIsolationTest, setShowTenantIsolationTest] = useState(false)
   const [viewMode, setViewMode] = useState<'cards' | 'list'>('cards')
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false)
   const [showGenerateReport, setShowGenerateReport] = useState(false)
@@ -1514,6 +1516,26 @@ export default function Home() {
                       </button>
                       
                       <button
+                        onClick={() => setShowTenantIsolationTest(true)}
+                        style={{
+                          background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+                          color: 'white',
+                          border: 'none',
+                          padding: '12px 24px',
+                          borderRadius: '12px',
+                          fontSize: '16px',
+                          fontWeight: '600',
+                          cursor: 'pointer',
+                          transition: 'all 0.3s ease',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px'
+                        }}
+                      >
+                        🛡️ Test Tenant Isolation
+                      </button>
+                      
+                      <button
                         onClick={handleBulkDelete}
                         style={{
                           background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
@@ -2366,6 +2388,14 @@ export default function Home() {
                 }
                 setShowCSVImport(false)
               }}
+            />
+          )}
+
+          {/* Tenant Isolation Stress Test Modal */}
+          {showTenantIsolationTest && user && (
+            <TenantIsolationStressTest
+              currentUser={user}
+              onClose={() => setShowTenantIsolationTest(false)}
             />
           )}
         </div>
