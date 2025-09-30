@@ -35,6 +35,7 @@ import { QuickExport } from '@/components/QuickExport'
 import { ReportGenerator } from '@/components/ReportGenerator'
 import { CSVImport } from '@/components/CSVImport'
 import { TenantIsolationStressTest } from '@/components/TenantIsolationStressTest'
+import { PerformanceStressTest } from '@/components/PerformanceStressTest'
 
 export default function Home() {
   const router = useRouter()
@@ -59,6 +60,7 @@ export default function Home() {
   const [showBulkUpload, setShowBulkUpload] = useState(false)
   const [showCSVImport, setShowCSVImport] = useState(false)
   const [showTenantIsolationTest, setShowTenantIsolationTest] = useState(false)
+  const [showPerformanceTest, setShowPerformanceTest] = useState(false)
   const [viewMode, setViewMode] = useState<'cards' | 'list'>('cards')
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false)
   const [showGenerateReport, setShowGenerateReport] = useState(false)
@@ -1536,6 +1538,26 @@ export default function Home() {
                       </button>
                       
                       <button
+                        onClick={() => setShowPerformanceTest(true)}
+                        style={{
+                          background: 'linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)',
+                          color: 'white',
+                          border: 'none',
+                          padding: '12px 24px',
+                          borderRadius: '12px',
+                          fontSize: '16px',
+                          fontWeight: '600',
+                          cursor: 'pointer',
+                          transition: 'all 0.3s ease',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px'
+                        }}
+                      >
+                        📊 Performance Test
+                      </button>
+                      
+                      <button
                         onClick={handleBulkDelete}
                         style={{
                           background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
@@ -2396,6 +2418,14 @@ export default function Home() {
             <TenantIsolationStressTest
               currentUser={user}
               onClose={() => setShowTenantIsolationTest(false)}
+            />
+          )}
+
+          {/* Performance Stress Test Modal */}
+          {showPerformanceTest && user && (
+            <PerformanceStressTest
+              currentUser={user}
+              onClose={() => setShowPerformanceTest(false)}
             />
           )}
         </div>
