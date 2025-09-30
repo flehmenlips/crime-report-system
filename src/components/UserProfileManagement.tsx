@@ -334,8 +334,8 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
     <div style={{
       position: 'fixed',
       inset: '0',
-      background: 'rgba(0, 0, 0, 0.8)',
-      backdropFilter: 'blur(12px)',
+      background: 'rgba(0, 0, 0, 0.9)',
+      backdropFilter: 'blur(16px)',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
@@ -344,18 +344,18 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
       fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif'
     }}>
       <div style={{
-        background: 'rgba(255, 255, 255, 0.12)',
-        backdropFilter: 'blur(30px)',
+        background: 'rgba(255, 255, 255, 0.95)',
+        backdropFilter: 'blur(20px)',
         borderRadius: '24px',
         padding: '32px',
         maxWidth: '1000px',
         width: '100%',
         maxHeight: '90vh',
+        display: 'flex',
+        flexDirection: 'column',
         overflow: 'hidden',
         boxShadow: '0 32px 64px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15)',
-        border: '1px solid rgba(255, 255, 255, 0.2)',
-        display: 'flex',
-        flexDirection: 'column'
+        border: '1px solid rgba(255, 255, 255, 0.2)'
       }}>
         {/* Header */}
         <div style={{
@@ -480,7 +480,8 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
         <div style={{ 
           flex: 1, 
           overflow: 'auto',
-          paddingRight: '8px'
+          paddingRight: '8px',
+          paddingBottom: '20px'
         }}>
           {activeTab === 'profile' && (
             <form onSubmit={handleProfileUpdate} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
@@ -1068,73 +1069,6 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
                 </div>
               )}
 
-              <div style={{
-                display: 'flex',
-                justifyContent: 'flex-end',
-                gap: '16px',
-                marginTop: '24px'
-              }}>
-                <button
-                  type="button"
-                  onClick={onClose}
-                  style={{
-                    padding: '12px 24px',
-                    background: 'rgba(107, 114, 128, 0.1)',
-                    border: '1px solid rgba(107, 114, 128, 0.2)',
-                    borderRadius: '16px',
-                    color: '#6b7280',
-                    fontSize: '16px',
-                    fontWeight: '600',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease'
-                  }}
-                  onMouseEnter={(e) => {
-                    const target = e.target as HTMLButtonElement
-                    target.style.background = 'rgba(107, 114, 128, 0.2)'
-                    target.style.color = '#374151'
-                  }}
-                  onMouseLeave={(e) => {
-                    const target = e.target as HTMLButtonElement
-                    target.style.background = 'rgba(107, 114, 128, 0.1)'
-                    target.style.color = '#6b7280'
-                  }}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={loading}
-                  style={{
-                    padding: '16px 32px',
-                    background: loading ? 'rgba(59, 130, 246, 0.7)' : 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)',
-                    border: 'none',
-                    borderRadius: '16px',
-                    color: 'white',
-                    fontSize: '16px',
-                    fontWeight: '600',
-                    cursor: loading ? 'not-allowed' : 'pointer',
-                    transition: 'all 0.3s ease',
-                    boxShadow: '0 10px 25px rgba(59, 130, 246, 0.3)',
-                    opacity: loading ? 0.7 : 1
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!loading) {
-                      const target = e.target as HTMLButtonElement
-                      target.style.transform = 'translateY(-2px)'
-                      target.style.boxShadow = '0 15px 35px rgba(59, 130, 246, 0.4)'
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!loading) {
-                      const target = e.target as HTMLButtonElement
-                      target.style.transform = 'translateY(0)'
-                      target.style.boxShadow = '0 10px 25px rgba(59, 130, 246, 0.3)'
-                    }
-                  }}
-                >
-                  {loading ? 'Updating...' : 'Update Profile'}
-                </button>
-              </div>
             </form>
           )}
 
@@ -1260,6 +1194,90 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
               </div>
             </div>
           )}
+        </div>
+
+        {/* Fixed Footer with Action Buttons */}
+        <div style={{
+          borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+          paddingTop: '24px',
+          marginTop: '24px',
+          display: 'flex',
+          justifyContent: 'flex-end',
+          gap: '16px',
+          background: 'rgba(255, 255, 255, 0.95)',
+          backdropFilter: 'blur(20px)'
+        }}>
+          <button
+            type="button"
+            onClick={onClose}
+            style={{
+              padding: '16px 32px',
+              background: 'rgba(107, 114, 128, 0.1)',
+              border: '1px solid rgba(107, 114, 128, 0.2)',
+              borderRadius: '16px',
+              color: '#6b7280',
+              fontSize: '16px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              transition: 'all 0.3s ease'
+            }}
+            onMouseEnter={(e) => {
+              const target = e.target as HTMLButtonElement
+              target.style.background = 'rgba(107, 114, 128, 0.2)'
+              target.style.color = '#374151'
+            }}
+            onMouseLeave={(e) => {
+              const target = e.target as HTMLButtonElement
+              target.style.background = 'rgba(107, 114, 128, 0.1)'
+              target.style.color = '#6b7280'
+            }}
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.preventDefault()
+              if (activeTab === 'profile') {
+                handleProfileUpdate(e as any)
+              } else if (activeTab === 'password') {
+                handlePasswordChange(e as any)
+              }
+            }}
+            disabled={loading}
+            style={{
+              padding: '16px 32px',
+              background: loading ? 'rgba(59, 130, 246, 0.7)' : 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)',
+              border: 'none',
+              borderRadius: '16px',
+              color: 'white',
+              fontSize: '16px',
+              fontWeight: '600',
+              cursor: loading ? 'not-allowed' : 'pointer',
+              transition: 'all 0.3s ease',
+              boxShadow: '0 10px 25px rgba(59, 130, 246, 0.3)',
+              opacity: loading ? 0.7 : 1
+            }}
+            onMouseEnter={(e) => {
+              if (!loading) {
+                const target = e.target as HTMLButtonElement
+                target.style.transform = 'translateY(-2px)'
+                target.style.boxShadow = '0 15px 35px rgba(59, 130, 246, 0.4)'
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!loading) {
+                const target = e.target as HTMLButtonElement
+                target.style.transform = 'translateY(0)'
+                target.style.boxShadow = '0 10px 25px rgba(59, 130, 246, 0.3)'
+              }
+            }}
+          >
+            {loading ? 'Updating...' : 
+             activeTab === 'profile' ? 'Update Profile' : 
+             activeTab === 'password' ? 'Change Password' : 
+             'Save Changes'}
+          </button>
         </div>
       </div>
     </div>

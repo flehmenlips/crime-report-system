@@ -99,10 +99,10 @@ export function UserProfile({ className = '', showDetails = true, onProfileUpdat
 
       {/* Expanded Profile Details */}
       {isExpanded && (
-        <div className="absolute top-full right-0 mt-2 w-80 bg-white rounded-xl shadow-xl border border-gray-200 z-50 overflow-hidden">
+        <div className="absolute top-full right-0 mt-2 w-80 bg-white/95 backdrop-blur-xl rounded-xl shadow-2xl border border-white/20 z-50 overflow-hidden">
           <div className="p-4">
-            {/* Header */}
-            <div className="flex items-center space-x-3 mb-4">
+            {/* Header - Clean, no redundant info */}
+            <div className="flex items-center space-x-3 mb-4 pb-4 border-b border-gray-200/50">
               <div className={`w-12 h-12 bg-gradient-to-br ${getRoleColor(user.role)} rounded-full flex items-center justify-center shadow-lg`}>
                 <span className="text-white text-xl">
                   {getRoleIcon(user.role)}
@@ -130,10 +130,6 @@ export function UserProfile({ className = '', showDetails = true, onProfileUpdat
                   <div className="flex justify-between">
                     <span className="text-gray-600">User ID:</span>
                     <span className="text-gray-900 font-mono text-xs">{user.id}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Role:</span>
-                    <span className="text-gray-900 font-medium">{getRoleDisplayName(user.role)}</span>
                   </div>
                   {accessLevelInfo && (
                     <div className="flex justify-between">
