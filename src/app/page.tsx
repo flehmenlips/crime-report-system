@@ -458,13 +458,23 @@ export default function Home() {
         const newItem = await addItem(formData, ownerId)
         
         if (newItem) {
+          // Immediate local update for instant UI feedback
           setAllItems(prev => [...prev, newItem])
           setTotalValue(prev => prev + newItem.estimatedValue)
-          // Notification will be handled by the NotificationManager component
           console.log('Item created:', newItem.name)
           
-          const updatedItems = await getAllItems()
-          setAllItems(updatedItems)
+          // Delayed server sync to ensure database consistency
+          setTimeout(async () => {
+            try {
+              const updatedItems = await getAllItems()
+              const updatedTotal = updatedItems.reduce((sum, item) => sum + item.estimatedValue, 0)
+              setAllItems(updatedItems)
+              setTotalValue(updatedTotal)
+              console.log('Server sync complete, total items:', updatedItems.length)
+            } catch (error) {
+              console.error('Error syncing after add:', error)
+            }
+          }, 1000)
         }
       }
       
