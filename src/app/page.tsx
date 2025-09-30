@@ -63,6 +63,7 @@ export default function Home() {
   const [showReportGenerator, setShowReportGenerator] = useState(false)
   const [filteredItems, setFilteredItems] = useState<StolenItem[]>([])
   const [isFiltered, setIsFiltered] = useState(false)
+  const [refreshKey, setRefreshKey] = useState(0) // Force re-render key
 
   // Enhanced RBAC user state
   const [user, setUser] = useState<User | null>(null)
@@ -463,10 +464,13 @@ export default function Home() {
           setTotalValue(prev => prev + newItem.estimatedValue)
           console.log('Item created and added to UI:', newItem.name)
           
+          // Show success message
+          alert(`✅ New Item Successfully Added!\n\n"${newItem.name}" has been added to your inventory.\n\nTotal Value: ${formatCurrency(newItem.estimatedValue)}`)
+          
           // Force re-render to ensure UI updates
           setTimeout(() => {
             console.log('Forcing UI refresh for new item')
-            setAllItems(prev => [...prev]) // Force re-render
+            setRefreshKey(prev => prev + 1) // Force re-render using key
           }, 100)
           
           // Delayed server sync to ensure database consistency
@@ -766,7 +770,7 @@ export default function Home() {
           </div>
 
           {/* Hero Stats */}
-          <div style={{ 
+          <div key={refreshKey} style={{ 
             display: 'grid', 
             gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', 
             gap: '32px', 
@@ -1454,7 +1458,7 @@ export default function Home() {
                 />
               </div>
             ) : viewMode === 'cards' ? (
-              <div style={{ 
+              <div key={refreshKey} style={{ 
                 display: 'grid', 
                 gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', 
                 gap: '32px' 
@@ -1808,7 +1812,7 @@ export default function Home() {
               </div>
             ) : (
               /* List View */
-              <div style={{ overflowX: 'auto' }}>
+              <div key={refreshKey} style={{ overflowX: 'auto' }}>
                 <table style={{ 
                   width: '100%', 
                   borderCollapse: 'collapse',
