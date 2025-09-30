@@ -114,18 +114,6 @@ export function UserProfile({ className = '', showDetails = true, onProfileUpdat
               <p className="text-gray-600 text-sm">
                 {getRoleDisplayName(user.role)}
               </p>
-              <div style={{
-                marginTop: '8px',
-                padding: '8px 12px',
-                backgroundColor: '#fef2f2',
-                color: '#991b1b',
-                borderRadius: '9999px',
-                fontSize: '12px',
-                fontWeight: '500',
-                border: '2px solid #dc2626'
-              }}>
-                🚀 DEPLOYMENT TEST - If you see this, changes are working!
-              </div>
             </div>
 
             {/* User Details - Modern Card Design */}
@@ -155,24 +143,52 @@ export function UserProfile({ className = '', showDetails = true, onProfileUpdat
                   }}></span>
                   Account Information
                 </h4>
-                <div className="space-y-3 text-sm">
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-600 font-medium">Email</span>
-                    <span className="text-gray-900 font-medium">{user.email}</span>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', fontSize: '14px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ color: '#6b7280', fontWeight: '500' }}>Email: </span>
+                    <span style={{ color: '#111827', fontWeight: '500' }}>{user.email}</span>
                   </div>
-                  <div className="flex justify-between items-start">
-                    <span className="text-gray-600 font-medium">User ID</span>
-                    <span className="text-gray-900 font-mono text-xs bg-white px-2 py-1 rounded border">{user.id}</span>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                    <span style={{ color: '#6b7280', fontWeight: '500' }}>User ID: </span>
+                    <span style={{ 
+                      color: '#111827', 
+                      fontFamily: 'monospace', 
+                      fontSize: '12px', 
+                      backgroundColor: 'white', 
+                      padding: '4px 8px', 
+                      borderRadius: '4px', 
+                      border: '1px solid #e5e7eb' 
+                    }}>{user.id}</span>
                   </div>
                   {accessLevelInfo && (
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-600 font-medium">Access Level</span>
-                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-                        accessLevelInfo.level === 'owner' ? 'bg-purple-100 text-purple-800 border border-purple-200' :
-                        accessLevelInfo.level === 'staff' ? 'bg-blue-100 text-blue-800 border border-blue-200' :
-                        accessLevelInfo.level === 'stakeholder' ? 'bg-green-100 text-green-800 border border-green-200' :
-                        'bg-gray-100 text-gray-800 border border-gray-200'
-                      }`}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ color: '#6b7280', fontWeight: '500' }}>Access Level: </span>
+                      <span style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        padding: '4px 12px',
+                        borderRadius: '9999px',
+                        fontSize: '12px',
+                        fontWeight: '500',
+                        border: '1px solid',
+                        ...(accessLevelInfo.level === 'owner' ? {
+                          backgroundColor: '#f3e8ff',
+                          color: '#6b21a8',
+                          borderColor: '#d8b4fe'
+                        } : accessLevelInfo.level === 'staff' ? {
+                          backgroundColor: '#dbeafe',
+                          color: '#1d4ed8',
+                          borderColor: '#93c5fd'
+                        } : accessLevelInfo.level === 'stakeholder' ? {
+                          backgroundColor: '#dcfce7',
+                          color: '#166534',
+                          borderColor: '#86efac'
+                        } : {
+                          backgroundColor: '#f3f4f6',
+                          color: '#374151',
+                          borderColor: '#d1d5db'
+                        })
+                      }}>
                         {accessLevelInfo.displayName}
                       </span>
                     </div>
@@ -182,28 +198,71 @@ export function UserProfile({ className = '', showDetails = true, onProfileUpdat
 
               {/* Tenant Information Card */}
               {tenantInfo && (
-                <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4 border border-green-100">
-                  <h4 className="font-semibold text-gray-900 text-sm mb-3 flex items-center">
-                    <span className="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+                <div style={{
+                  background: 'linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%)',
+                  borderRadius: '12px',
+                  padding: '16px',
+                  border: '1px solid #bbf7d0',
+                  marginBottom: '16px'
+                }}>
+                  <h4 style={{
+                    fontWeight: '600',
+                    color: '#111827',
+                    fontSize: '14px',
+                    marginBottom: '12px',
+                    display: 'flex',
+                    alignItems: 'center'
+                  }}>
+                    <span style={{
+                      width: '8px',
+                      height: '8px',
+                      backgroundColor: '#22c55e',
+                      borderRadius: '50%',
+                      marginRight: '8px'
+                    }}></span>
                     Tenant Information
                   </h4>
-                  <div className="space-y-3 text-sm">
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-600 font-medium">Property</span>
-                      <span className="text-gray-900 font-medium">{tenantInfo.name}</span>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', fontSize: '14px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ color: '#6b7280', fontWeight: '500' }}>Property: </span>
+                      <span style={{ color: '#111827', fontWeight: '500' }}>{tenantInfo.name}</span>
                     </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-600 font-medium">Status</span>
-                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border ${
-                        tenantInfo.isActive ? 'bg-green-100 text-green-800 border-green-200' : 'bg-red-100 text-red-800 border-red-200'
-                      }`}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ color: '#6b7280', fontWeight: '500' }}>Status: </span>
+                      <span style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        padding: '4px 12px',
+                        borderRadius: '9999px',
+                        fontSize: '12px',
+                        fontWeight: '500',
+                        border: '1px solid',
+                        ...(tenantInfo.isActive ? {
+                          backgroundColor: '#dcfce7',
+                          color: '#166534',
+                          borderColor: '#86efac'
+                        } : {
+                          backgroundColor: '#fef2f2',
+                          color: '#991b1b',
+                          borderColor: '#fecaca'
+                        })
+                      }}>
                         {tenantInfo.isActive ? 'Active' : 'Inactive'}
                       </span>
                     </div>
                     {tenantInfo.description && (
-                      <div className="mt-3 pt-3 border-t border-green-100">
-                        <span className="text-gray-600 font-medium text-xs block mb-2">Description</span>
-                        <span className="text-gray-700 text-xs leading-relaxed bg-white p-3 rounded-lg border border-green-100">{tenantInfo.description}</span>
+                      <div style={{ marginTop: '12px', paddingTop: '12px', borderTop: '1px solid #bbf7d0' }}>
+                        <span style={{ color: '#6b7280', fontWeight: '500', fontSize: '12px', display: 'block', marginBottom: '8px' }}>Description: </span>
+                        <span style={{ 
+                          color: '#374151', 
+                          fontSize: '12px', 
+                          lineHeight: '1.5', 
+                          backgroundColor: 'white', 
+                          padding: '12px', 
+                          borderRadius: '8px', 
+                          border: '1px solid #bbf7d0',
+                          display: 'block'
+                        }}>{tenantInfo.description}</span>
                       </div>
                     )}
                   </div>
@@ -211,30 +270,65 @@ export function UserProfile({ className = '', showDetails = true, onProfileUpdat
               )}
 
               {/* Access Type Card */}
-              <div className="bg-gradient-to-br from-purple-50 to-violet-50 rounded-xl p-4 border border-purple-100">
-                <h4 className="font-semibold text-gray-900 text-sm mb-3 flex items-center">
-                  <span className="w-2 h-2 bg-purple-500 rounded-full mr-2"></span>
+              <div style={{
+                background: 'linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%)',
+                borderRadius: '12px',
+                padding: '16px',
+                border: '1px solid #e9d5ff',
+                marginBottom: '16px'
+              }}>
+                <h4 style={{
+                  fontWeight: '600',
+                  color: '#111827',
+                  fontSize: '14px',
+                  marginBottom: '12px',
+                  display: 'flex',
+                  alignItems: 'center'
+                }}>
+                  <span style={{
+                    width: '8px',
+                    height: '8px',
+                    backgroundColor: '#8b5cf6',
+                    borderRadius: '50%',
+                    marginRight: '8px'
+                  }}></span>
                   Access Type
                 </h4>
-                <div className="space-y-2">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   {isPropertyOwner(user) ? (
-                    <div className="flex items-center space-x-3">
-                      <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
-                        <div className="w-2 h-2 bg-white rounded-full"></div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <div style={{
+                        width: '16px',
+                        height: '16px',
+                        backgroundColor: '#3b82f6',
+                        borderRadius: '50%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}>
+                        <div style={{ width: '8px', height: '8px', backgroundColor: 'white', borderRadius: '50%' }}></div>
                       </div>
                       <div>
-                        <span className="text-sm text-blue-700 font-medium">Property Owner</span>
-                        <p className="text-xs text-gray-500 mt-1">Full control over your property data</p>
+                        <span style={{ fontSize: '14px', color: '#1d4ed8', fontWeight: '500' }}>Property Owner</span>
+                        <p style={{ fontSize: '12px', color: '#6b7280', margin: '4px 0 0 0' }}>Full control over your property data</p>
                       </div>
                     </div>
                   ) : (
-                    <div className="flex items-center space-x-3">
-                      <div className="w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
-                        <div className="w-2 h-2 bg-white rounded-full"></div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <div style={{
+                        width: '16px',
+                        height: '16px',
+                        backgroundColor: '#22c55e',
+                        borderRadius: '50%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}>
+                        <div style={{ width: '8px', height: '8px', backgroundColor: 'white', borderRadius: '50%' }}></div>
                       </div>
                       <div>
-                        <span className="text-sm text-green-700 font-medium">Stakeholder Access</span>
-                        <p className="text-xs text-gray-500 mt-1">Controlled access to property data</p>
+                        <span style={{ fontSize: '14px', color: '#166534', fontWeight: '500' }}>Stakeholder Access</span>
+                        <p style={{ fontSize: '12px', color: '#6b7280', margin: '4px 0 0 0' }}>Controlled access to property data</p>
                       </div>
                     </div>
                   )}
@@ -243,16 +337,46 @@ export function UserProfile({ className = '', showDetails = true, onProfileUpdat
 
               {/* Permissions Card */}
               {permissions.length > 0 && (
-                <div className="bg-gradient-to-br from-orange-50 to-amber-50 rounded-xl p-4 border border-orange-100">
-                  <h4 className="font-semibold text-gray-900 text-sm mb-3 flex items-center">
-                    <span className="w-2 h-2 bg-orange-500 rounded-full mr-2"></span>
+                <div style={{
+                  background: 'linear-gradient(135deg, #fff7ed 0%, #fed7aa 100%)',
+                  borderRadius: '12px',
+                  padding: '16px',
+                  border: '1px solid #fed7aa',
+                  marginBottom: '16px'
+                }}>
+                  <h4 style={{
+                    fontWeight: '600',
+                    color: '#111827',
+                    fontSize: '14px',
+                    marginBottom: '12px',
+                    display: 'flex',
+                    alignItems: 'center'
+                  }}>
+                    <span style={{
+                      width: '8px',
+                      height: '8px',
+                      backgroundColor: '#f97316',
+                      borderRadius: '50%',
+                      marginRight: '8px'
+                    }}></span>
                     Permissions
                   </h4>
-                  <div className="flex flex-wrap gap-2">
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
                     {permissions.map((permission, index) => (
                       <span 
                         key={index}
-                        className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-white text-orange-800 border border-orange-200 shadow-sm"
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          padding: '6px 12px',
+                          borderRadius: '9999px',
+                          fontSize: '12px',
+                          fontWeight: '500',
+                          backgroundColor: 'white',
+                          color: '#ea580c',
+                          border: '1px solid #fed7aa',
+                          boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)'
+                        }}
                       >
                         {permission}
                       </span>
@@ -262,23 +386,86 @@ export function UserProfile({ className = '', showDetails = true, onProfileUpdat
               )}
 
               {/* Quick Actions Card */}
-              <div className="bg-gradient-to-br from-gray-50 to-slate-50 rounded-xl p-4 border border-gray-100">
-                <h4 className="font-semibold text-gray-900 text-sm mb-3 flex items-center">
-                  <span className="w-2 h-2 bg-gray-500 rounded-full mr-2"></span>
+              <div style={{
+                background: 'linear-gradient(135deg, #f9fafb 0%, #f1f5f9 100%)',
+                borderRadius: '12px',
+                padding: '16px',
+                border: '1px solid #e2e8f0'
+              }}>
+                <h4 style={{
+                  fontWeight: '600',
+                  color: '#111827',
+                  fontSize: '14px',
+                  marginBottom: '12px',
+                  display: 'flex',
+                  alignItems: 'center'
+                }}>
+                  <span style={{
+                    width: '8px',
+                    height: '8px',
+                    backgroundColor: '#6b7280',
+                    borderRadius: '50%',
+                    marginRight: '8px'
+                  }}></span>
                   Quick Actions
                 </h4>
-                <div className="space-y-3">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                   <button 
                     onClick={() => setShowProfileManagement(true)}
-                    className="w-full px-4 py-3 bg-blue-100 text-blue-700 rounded-lg text-sm font-medium hover:bg-blue-200 transition-all duration-200 border border-blue-200 hover:border-blue-300 hover:shadow-sm flex items-center justify-center"
+                    style={{
+                      width: '100%',
+                      padding: '12px 16px',
+                      backgroundColor: '#dbeafe',
+                      color: '#1d4ed8',
+                      borderRadius: '8px',
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      border: '1px solid #93c5fd',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      transition: 'all 0.2s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = '#bfdbfe'
+                      e.currentTarget.style.borderColor = '#60a5fa'
+                      e.currentTarget.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.1)'
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = '#dbeafe'
+                      e.currentTarget.style.borderColor = '#93c5fd'
+                      e.currentTarget.style.boxShadow = 'none'
+                    }}
                   >
-                    <span className="mr-2">⚙️</span>
+                    <span style={{ marginRight: '8px' }}>⚙️</span>
                     Manage Profile
                   </button>
-                  <div className="flex space-x-2">
+                  <div style={{ display: 'flex', gap: '8px' }}>
                     <button 
                       onClick={() => setIsExpanded(false)}
-                      className="flex-1 px-4 py-3 bg-white text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition-all duration-200 border border-gray-200 hover:border-gray-400 hover:shadow-sm"
+                      style={{
+                        flex: 1,
+                        padding: '12px 16px',
+                        backgroundColor: 'white',
+                        color: '#374151',
+                        borderRadius: '8px',
+                        fontSize: '14px',
+                        fontWeight: '500',
+                        border: '1px solid #d1d5db',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = '#f9fafb'
+                        e.currentTarget.style.borderColor = '#9ca3af'
+                        e.currentTarget.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.1)'
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = 'white'
+                        e.currentTarget.style.borderColor = '#d1d5db'
+                        e.currentTarget.style.boxShadow = 'none'
+                      }}
                     >
                       Close
                     </button>
@@ -291,7 +478,28 @@ export function UserProfile({ className = '', showDetails = true, onProfileUpdat
                           console.error('Logout failed:', error)
                         }
                       }}
-                      className="flex-1 px-4 py-3 bg-red-100 text-red-700 rounded-lg text-sm font-medium hover:bg-red-200 transition-all duration-200 border border-red-200 hover:border-red-300 hover:shadow-sm"
+                      style={{
+                        flex: 1,
+                        padding: '12px 16px',
+                        backgroundColor: '#fef2f2',
+                        color: '#dc2626',
+                        borderRadius: '8px',
+                        fontSize: '14px',
+                        fontWeight: '500',
+                        border: '1px solid #fecaca',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = '#fee2e2'
+                        e.currentTarget.style.borderColor = '#fca5a5'
+                        e.currentTarget.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.1)'
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = '#fef2f2'
+                        e.currentTarget.style.borderColor = '#fecaca'
+                        e.currentTarget.style.boxShadow = 'none'
+                      }}
                     >
                       Sign Out
                     </button>
