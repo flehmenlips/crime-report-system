@@ -83,17 +83,24 @@ export function EnhancedEvidenceUpload({ item, onClose, onSuccess }: EnhancedEvi
 
   // Process and validate files
   const processFiles = async (files: File[]) => {
+    console.log(`📁 PROCESSING ${files.length} FILES FOR STRESS TESTING`)
     const newUploadFiles: UploadFile[] = []
+    const validationErrors: string[] = []
     
     for (const file of files) {
-      // Validate file size (50MB limit)
-      if (file.size > 50 * 1024 * 1024) {
+      console.log(`🔍 VALIDATING FILE: ${file.name} (${(file.size / 1024 / 1024).toFixed(1)}MB)`)
+      
+      // Enhanced file size validation (10MB limit for stress testing)
+      const maxFileSize = 10 * 1024 * 1024 // 10MB
+      if (file.size > maxFileSize) {
+        const errorMsg = `File too large: ${file.name} (${(file.size / 1024 / 1024).toFixed(1)}MB). Maximum size is 10MB.`
+        validationErrors.push(errorMsg)
         newUploadFiles.push({
           file,
           id: Math.random().toString(36).substr(2, 9),
           progress: 0,
           status: 'error',
-          error: 'File too large (max 50MB)',
+          error: errorMsg,
           evidenceType: getEvidenceType(file)
         })
         continue
@@ -132,14 +139,36 @@ export function EnhancedEvidenceUpload({ item, onClose, onSuccess }: EnhancedEvi
       })
     }
 
+    // Log validation results
+    const validFiles = newUploadFiles.filter(f => f.status === 'pending').length
+    const errorFiles = newUploadFiles.filter(f => f.status === 'error').length
+    
+    console.log(`📊 FILE VALIDATION COMPLETE:`)
+    console.log(`   ✅ Valid files: ${validFiles}`)
+    console.log(`   ❌ Invalid files: ${errorFiles}`)
+    console.log(`   📁 Total processed: ${newUploadFiles.length}`)
+    
+    if (validationErrors.length > 0) {
+      console.warn(`⚠️ VALIDATION ERRORS:`, validationErrors)
+    }
+    
     setUploadFiles(prev => [...prev, ...newUploadFiles])
   }
 
-  // Upload single file
-  const uploadSingleFile = async (uploadFile: UploadFile): Promise<Evidence | null> => {
+  // Upload single file with enhanced error handling and retry logic
+  const uploadSingleFile = async (uploadFile: UploadFile, retryCount = 0): Promise<Evidence | null> => {
     const { file, id } = uploadFile
+    const maxRetries = 3
     
     try {
+      console.log(`🚀 UPLOADING FILE: ${file.name} (${file.size} bytes) - Attempt ${retryCount + 1}`)
+      
+      // File size validation (10MB limit)
+      const maxFileSize = 10 * 1024 * 1024 // 10MB
+      if (file.size > maxFileSize) {
+        throw new Error(`File too large: ${file.name} (${(file.size / 1024 / 1024).toFixed(1)}MB). Maximum size is 10MB.`)
+      }
+
       // Update status to uploading
       setUploadFiles(prev => prev.map(f => 
         f.id === id ? { ...f, status: 'uploading', progress: 0 } : f
@@ -151,21 +180,26 @@ export function EnhancedEvidenceUpload({ item, onClose, onSuccess }: EnhancedEvi
       formData.append('itemId', item.id.toString())
       formData.append('type', uploadFile.evidenceType)
 
-      // Simulate progress updates
+      // Enhanced progress tracking with timeout
       const progressInterval = setInterval(() => {
         setUploadFiles(prev => prev.map(f => 
           f.id === id && f.status === 'uploading' 
-            ? { ...f, progress: Math.min(f.progress + 10, 90) } 
+            ? { ...f, progress: Math.min(f.progress + 5, 90) } 
             : f
         ))
-      }, 200)
+      }, 300)
 
-      // Upload file
+      // Upload with timeout
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 30000) // 30 second timeout
+
       const response = await fetch('/api/upload', {
         method: 'POST',
-        body: formData
+        body: formData,
+        signal: controller.signal
       })
 
+      clearTimeout(timeoutId)
       clearInterval(progressInterval)
 
       const result = await response.json()
@@ -176,38 +210,77 @@ export function EnhancedEvidenceUpload({ item, onClose, onSuccess }: EnhancedEvi
           f.id === id ? { ...f, status: 'completed', progress: 100 } : f
         ))
 
+        console.log(`✅ UPLOAD SUCCESS: ${file.name}`)
         return result.evidence
       } else {
-        throw new Error(result.error || 'Upload failed')
+        throw new Error(result.error || `Upload failed: ${response.status}`)
       }
     } catch (error) {
+      clearInterval(progressInterval)
+      
+      const errorMessage = error instanceof Error ? error.message : 'Upload failed'
+      console.error(`❌ UPLOAD FAILED: ${file.name} - ${errorMessage}`)
+      
+      // Retry logic for network errors
+      if (retryCount < maxRetries && (errorMessage.includes('network') || errorMessage.includes('timeout'))) {
+        console.log(`🔄 RETRYING UPLOAD: ${file.name} (attempt ${retryCount + 2})`)
+        
+        // Wait before retry (exponential backoff)
+        await new Promise(resolve => setTimeout(resolve, Math.pow(2, retryCount) * 1000))
+        
+        return uploadSingleFile(uploadFile, retryCount + 1)
+      }
+      
       // Update status to error
       setUploadFiles(prev => prev.map(f => 
         f.id === id ? { 
           ...f, 
           status: 'error', 
-          error: error instanceof Error ? error.message : 'Upload failed' 
+          error: errorMessage
         } : f
       ))
       return null
     }
   }
 
-  // Upload all pending files
+  // Upload all pending files with concurrent processing and queue management
   const handleUploadAll = async () => {
     const pendingFiles = uploadFiles.filter(f => f.status === 'pending')
     if (pendingFiles.length === 0) return
 
+    console.log(`🚀 STARTING BATCH UPLOAD: ${pendingFiles.length} files`)
     setUploading(true)
     const uploadedEvidence: Evidence[] = []
-
-    for (const uploadFile of pendingFiles) {
-      const evidence = await uploadSingleFile(uploadFile)
-      if (evidence) {
-        uploadedEvidence.push(evidence)
+    
+    // Concurrent upload limit to prevent server overload
+    const maxConcurrentUploads = 3
+    
+    // Process files in batches
+    for (let i = 0; i < pendingFiles.length; i += maxConcurrentUploads) {
+      const batch = pendingFiles.slice(i, i + maxConcurrentUploads)
+      console.log(`📦 PROCESSING BATCH ${Math.floor(i / maxConcurrentUploads) + 1}: ${batch.length} files`)
+      
+      // Upload batch concurrently
+      const batchPromises = batch.map(file => uploadSingleFile(file))
+      const batchResults = await Promise.allSettled(batchPromises)
+      
+      // Process results
+      batchResults.forEach((result, index) => {
+        if (result.status === 'fulfilled' && result.value) {
+          uploadedEvidence.push(result.value)
+          console.log(`✅ BATCH UPLOAD SUCCESS: ${batch[index].file.name}`)
+        } else {
+          console.error(`❌ BATCH UPLOAD FAILED: ${batch[index].file.name}`, result.status === 'rejected' ? result.reason : 'Unknown error')
+        }
+      })
+      
+      // Small delay between batches to prevent overwhelming the server
+      if (i + maxConcurrentUploads < pendingFiles.length) {
+        await new Promise(resolve => setTimeout(resolve, 500))
       }
     }
 
+    console.log(`🎉 BATCH UPLOAD COMPLETE: ${uploadedEvidence.length}/${pendingFiles.length} files uploaded successfully`)
     setUploading(false)
 
     if (uploadedEvidence.length > 0) {
