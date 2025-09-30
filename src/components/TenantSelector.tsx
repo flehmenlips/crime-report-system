@@ -38,25 +38,7 @@ export function TenantSelector({ user, onTenantChange, className = '' }: TenantS
           // For demo purposes, we'll show the current tenant plus a few others
           tenants = user.tenant ? [user.tenant] : []
           
-          // Add some demo tenants for stakeholders (in real app, this would come from API)
-          if (user.role === 'law_enforcement') {
-            tenants.push({
-              id: 'tenant-2',
-              name: 'Smith Property',
-              description: 'Residential property theft case',
-              isActive: true,
-              createdAt: '2023-10-01T00:00:00Z',
-              updatedAt: '2023-10-01T00:00:00Z'
-            })
-            tenants.push({
-              id: 'tenant-3',
-              name: 'Johnson Equipment',
-              description: 'Commercial equipment theft case',
-              isActive: true,
-              createdAt: '2023-11-01T00:00:00Z',
-              updatedAt: '2023-11-01T00:00:00Z'
-            })
-          }
+          // Demo tenants removed - all tenant data now comes from database API
         }
 
         setAvailableTenants(tenants)

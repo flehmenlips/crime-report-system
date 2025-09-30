@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { User, Tenant } from '@/types'
-import { users, tenants } from '@/lib/auth'
+// Removed hardcoded arrays - now using database API calls
 import { CreateTenantModal } from './CreateTenantModal'
 import { TenantUserManagement } from './TenantUserManagement'
 

@@ -38,6 +38,7 @@ import { TenantIsolationStressTest } from '@/components/TenantIsolationStressTes
 import { PerformanceStressTest } from '@/components/PerformanceStressTest'
 import { EdgeCaseStressTest } from '@/components/EdgeCaseStressTest'
 import { SuperAdminDashboard } from '@/components/SuperAdminDashboard'
+import { TenantUserManagement } from '@/components/TenantUserManagement'
 
 export default function Home() {
   const router = useRouter()
@@ -65,6 +66,7 @@ export default function Home() {
   const [showPerformanceTest, setShowPerformanceTest] = useState(false)
   const [showEdgeCaseTest, setShowEdgeCaseTest] = useState(false)
   const [showSuperAdminDashboard, setShowSuperAdminDashboard] = useState(false)
+  const [showTenantUserManagement, setShowTenantUserManagement] = useState(false)
   const [viewMode, setViewMode] = useState<'cards' | 'list'>('cards')
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false)
   const [showGenerateReport, setShowGenerateReport] = useState(false)
@@ -125,29 +127,30 @@ export default function Home() {
     loadData(true)
   }
 
+  // Check for user session and load full profile with tenant data
+  const checkAuth = async () => {
+    try {
+      const response = await fetch('/api/user/profile')
+      if (response.ok) {
+        const userData = await response.json()
+        console.log('Loaded user profile:', userData.user)
+        setUser(userData.user)
+      } else {
+        router.push('/login-simple')
+        return
+      }
+    } catch (error) {
+      console.error('Auth check failed:', error)
+      router.push('/login-simple')
+      return
+    }
+  }
+
   useEffect(() => {
     // Mark as hydrated to prevent hydration mismatch
     setIsHydrated(true)
     console.log('Main page hydrated')
     
-    // Check for user session
-    const checkAuth = async () => {
-      try {
-        const response = await fetch('/api/auth/me')
-        if (response.ok) {
-          const userData = await response.json()
-          setUser(userData.user)
-        } else {
-          router.push('/login-simple')
-          return
-        }
-      } catch (error) {
-        console.error('Auth check failed:', error)
-        router.push('/login-simple')
-        return
-      }
-    }
-
     checkAuth()
     loadData()
   }, [])
@@ -1293,6 +1296,40 @@ export default function Home() {
                 <span style={{ fontSize: '20px' }}>📊</span>
                 Analytics
               </button>
+
+              {/* Manage Users - Only available to property owners */}
+              {user?.role === 'property_owner' && user?.tenant && (
+                <button
+                  onClick={() => setShowTenantUserManagement(true)}
+                  style={{
+                    background: 'linear-gradient(135deg, #059669 0%, #047857 50%, #065f46 100%)',
+                    color: 'white',
+                    border: 'none',
+                    padding: '20px 32px',
+                    borderRadius: '16px',
+                    cursor: 'pointer',
+                    fontWeight: '600',
+                    fontSize: '18px',
+                    boxShadow: '0 10px 25px rgba(5, 150, 105, 0.3)',
+                    transition: 'all 0.3s ease',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '12px'
+                  }}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-4px)'
+                    e.currentTarget.style.boxShadow = '0 20px 40px rgba(5, 150, 105, 0.4)'
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)'
+                    e.currentTarget.style.boxShadow = '0 10px 25px rgba(5, 150, 105, 0.3)'
+                  }}
+                >
+                  <span style={{ fontSize: '20px' }}>👥</span>
+                  Manage Users
+                </button>
+              )}
               
               {/* Super Admin Dashboard - Only available to super_admin users */}
               {canSuperAdmin(user) && (
@@ -2500,6 +2537,18 @@ export default function Home() {
             <SuperAdminDashboard
               currentUser={user}
               onClose={() => setShowSuperAdminDashboard(false)}
+            />
+          )}
+
+          {/* Tenant User Management Modal */}
+          {showTenantUserManagement && user && user.tenant && (
+            <TenantUserManagement
+              tenant={user.tenant}
+              onClose={() => setShowTenantUserManagement(false)}
+              onUpdate={() => {
+                // Refresh user profile to get updated tenant data
+                checkAuth()
+              }}
             />
           )}
         </div>
