@@ -52,12 +52,8 @@ export function TenantUserManagement({ tenant, onClose, onUpdate }: TenantUserMa
     if (!confirm(confirmMessage)) return
 
     try {
-      const response = await fetch(`/api/admin/users/${userId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          tenantId: null // Remove from tenant
-        })
+      const response = await fetch(`/api/tenant/users/${userId}`, {
+        method: 'DELETE'
       })
 
       if (response.ok) {
@@ -83,7 +79,7 @@ export function TenantUserManagement({ tenant, onClose, onUpdate }: TenantUserMa
     if (!confirm(confirmMessage)) return
 
     try {
-      const response = await fetch(`/api/admin/users/${userId}`, {
+      const response = await fetch(`/api/tenant/users/${userId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
