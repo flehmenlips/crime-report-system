@@ -36,6 +36,7 @@ import { ReportGenerator } from '@/components/ReportGenerator'
 import { CSVImport } from '@/components/CSVImport'
 import { TenantIsolationStressTest } from '@/components/TenantIsolationStressTest'
 import { PerformanceStressTest } from '@/components/PerformanceStressTest'
+import { EdgeCaseStressTest } from '@/components/EdgeCaseStressTest'
 
 export default function Home() {
   const router = useRouter()
@@ -61,6 +62,7 @@ export default function Home() {
   const [showCSVImport, setShowCSVImport] = useState(false)
   const [showTenantIsolationTest, setShowTenantIsolationTest] = useState(false)
   const [showPerformanceTest, setShowPerformanceTest] = useState(false)
+  const [showEdgeCaseTest, setShowEdgeCaseTest] = useState(false)
   const [viewMode, setViewMode] = useState<'cards' | 'list'>('cards')
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false)
   const [showGenerateReport, setShowGenerateReport] = useState(false)
@@ -1558,6 +1560,26 @@ export default function Home() {
                       </button>
                       
                       <button
+                        onClick={() => setShowEdgeCaseTest(true)}
+                        style={{
+                          background: 'linear-gradient(135deg, #ec4899 0%, #db2777 100%)',
+                          color: 'white',
+                          border: 'none',
+                          padding: '12px 24px',
+                          borderRadius: '12px',
+                          fontSize: '16px',
+                          fontWeight: '600',
+                          cursor: 'pointer',
+                          transition: 'all 0.3s ease',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px'
+                        }}
+                      >
+                        🧪 Edge Case Test
+                      </button>
+                      
+                      <button
                         onClick={handleBulkDelete}
                         style={{
                           background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
@@ -2426,6 +2448,14 @@ export default function Home() {
             <PerformanceStressTest
               currentUser={user}
               onClose={() => setShowPerformanceTest(false)}
+            />
+          )}
+
+          {/* Edge Case Stress Test Modal */}
+          {showEdgeCaseTest && user && (
+            <EdgeCaseStressTest
+              currentUser={user}
+              onClose={() => setShowEdgeCaseTest(false)}
             />
           )}
         </div>
