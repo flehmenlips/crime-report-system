@@ -461,11 +461,18 @@ export default function Home() {
           // Immediate local update for instant UI feedback
           setAllItems(prev => [...prev, newItem])
           setTotalValue(prev => prev + newItem.estimatedValue)
-          console.log('Item created:', newItem.name)
+          console.log('Item created and added to UI:', newItem.name)
+          
+          // Force re-render to ensure UI updates
+          setTimeout(() => {
+            console.log('Forcing UI refresh for new item')
+            setAllItems(prev => [...prev]) // Force re-render
+          }, 100)
           
           // Delayed server sync to ensure database consistency
           setTimeout(async () => {
             try {
+              console.log('Starting server sync...')
               const updatedItems = await getAllItems()
               const updatedTotal = updatedItems.reduce((sum, item) => sum + item.estimatedValue, 0)
               setAllItems(updatedItems)
@@ -474,7 +481,7 @@ export default function Home() {
             } catch (error) {
               console.error('Error syncing after add:', error)
             }
-          }, 1000)
+          }, 1500) // Increased delay to 1.5 seconds
         }
       }
       
@@ -537,7 +544,71 @@ export default function Home() {
 
   // Show loading state while authenticating or loading data
   if (!user || loading) {
-    return <DashboardLoading />
+    return (
+      <div style={{
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontFamily: 'Inter, -apple-system, sans-serif'
+      }}>
+        <div style={{
+          background: 'rgba(255, 255, 255, 0.95)',
+          backdropFilter: 'blur(20px)',
+          borderRadius: '24px',
+          padding: '48px',
+          boxShadow: '0 20px 40px rgba(0, 0, 0, 0.1)',
+          border: '1px solid rgba(255, 255, 255, 0.2)',
+          textAlign: 'center',
+          maxWidth: '400px'
+        }}>
+          <div style={{
+            width: '60px',
+            height: '60px',
+            border: '4px solid rgba(59, 130, 246, 0.3)',
+            borderTop: '4px solid #3b82f6',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite',
+            margin: '0 auto 24px'
+          }}></div>
+          <h2 style={{
+            fontSize: '24px',
+            fontWeight: '700',
+            color: '#1f2937',
+            marginBottom: '12px'
+          }}>
+            Loading Crime Report System
+          </h2>
+          <p style={{
+            fontSize: '16px',
+            color: '#6b7280',
+            marginBottom: '24px'
+          }}>
+            {!user ? 'Authenticating user...' : 'Loading your data...'}
+          </p>
+          <div style={{
+            background: '#f3f4f6',
+            borderRadius: '8px',
+            padding: '12px',
+            fontSize: '14px',
+            color: '#6b7280'
+          }}>
+            Please wait while we prepare your dashboard
+          </div>
+        </div>
+        <style jsx>{`
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+          @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+          }
+        `}</style>
+      </div>
+    )
   }
 
   // Show error state if there's an error
@@ -1263,7 +1334,64 @@ export default function Home() {
               )}
             </div>
 
-            {displayItems.length === 0 ? (
+            {loading ? (
+              // Skeleton loading for items grid
+              <div style={{ 
+                display: 'grid', 
+                gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', 
+                gap: '32px' 
+              }}>
+                {[1, 2, 3].map((i) => (
+                  <div key={i} style={{
+                    background: 'white',
+                    borderRadius: '20px',
+                    padding: '32px',
+                    boxShadow: '0 20px 40px rgba(0, 0, 0, 0.08)',
+                    border: '1px solid rgba(0, 0, 0, 0.05)',
+                    animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '24px' }}>
+                      <div style={{
+                        width: '80px',
+                        height: '80px',
+                        background: '#e5e7eb',
+                        borderRadius: '12px',
+                        animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+                      }}></div>
+                      <div style={{ flex: 1 }}>
+                        <div style={{
+                          height: '24px',
+                          background: '#e5e7eb',
+                          borderRadius: '6px',
+                          marginBottom: '8px',
+                          animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+                        }}></div>
+                        <div style={{
+                          height: '16px',
+                          background: '#e5e7eb',
+                          borderRadius: '4px',
+                          width: '60%',
+                          animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+                        }}></div>
+                      </div>
+                    </div>
+                    <div style={{
+                      height: '16px',
+                      background: '#e5e7eb',
+                      borderRadius: '4px',
+                      marginBottom: '16px',
+                      animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+                    }}></div>
+                    <div style={{
+                      height: '40px',
+                      background: '#e5e7eb',
+                      borderRadius: '8px',
+                      animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+                    }}></div>
+                  </div>
+                ))}
+              </div>
+            ) : displayItems.length === 0 ? (
               <div style={{ 
                 background: 'white', 
                 borderRadius: '24px', 

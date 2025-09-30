@@ -64,6 +64,24 @@ const nextConfig = {
   // generateBuildId: async () => {
   //   return 'fix-chunks-v2-' + Math.random().toString(36).substring(7) + '-' + Date.now()
   // },
+  
+  // Performance optimizations
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      // Reduce bundle size by splitting vendor chunks
+      config.optimization.splitChunks = {
+        chunks: 'all',
+        cacheGroups: {
+          vendor: {
+            test: /[\\/]node_modules[\\/]/,
+            name: 'vendors',
+            chunks: 'all',
+          },
+        },
+      }
+    }
+    return config
+  },
 }
 
 module.exports = nextConfig
