@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { User, Tenant } from '@/types'
 import { users, tenants } from '@/lib/auth'
 import { CreateTenantModal } from './CreateTenantModal'
+import { TenantUserManagement } from './TenantUserManagement'
 
 interface SuperAdminDashboardProps {
   currentUser: User
@@ -29,6 +30,7 @@ export function SuperAdminDashboard({ currentUser, onClose }: SuperAdminDashboar
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [showCreateTenant, setShowCreateTenant] = useState(false)
+  const [selectedTenantForUsers, setSelectedTenantForUsers] = useState<Tenant | null>(null)
 
   useEffect(() => {
     loadData()
@@ -569,6 +571,22 @@ export function SuperAdminDashboard({ currentUser, onClose }: SuperAdminDashboar
                         )}
                         
                         <button
+                          onClick={() => setSelectedTenantForUsers(tenant)}
+                          style={{
+                            background: '#dbeafe',
+                            color: '#2563eb',
+                            border: 'none',
+                            padding: '6px 12px',
+                            borderRadius: '6px',
+                            fontSize: '12px',
+                            cursor: 'pointer',
+                            marginRight: '8px'
+                          }}
+                        >
+                          👥 Manage Users
+                        </button>
+                        
+                        <button
                           onClick={() => handleTenantAction(tenant.id, 'delete')}
                           style={{
                             background: '#fee2e2',
@@ -681,6 +699,15 @@ export function SuperAdminDashboard({ currentUser, onClose }: SuperAdminDashboar
         <CreateTenantModal
           onClose={() => setShowCreateTenant(false)}
           onSuccess={loadData}
+        />
+      )}
+
+      {/* Tenant User Management Modal */}
+      {selectedTenantForUsers && (
+        <TenantUserManagement
+          tenant={selectedTenantForUsers}
+          onClose={() => setSelectedTenantForUsers(null)}
+          onUpdate={loadData}
         />
       )}
     </div>

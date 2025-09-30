@@ -15,7 +15,8 @@ export function RegistrationModal({ onClose, onSuccess }: RegistrationModalProps
     name: '',
     password: '',
     confirmPassword: '',
-    role: 'property_owner' as Role
+    role: 'property_owner' as Role,
+    propertyName: ''
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -46,7 +47,8 @@ export function RegistrationModal({ onClose, onSuccess }: RegistrationModalProps
           email: formData.email,
           name: formData.name,
           password: formData.password,
-          role: formData.role
+          role: formData.role,
+          propertyName: formData.propertyName // Include property name for property owners
         }),
       })
 
@@ -659,6 +661,77 @@ export function RegistrationModal({ onClose, onSuccess }: RegistrationModalProps
               </div>
             </div>
           </div>
+
+          {/* Property Name - Only show for property owners */}
+          {formData.role === 'property_owner' && (
+            <div>
+              <label style={{
+                display: 'block',
+                fontSize: '14px',
+                fontWeight: '600',
+                color: 'rgba(255, 255, 255, 0.9)',
+                marginBottom: '8px'
+              }}>
+                Property/Organization Name *
+              </label>
+              <div style={{ position: 'relative' }}>
+                <input
+                  type="text"
+                  required={formData.role === 'property_owner'}
+                  value={formData.propertyName}
+                  onChange={(e) => handleInputChange('propertyName', e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '16px 16px 16px 52px',
+                    background: 'rgba(255, 255, 255, 0.15)',
+                    backdropFilter: 'blur(20px)',
+                    border: '1px solid rgba(255, 255, 255, 0.25)',
+                    borderRadius: '16px',
+                    fontSize: '16px',
+                    color: 'white',
+                    outline: 'none',
+                    transition: 'all 0.3s ease',
+                    boxSizing: 'border-box',
+                    boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 8px 32px rgba(0, 0, 0, 0.1)'
+                  }}
+                  placeholder="e.g., Birkenfeld Farm, Smith Construction"
+                  onFocus={(e) => {
+                    e.target.style.borderColor = 'rgba(59, 130, 246, 0.8)'
+                    e.target.style.boxShadow = '0 0 0 4px rgba(59, 130, 246, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.3), 0 8px 32px rgba(0, 0, 0, 0.2)'
+                    e.target.style.background = 'rgba(255, 255, 255, 0.25)'
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = 'rgba(255, 255, 255, 0.25)'
+                    e.target.style.boxShadow = 'inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 8px 32px rgba(0, 0, 0, 0.1)'
+                    e.target.style.background = 'rgba(255, 255, 255, 0.15)'
+                  }}
+                />
+                <div style={{
+                  position: 'absolute',
+                  left: '18px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  color: 'rgba(255, 255, 255, 0.4)',
+                  pointerEvents: 'none',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                  </svg>
+                </div>
+              </div>
+              <p style={{
+                fontSize: '12px',
+                color: 'rgba(255, 255, 255, 0.6)',
+                marginTop: '4px',
+                marginBottom: '0'
+              }}>
+                This will be the name of your property or organization for data isolation
+              </p>
+            </div>
+          )}
 
           {/* Error Message */}
           {error && (

@@ -26,7 +26,7 @@ function getDefaultPermissions(role: Role): string[] {
 
 export async function POST(request: NextRequest) {
   try {
-    const { username, email, name, password, role = 'property_owner' } = await request.json()
+    const { username, email, name, password, role = 'property_owner', propertyName } = await request.json()
 
     // Validate required fields
     if (!username || !email || !name || !password) {
@@ -65,17 +65,23 @@ export async function POST(request: NextRequest) {
     // Create new user (generate new ID)
     const newId = (Math.max(...users.map(u => parseInt(u.id)), 0) + 1).toString()
     
-    // Create new tenant for ALL users to ensure proper isolation
-    // Each user gets their own tenant for complete data separation
-    const newTenantId = `tenant-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
-    let userTenant = {
-      id: newTenantId,
-      name: role === 'property_owner' ? `${name}'s Property` : `${name}'s Account`,
-      description: role === 'property_owner' ? `Property managed by ${name}` : `Account for ${name} (${role})`,
-      isActive: true,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    }
+        // Create new tenant for ALL users to ensure proper isolation
+        // Each user gets their own tenant for complete data separation
+        const newTenantId = `tenant-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+        let userTenant = {
+          id: newTenantId,
+          name: role === 'property_owner' && propertyName 
+            ? propertyName 
+            : role === 'property_owner' 
+              ? `${name}'s Property` 
+              : `${name}'s Account`,
+          description: role === 'property_owner' 
+            ? `Property managed by ${name}` 
+            : `Account for ${name} (${role})`,
+          isActive: true,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        }
     tenants.push(userTenant)
     
     const newUser = {
