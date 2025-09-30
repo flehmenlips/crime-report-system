@@ -38,8 +38,8 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       )
     }
 
-    // Check tenant isolation (law enforcement can access any evidence)
-    if (user.role !== 'law_enforcement' && evidence.item.tenantId !== user.tenantId) {
+    // Check tenant isolation (super admin and law enforcement can access any evidence)
+    if (user.role !== 'super_admin' && user.role !== 'law_enforcement' && evidence.item.tenantId !== user.tenantId) {
       return NextResponse.json(
         { error: 'Unauthorized to access this evidence' },
         { status: 403 }
@@ -98,8 +98,8 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
       )
     }
 
-    // Check tenant isolation (law enforcement can delete any evidence)
-    if (user.role !== 'law_enforcement' && evidence.item.tenantId !== user.tenantId) {
+    // Check tenant isolation (super admin and law enforcement can delete any evidence)
+    if (user.role !== 'super_admin' && user.role !== 'law_enforcement' && evidence.item.tenantId !== user.tenantId) {
       return NextResponse.json(
         { error: 'Unauthorized to delete this evidence' },
         { status: 403 }

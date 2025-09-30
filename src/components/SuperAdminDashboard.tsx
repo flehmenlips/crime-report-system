@@ -15,9 +15,15 @@ interface UserWithTenant extends User {
   lastLogin?: string
 }
 
+interface TenantWithStats extends Tenant {
+  userCount?: number
+  itemCount?: number
+  totalValue?: number
+}
+
 export function SuperAdminDashboard({ currentUser, onClose }: SuperAdminDashboardProps) {
   const [allUsers, setAllUsers] = useState<UserWithTenant[]>([])
-  const [allTenants, setAllTenants] = useState<Tenant[]>([])
+  const [allTenants, setAllTenants] = useState<TenantWithStats[]>([])
   const [selectedTab, setSelectedTab] = useState<'users' | 'tenants' | 'system'>('users')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -30,16 +36,22 @@ export function SuperAdminDashboard({ currentUser, onClose }: SuperAdminDashboar
     try {
       setLoading(true)
       
-      // Load all users with their tenant information
-      const usersWithTenants: UserWithTenant[] = users.map(user => ({
-        ...user,
-        tenant: tenants.find(t => t.id === user.tenantId),
-        itemCount: 0, // This would be fetched from database in real implementation
-        lastLogin: (user as any).lastLoginAt || 'Never'
-      })) as UserWithTenant[]
+      // Load users from real database
+      const usersResponse = await fetch('/api/admin/users')
+      if (!usersResponse.ok) {
+        throw new Error('Failed to load users')
+      }
+      const usersData = await usersResponse.json()
       
-      setAllUsers(usersWithTenants)
-      setAllTenants(tenants)
+      // Load tenants from real database
+      const tenantsResponse = await fetch('/api/admin/tenants')
+      if (!tenantsResponse.ok) {
+        throw new Error('Failed to load tenants')
+      }
+      const tenantsData = await tenantsResponse.json()
+      
+      setAllUsers(usersData.users)
+      setAllTenants(tenantsData.tenants)
       setError(null)
     } catch (err) {
       setError('Failed to load admin data')
@@ -51,33 +63,127 @@ export function SuperAdminDashboard({ currentUser, onClose }: SuperAdminDashboar
 
   const handleUserAction = async (userId: string, action: 'activate' | 'deactivate' | 'delete') => {
     try {
-      // In a real implementation, this would call an API
-      console.log(`Performing ${action} on user ${userId}`)
-      
-      // For now, just show a confirmation
-      if (confirm(`Are you sure you want to ${action} this user?`)) {
-        alert(`${action} action would be performed on user ${userId}`)
+      const user = allUsers.find(u => u.id === userId)
+      if (!user) return
+
+      let confirmMessage = ''
+      let isDestructive = false
+
+      switch (action) {
+        case 'activate':
+          confirmMessage = `Are you sure you want to activate user "${user.name}" (${user.email})?`
+          break
+        case 'deactivate':
+          confirmMessage = `Are you sure you want to deactivate user "${user.name}" (${user.email})?\n\nThis will prevent them from logging in.`
+          isDestructive = true
+          break
+        case 'delete':
+          confirmMessage = `⚠️ DANGER: Are you sure you want to DELETE user "${user.name}" (${user.email})?\n\nThis action is PERMANENT and cannot be undone!\n\nUser has ${user.itemCount || 0} items that will be affected.\n\nType "DELETE" to confirm:`
+          isDestructive = true
+          break
+      }
+
+      if (isDestructive && action === 'delete') {
+        const confirmation = prompt(confirmMessage)
+        if (confirmation !== 'DELETE') {
+          alert('User deletion cancelled. You must type "DELETE" to confirm.')
+          return
+        }
+      } else {
+        if (!confirm(confirmMessage)) {
+          return
+        }
+      }
+
+      let response
+      if (action === 'delete') {
+        response = await fetch(`/api/admin/users/${userId}`, {
+          method: 'DELETE'
+        })
+      } else {
+        response = await fetch(`/api/admin/users/${userId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            isActive: action === 'activate' 
+          })
+        })
+      }
+
+      const result = await response.json()
+
+      if (response.ok) {
+        alert(`✅ User ${action} successful!`)
         loadData() // Refresh data
+      } else {
+        alert(`❌ Failed to ${action} user: ${result.error}`)
       }
     } catch (error) {
       console.error(`Error performing ${action} on user:`, error)
-      alert(`Failed to ${action} user`)
+      alert(`❌ Failed to ${action} user: ${error instanceof Error ? error.message : 'Unknown error'}`)
     }
   }
 
   const handleTenantAction = async (tenantId: string, action: 'activate' | 'deactivate' | 'delete') => {
     try {
-      // In a real implementation, this would call an API
-      console.log(`Performing ${action} on tenant ${tenantId}`)
-      
-      // For now, just show a confirmation
-      if (confirm(`Are you sure you want to ${action} this tenant?`)) {
-        alert(`${action} action would be performed on tenant ${tenantId}`)
+      const tenant = allTenants.find(t => t.id === tenantId)
+      if (!tenant) return
+
+      let confirmMessage = ''
+      let isDestructive = false
+
+      switch (action) {
+        case 'activate':
+          confirmMessage = `Are you sure you want to activate tenant "${tenant.name}"?`
+          break
+        case 'deactivate':
+          confirmMessage = `Are you sure you want to deactivate tenant "${tenant.name}"?\n\nThis will affect ${tenant.userCount || 0} users and ${tenant.itemCount || 0} items.`
+          isDestructive = true
+          break
+        case 'delete':
+          confirmMessage = `⚠️ DANGER: Are you sure you want to DELETE tenant "${tenant.name}"?\n\nThis action is PERMANENT and cannot be undone!\n\nTenant has:\n- ${tenant.userCount || 0} users\n- ${tenant.itemCount || 0} items\n- Total value: $${(tenant.totalValue || 0).toLocaleString()}\n\nType "DELETE" to confirm:`
+          isDestructive = true
+          break
+      }
+
+      if (isDestructive && action === 'delete') {
+        const confirmation = prompt(confirmMessage)
+        if (confirmation !== 'DELETE') {
+          alert('Tenant deletion cancelled. You must type "DELETE" to confirm.')
+          return
+        }
+      } else {
+        if (!confirm(confirmMessage)) {
+          return
+        }
+      }
+
+      let response
+      if (action === 'delete') {
+        response = await fetch(`/api/admin/tenants/${tenantId}`, {
+          method: 'DELETE'
+        })
+      } else {
+        response = await fetch(`/api/admin/tenants/${tenantId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            isActive: action === 'activate' 
+          })
+        })
+      }
+
+      const result = await response.json()
+
+      if (response.ok) {
+        alert(`✅ Tenant ${action} successful!`)
         loadData() // Refresh data
+      } else {
+        alert(`❌ Failed to ${action} tenant: ${result.error}`)
       }
     } catch (error) {
       console.error(`Error performing ${action} on tenant:`, error)
-      alert(`Failed to ${action} tenant`)
+      alert(`❌ Failed to ${action} tenant: ${error instanceof Error ? error.message : 'Unknown error'}`)
     }
   }
 

@@ -15,6 +15,10 @@ model Tenant {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  // Relationships
+  users       User[]
+  items       StolenItem[]
+
   @@map("tenants")
 }
 
@@ -45,6 +49,9 @@ model User {
   tenantId      String?      @default("tenant-1")
   items         StolenItem[]
 
+  // Relationships
+  tenant        Tenant?      @relation(fields: [tenantId], references: [id])
+
   @@map("users")
 }
 
@@ -67,6 +74,7 @@ model StolenItem {
   tenantId         String?    @default("tenant-1")
   evidence         Evidence[]
   owner            User       @relation(fields: [ownerId], references: [id])
+  tenant           Tenant?    @relation(fields: [tenantId], references: [id])
 
   @@map("stolen_items")
 }

@@ -32,8 +32,8 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Item not found' }, { status: 404 })
     }
 
-    // Check tenant isolation (law enforcement can access any item's evidence)
-    if (user.role !== 'law_enforcement' && item.tenantId !== user.tenantId) {
+    // Check tenant isolation (super admin and law enforcement can access any item's evidence)
+    if (user.role !== 'super_admin' && user.role !== 'law_enforcement' && item.tenantId !== user.tenantId) {
       return NextResponse.json({ error: 'Unauthorized to access this item\'s evidence' }, { status: 403 })
     }
 
@@ -91,8 +91,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Item not found' }, { status: 404 })
     }
 
-    // Check tenant isolation (law enforcement can add evidence to any item)
-    if (user.role !== 'law_enforcement' && targetItem.tenantId !== user.tenantId) {
+    // Check tenant isolation (super admin and law enforcement can add evidence to any item)
+    if (user.role !== 'super_admin' && user.role !== 'law_enforcement' && targetItem.tenantId !== user.tenantId) {
       return NextResponse.json({ error: 'Unauthorized to add evidence to this item' }, { status: 403 })
     }
 
