@@ -72,7 +72,7 @@ export function UserProfile({ className = '', showDetails = true, onProfileUpdat
     <div className={`relative ${className}`}>
       {/* Compact Profile Display */}
       <div 
-        className="flex items-center space-x-3 cursor-pointer hover:bg-white/10 rounded-xl p-2 transition-colors duration-200"
+        className={`flex items-center space-x-3 cursor-pointer hover:bg-white/10 rounded-xl p-2 transition-colors duration-200 ${isExpanded ? 'opacity-50' : ''}`}
         onClick={() => setIsExpanded(!isExpanded)}
       >
         <div className={`w-10 h-10 bg-gradient-to-br ${getRoleColor(user.role)} rounded-full flex items-center justify-center shadow-lg`}>
@@ -122,18 +122,18 @@ export function UserProfile({ className = '', showDetails = true, onProfileUpdat
             <div className="space-y-3">
               <div className="border-t border-gray-200 pt-3">
                 <h4 className="font-semibold text-gray-900 text-sm mb-2">Account Information</h4>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Email:</span>
+                <div className="space-y-3 text-sm">
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-600 font-medium">Email:</span>
                     <span className="text-gray-900 font-medium">{user.email}</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">User ID:</span>
-                    <span className="text-gray-900 font-mono text-xs">{user.id}</span>
+                  <div className="flex justify-between items-start">
+                    <span className="text-gray-600 font-medium">User ID:</span>
+                    <span className="text-gray-900 font-mono text-xs bg-gray-100 px-2 py-1 rounded">{user.id}</span>
                   </div>
                   {accessLevelInfo && (
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Access Level:</span>
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-600 font-medium">Access Level:</span>
                       <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
                         accessLevelInfo.level === 'owner' ? 'bg-purple-100 text-purple-800' :
                         accessLevelInfo.level === 'staff' ? 'bg-blue-100 text-blue-800' :
@@ -150,14 +150,14 @@ export function UserProfile({ className = '', showDetails = true, onProfileUpdat
               {/* Tenant Information */}
               {tenantInfo && (
                 <div className="border-t border-gray-200 pt-3">
-                  <h4 className="font-semibold text-gray-900 text-sm mb-2">Tenant Information</h4>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Property:</span>
+                  <h4 className="font-semibold text-gray-900 text-sm mb-3">Tenant Information</h4>
+                  <div className="space-y-3 text-sm">
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-600 font-medium">Property:</span>
                       <span className="text-gray-900 font-medium">{tenantInfo.name}</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Status:</span>
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-600 font-medium">Status:</span>
                       <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
                         tenantInfo.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                       }`}>
@@ -165,9 +165,9 @@ export function UserProfile({ className = '', showDetails = true, onProfileUpdat
                       </span>
                     </div>
                     {tenantInfo.description && (
-                      <div className="mt-2">
-                        <span className="text-gray-600 text-xs block mb-1">Description:</span>
-                        <span className="text-gray-700 text-xs leading-relaxed">{tenantInfo.description}</span>
+                      <div className="mt-3 pt-2 border-t border-gray-100">
+                        <span className="text-gray-600 font-medium text-xs block mb-2">Description:</span>
+                        <span className="text-gray-700 text-xs leading-relaxed bg-gray-50 p-2 rounded">{tenantInfo.description}</span>
                       </div>
                     )}
                   </div>
@@ -176,20 +176,24 @@ export function UserProfile({ className = '', showDetails = true, onProfileUpdat
 
               {/* Access Type Indicator */}
               <div className="border-t border-gray-200 pt-3">
-                <h4 className="font-semibold text-gray-900 text-sm mb-2">Access Type</h4>
-                <div className="flex items-center space-x-2">
+                <h4 className="font-semibold text-gray-900 text-sm mb-3">Access Type</h4>
+                <div className="space-y-2">
                   {isPropertyOwner(user) ? (
-                    <>
-                      <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                      <span className="text-sm text-blue-700 font-medium">Property Owner</span>
-                      <span className="text-xs text-gray-500">Full control over your property data</span>
-                    </>
+                    <div className="flex items-center space-x-3">
+                      <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                      <div>
+                        <span className="text-sm text-blue-700 font-medium">Property Owner</span>
+                        <p className="text-xs text-gray-500 mt-1">Full control over your property data</p>
+                      </div>
+                    </div>
                   ) : (
-                    <>
-                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                      <span className="text-sm text-green-700 font-medium">Stakeholder Access</span>
-                      <span className="text-xs text-gray-500">Controlled access to property data</span>
-                    </>
+                    <div className="flex items-center space-x-3">
+                      <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                      <div>
+                        <span className="text-sm text-green-700 font-medium">Stakeholder Access</span>
+                        <p className="text-xs text-gray-500 mt-1">Controlled access to property data</p>
+                      </div>
+                    </div>
                   )}
                 </div>
               </div>
@@ -197,12 +201,12 @@ export function UserProfile({ className = '', showDetails = true, onProfileUpdat
               {/* Permissions */}
               {permissions.length > 0 && (
                 <div className="border-t border-gray-200 pt-3">
-                  <h4 className="font-semibold text-gray-900 text-sm mb-2">Permissions</h4>
-                  <div className="flex flex-wrap gap-1">
+                  <h4 className="font-semibold text-gray-900 text-sm mb-3">Permissions</h4>
+                  <div className="flex flex-wrap gap-2">
                     {permissions.map((permission, index) => (
                       <span 
                         key={index}
-                        className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+                        className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 border border-blue-200"
                       >
                         {permission}
                       </span>
