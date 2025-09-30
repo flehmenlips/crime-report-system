@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { User, Tenant } from '@/types'
 import { users, tenants } from '@/lib/auth'
+import { CreateTenantModal } from './CreateTenantModal'
 
 interface SuperAdminDashboardProps {
   currentUser: User
@@ -27,6 +28,7 @@ export function SuperAdminDashboard({ currentUser, onClose }: SuperAdminDashboar
   const [selectedTab, setSelectedTab] = useState<'users' | 'tenants' | 'system'>('users')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [showCreateTenant, setShowCreateTenant] = useState(false)
 
   useEffect(() => {
     loadData()
@@ -460,9 +462,39 @@ export function SuperAdminDashboard({ currentUser, onClose }: SuperAdminDashboar
 
           {selectedTab === 'tenants' && (
             <div>
-              <h3 style={{ fontSize: '20px', fontWeight: '600', color: '#1f2937', marginBottom: '20px' }}>
-                Tenant Management ({allTenants.length} tenants)
-              </h3>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                <h3 style={{ fontSize: '20px', fontWeight: '600', color: '#1f2937', margin: 0 }}>
+                  Tenant Management ({allTenants.length} tenants)
+                </h3>
+                <button
+                  onClick={() => setShowCreateTenant(true)}
+                  style={{
+                    background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                    color: 'white',
+                    border: 'none',
+                    padding: '10px 16px',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    transition: 'all 0.2s ease'
+                  }}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-1px)'
+                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(16, 185, 129, 0.3)'
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)'
+                    e.currentTarget.style.boxShadow = 'none'
+                  }}
+                >
+                  <span>➕</span>
+                  Create Tenant
+                </button>
+              </div>
               
               <div style={{
                 background: '#f9fafb',
@@ -643,6 +675,14 @@ export function SuperAdminDashboard({ currentUser, onClose }: SuperAdminDashboar
           )}
         </div>
       </div>
+
+      {/* Create Tenant Modal */}
+      {showCreateTenant && (
+        <CreateTenantModal
+          onClose={() => setShowCreateTenant(false)}
+          onSuccess={loadData}
+        />
+      )}
     </div>
   )
 }
