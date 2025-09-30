@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { StolenItem } from '@/types'
 
 interface AdvancedSearchProps {
@@ -46,10 +46,11 @@ export function AdvancedSearch({ items, onClose, onResults }: AdvancedSearchProp
     hasDocuments: null
   })
 
-  const [searchResults, setSearchResults] = useState<StolenItem[]>([])
+  const [searchResultsState, setSearchResultsState] = useState<StolenItem[]>([])
   const [showResults, setShowResults] = useState(false)
   const [availableCategories, setAvailableCategories] = useState<string[]>([])
   const [availableTags, setAvailableTags] = useState<string[]>([])
+  const [searchDebounceTimer, setSearchDebounceTimer] = useState<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
     // Extract unique categories and tags from items
@@ -69,77 +70,181 @@ export function AdvancedSearch({ items, onClose, onResults }: AdvancedSearchProp
     setAvailableTags(Array.from(tags).sort())
   }, [items])
 
-  const performSearch = () => {
+  // Cleanup debounce timer on unmount
+  useEffect(() => {
+    return () => {
+      if (searchDebounceTimer) {
+        clearTimeout(searchDebounceTimer)
+      }
+    }
+  }, [searchDebounceTimer])
+
+  // Debounced search to prevent excessive operations
+  const performSearchDebounced = useCallback(() => {
+    if (searchDebounceTimer) {
+      clearTimeout(searchDebounceTimer)
+    }
+    
+    const timer = setTimeout(() => {
+      performSearch()
+    }, 300) // 300ms debounce
+    
+    setSearchDebounceTimer(timer)
+  }, [searchDebounceTimer])
+
+  // Memoized search results for performance
+  const searchResults = useMemo(() => {
+    if (!showResults) return []
+    
+    console.log('🔍 PERFORMING ADVANCED SEARCH with filters:', filters)
+    console.log('📊 SEARCHING THROUGH', items.length, 'ITEMS')
+    
+    const startTime = performance.now()
+    
     const results = items.filter(item => {
-      // Name filter
-      if (filters.name && !item.name.toLowerCase().includes(filters.name.toLowerCase())) {
-        return false
-      }
+      try {
+        // Name filter with null safety
+        if (filters.name && filters.name.trim()) {
+          const searchName = filters.name.toLowerCase().trim()
+          const itemName = (item.name || '').toLowerCase()
+          if (!itemName.includes(searchName)) {
+            return false
+          }
+        }
 
-      // Description filter
-      if (filters.description && !item.description.toLowerCase().includes(filters.description.toLowerCase())) {
-        return false
-      }
+        // Description filter with null safety
+        if (filters.description && filters.description.trim()) {
+          const searchDesc = filters.description.toLowerCase().trim()
+          const itemDesc = (item.description || '').toLowerCase()
+          if (!itemDesc.includes(searchDesc)) {
+            return false
+          }
+        }
 
-      // Category filter
-      if (filters.category && (item as any).category !== filters.category) {
-        return false
-      }
+        // Category filter with null safety
+        if (filters.category && filters.category.trim()) {
+          const itemCategory = (item as any).category || 'Uncategorized'
+          if (itemCategory !== filters.category) {
+            return false
+          }
+        }
 
-      // Tags filter
-      if (filters.tags.length > 0) {
-        const itemTags = (item as any).tags || []
-        const hasAllTags = filters.tags.every(tag => itemTags.includes(tag))
-        if (!hasAllTags) return false
-      }
+        // Tags filter with null safety
+        if (filters.tags && filters.tags.length > 0) {
+          const itemTags = (item as any).tags || []
+          if (!Array.isArray(itemTags)) {
+            return false
+          }
+          const hasAllTags = filters.tags.every(tag => itemTags.includes(tag))
+          if (!hasAllTags) return false
+        }
 
-      // Serial number filter
-      if (filters.serialNumber && !item.serialNumber?.toLowerCase().includes(filters.serialNumber.toLowerCase())) {
-        return false
-      }
+        // Serial number filter with null safety
+        if (filters.serialNumber && filters.serialNumber.trim()) {
+          const searchSerial = filters.serialNumber.toLowerCase().trim()
+          const itemSerial = (item.serialNumber || '').toLowerCase()
+          if (!itemSerial.includes(searchSerial)) {
+            return false
+          }
+        }
 
-      // Value range filter
-      if (filters.minValue !== null && item.estimatedValue < filters.minValue) {
-        return false
-      }
-      if (filters.maxValue !== null && item.estimatedValue > filters.maxValue) {
-        return false
-      }
+        // Value range filter with null safety
+        if (filters.minValue !== null && filters.minValue !== undefined) {
+          const itemValue = item.estimatedValue || 0
+          if (itemValue < filters.minValue) {
+            return false
+          }
+        }
+        if (filters.maxValue !== null && filters.maxValue !== undefined) {
+          const itemValue = item.estimatedValue || 0
+          if (itemValue > filters.maxValue) {
+            return false
+          }
+        }
 
-      // Date last seen range filter
-      if (filters.dateLastSeenFrom && item.dateLastSeen < filters.dateLastSeenFrom) {
-        return false
-      }
-      if (filters.dateLastSeenTo && item.dateLastSeen > filters.dateLastSeenTo) {
-        return false
-      }
+        // Date last seen range filter with validation
+        if (filters.dateLastSeenFrom && filters.dateLastSeenFrom.trim()) {
+          const itemDate = item.dateLastSeen || ''
+          if (itemDate < filters.dateLastSeenFrom) {
+            return false
+          }
+        }
+        if (filters.dateLastSeenTo && filters.dateLastSeenTo.trim()) {
+          const itemDate = item.dateLastSeen || ''
+          if (itemDate > filters.dateLastSeenTo) {
+            return false
+          }
+        }
 
-      // Purchase date range filter
-      if (filters.purchaseDateFrom && item.purchaseDate < filters.purchaseDateFrom) {
+        // Purchase date range filter with validation
+        if (filters.purchaseDateFrom && filters.purchaseDateFrom.trim()) {
+          const itemDate = item.purchaseDate || ''
+          if (itemDate < filters.purchaseDateFrom) {
+            return false
+          }
+        }
+        if (filters.purchaseDateTo && filters.purchaseDateTo.trim()) {
+          const itemDate = item.purchaseDate || ''
+          if (itemDate > filters.purchaseDateTo) {
+            return false
+          }
+        }
+
+        // Location filter with null safety
+        if (filters.location && filters.location.trim()) {
+          const searchLocation = filters.location.toLowerCase().trim()
+          const itemLocation = (item.locationLastSeen || '').toLowerCase()
+          if (!itemLocation.includes(searchLocation)) {
+            return false
+          }
+        }
+
+        // Evidence filters with null safety
+        if (filters.hasPhotos === true) {
+          const photoCount = item.evidence?.filter(e => e.type === 'photo')?.length || 0
+          if (photoCount === 0) return false
+        }
+        if (filters.hasPhotos === false) {
+          const photoCount = item.evidence?.filter(e => e.type === 'photo')?.length || 0
+          if (photoCount > 0) return false
+        }
+        if (filters.hasVideos === true) {
+          const videoCount = item.evidence?.filter(e => e.type === 'video')?.length || 0
+          if (videoCount === 0) return false
+        }
+        if (filters.hasVideos === false) {
+          const videoCount = item.evidence?.filter(e => e.type === 'video')?.length || 0
+          if (videoCount > 0) return false
+        }
+        if (filters.hasDocuments === true) {
+          const docCount = item.evidence?.filter(e => e.type === 'document')?.length || 0
+          if (docCount === 0) return false
+        }
+        if (filters.hasDocuments === false) {
+          const docCount = item.evidence?.filter(e => e.type === 'document')?.length || 0
+          if (docCount > 0) return false
+        }
+
+        return true
+      } catch (error) {
+        console.error('Error filtering item:', item.id, error)
         return false
       }
-      if (filters.purchaseDateTo && item.purchaseDate > filters.purchaseDateTo) {
-        return false
-      }
-
-      // Location filter
-      if (filters.location && !item.locationLastSeen.toLowerCase().includes(filters.location.toLowerCase())) {
-        return false
-      }
-
-      // Evidence filters
-      if (filters.hasPhotos === true && item.evidence?.filter(e => e.type === 'photo')?.length === 0) { return false }
-      if (filters.hasPhotos === false && item.evidence?.filter(e => e.type === 'photo')?.length > 0) { return false }
-      if (filters.hasVideos === true && item.evidence?.filter(e => e.type === 'video')?.length === 0) { return false }
-      if (filters.hasVideos === false && item.evidence?.filter(e => e.type === 'video')?.length > 0) { return false }
-      if (filters.hasDocuments === true && item.evidence?.filter(e => e.type === 'document')?.length === 0) { return false }
-      if (filters.hasDocuments === false && item.evidence?.filter(e => e.type === 'document')?.length > 0) { return false }
-
-      return true
     })
 
-    setSearchResults(results)
+    const endTime = performance.now()
+    const searchTime = endTime - startTime
+    
+    console.log(`✅ SEARCH COMPLETED: ${results.length} results in ${searchTime.toFixed(2)}ms`)
+    console.log('📊 SEARCH RESULTS:', results.slice(0, 5).map(r => ({ id: r.id, name: r.name })))
+
+    return results
+  }, [items, filters, showResults])
+
+  const performSearch = () => {
     setShowResults(true)
+    setSearchResultsState(searchResults)
+    onResults(searchResults)
   }
 
   const clearFilters = () => {
