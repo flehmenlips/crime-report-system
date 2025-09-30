@@ -66,55 +66,113 @@ export function TenantInfo({ user, className = '' }: TenantInfoProps) {
   }
 
   return (
-    <div className={`bg-white/10 backdrop-blur-md rounded-xl border border-white/20 p-4 ${className}`}>
-      <div className="flex items-center space-x-3 mb-3">
-        <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-          isPropertyOwner(user) 
-            ? 'bg-gradient-to-br from-blue-500 to-indigo-600' 
-            : 'bg-gradient-to-br from-green-500 to-emerald-600'
-        }`}>
-          <span className="text-white text-lg">
-            {isPropertyOwner(user) ? '🏠' : '🏢'}
+    <div style={{
+      background: 'rgba(255, 255, 255, 0.1)',
+      backdropFilter: 'blur(12px)',
+      borderRadius: '12px',
+      border: '1px solid rgba(255, 255, 255, 0.2)',
+      padding: '16px',
+      ...(className ? { className } : {})
+    }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+        <div style={{
+          width: '40px',
+          height: '40px',
+          borderRadius: '50%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: isPropertyOwner(user) 
+            ? 'linear-gradient(135deg, #3b82f6 0%, #6366f1 100%)'
+            : 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)'
+        }}>
+          <span style={{
+            color: 'white',
+            fontSize: '16px',
+            fontWeight: 'bold'
+          }}>
+            {user.name.charAt(0).toUpperCase()}
           </span>
         </div>
-        <div className="flex-1">
-          <h3 className="text-white font-semibold text-sm truncate">
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <h3 style={{
+            color: 'white',
+            fontWeight: '600',
+            fontSize: '14px',
+            margin: '0 0 2px 0',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap'
+          }}>
             {tenant.name}
           </h3>
-          <p className="text-white/70 text-xs">
+          <p style={{
+            color: 'rgba(255, 255, 255, 0.7)',
+            fontSize: '12px',
+            margin: '0'
+          }}>
             {isPropertyOwner(user) ? 'Your Property' : 'Accessing Property'}
           </p>
         </div>
-        <div className={`w-2 h-2 rounded-full ${
-          tenant.isActive ? 'bg-green-400' : 'bg-red-400'
-        }`} title={tenant.isActive ? 'Active' : 'Inactive'}></div>
+        <div style={{
+          width: '8px',
+          height: '8px',
+          borderRadius: '50%',
+          backgroundColor: tenant.isActive ? '#22c55e' : '#ef4444'
+        }} title={tenant.isActive ? 'Active' : 'Inactive'}></div>
       </div>
 
       {tenant.description && (
-        <div className="mt-3 pt-3 border-t border-white/20">
-          <p className="text-white/80 text-xs leading-relaxed">
+        <div style={{ marginTop: '12px', paddingTop: '12px', borderTop: '1px solid rgba(255, 255, 255, 0.2)' }}>
+          <p style={{
+            color: 'rgba(255, 255, 255, 0.8)',
+            fontSize: '12px',
+            lineHeight: '1.5',
+            margin: '0'
+          }}>
             {tenant.description}
           </p>
         </div>
       )}
 
-      <div className="mt-3 pt-3 border-t border-white/20">
-        <div className="flex items-center justify-between text-xs">
-          <div className="flex items-center space-x-2">
-            <div className={`w-2 h-2 rounded-full ${
-              isPropertyOwner(user) ? 'bg-blue-400' : 'bg-green-400'
-            }`}></div>
-            <span className="text-white/70">
+      <div style={{ marginTop: '12px', paddingTop: '12px', borderTop: '1px solid rgba(255, 255, 255, 0.2)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '12px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div style={{
+              width: '8px',
+              height: '8px',
+              borderRadius: '50%',
+              backgroundColor: isPropertyOwner(user) ? '#3b82f6' : '#22c55e'
+            }}></div>
+            <span style={{ color: 'rgba(255, 255, 255, 0.7)' }}>
               {isPropertyOwner(user) ? 'Owner Access' : 'Stakeholder Access'}
             </span>
           </div>
           {user.accessLevel && (
-            <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-              user.accessLevel === 'owner' ? 'bg-purple-100 text-purple-800' :
-              user.accessLevel === 'staff' ? 'bg-blue-100 text-blue-800' :
-              user.accessLevel === 'stakeholder' ? 'bg-green-100 text-green-800' :
-              'bg-gray-100 text-gray-800'
-            }`}>
+            <span style={{
+              padding: '4px 8px',
+              borderRadius: '9999px',
+              fontSize: '12px',
+              fontWeight: '500',
+              border: '1px solid',
+              ...(user.accessLevel === 'owner' ? {
+                backgroundColor: 'rgba(147, 51, 234, 0.1)',
+                color: '#a855f7',
+                borderColor: 'rgba(168, 85, 247, 0.3)'
+              } : user.accessLevel === 'staff' ? {
+                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                color: '#3b82f6',
+                borderColor: 'rgba(59, 130, 246, 0.3)'
+              } : user.accessLevel === 'stakeholder' ? {
+                backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                color: '#22c55e',
+                borderColor: 'rgba(34, 197, 94, 0.3)'
+              } : {
+                backgroundColor: 'rgba(107, 114, 128, 0.1)',
+                color: '#6b7280',
+                borderColor: 'rgba(107, 114, 128, 0.3)'
+              })
+            }}>
               {user.accessLevel.charAt(0).toUpperCase() + user.accessLevel.slice(1)}
             </span>
           )}
@@ -122,35 +180,35 @@ export function TenantInfo({ user, className = '' }: TenantInfoProps) {
       </div>
 
       {/* Access Level Details */}
-      <div className="mt-3 pt-3 border-t border-white/20">
-        <div className="space-y-2 text-xs">
+      <div style={{ marginTop: '12px', paddingTop: '12px', borderTop: '1px solid rgba(255, 255, 255, 0.2)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '12px' }}>
           {isPropertyOwner(user) ? (
-            <div className="text-white/80">
-              <div className="flex items-center space-x-2 mb-1">
-                <span className="text-blue-300">✓</span>
+            <div style={{ color: 'rgba(255, 255, 255, 0.8)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                <span style={{ color: '#60a5fa' }}>✓</span>
                 <span>Full data access and management</span>
               </div>
-              <div className="flex items-center space-x-2 mb-1">
-                <span className="text-blue-300">✓</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                <span style={{ color: '#60a5fa' }}>✓</span>
                 <span>Add, edit, and delete items</span>
               </div>
-              <div className="flex items-center space-x-2">
-                <span className="text-blue-300">✓</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ color: '#60a5fa' }}>✓</span>
                 <span>Upload evidence and generate reports</span>
               </div>
             </div>
           ) : (
-            <div className="text-white/80">
-              <div className="flex items-center space-x-2 mb-1">
-                <span className="text-green-300">✓</span>
+            <div style={{ color: 'rgba(255, 255, 255, 0.8)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                <span style={{ color: '#4ade80' }}>✓</span>
                 <span>Read-only access to property data</span>
               </div>
-              <div className="flex items-center space-x-2 mb-1">
-                <span className="text-green-300">✓</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                <span style={{ color: '#4ade80' }}>✓</span>
                 <span>Advanced search and analytics</span>
               </div>
-              <div className="flex items-center space-x-2">
-                <span className="text-green-300">✓</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ color: '#4ade80' }}>✓</span>
                 <span>Generate reports and export data</span>
               </div>
             </div>

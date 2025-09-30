@@ -76,8 +76,8 @@ export function UserProfile({ className = '', showDetails = true, onProfileUpdat
         onClick={() => setIsExpanded(!isExpanded)}
       >
         <div className={`w-10 h-10 bg-gradient-to-br ${getRoleColor(user.role)} rounded-full flex items-center justify-center shadow-lg`}>
-          <span className="text-white text-lg">
-            {getRoleIcon(user.role)}
+          <span className="text-white text-lg font-bold">
+            {user.name.charAt(0).toUpperCase()}
           </span>
         </div>
         
@@ -101,17 +101,22 @@ export function UserProfile({ className = '', showDetails = true, onProfileUpdat
       {isExpanded && (
         <div className="absolute top-full right-0 mt-2 w-80 bg-white/95 backdrop-blur-xl rounded-xl shadow-2xl border border-white/20 z-50 overflow-hidden" style={{ width: '320px', minWidth: '320px', maxWidth: '320px' }}>
           <div className="p-6">
-            {/* Header - Modern, clean design - TESTING DEPLOYMENT */}
-            <div className="text-center mb-6">
-              <div className={`w-16 h-16 bg-gradient-to-br ${getRoleColor(user.role)} rounded-full flex items-center justify-center shadow-lg mx-auto mb-3`}>
-                <span className="text-white text-2xl">
-                  {getRoleIcon(user.role)}
-                </span>
-              </div>
-              <h3 className="font-bold text-gray-900 text-xl mb-1">
+            {/* Header - Modern, clean design */}
+            <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+              <h3 style={{
+                fontWeight: 'bold',
+                color: '#111827',
+                fontSize: '20px',
+                marginBottom: '4px',
+                margin: '0 0 4px 0'
+              }}>
                 {user.name}
               </h3>
-              <p className="text-gray-600 text-sm">
+              <p style={{
+                color: '#6b7280',
+                fontSize: '14px',
+                margin: '0'
+              }}>
                 {getRoleDisplayName(user.role)}
               </p>
             </div>
