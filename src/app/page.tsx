@@ -33,6 +33,7 @@ import { DashboardLoading, StatsLoading, ItemsLoading, ErrorState, EmptyState } 
 import { ExportManager } from '@/components/ExportManager'
 import { QuickExport } from '@/components/QuickExport'
 import { ReportGenerator } from '@/components/ReportGenerator'
+import { CSVImport } from '@/components/CSVImport'
 
 export default function Home() {
   const router = useRouter()
@@ -55,6 +56,7 @@ export default function Home() {
   const [showEvidenceManagement, setShowEvidenceManagement] = useState(false)
   const [evidenceManagementItem, setEvidenceManagementItem] = useState<StolenItem | null>(null)
   const [showBulkUpload, setShowBulkUpload] = useState(false)
+  const [showCSVImport, setShowCSVImport] = useState(false)
   const [viewMode, setViewMode] = useState<'cards' | 'list'>('cards')
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false)
   const [showGenerateReport, setShowGenerateReport] = useState(false)
@@ -959,6 +961,40 @@ export default function Home() {
               >
                 <span style={{ fontSize: '20px' }}>📤</span>
                 Bulk Upload
+              </button>
+              )}
+
+              {/* CSV Import - Only for users who can write */}
+              {canBulkUpload() && (
+              <button
+                onClick={() => setShowCSVImport(true)}
+                style={{
+                  background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 50%, #6d28d9 100%)',
+                  color: 'white',
+                  border: 'none',
+                  padding: '20px 32px',
+                  borderRadius: '16px',
+                  cursor: 'pointer',
+                  fontWeight: '600',
+                  fontSize: '18px',
+                  boxShadow: '0 10px 25px rgba(139, 92, 246, 0.3)',
+                  transition: 'all 0.3s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '12px'
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-4px)'
+                  e.currentTarget.style.boxShadow = '0 20px 40px rgba(139, 92, 246, 0.4)'
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)'
+                  e.currentTarget.style.boxShadow = '0 10px 25px rgba(139, 92, 246, 0.3)'
+                }}
+              >
+                <span style={{ fontSize: '20px' }}>📊</span>
+                CSV Import
               </button>
               )}
               
@@ -2165,6 +2201,26 @@ export default function Home() {
               items={isFiltered ? filteredItems : allItems}
               user={user}
               onClose={() => setShowReportGenerator(false)}
+            />
+          )}
+
+          {/* CSV Import Modal */}
+          {showCSVImport && (
+            <CSVImport
+              items={isFiltered ? filteredItems : allItems}
+              onClose={() => setShowCSVImport(false)}
+              onSuccess={async () => {
+                // Refresh the items list after successful import
+                try {
+                  const updatedItems = await getAllItems()
+                  setAllItems(updatedItems)
+                  const updatedTotal = updatedItems.reduce((sum, item) => sum + item.estimatedValue, 0)
+                  setTotalValue(updatedTotal)
+                } catch (error) {
+                  console.error('Error refreshing items after CSV import:', error)
+                }
+                setShowCSVImport(false)
+              }}
             />
           )}
         </div>
