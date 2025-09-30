@@ -28,10 +28,10 @@ export function TenantUserManagement({ tenant, onClose, onUpdate }: TenantUserMa
   const loadTenantUsers = async () => {
     try {
       setLoading(true)
-      const response = await fetch(`/api/admin/tenants/${tenant.id}`)
+      const response = await fetch('/api/tenant/users')
       if (response.ok) {
         const data = await response.json()
-        setUsers(data.tenant.users || [])
+        setUsers(data.users || [])
       } else {
         setError('Failed to load tenant users')
       }

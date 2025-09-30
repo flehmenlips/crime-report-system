@@ -7,21 +7,25 @@ import { UserProfileManagement } from './UserProfileManagement'
 interface UserProfileProps {
   className?: string
   showDetails?: boolean
+  onProfileUpdate?: (updatedUser: User) => void
 }
 
-export function UserProfile({ className = '', showDetails = true }: UserProfileProps) {
+export function UserProfile({ className = '', showDetails = true, onProfileUpdate }: UserProfileProps) {
   const [user, setUser] = useState<User | null>(null)
   const [isExpanded, setIsExpanded] = useState(false)
   const [showProfileManagement, setShowProfileManagement] = useState(false)
 
   const handleProfileUpdate = (updatedUser: User) => {
     setUser(updatedUser)
+    if (onProfileUpdate) {
+      onProfileUpdate(updatedUser)
+    }
   }
 
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const response = await fetch('/api/auth/me')
+        const response = await fetch('/api/user/profile')
         if (response.ok) {
           const userData = await response.json()
           setUser(userData.user)

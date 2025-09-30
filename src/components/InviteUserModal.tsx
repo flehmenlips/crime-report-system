@@ -27,26 +27,23 @@ export function InviteUserModal({ tenantId, tenantName, onClose, onSuccess }: In
     setError('')
 
     try {
-      // First, register the user
-      const registerResponse = await fetch('/api/auth/register', {
+      // Invite user to existing tenant
+      const inviteResponse = await fetch('/api/tenant/users', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          ...formData,
-          tenantId: tenantId // Associate with this tenant
-        }),
+        body: JSON.stringify(formData),
       })
 
-      const registerResult = await registerResponse.json()
+      const inviteResult = await inviteResponse.json()
 
-      if (registerResponse.ok) {
+      if (inviteResponse.ok) {
         alert(`✅ User "${formData.name}" has been successfully added to ${tenantName}!`)
         onSuccess()
         onClose()
       } else {
-        setError(registerResult.error || 'Failed to create user')
+        setError(inviteResult.error || 'Failed to invite user')
       }
     } catch (error) {
       console.error('Error inviting user:', error)

@@ -869,8 +869,13 @@ export default function Home() {
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
                 {/* <NotificationBell /> */}
-                <TenantInfo user={user} />
-                <UserProfile showDetails={true} />
+              <TenantInfo user={user} />
+              <UserProfile 
+                showDetails={true} 
+                onProfileUpdate={(updatedUser) => {
+                  setUser(updatedUser)
+                }}
+              />
               </div>
             </div>
           </div>
