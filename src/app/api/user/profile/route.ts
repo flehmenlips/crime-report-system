@@ -1,6 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getCurrentUser } from '@/lib/auth-server'
-import { users } from '@/lib/auth'
+import { prisma } from '@/lib/prisma'
+import { Role } from '@/lib/auth'
+
+function getDefaultPermissions(role: Role): string[] {
+  switch (role) {
+    case 'property_owner':
+      return ['read:own', 'write:own', 'upload:evidence', 'generate:reports']
+    case 'law_enforcement':
+      return ['read:all', 'write:all', 'admin:users', 'admin:system']
+    case 'super_admin':
+      return ['read:all', 'write:all', 'admin:users', 'admin:system', 'admin:tenants', 'super:admin']
+    case 'insurance_agent':
+    case 'broker':
+    case 'banker':
+    case 'asset_manager':
+      return ['read:own', 'write:own', 'upload:evidence']
+    case 'assistant':
+    case 'secretary':
+    case 'manager':
+    case 'executive_assistant':
+      return ['read:own', 'write:own']
+    default:
+      return ['read:own', 'write:own']
+  }
+}
 
 export async function GET() {
   try {
@@ -10,16 +34,34 @@ export async function GET() {
       return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
     }
 
-    // Get full user data from hardcoded users array
-    const fullUser = users.find(u => u.id === user.id)
+    // Get full user data from database
+    const fullUser = await prisma.user.findUnique({
+      where: { id: user.id },
+      include: {
+        tenant: true
+      }
+    })
     
     if (!fullUser) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 })
     }
 
-    // Return user without password
-    const { password, ...userWithoutPassword } = fullUser
-    return NextResponse.json({ user: userWithoutPassword })
+    // Convert Date fields to string for compatibility
+    const { password, lastLoginAt, createdAt, updatedAt, tenant, ...userWithoutPassword } = fullUser
+    const formattedUser = {
+      ...userWithoutPassword,
+      createdAt: createdAt.toISOString(),
+      updatedAt: updatedAt.toISOString(),
+      lastLoginAt: lastLoginAt?.toISOString() || '',
+      tenant: tenant ? {
+        ...tenant,
+        createdAt: tenant.createdAt.toISOString(),
+        updatedAt: tenant.updatedAt.toISOString()
+      } : undefined,
+      permissions: getDefaultPermissions(fullUser.role) // Add permissions back from role
+    }
+
+    return NextResponse.json({ user: formattedUser })
 
   } catch (error) {
     console.error('Error fetching user profile:', error)
@@ -48,14 +90,14 @@ export async function PUT(request: NextRequest) {
       )
     }
 
-    // Find the user in the hardcoded array
-    const userIndex = users.findIndex(u => u.id === user.id)
-    if (userIndex === -1) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 })
-    }
-
     // Check if email is already taken by another user
-    const existingUser = users.find(u => u.email === profileData.email && u.id !== user.id)
+    const existingUser = await prisma.user.findFirst({
+      where: { 
+        email: profileData.email,
+        id: { not: user.id }
+      }
+    })
+    
     if (existingUser) {
       return NextResponse.json(
         { error: 'Email is already in use by another account' },
@@ -63,40 +105,43 @@ export async function PUT(request: NextRequest) {
       )
     }
 
-    // Update user profile in the hardcoded array
-    users[userIndex] = {
-      ...users[userIndex],
-      name: profileData.name,
-      email: profileData.email,
-      phone: profileData.phone || '',
-      address: profileData.address || '',
-      city: profileData.city || '',
-      state: profileData.state || '',
-      zipCode: profileData.zipCode || '',
-      country: profileData.country || '',
-      company: profileData.company || '',
-      title: profileData.title || '',
-      bio: profileData.bio || '',
-      updatedAt: new Date().toISOString(),
-      createdAt: users[userIndex].createdAt || new Date().toISOString(),
-      // Ensure all required fields are present
-      accessLevel: users[userIndex].accessLevel || 'owner',
-      tenantId: users[userIndex].tenantId || 'tenant-1',
-      tenant: users[userIndex].tenant || {
-        id: 'tenant-1',
-        name: 'Birkenfeld Farm',
-        description: 'Original Birkenfeld Farm theft case',
-        isActive: true,
-        createdAt: '2023-09-01T00:00:00Z',
-        updatedAt: '2023-09-19T00:00:00Z'
+    // Update user profile in database
+    const updatedUser = await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        name: profileData.name,
+        email: profileData.email,
+        phone: profileData.phone || '',
+        address: profileData.address || '',
+        city: profileData.city || '',
+        state: profileData.state || '',
+        zipCode: profileData.zipCode || '',
+        country: profileData.country || '',
+        company: profileData.company || '',
+        title: profileData.title || '',
+        bio: profileData.bio || '',
+      },
+      include: {
+        tenant: true
       }
+    })
+
+    // Convert Date fields to string for compatibility
+    const { password, lastLoginAt, createdAt, updatedAt, tenant, ...userWithoutPassword } = updatedUser
+    const formattedUser = {
+      ...userWithoutPassword,
+      createdAt: createdAt.toISOString(),
+      updatedAt: updatedAt.toISOString(),
+      lastLoginAt: lastLoginAt?.toISOString() || '',
+      tenant: tenant ? {
+        ...tenant,
+        createdAt: tenant.createdAt.toISOString(),
+        updatedAt: tenant.updatedAt.toISOString()
+      } : undefined,
+      permissions: getDefaultPermissions(updatedUser.role) // Add permissions back from role
     }
 
-    const updatedUser = users[userIndex]
-
-    // Return user without password
-    const { password, ...userWithoutPassword } = updatedUser
-    return NextResponse.json({ user: userWithoutPassword })
+    return NextResponse.json({ user: formattedUser })
 
   } catch (error) {
     console.error('Error updating user profile:', error)
