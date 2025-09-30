@@ -1,6 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { users, tenants, Role, AccessLevel } from '@/lib/auth'
 
+function getDefaultPermissions(role: Role): string[] {
+  switch (role) {
+    case 'property_owner':
+      return ['read:own', 'write:own', 'upload:evidence', 'generate:reports']
+    case 'law_enforcement':
+      return ['read:all', 'write:all', 'admin:users', 'admin:system']
+    case 'super_admin':
+      return ['read:all', 'write:all', 'admin:users', 'admin:system', 'admin:tenants', 'super:admin']
+    case 'insurance_agent':
+    case 'broker':
+    case 'banker':
+    case 'asset_manager':
+      return ['read:own', 'write:own', 'upload:evidence']
+    case 'assistant':
+    case 'secretary':
+    case 'manager':
+    case 'executive_assistant':
+      return ['read:own', 'write:own']
+    default:
+      return ['read:own', 'write:own']
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     const { username, email, name, password, role = 'property_owner' } = await request.json()
@@ -42,23 +65,18 @@ export async function POST(request: NextRequest) {
     // Create new user (generate new ID)
     const newId = (Math.max(...users.map(u => parseInt(u.id)), 0) + 1).toString()
     
-    // Create new tenant for property owners, use existing for others
-    const defaultTenant = tenants[0] // Use Birkenfeld Farm as default
-    let userTenant = defaultTenant
-    
-    if (role === 'property_owner') {
-      // Create new tenant for new property owner
-      const newTenantId = `tenant-${Date.now()}`
-      userTenant = {
-        id: newTenantId,
-        name: `${name}'s Property`,
-        description: `Property managed by ${name}`,
-        isActive: true,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      }
-      tenants.push(userTenant)
+    // Create new tenant for ALL users to ensure proper isolation
+    // Each user gets their own tenant for complete data separation
+    const newTenantId = `tenant-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+    let userTenant = {
+      id: newTenantId,
+      name: role === 'property_owner' ? `${name}'s Property` : `${name}'s Account`,
+      description: role === 'property_owner' ? `Property managed by ${name}` : `Account for ${name} (${role})`,
+      isActive: true,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     }
+    tenants.push(userTenant)
     
     const newUser = {
       id: newId,
@@ -68,7 +86,7 @@ export async function POST(request: NextRequest) {
       password, // In a real app, you'd hash this
       role: role as Role,
       accessLevel: (role === 'property_owner' ? 'owner' : 'stakeholder') as AccessLevel,
-      permissions: ['read:own', 'write:own'], // Default permissions
+      permissions: getDefaultPermissions(role as Role), // Role-specific permissions
       phone: '',
       address: '',
       city: '',

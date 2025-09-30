@@ -96,6 +96,7 @@ enum Role {
   secretary
   manager
   executive_assistant
+  super_admin
 }
 
 enum AccessLevel {

@@ -52,7 +52,7 @@ export interface AuthCredentials {
   password: string;
 }
 
-export type Role = 'property_owner' | 'law_enforcement' | 'insurance_agent' | 'broker' | 'banker' | 'asset_manager' | 'assistant' | 'secretary' | 'manager' | 'executive_assistant'
+export type Role = 'property_owner' | 'law_enforcement' | 'insurance_agent' | 'broker' | 'banker' | 'asset_manager' | 'assistant' | 'secretary' | 'manager' | 'executive_assistant' | 'super_admin'
 
 export type AccessLevel = 'owner' | 'staff' | 'stakeholder' | 'view_only'
 

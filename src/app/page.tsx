@@ -24,7 +24,7 @@ import { AdvancedSearch } from '@/components/AdvancedSearch'
 import { GenerateReport } from '@/components/GenerateReport'
 import { StolenItem, ItemFormData } from '@/types'
 import { getAllItems, getTotalValue, formatCurrency, formatDate, addItem } from '@/lib/data'
-import { User, getDashboardTitle, getRoleDisplayName, canWriteAll, canReadAll, canManageUsers, canAccessAdmin } from '@/lib/auth'
+import { User, getDashboardTitle, getRoleDisplayName, canWriteAll, canReadAll, canManageUsers, canAccessAdmin, canSuperAdmin } from '@/lib/auth'
 import { UserProfile } from '@/components/UserProfile'
 import { AnalyticsDashboard } from '@/components/AnalyticsDashboard'
 import { StakeholderDashboard } from '@/components/StakeholderDashboard'
@@ -37,6 +37,7 @@ import { CSVImport } from '@/components/CSVImport'
 import { TenantIsolationStressTest } from '@/components/TenantIsolationStressTest'
 import { PerformanceStressTest } from '@/components/PerformanceStressTest'
 import { EdgeCaseStressTest } from '@/components/EdgeCaseStressTest'
+import { SuperAdminDashboard } from '@/components/SuperAdminDashboard'
 
 export default function Home() {
   const router = useRouter()
@@ -63,6 +64,7 @@ export default function Home() {
   const [showTenantIsolationTest, setShowTenantIsolationTest] = useState(false)
   const [showPerformanceTest, setShowPerformanceTest] = useState(false)
   const [showEdgeCaseTest, setShowEdgeCaseTest] = useState(false)
+  const [showSuperAdminDashboard, setShowSuperAdminDashboard] = useState(false)
   const [viewMode, setViewMode] = useState<'cards' | 'list'>('cards')
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false)
   const [showGenerateReport, setShowGenerateReport] = useState(false)
@@ -1291,6 +1293,40 @@ export default function Home() {
                 <span style={{ fontSize: '20px' }}>📊</span>
                 Analytics
               </button>
+              
+              {/* Super Admin Dashboard - Only available to super_admin users */}
+              {canSuperAdmin(user) && (
+                <button
+                  onClick={() => setShowSuperAdminDashboard(true)}
+                  style={{
+                    background: 'linear-gradient(135deg, #dc2626 0%, #b91c1c 50%, #991b1b 100%)',
+                    color: 'white',
+                    border: 'none',
+                    padding: '20px 32px',
+                    borderRadius: '16px',
+                    cursor: 'pointer',
+                    fontWeight: '600',
+                    fontSize: '18px',
+                    boxShadow: '0 10px 25px rgba(220, 38, 38, 0.3)',
+                    transition: 'all 0.3s ease',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '12px'
+                  }}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-4px)'
+                    e.currentTarget.style.boxShadow = '0 20px 40px rgba(220, 38, 38, 0.4)'
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)'
+                    e.currentTarget.style.boxShadow = '0 10px 25px rgba(220, 38, 38, 0.3)'
+                  }}
+                >
+                  <span style={{ fontSize: '20px' }}>👑</span>
+                  Super Admin
+                </button>
+              )}
             </div>
           </div>
 
@@ -2456,6 +2492,14 @@ export default function Home() {
             <EdgeCaseStressTest
               currentUser={user}
               onClose={() => setShowEdgeCaseTest(false)}
+            />
+          )}
+
+          {/* Super Admin Dashboard Modal */}
+          {showSuperAdminDashboard && user && (
+            <SuperAdminDashboard
+              currentUser={user}
+              onClose={() => setShowSuperAdminDashboard(false)}
             />
           )}
         </div>

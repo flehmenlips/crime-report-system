@@ -632,6 +632,7 @@ export function RegistrationModal({ onClose, onSuccess }: RegistrationModalProps
                 }}
               >
                 <option value="property_owner" style={{ background: '#1f2937', color: 'white' }}>Property Owner</option>
+                <option value="law_enforcement" style={{ background: '#1f2937', color: 'white' }}>Law Enforcement</option>
                 <option value="insurance_agent" style={{ background: '#1f2937', color: 'white' }}>Insurance Agent</option>
                 <option value="broker" style={{ background: '#1f2937', color: 'white' }}>Equipment Broker</option>
                 <option value="banker" style={{ background: '#1f2937', color: 'white' }}>Banker</option>

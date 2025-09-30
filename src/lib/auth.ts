@@ -1,4 +1,4 @@
-export type Role = 'property_owner' | 'law_enforcement' | 'insurance_agent' | 'broker' | 'banker' | 'asset_manager' | 'assistant' | 'secretary' | 'manager' | 'executive_assistant'
+export type Role = 'property_owner' | 'law_enforcement' | 'insurance_agent' | 'broker' | 'banker' | 'asset_manager' | 'assistant' | 'secretary' | 'manager' | 'executive_assistant' | 'super_admin'
 export type AccessLevel = 'owner' | 'staff' | 'stakeholder' | 'view_only'
 
 export interface Tenant {
@@ -59,6 +59,38 @@ export const tenants = [
 
 // Enhanced user database with all stakeholder roles
 export const users = [
+  // Super Admin - has access to all tenants and system management
+  {
+    id: "0",
+    name: "System Administrator",
+    email: "admin@system.com",
+    username: "superadmin",
+    password: "admin123",
+    role: "super_admin" as Role,
+    accessLevel: "owner" as AccessLevel,
+    permissions: ["read:all", "write:all", "admin:users", "admin:system", "admin:tenants", "super:admin"],
+    phone: "+1 (555) 000-0000",
+    address: "System Admin",
+    city: "System",
+    state: "System",
+    zipCode: "00000",
+    country: "United States",
+    company: "Crime Report System",
+    title: "Super Administrator",
+    bio: "System administrator with full access to all tenants and system management.",
+    tenantId: "system-tenant",
+    tenant: {
+      id: "system-tenant",
+      name: "System Administration",
+      description: "System administration tenant",
+      isActive: true,
+      createdAt: "2023-09-01T00:00:00Z",
+      updatedAt: "2023-09-19T00:00:00Z"
+    },
+    createdAt: "2023-09-01T00:00:00Z",
+    updatedAt: "2023-09-19T00:00:00Z"
+  },
+  
   // Law Enforcement - has access to all tenants
   {
     id: "1",
@@ -229,6 +261,14 @@ export function canManageUsers(user: User | null): boolean {
 
 export function canAccessAdmin(user: User | null): boolean {
   return hasPermission(user, 'admin:system')
+}
+
+export function canSuperAdmin(user: User | null): boolean {
+  return user?.role === 'super_admin'
+}
+
+export function canAccessAllTenants(user: User | null): boolean {
+  return user?.role === 'super_admin' || user?.role === 'law_enforcement'
 }
 
 // Role-based UI access helpers

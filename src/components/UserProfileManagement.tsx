@@ -284,6 +284,7 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="property_owner">Property Owner</option>
+                <option value="law_enforcement">Law Enforcement</option>
                 <option value="insurance_agent">Insurance Agent</option>
                 <option value="broker">Equipment Broker</option>
                 <option value="banker">Banker</option>

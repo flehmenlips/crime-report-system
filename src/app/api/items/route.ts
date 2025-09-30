@@ -6,8 +6,9 @@ import { StolenItem, SearchFilters } from '@/types'
 async function getAllItems(userTenantId?: string, userRole?: string): Promise<StolenItem[]> {
   try {
     // CRITICAL: Filter by tenantId for proper data isolation
-    // Law enforcement can access all tenants, others only their own
-    const whereClause = (userRole !== 'law_enforcement' && userTenantId) ? { tenantId: userTenantId } : {}
+    // Super admin and law enforcement can access all tenants, others only their own
+    const canAccessAllTenants = userRole === 'super_admin' || userRole === 'law_enforcement'
+    const whereClause = (!canAccessAllTenants && userTenantId) ? { tenantId: userTenantId } : {}
     
     const items = await prisma.stolenItem.findMany({
       where: whereClause,
@@ -62,8 +63,8 @@ async function searchItems(filters: SearchFilters, userTenantId?: string, userRo
   try {
     const whereClause: any = {
       // CRITICAL: Filter by tenantId for proper data isolation
-      // Law enforcement can access all tenants, others only their own
-      ...(userRole !== 'law_enforcement' && userTenantId && { tenantId: userTenantId })
+      // Super admin and law enforcement can access all tenants, others only their own
+      ...((userRole !== 'super_admin' && userRole !== 'law_enforcement') && userTenantId && { tenantId: userTenantId })
     }
 
     // Text search
