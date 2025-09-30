@@ -159,6 +159,7 @@ export function EnhancedEvidenceUpload({ item, onClose, onSuccess }: EnhancedEvi
   const uploadSingleFile = async (uploadFile: UploadFile, retryCount = 0): Promise<Evidence | null> => {
     const { file, id } = uploadFile
     const maxRetries = 3
+    let progressInterval: NodeJS.Timeout | null = null
     
     try {
       console.log(`🚀 UPLOADING FILE: ${file.name} (${file.size} bytes) - Attempt ${retryCount + 1}`)
@@ -181,7 +182,7 @@ export function EnhancedEvidenceUpload({ item, onClose, onSuccess }: EnhancedEvi
       formData.append('type', uploadFile.evidenceType)
 
       // Enhanced progress tracking with timeout
-      const progressInterval = setInterval(() => {
+      progressInterval = setInterval(() => {
         setUploadFiles(prev => prev.map(f => 
           f.id === id && f.status === 'uploading' 
             ? { ...f, progress: Math.min(f.progress + 5, 90) } 
@@ -200,7 +201,9 @@ export function EnhancedEvidenceUpload({ item, onClose, onSuccess }: EnhancedEvi
       })
 
       clearTimeout(timeoutId)
-      clearInterval(progressInterval)
+      if (progressInterval) {
+        clearInterval(progressInterval)
+      }
 
       const result = await response.json()
 
@@ -216,7 +219,9 @@ export function EnhancedEvidenceUpload({ item, onClose, onSuccess }: EnhancedEvi
         throw new Error(result.error || `Upload failed: ${response.status}`)
       }
     } catch (error) {
-      clearInterval(progressInterval)
+      if (progressInterval) {
+        clearInterval(progressInterval)
+      }
       
       const errorMessage = error instanceof Error ? error.message : 'Upload failed'
       console.error(`❌ UPLOAD FAILED: ${file.name} - ${errorMessage}`)

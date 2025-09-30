@@ -229,21 +229,21 @@ export function PerformanceStressTest({ currentUser, onClose }: PerformanceStres
       
       // Test 2: Bulk selection performance
       const selectionStart = performance.now()
-      const selectedItems = new Set(items.slice(0, Math.min(10, items.length)).map(item => item.id))
+      const selectedItems = new Set(items.slice(0, Math.min(10, items.length)).map((item: StolenItem) => item.id))
       const selectionTime = performance.now() - selectionStart
       
       details.push(`✅ Bulk selection: ${selectedItems.size} items in ${selectionTime.toFixed(2)}ms`)
       
       // Test 3: Bulk delete simulation (without actually deleting)
       const deleteStart = performance.now()
-      const itemsToDelete = items.filter(item => selectedItems.has(item.id))
+      const itemsToDelete = items.filter((item: StolenItem) => selectedItems.has(item.id))
       const deleteTime = performance.now() - deleteStart
       
       details.push(`✅ Bulk delete simulation: ${itemsToDelete.length} items in ${deleteTime.toFixed(2)}ms`)
       
       // Test 4: Bulk duplicate simulation
       const duplicateStart = performance.now()
-      const duplicateOperations = itemsToDelete.map(item => ({
+      const duplicateOperations = itemsToDelete.map((item: StolenItem) => ({
         name: `${item.name} (Copy)`,
         description: item.description,
         estimatedValue: item.estimatedValue

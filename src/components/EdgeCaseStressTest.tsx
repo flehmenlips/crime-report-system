@@ -385,7 +385,7 @@ export function EdgeCaseStressTest({ currentUser, onClose }: EdgeCaseStressTestP
       }
       
       // Test 2: Concurrent writes (if user can write)
-      if (currentUser && currentUser.role !== 'view_only') {
+      if (currentUser && currentUser.role !== 'assistant') {
         const writePromises = Array(3).fill(null).map((_, i) => 
           fetch('/api/items', {
             method: 'POST',
