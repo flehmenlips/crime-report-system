@@ -38,23 +38,43 @@ export function GenerateReport({ items, onClose }: GenerateReportProps) {
 
   const [generating, setGenerating] = useState(false)
   const [step, setStep] = useState<'options' | 'preview' | 'generating' | 'complete'>('options')
+  const [progress, setProgress] = useState(0)
+  const [progressMessage, setProgressMessage] = useState('')
 
   const totalValue = items.reduce((sum, item) => sum + item.estimatedValue, 0)
-  const totalEvidence = items.reduce((sum, item) => 
-    sum + item.evidence?.filter(e => e.type === 'photo')?.length + 
-    item.evidence?.filter(e => e.type === 'video')?.length + 
-    item.evidence?.filter(e => e.type === 'document')?.length, 0
-  )
+  const totalEvidence = items.reduce((sum, item) => {
+    if (!item.evidence) return sum
+    return sum + 
+      (item.evidence.filter(e => e.type === 'photo')?.length || 0) + 
+      (item.evidence.filter(e => e.type === 'video')?.length || 0) + 
+      (item.evidence.filter(e => e.type === 'document')?.length || 0)
+  }, 0)
 
   const generatePDF = async () => {
     setStep('generating')
     setGenerating(true)
+    setProgress(0)
+    setProgressMessage('Initializing PDF generation...')
 
     try {
       const pdf = new jsPDF('p', 'mm', 'a4')
       const pageWidth = pdf.internal.pageSize.getWidth()
       const pageHeight = pdf.internal.pageSize.getHeight()
       let yPosition = 20
+      
+      // Calculate total work for progress tracking
+      const totalItems = items.length
+      const totalImages = items.reduce((sum, item) => sum + (item.evidence?.filter(e => e.type === 'photo')?.length || 0), 0)
+      const totalWork = totalItems + totalImages + 10 // +10 for other operations
+      let completedWork = 0
+      
+      const updateProgress = (increment: number, message: string) => {
+        completedWork += increment
+        const newProgress = Math.min(Math.round((completedWork / totalWork) * 100), 100)
+        setProgress(newProgress)
+        setProgressMessage(message)
+        console.log(`Progress: ${newProgress}% - ${message}`)
+      }
 
       // Helper function to add new page if needed
       const checkNewPage = (requiredSpace: number) => {
@@ -65,11 +85,19 @@ export function GenerateReport({ items, onClose }: GenerateReportProps) {
       }
 
       // Helper function to load image as base64 using server-side proxy
-      const loadImageAsBase64 = async (imageUrl: string): Promise<string | null> => {
+      const loadImageAsBase64 = async (imageUrl: string, timeout = 10000): Promise<string | null> => {
         try {
           console.log('Loading image via proxy:', imageUrl)
           
-          const response = await fetch(`/api/image-proxy?url=${encodeURIComponent(imageUrl)}`)
+          // Create timeout promise
+          const timeoutPromise = new Promise<never>((_, reject) => {
+            setTimeout(() => reject(new Error('Image loading timeout')), timeout)
+          })
+          
+          // Create fetch promise
+          const fetchPromise = fetch(`/api/image-proxy?url=${encodeURIComponent(imageUrl)}`)
+          
+          const response = await Promise.race([fetchPromise, timeoutPromise])
           
           if (!response.ok) {
             console.error('Image proxy failed:', response.status)
@@ -79,7 +107,7 @@ export function GenerateReport({ items, onClose }: GenerateReportProps) {
           const data = await response.json()
           
           if (data.success && data.dataUrl) {
-            console.log('Successfully loaded image via proxy')
+            console.log('Successfully loaded image via proxy, size:', data.size || 'unknown')
             return data.dataUrl
           } else {
             console.error('Image proxy returned error:', data.error)
@@ -331,14 +359,19 @@ export function GenerateReport({ items, onClose }: GenerateReportProps) {
         pdf.text(`Generated: ${new Date().toLocaleString()}`, 20, pageHeight - 10)
       }
 
+      updateProgress(5, 'Finalizing PDF...')
+      
       // Save the PDF
       const fileName = `stolen-property-report-${reportOptions.caseNumber.replace(/[^a-zA-Z0-9]/g, '-')}-${new Date().toISOString().split('T')[0]}.pdf`
       pdf.save(fileName)
-
+      
+      updateProgress(5, 'PDF generated successfully!')
       setStep('complete')
     } catch (error) {
       console.error('Error generating PDF:', error)
-      alert('Error generating report. Please try again.')
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+      setProgressMessage(`Error: ${errorMessage}`)
+      alert(`Error generating report: ${errorMessage}`)
     } finally {
       setGenerating(false)
     }
@@ -658,8 +691,35 @@ export function GenerateReport({ items, onClose }: GenerateReportProps) {
                 Generating Report...
               </h3>
               <p style={{ color: '#6b7280', fontSize: '18px', marginBottom: '16px', margin: '0 0 16px 0' }}>
-                Creating professional PDF document
+                {progressMessage || 'Creating professional PDF document'}
               </p>
+              
+              {/* Progress Bar */}
+              <div style={{
+                width: '100%',
+                maxWidth: '400px',
+                margin: '0 auto 24px',
+                background: '#e5e7eb',
+                borderRadius: '8px',
+                overflow: 'hidden'
+              }}>
+                <div style={{
+                  width: `${progress}%`,
+                  height: '8px',
+                  background: 'linear-gradient(90deg, #dc2626 0%, #b91c1c 100%)',
+                  transition: 'width 0.3s ease'
+                }}></div>
+              </div>
+              
+              <div style={{
+                fontSize: '16px',
+                color: '#374151',
+                fontWeight: '600',
+                marginBottom: '16px'
+              }}>
+                {progress}% Complete
+              </div>
+              
               {reportOptions.includePhotos && (
                 <div style={{
                   background: '#fef3c7',
