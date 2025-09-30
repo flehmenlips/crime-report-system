@@ -115,7 +115,7 @@ export async function addItem(itemData: any, ownerId: string): Promise<StolenIte
 
     const data = await response.json()
     console.log('API success response:', data)
-    return data.item
+    return data // API returns the item directly, not wrapped in data.item
   } catch (error) {
     console.error('Error adding item:', error)
     throw error // Re-throw to see the actual error in the UI
@@ -140,7 +140,7 @@ export async function updateItem(itemData: any): Promise<StolenItem | null> {
     }
 
     const data = await response.json()
-    return data.item
+    return data // API returns the item directly, not wrapped in data.item
   } catch (error) {
     console.error('Error updating item:', error)
     return null

@@ -417,7 +417,8 @@ export default function Home() {
 
   const handleModernFormSubmit = async (formData: ItemFormData) => {
     try {
-      console.log('Modern form submitted:', formData)
+      console.log('🚀 MODERN FORM SUBMITTED:', formData)
+      console.log('🔍 EDITING FORM ITEM:', editingFormItem)
       const ownerId = 'cmfeyn7es0000t6oil8p6d45c'
       
       if (editingFormItem) {
@@ -447,52 +448,69 @@ export default function Home() {
 
         if (response.ok) {
           const result = await response.json()
+          console.log('📦 UPDATE API RESULT:', result)
           // API returns the item directly, not wrapped in an 'item' property
           const updatedItem = result
+          console.log('✅ ITEM UPDATED SUCCESSFULLY:', updatedItem)
           setAllItems(prev => prev.map(i => i.id === editingFormItem.id ? updatedItem : i))
           setTotalValue(prev => prev - editingFormItem.estimatedValue + updatedItem.estimatedValue)
           // Notification will be handled by the NotificationManager component
-          console.log('Item updated:', updatedItem.name)
+          console.log('🔄 ITEM UPDATED IN LOCAL STATE:', updatedItem.name)
+        } else {
+          console.error('❌ UPDATE API FAILED:', response.status, await response.text())
+          alert('❌ Error: Failed to update item. Please try again.')
         }
       } else {
         // Create new item
+        console.log('🆕 CREATING NEW ITEM with data:', formData)
+        console.log('🆔 OWNER ID:', ownerId)
+        
         const newItem = await addItem(formData, ownerId)
+        console.log('📦 ADDITEM RESULT:', newItem)
         
         if (newItem) {
+          console.log('✅ NEW ITEM CREATED SUCCESSFULLY:', newItem)
+          
           // Immediate local update for instant UI feedback
           setAllItems(prev => [...prev, newItem])
           setTotalValue(prev => prev + newItem.estimatedValue)
-          console.log('Item created and added to UI:', newItem.name)
+          console.log('🔄 ITEM ADDED TO LOCAL STATE:', newItem.name)
           
           // Show success message
-          alert(`✅ New Item Successfully Added!\n\n"${newItem.name}" has been added to your inventory.\n\nTotal Value: ${formatCurrency(newItem.estimatedValue)}`)
+          const successMessage = `✅ New Item Successfully Added!\n\n"${newItem.name}" has been added to your inventory.\n\nTotal Value: ${formatCurrency(newItem.estimatedValue)}`
+          console.log('📢 SHOWING SUCCESS MESSAGE:', successMessage)
+          alert(successMessage)
           
           // Force re-render to ensure UI updates
           setTimeout(() => {
-            console.log('Forcing UI refresh for new item')
+            console.log('🔄 FORCING UI REFRESH FOR NEW ITEM')
             setRefreshKey(prev => prev + 1) // Force re-render using key
           }, 100)
           
           // Delayed server sync to ensure database consistency
           setTimeout(async () => {
             try {
-              console.log('Starting server sync...')
+              console.log('🔄 STARTING SERVER SYNC...')
               const updatedItems = await getAllItems()
               const updatedTotal = updatedItems.reduce((sum, item) => sum + item.estimatedValue, 0)
               setAllItems(updatedItems)
               setTotalValue(updatedTotal)
-              console.log('Server sync complete, total items:', updatedItems.length)
+              console.log('✅ SERVER SYNC COMPLETE, TOTAL ITEMS:', updatedItems.length)
             } catch (error) {
-              console.error('Error syncing after add:', error)
+              console.error('❌ ERROR SYNCING AFTER ADD:', error)
             }
           }, 1500) // Increased delay to 1.5 seconds
+        } else {
+          console.error('❌ NEW ITEM IS NULL OR UNDEFINED!')
+          alert('❌ Error: Failed to create item. Please try again.')
         }
       }
       
       setShowModernForm(false)
       setEditingFormItem(null)
     } catch (error) {
-      console.error('Error in form submission:', error)
+      console.error('❌ ERROR IN FORM SUBMISSION:', error)
+      console.error('❌ ERROR STACK:', error instanceof Error ? error.stack : 'No stack trace')
       alert(`❌ Error: ${error instanceof Error ? error.message : error}`)
     }
   }
