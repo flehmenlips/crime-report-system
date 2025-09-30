@@ -114,7 +114,16 @@ export function UserProfile({ className = '', showDetails = true, onProfileUpdat
               <p className="text-gray-600 text-sm">
                 {getRoleDisplayName(user.role)}
               </p>
-              <div className="mt-2 px-3 py-1 bg-red-100 text-red-800 rounded-full text-xs font-medium">
+              <div style={{
+                marginTop: '8px',
+                padding: '8px 12px',
+                backgroundColor: '#fef2f2',
+                color: '#991b1b',
+                borderRadius: '9999px',
+                fontSize: '12px',
+                fontWeight: '500',
+                border: '2px solid #dc2626'
+              }}>
                 🚀 DEPLOYMENT TEST - If you see this, changes are working!
               </div>
             </div>
@@ -122,9 +131,28 @@ export function UserProfile({ className = '', showDetails = true, onProfileUpdat
             {/* User Details - Modern Card Design */}
             <div className="space-y-4">
               {/* Account Information Card */}
-              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 border border-blue-100">
-                <h4 className="font-semibold text-gray-900 text-sm mb-3 flex items-center">
-                  <span className="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
+              <div style={{
+                background: 'linear-gradient(135deg, #eff6ff 0%, #e0e7ff 100%)',
+                borderRadius: '12px',
+                padding: '16px',
+                border: '1px solid #dbeafe',
+                marginBottom: '16px'
+              }}>
+                <h4 style={{
+                  fontWeight: '600',
+                  color: '#111827',
+                  fontSize: '14px',
+                  marginBottom: '12px',
+                  display: 'flex',
+                  alignItems: 'center'
+                }}>
+                  <span style={{
+                    width: '8px',
+                    height: '8px',
+                    backgroundColor: '#3b82f6',
+                    borderRadius: '50%',
+                    marginRight: '8px'
+                  }}></span>
                   Account Information
                 </h4>
                 <div className="space-y-3 text-sm">
