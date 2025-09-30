@@ -804,7 +804,7 @@ export default function Home() {
   const displayItems = isFiltered ? filteredItems : allItems
   const displayTotalValue = displayItems.reduce((sum, item) => sum + item.estimatedValue, 0)
 
-  if (userRole === 'property_owner') {
+  if (userRole === 'property_owner' || userRole === 'super_admin') {
     return (
       <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)' }}>
         {/* PWA Service Worker - DISABLED FOR DEBUGGING */}
