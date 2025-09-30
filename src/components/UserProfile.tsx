@@ -81,7 +81,7 @@ export function UserProfile({ className = '', showDetails = true, onProfileUpdat
           </span>
         </div>
         
-        {showDetails && (
+        {showDetails && !isExpanded && (
           <div className="flex-1 min-w-0">
             <p className="text-white font-semibold text-sm truncate">
               {user.name}
@@ -124,16 +124,16 @@ export function UserProfile({ className = '', showDetails = true, onProfileUpdat
                 <h4 className="font-semibold text-gray-900 text-sm mb-2">Account Information</h4>
                 <div className="space-y-3 text-sm">
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-600 font-medium">Email:</span>
+                    <span className="text-gray-600 font-medium">Email: </span>
                     <span className="text-gray-900 font-medium">{user.email}</span>
                   </div>
                   <div className="flex justify-between items-start">
-                    <span className="text-gray-600 font-medium">User ID:</span>
+                    <span className="text-gray-600 font-medium">User ID: </span>
                     <span className="text-gray-900 font-mono text-xs bg-gray-100 px-2 py-1 rounded">{user.id}</span>
                   </div>
                   {accessLevelInfo && (
                     <div className="flex justify-between items-center">
-                      <span className="text-gray-600 font-medium">Access Level:</span>
+                      <span className="text-gray-600 font-medium">Access Level: </span>
                       <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
                         accessLevelInfo.level === 'owner' ? 'bg-purple-100 text-purple-800' :
                         accessLevelInfo.level === 'staff' ? 'bg-blue-100 text-blue-800' :
@@ -153,11 +153,11 @@ export function UserProfile({ className = '', showDetails = true, onProfileUpdat
                   <h4 className="font-semibold text-gray-900 text-sm mb-3">Tenant Information</h4>
                   <div className="space-y-3 text-sm">
                     <div className="flex justify-between items-center">
-                      <span className="text-gray-600 font-medium">Property:</span>
+                      <span className="text-gray-600 font-medium">Property: </span>
                       <span className="text-gray-900 font-medium">{tenantInfo.name}</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-gray-600 font-medium">Status:</span>
+                      <span className="text-gray-600 font-medium">Status: </span>
                       <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
                         tenantInfo.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                       }`}>
@@ -166,7 +166,7 @@ export function UserProfile({ className = '', showDetails = true, onProfileUpdat
                     </div>
                     {tenantInfo.description && (
                       <div className="mt-3 pt-2 border-t border-gray-100">
-                        <span className="text-gray-600 font-medium text-xs block mb-2">Description:</span>
+                        <span className="text-gray-600 font-medium text-xs block mb-2">Description: </span>
                         <span className="text-gray-700 text-xs leading-relaxed bg-gray-50 p-2 rounded">{tenantInfo.description}</span>
                       </div>
                     )}
