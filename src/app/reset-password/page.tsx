@@ -1,9 +1,9 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 
-export default function ResetPasswordPage() {
+function ResetPasswordContent() {
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [loading, setLoading] = useState(false)
@@ -342,5 +342,52 @@ export default function ResetPasswordPage() {
         `}</style>
       </div>
     </div>
+  )
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={
+      <div style={{
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '20px'
+      }}>
+        <div style={{
+          background: 'rgba(255, 255, 255, 0.95)',
+          backdropFilter: 'blur(20px)',
+          borderRadius: '20px',
+          padding: '40px',
+          maxWidth: '500px',
+          width: '100%',
+          textAlign: 'center',
+          boxShadow: '0 20px 40px rgba(0, 0, 0, 0.1)',
+          border: '1px solid rgba(255, 255, 255, 0.2)'
+        }}>
+          <div style={{
+            width: '60px',
+            height: '60px',
+            border: '4px solid #e5e7eb',
+            borderTop: '4px solid #3b82f6',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite',
+            margin: '0 auto 20px'
+          }}></div>
+          <h1 style={{
+            fontSize: '24px',
+            fontWeight: 'bold',
+            color: '#1f2937',
+            marginBottom: '12px'
+          }}>
+            Loading...
+          </h1>
+        </div>
+      </div>
+    }>
+      <ResetPasswordContent />
+    </Suspense>
   )
 }
