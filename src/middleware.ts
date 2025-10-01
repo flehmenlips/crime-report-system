@@ -29,7 +29,10 @@ export async function middleware(req: NextRequest) {
       pathname === '/sw.js' ||
       pathname === '/offline.html' ||
       pathname.startsWith('/api/serve-document') ||
-      pathname.startsWith('/api/document-proxy')) {
+      pathname.startsWith('/api/document-proxy') ||
+      pathname === '/verify-email' ||
+      pathname === '/forgot-password' ||
+      pathname === '/reset-password') {
     return NextResponse.next()
   }
   
