@@ -23,31 +23,37 @@ model Tenant {
 }
 
 model User {
-  id            String       @id @default(uuid())
-  email         String       @unique
-  name          String
-  username      String       @unique
-  password      String
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
-  role          Role         @default(property_owner)
-  address       String?
-  avatar        String?
-  bio           String?
-  city          String?
-  company       String?
-  country       String?
-  emailVerified Boolean      @default(false)
-  isActive      Boolean      @default(true)
-  lastLoginAt   DateTime?
-  phone         String?
-  preferences   String?
-  state         String?
-  title         String?
-  zipCode       String?
-  accessLevel   AccessLevel? @default(owner)
-  tenantId      String?      @default("tenant-1")
-  items         StolenItem[]
+  id                String       @id @default(uuid())
+  email             String       @unique
+  name              String
+  username          String       @unique
+  password          String
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+  role              Role         @default(property_owner)
+  address           String?
+  avatar            String?
+  bio               String?
+  city              String?
+  company           String?
+  country           String?
+  emailVerified     Boolean      @default(false)
+  isActive          Boolean      @default(true)
+  lastLoginAt       DateTime?
+  phone             String?
+  preferences       String?
+  state             String?
+  title             String?
+  zipCode           String?
+  accessLevel       AccessLevel? @default(owner)
+  tenantId          String?      @default("tenant-1")
+  items             StolenItem[]
+  
+  // Email verification fields
+  verificationToken String?
+  verificationExpires DateTime?
+  passwordResetToken String?
+  passwordResetExpires DateTime?
 
   // Relationships
   tenant        Tenant?      @relation(fields: [tenantId], references: [id])

@@ -52,6 +52,13 @@ export async function authenticateUser(username: string, password: string): Prom
       console.log('=== END AUTH DEBUG ===')
       return null
     }
+
+    // Check if email is verified (except for super_admin)
+    if (!user.emailVerified && user.role !== 'super_admin') {
+      console.log('❌ User email is not verified:', username)
+      console.log('=== END AUTH DEBUG ===')
+      return null
+    }
     
     // Check password (in a real app, you'd compare hashed passwords)
     if (user.password !== password) {

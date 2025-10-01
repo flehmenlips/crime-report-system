@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { Role, AccessLevel } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { EmailService } from '@/lib/email'
+import crypto from 'crypto'
 
 function getDefaultPermissions(role: Role): string[] {
   switch (role) {
@@ -83,58 +85,79 @@ export async function POST(request: NextRequest) {
       ? `Property managed by ${name}` 
       : `Account for ${name} (${role})`
 
-    console.log('Creating tenant:', { name: tenantName, description: tenantDescription })
+        console.log('Creating tenant:', { name: tenantName, description: tenantDescription })
 
-    // Create tenant in database
-    const newTenant = await prisma.tenant.create({
-      data: {
-        name: tenantName,
-        description: tenantDescription,
-        isActive: true,
-      }
-    })
+        // Create tenant in database
+        const newTenant = await prisma.tenant.create({
+          data: {
+            name: tenantName,
+            description: tenantDescription,
+            isActive: true,
+          }
+        })
 
-    console.log('Tenant created with ID:', newTenant.id)
+        console.log('Tenant created with ID:', newTenant.id)
 
-    // Create user in database
-    const newUser = await prisma.user.create({
-      data: {
-        username,
-        email,
-        name,
-        password, // In a real app, you'd hash this
-        role: role as Role,
-        accessLevel: (role === 'property_owner' ? 'owner' : 'stakeholder') as AccessLevel,
-        // permissions: getDefaultPermissions(role as Role), // Role-specific permissions - not in DB schema
-        phone: '',
-        address: '',
-        city: '',
-        state: '',
-        zipCode: '',
-        country: '',
-        company: '',
-        title: '',
-        bio: '',
-        avatar: '',
-        emailVerified: false,
-        isActive: true,
-        preferences: '',
-        tenantId: newTenant.id,
-      },
-      include: {
-        tenant: true
-      }
-    })
+        // Generate verification token
+        const verificationToken = crypto.randomBytes(32).toString('hex')
+        const verificationExpires = new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours from now
 
-    console.log('User created with ID:', newUser.id)
-    console.log('=== REGISTRATION API DEBUG COMPLETE ===')
+        // Create user in database
+        const newUser = await prisma.user.create({
+          data: {
+            username,
+            email,
+            name,
+            password, // In a real app, you'd hash this
+            role: role as Role,
+            accessLevel: (role === 'property_owner' ? 'owner' : 'stakeholder') as AccessLevel,
+            // permissions: getDefaultPermissions(role as Role), // Role-specific permissions - not in DB schema
+            phone: '',
+            address: '',
+            city: '',
+            state: '',
+            zipCode: '',
+            country: '',
+            company: '',
+            title: '',
+            bio: '',
+            avatar: '',
+            emailVerified: false,
+            isActive: false, // Don't activate until email is verified
+            preferences: '',
+            tenantId: newTenant.id,
+            verificationToken,
+            verificationExpires,
+          },
+          include: {
+            tenant: true
+          }
+        })
 
-    // Return user without password
-    const { password: _, ...userWithoutPassword } = newUser
-    return NextResponse.json({
-      success: true,
-      user: userWithoutPassword
-    })
+        console.log('User created with ID:', newUser.id)
+
+        // Send verification email
+        const emailResult = await EmailService.sendVerificationEmail(
+          email,
+          name,
+          verificationToken
+        )
+
+        if (!emailResult.success) {
+          console.error('Failed to send verification email:', emailResult.error)
+          // Don't fail registration if email fails, but log it
+        }
+
+        console.log('=== REGISTRATION API DEBUG COMPLETE ===')
+
+        // Return user without password
+        const { password: _, ...userWithoutPassword } = newUser
+        return NextResponse.json({
+          success: true,
+          message: 'Account created successfully. Please check your email to verify your account.',
+          user: userWithoutPassword,
+          emailSent: emailResult.success
+        })
 
   } catch (error) {
     console.error('Error creating user:', error)

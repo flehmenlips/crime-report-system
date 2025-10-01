@@ -56,11 +56,11 @@ export function RegistrationModal({ onClose, onSuccess }: RegistrationModalProps
 
       if (response.ok) {
         setSuccess(true)
-        // Close modal after a short delay
+        // Close modal after a longer delay since user needs to check email
         setTimeout(() => {
           onClose()
           if (onSuccess) onSuccess()
-        }, 2000)
+        }, 5000)
       } else {
         setError(data.error || 'Registration failed')
       }
@@ -129,7 +129,7 @@ export function RegistrationModal({ onClose, onSuccess }: RegistrationModalProps
             fontSize: '16px',
             margin: '0 0 24px 0'
           }}>
-            Welcome to the Crime Report System! You can now sign in with your credentials.
+            Welcome to the Crime Report System! Please check your email to verify your account before signing in.
           </p>
           <div style={{
             background: 'rgba(16, 185, 129, 0.15)',
