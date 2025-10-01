@@ -5,8 +5,8 @@ const resend = new Resend(process.env.RESEND_API_KEY)
 
 // Email configuration
 export const EMAIL_CONFIG = {
-  from: 'Crime Report System <noreply@crime-report-system.com>', // You'll need to verify this domain with Resend
-  replyTo: 'support@crime-report-system.com',
+  from: process.env.EMAIL_FROM || 'Crime Report System <onboarding@resend.dev>', // Use environment variable or fallback to test domain
+  replyTo: process.env.EMAIL_REPLY_TO || 'onboarding@resend.dev',
   companyName: 'Crime Report System',
   websiteUrl: process.env.NEXTAUTH_URL || 'https://remise-rov8.onrender.com'
 }
