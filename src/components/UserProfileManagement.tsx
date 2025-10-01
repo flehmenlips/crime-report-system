@@ -1063,9 +1063,15 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
           )}
 
           {activeTab === 'password' && (
-            <form onSubmit={handlePasswordChange} className="space-y-6">
+            <form onSubmit={handlePasswordChange} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  color: '#374151',
+                  marginBottom: '8px'
+                }}>
                   Current Password *
                 </label>
                 <input
@@ -1073,13 +1079,45 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
                   required
                   value={passwordData.currentPassword}
                   onChange={(e) => setPasswordData({...passwordData, currentPassword: e.target.value})}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  style={{
+                    width: '100%',
+                    padding: '16px',
+                    background: '#f9fafb',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '16px',
+                    fontSize: '16px',
+                    color: '#1f2937',
+                    outline: 'none',
+                    transition: 'all 0.3s ease',
+                    boxSizing: 'border-box',
+                    boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.06)'
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.borderColor = '#3b82f6'
+                    e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1), inset 0 1px 3px rgba(0,0,0,0.06)'
+                    e.target.style.background = 'white'
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = '#e5e7eb'
+                    e.target.style.boxShadow = 'inset 0 1px 3px rgba(0,0,0,0.06)'
+                    e.target.style.background = '#f9fafb'
+                  }}
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+                gap: '24px'
+              }}>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label style={{
+                    display: 'block',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    color: '#374151',
+                    marginBottom: '8px'
+                  }}>
                     New Password *
                   </label>
                   <input
@@ -1087,11 +1125,39 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
                     required
                     value={passwordData.newPassword}
                     onChange={(e) => setPasswordData({...passwordData, newPassword: e.target.value})}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                    style={{
+                      width: '100%',
+                      padding: '16px',
+                      background: '#f9fafb',
+                      border: '1px solid #e5e7eb',
+                      borderRadius: '16px',
+                      fontSize: '16px',
+                      color: '#1f2937',
+                      outline: 'none',
+                      transition: 'all 0.3s ease',
+                      boxSizing: 'border-box',
+                      boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.06)'
+                    }}
+                    onFocus={(e) => {
+                      e.target.style.borderColor = '#3b82f6'
+                      e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1), inset 0 1px 3px rgba(0,0,0,0.06)'
+                      e.target.style.background = 'white'
+                    }}
+                    onBlur={(e) => {
+                      e.target.style.borderColor = '#e5e7eb'
+                      e.target.style.boxShadow = 'inset 0 1px 3px rgba(0,0,0,0.06)'
+                      e.target.style.background = '#f9fafb'
+                    }}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label style={{
+                    display: 'block',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    color: '#374151',
+                    marginBottom: '8px'
+                  }}>
                     Confirm New Password *
                   </label>
                   <input
@@ -1099,85 +1165,203 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
                     required
                     value={passwordData.confirmPassword}
                     onChange={(e) => setPasswordData({...passwordData, confirmPassword: e.target.value})}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                    style={{
+                      width: '100%',
+                      padding: '16px',
+                      background: '#f9fafb',
+                      border: '1px solid #e5e7eb',
+                      borderRadius: '16px',
+                      fontSize: '16px',
+                      color: '#1f2937',
+                      outline: 'none',
+                      transition: 'all 0.3s ease',
+                      boxSizing: 'border-box',
+                      boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.06)'
+                    }}
+                    onFocus={(e) => {
+                      e.target.style.borderColor = '#3b82f6'
+                      e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1), inset 0 1px 3px rgba(0,0,0,0.06)'
+                      e.target.style.background = 'white'
+                    }}
+                    onBlur={(e) => {
+                      e.target.style.borderColor = '#e5e7eb'
+                      e.target.style.boxShadow = 'inset 0 1px 3px rgba(0,0,0,0.06)'
+                      e.target.style.background = '#f9fafb'
+                    }}
                   />
                 </div>
               </div>
 
               {error && (
-                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+                <div style={{
+                  background: '#fef2f2',
+                  border: '1px solid #fecaca',
+                  borderRadius: '12px',
+                  padding: '16px',
+                  color: '#dc2626'
+                }}>
                   {error}
                 </div>
               )}
 
               {success && (
-                <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
+                <div style={{
+                  background: '#ecfdf5',
+                  border: '1px solid #a7f3d0',
+                  borderRadius: '12px',
+                  padding: '16px',
+                  color: '#059669'
+                }}>
                   {success}
                 </div>
               )}
-
-              <div className="flex justify-end space-x-4">
-                <button
-                  type="button"
-                  onClick={onClose}
-                  className="px-4 py-2 text-gray-600 hover:text-gray-800"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="px-8 py-3 bg-gradient-to-r from-red-500 to-pink-600 text-white rounded-xl hover:from-red-600 hover:to-pink-700 disabled:opacity-50 font-semibold shadow-lg transition-all duration-200 transform hover:scale-105"
-                >
-                  {loading ? 'Changing...' : 'Change Password'}
-                </button>
-              </div>
             </form>
           )}
 
           {activeTab === 'account' && (
-            <div className="space-y-6">
-              <div className="bg-gray-50 p-6 rounded-lg">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Account Information</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+              <div style={{
+                background: '#f9fafb',
+                padding: '24px',
+                borderRadius: '12px',
+                border: '1px solid #e5e7eb'
+              }}>
+                <h3 style={{
+                  fontSize: '18px',
+                  fontWeight: '600',
+                  color: '#1f2937',
+                  marginBottom: '16px'
+                }}>
+                  Account Information
+                </h3>
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+                  gap: '16px'
+                }}>
                   <div>
-                    <span className="text-sm font-medium text-gray-500">User ID:</span>
-                    <p className="text-gray-900">{user.id}</p>
+                    <span style={{
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      color: '#6b7280'
+                    }}>
+                      User ID:
+                    </span>
+                    <p style={{
+                      color: '#1f2937',
+                      margin: '4px 0 0 0',
+                      fontSize: '14px',
+                      fontFamily: 'monospace'
+                    }}>
+                      {user.id}
+                    </p>
                   </div>
                   <div>
-                    <span className="text-sm font-medium text-gray-500">Username:</span>
-                    <p className="text-gray-900">{user.username}</p>
+                    <span style={{
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      color: '#6b7280'
+                    }}>
+                      Username:
+                    </span>
+                    <p style={{
+                      color: '#1f2937',
+                      margin: '4px 0 0 0',
+                      fontSize: '14px'
+                    }}>
+                      {user.username}
+                    </p>
                   </div>
                   <div>
-                    <span className="text-sm font-medium text-gray-500">Role:</span>
-                    <p className="text-gray-900">{user.role}</p>
+                    <span style={{
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      color: '#6b7280'
+                    }}>
+                      Role:
+                    </span>
+                    <p style={{
+                      color: '#1f2937',
+                      margin: '4px 0 0 0',
+                      fontSize: '14px'
+                    }}>
+                      {user.role}
+                    </p>
                   </div>
                   <div>
-                    <span className="text-sm font-medium text-gray-500">Email Verified:</span>
-                    <p className="text-gray-900">{user.emailVerified ? 'Yes' : 'No'}</p>
+                    <span style={{
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      color: '#6b7280'
+                    }}>
+                      Email Verified:
+                    </span>
+                    <p style={{
+                      color: '#1f2937',
+                      margin: '4px 0 0 0',
+                      fontSize: '14px'
+                    }}>
+                      {user.emailVerified ? 'Yes' : 'No'}
+                    </p>
                   </div>
                   <div>
-                    <span className="text-sm font-medium text-gray-500">Account Created:</span>
-                    <p className="text-gray-900">{new Date(user.createdAt).toLocaleDateString()}</p>
+                    <span style={{
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      color: '#6b7280'
+                    }}>
+                      Account Created:
+                    </span>
+                    <p style={{
+                      color: '#1f2937',
+                      margin: '4px 0 0 0',
+                      fontSize: '14px'
+                    }}>
+                      {new Date(user.createdAt).toLocaleDateString()}
+                    </p>
                   </div>
                   <div>
-                    <span className="text-sm font-medium text-gray-500">Last Login:</span>
-                    <p className="text-gray-900">{user.lastLoginAt ? new Date(user.lastLoginAt).toLocaleDateString() : 'Never'}</p>
+                    <span style={{
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      color: '#6b7280'
+                    }}>
+                      Last Login:
+                    </span>
+                    <p style={{
+                      color: '#1f2937',
+                      margin: '4px 0 0 0',
+                      fontSize: '14px'
+                    }}>
+                      {user.lastLoginAt ? new Date(user.lastLoginAt).toLocaleDateString() : 'Never'}
+                    </p>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-lg">
-                <div className="flex">
-                  <div className="flex-shrink-0">
-                    <span className="text-yellow-400 text-xl">⚠️</span>
+              <div style={{
+                background: '#fffbeb',
+                border: '1px solid #fde68a',
+                padding: '16px',
+                borderRadius: '12px'
+              }}>
+                <div style={{ display: 'flex' }}>
+                  <div style={{ flexShrink: 0, marginRight: '12px' }}>
+                    <span style={{ fontSize: '20px' }}>⚠️</span>
                   </div>
-                  <div className="ml-3">
-                    <h3 className="text-sm font-medium text-yellow-800">
+                  <div>
+                    <h3 style={{
+                      fontSize: '14px',
+                      fontWeight: '600',
+                      color: '#92400e',
+                      margin: '0 0 8px 0'
+                    }}>
                       Account Actions
                     </h3>
-                    <div className="mt-2 text-sm text-yellow-700">
-                      <p>For security reasons, account deletion and role changes must be requested through your administrator.</p>
+                    <div style={{ fontSize: '14px', color: '#b45309' }}>
+                      <p style={{ margin: '0' }}>
+                        For security reasons, account deletion and role changes must be requested through your administrator.
+                      </p>
                     </div>
                   </div>
                 </div>
