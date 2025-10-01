@@ -227,14 +227,16 @@ export default function ResetPasswordPage() {
                 }}
                 placeholder="Enter your new password"
                 onFocus={(e) => {
-                  e.target.style.borderColor = '#3b82f6'
-                  e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)'
-                  e.target.style.background = 'white'
+                  const target = e.target as HTMLInputElement
+                  target.style.borderColor = '#3b82f6'
+                  target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)'
+                  target.style.background = 'white'
                 }}
                 onBlur={(e) => {
-                  e.target.style.borderColor = '#e5e7eb'
-                  e.target.style.boxShadow = 'none'
-                  e.target.style.background = '#f9fafb'
+                  const target = e.target as HTMLInputElement
+                  target.style.borderColor = '#e5e7eb'
+                  target.style.boxShadow = 'none'
+                  target.style.background = '#f9fafb'
                 }}
               />
             </div>
@@ -268,14 +270,16 @@ export default function ResetPasswordPage() {
                 }}
                 placeholder="Confirm your new password"
                 onFocus={(e) => {
-                  e.target.style.borderColor = '#3b82f6'
-                  e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)'
-                  e.target.style.background = 'white'
+                  const target = e.target as HTMLInputElement
+                  target.style.borderColor = '#3b82f6'
+                  target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)'
+                  target.style.background = 'white'
                 }}
                 onBlur={(e) => {
-                  e.target.style.borderColor = '#e5e7eb'
-                  e.target.style.boxShadow = 'none'
-                  e.target.style.background = '#f9fafb'
+                  const target = e.target as HTMLInputElement
+                  target.style.borderColor = '#e5e7eb'
+                  target.style.boxShadow = 'none'
+                  target.style.background = '#f9fafb'
                 }}
               />
             </div>
@@ -298,13 +302,15 @@ export default function ResetPasswordPage() {
               }}
               onMouseOver={(e) => {
                 if (!loading) {
-                  e.target.style.transform = 'translateY(-2px)'
-                  e.target.style.boxShadow = '0 8px 25px rgba(59, 130, 246, 0.3)'
+                  const target = e.target as HTMLButtonElement
+                  target.style.transform = 'translateY(-2px)'
+                  target.style.boxShadow = '0 8px 25px rgba(59, 130, 246, 0.3)'
                 }
               }}
               onMouseOut={(e) => {
-                e.target.style.transform = 'translateY(0)'
-                e.target.style.boxShadow = 'none'
+                const target = e.target as HTMLButtonElement
+                target.style.transform = 'translateY(0)'
+                target.style.boxShadow = 'none'
               }}
             >
               {loading ? 'Resetting...' : 'Reset Password'}

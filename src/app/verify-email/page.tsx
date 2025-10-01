@@ -180,12 +180,14 @@ export default function VerifyEmailPage() {
                 transition: 'all 0.3s ease'
               }}
               onMouseOver={(e) => {
-                e.target.style.transform = 'translateY(-2px)'
-                e.target.style.boxShadow = '0 8px 25px rgba(59, 130, 246, 0.3)'
+                const target = e.target as HTMLButtonElement
+                target.style.transform = 'translateY(-2px)'
+                target.style.boxShadow = '0 8px 25px rgba(59, 130, 246, 0.3)'
               }}
               onMouseOut={(e) => {
-                e.target.style.transform = 'translateY(0)'
-                e.target.style.boxShadow = 'none'
+                const target = e.target as HTMLButtonElement
+                target.style.transform = 'translateY(0)'
+                target.style.boxShadow = 'none'
               }}
             >
               Go to Login

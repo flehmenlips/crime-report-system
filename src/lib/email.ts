@@ -254,7 +254,7 @@ export class EmailService {
       return { success: true, messageId: result.data?.id }
     } catch (error) {
       console.error('Error sending verification email:', error)
-      return { success: false, error: error.message }
+      return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
     }
   }
 
@@ -274,7 +274,7 @@ export class EmailService {
       return { success: true, messageId: result.data?.id }
     } catch (error) {
       console.error('Error sending welcome email:', error)
-      return { success: false, error: error.message }
+      return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
     }
   }
 
@@ -295,7 +295,7 @@ export class EmailService {
       return { success: true, messageId: result.data?.id }
     } catch (error) {
       console.error('Error sending password reset email:', error)
-      return { success: false, error: error.message }
+      return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
     }
   }
 
@@ -315,7 +315,7 @@ export class EmailService {
       return { success: true, messageId: result.data?.id }
     } catch (error) {
       console.error('Error sending item notification email:', error)
-      return { success: false, error: error.message }
+      return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
     }
   }
 
@@ -369,7 +369,7 @@ export class EmailService {
       return { success: true, messageId: result.data?.id }
     } catch (error) {
       console.error('Error sending notification email:', error)
-      return { success: false, error: error.message }
+      return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
     }
   }
 }
