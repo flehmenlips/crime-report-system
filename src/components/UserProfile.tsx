@@ -72,27 +72,90 @@ export function UserProfile({ className = '', showDetails = true, onProfileUpdat
     <div className={`relative ${className}`}>
       {/* Compact Profile Display */}
       <div 
-        className={`flex items-center space-x-3 cursor-pointer hover:bg-white/10 rounded-xl p-2 transition-colors duration-200 ${isExpanded ? 'opacity-50' : ''}`}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px',
+          cursor: 'pointer',
+          padding: '8px',
+          borderRadius: '12px',
+          transition: 'all 0.2s ease',
+          opacity: isExpanded ? 0.7 : 1
+        }}
         onClick={() => setIsExpanded(!isExpanded)}
+        onMouseEnter={(e) => {
+          if (!isExpanded) {
+            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)'
+          }
+        }}
+        onMouseLeave={(e) => {
+          if (!isExpanded) {
+            e.currentTarget.style.background = 'transparent'
+          }
+        }}
       >
-        <div className={`w-10 h-10 bg-gradient-to-br ${getRoleColor(user.role)} rounded-full flex items-center justify-center shadow-lg`}>
-          <span className="text-white text-lg font-bold">
+        <div style={{
+          width: '40px',
+          height: '40px',
+          background: user.role === 'property_owner' 
+            ? 'linear-gradient(135deg, #3b82f6 0%, #6366f1 100%)'
+            : user.role === 'law_enforcement'
+            ? 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)'
+            : 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
+          borderRadius: '50%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)'
+        }}>
+          <span style={{
+            color: 'white',
+            fontSize: '18px',
+            fontWeight: 'bold'
+          }}>
             {user.name.charAt(0).toUpperCase()}
           </span>
         </div>
         
         {showDetails && !isExpanded && (
-          <div className="flex-1 min-w-0">
-            <p className="text-white font-semibold text-sm truncate">
+          <div style={{
+            flex: 1,
+            minWidth: 0,
+            background: 'rgba(255, 255, 255, 0.1)',
+            backdropFilter: 'blur(12px)',
+            borderRadius: '12px',
+            padding: '12px 16px',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)'
+          }}>
+            <p style={{
+              color: 'white',
+              fontWeight: '600',
+              fontSize: '16px',
+              margin: '0 0 4px 0',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap'
+            }}>
               {user.name}
             </p>
-            <p className="text-white/70 text-xs">
+            <p style={{
+              color: 'rgba(255, 255, 255, 0.8)',
+              fontSize: '14px',
+              margin: '0',
+              fontWeight: '500'
+            }}>
               {getRoleDisplayName(user.role)}
             </p>
           </div>
         )}
         
-        <div className="text-white/50 text-xs">
+        <div style={{
+          color: 'rgba(255, 255, 255, 0.6)',
+          fontSize: '12px',
+          transition: 'transform 0.2s ease',
+          transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)'
+        }}>
           ▼
         </div>
       </div>
