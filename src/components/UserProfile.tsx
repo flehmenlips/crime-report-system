@@ -186,6 +186,129 @@ export function UserProfile({ className = '', showDetails = true, onProfileUpdat
 
             {/* User Details - Modern Card Design */}
             <div className="space-y-4">
+              {/* Quick Actions Card - MOVED TO TOP */}
+              <div style={{
+                background: 'linear-gradient(135deg, #f9fafb 0%, #f1f5f9 100%)',
+                borderRadius: '12px',
+                padding: '16px',
+                border: '1px solid #e2e8f0',
+                marginBottom: '16px'
+              }}>
+                <h4 style={{
+                  fontWeight: '600',
+                  color: '#111827',
+                  fontSize: '14px',
+                  marginBottom: '12px',
+                  display: 'flex',
+                  alignItems: 'center'
+                }}>
+                  <span style={{
+                    width: '8px',
+                    height: '8px',
+                    backgroundColor: '#6b7280',
+                    borderRadius: '50%',
+                    marginRight: '8px'
+                  }}></span>
+                  Quick Actions
+                </h4>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  <button 
+                    onClick={() => setShowProfileManagement(true)}
+                    style={{
+                      width: '100%',
+                      padding: '12px 16px',
+                      backgroundColor: '#dbeafe',
+                      color: '#1d4ed8',
+                      borderRadius: '8px',
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      border: '1px solid #93c5fd',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      transition: 'all 0.2s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = '#bfdbfe'
+                      e.currentTarget.style.borderColor = '#60a5fa'
+                      e.currentTarget.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.1)'
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = '#dbeafe'
+                      e.currentTarget.style.borderColor = '#93c5fd'
+                      e.currentTarget.style.boxShadow = 'none'
+                    }}
+                  >
+                    <span style={{ marginRight: '8px' }}>⚙️</span>
+                    Manage Profile
+                  </button>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <button 
+                      onClick={() => setIsExpanded(false)}
+                      style={{
+                        flex: 1,
+                        padding: '12px 16px',
+                        backgroundColor: 'white',
+                        color: '#374151',
+                        borderRadius: '8px',
+                        fontSize: '14px',
+                        fontWeight: '500',
+                        border: '1px solid #d1d5db',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = '#f9fafb'
+                        e.currentTarget.style.borderColor = '#9ca3af'
+                        e.currentTarget.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.1)'
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = 'white'
+                        e.currentTarget.style.borderColor = '#d1d5db'
+                        e.currentTarget.style.boxShadow = 'none'
+                      }}
+                    >
+                      Close
+                    </button>
+                    <button 
+                      onClick={async () => {
+                        try {
+                          await fetch('/api/auth/logout', { method: 'POST' })
+                          window.location.href = '/login-simple'
+                        } catch (error) {
+                          console.error('Logout failed:', error)
+                        }
+                      }}
+                      style={{
+                        flex: 1,
+                        padding: '12px 16px',
+                        backgroundColor: '#fef2f2',
+                        color: '#dc2626',
+                        borderRadius: '8px',
+                        fontSize: '14px',
+                        fontWeight: '500',
+                        border: '1px solid #fecaca',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = '#fee2e2'
+                        e.currentTarget.style.borderColor = '#fca5a5'
+                        e.currentTarget.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.1)'
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = '#fef2f2'
+                        e.currentTarget.style.borderColor = '#fecaca'
+                        e.currentTarget.style.boxShadow = 'none'
+                      }}
+                    >
+                      Sign Out
+                    </button>
+                  </div>
+                </div>
+              </div>
+
               {/* Account Information Card */}
               <div style={{
                 background: 'linear-gradient(135deg, #eff6ff 0%, #e0e7ff 100%)',
@@ -453,127 +576,6 @@ export function UserProfile({ className = '', showDetails = true, onProfileUpdat
                 </div>
               )}
 
-              {/* Quick Actions Card */}
-              <div style={{
-                background: 'linear-gradient(135deg, #f9fafb 0%, #f1f5f9 100%)',
-                borderRadius: '12px',
-                padding: '16px',
-                border: '1px solid #e2e8f0'
-              }}>
-                <h4 style={{
-                  fontWeight: '600',
-                  color: '#111827',
-                  fontSize: '14px',
-                  marginBottom: '12px',
-                  display: 'flex',
-                  alignItems: 'center'
-                }}>
-                  <span style={{
-                    width: '8px',
-                    height: '8px',
-                    backgroundColor: '#6b7280',
-                    borderRadius: '50%',
-                    marginRight: '8px'
-                  }}></span>
-                  Quick Actions
-                </h4>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  <button 
-                    onClick={() => setShowProfileManagement(true)}
-                    style={{
-                      width: '100%',
-                      padding: '12px 16px',
-                      backgroundColor: '#dbeafe',
-                      color: '#1d4ed8',
-                      borderRadius: '8px',
-                      fontSize: '14px',
-                      fontWeight: '500',
-                      border: '1px solid #93c5fd',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      transition: 'all 0.2s ease'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = '#bfdbfe'
-                      e.currentTarget.style.borderColor = '#60a5fa'
-                      e.currentTarget.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.1)'
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = '#dbeafe'
-                      e.currentTarget.style.borderColor = '#93c5fd'
-                      e.currentTarget.style.boxShadow = 'none'
-                    }}
-                  >
-                    <span style={{ marginRight: '8px' }}>⚙️</span>
-                    Manage Profile
-                  </button>
-                  <div style={{ display: 'flex', gap: '8px' }}>
-                    <button 
-                      onClick={() => setIsExpanded(false)}
-                      style={{
-                        flex: 1,
-                        padding: '12px 16px',
-                        backgroundColor: 'white',
-                        color: '#374151',
-                        borderRadius: '8px',
-                        fontSize: '14px',
-                        fontWeight: '500',
-                        border: '1px solid #d1d5db',
-                        cursor: 'pointer',
-                        transition: 'all 0.2s ease'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = '#f9fafb'
-                        e.currentTarget.style.borderColor = '#9ca3af'
-                        e.currentTarget.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.1)'
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = 'white'
-                        e.currentTarget.style.borderColor = '#d1d5db'
-                        e.currentTarget.style.boxShadow = 'none'
-                      }}
-                    >
-                      Close
-                    </button>
-                    <button 
-                      onClick={async () => {
-                        try {
-                          await fetch('/api/auth/logout', { method: 'POST' })
-                          window.location.href = '/login-simple'
-                        } catch (error) {
-                          console.error('Logout failed:', error)
-                        }
-                      }}
-                      style={{
-                        flex: 1,
-                        padding: '12px 16px',
-                        backgroundColor: '#fef2f2',
-                        color: '#dc2626',
-                        borderRadius: '8px',
-                        fontSize: '14px',
-                        fontWeight: '500',
-                        border: '1px solid #fecaca',
-                        cursor: 'pointer',
-                        transition: 'all 0.2s ease'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = '#fee2e2'
-                        e.currentTarget.style.borderColor = '#fca5a5'
-                        e.currentTarget.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.1)'
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = '#fef2f2'
-                        e.currentTarget.style.borderColor = '#fecaca'
-                        e.currentTarget.style.boxShadow = 'none'
-                      }}
-                    >
-                      Sign Out
-                    </button>
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
         </div>
