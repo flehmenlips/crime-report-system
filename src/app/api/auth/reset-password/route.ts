@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { EmailService } from '@/lib/email'
 import crypto from 'crypto'
 
 export async function POST(request: NextRequest) {
@@ -39,14 +40,29 @@ export async function POST(request: NextRequest) {
     }
 
     // Update user with new password and clear reset tokens
-    await prisma.user.update({
+    const updatedUser = await prisma.user.update({
       where: { id: user.id },
       data: {
         password: password, // In a real app, you'd hash this
         passwordResetToken: null,
-        passwordResetExpires: null
+        passwordResetExpires: null,
+        isActive: true // Activate account after password is set
       }
     })
+
+    // If this was an invitation setup (user had temp password), send welcome email
+    if (user.password === 'temp-password-needs-setup') {
+      try {
+        await EmailService.sendWelcomeEmail(
+          user.email,
+          user.name,
+          user.role
+        )
+      } catch (error) {
+        console.error('Failed to send welcome email after invitation setup:', error)
+        // Don't fail the password reset if welcome email fails
+      }
+    }
 
     return NextResponse.json({
       success: true,
@@ -94,7 +110,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       success: true,
       message: 'Token is valid',
-      email: user.email
+      email: user.email,
+      isInvitationSetup: user.password === 'temp-password-needs-setup'
     })
 
   } catch (error) {

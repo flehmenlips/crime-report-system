@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { getCurrentUser } from '@/lib/auth-server'
 import { EmailService } from '@/lib/email'
+import crypto from 'crypto'
 
 export async function GET(request: NextRequest) {
   try {
@@ -92,13 +93,17 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Generate password reset token for invitation setup
+    const setupToken = crypto.randomBytes(32).toString('hex')
+    const setupExpires = new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours from now
+
     // Create user and assign to current user's tenant
     const newUser = await prisma.user.create({
       data: {
         username,
         email,
         name,
-        password, // In a real app, you'd hash this
+        password: 'temp-password-needs-setup', // Temporary password that must be changed
         role: role as any,
         accessLevel: 'stakeholder' as any,
         phone: '',
@@ -111,10 +116,12 @@ export async function POST(request: NextRequest) {
         title: '',
         bio: '',
         avatar: '',
-        emailVerified: false,
-        isActive: true,
+        emailVerified: true, // Mark as verified since they're invited by trusted user
+        isActive: false, // Don't activate until password is set
         preferences: '',
         tenantId: currentUser.tenantId, // Assign to current user's tenant
+        passwordResetToken: setupToken,
+        passwordResetExpires: setupExpires,
       },
       include: {
         tenant: true
@@ -129,11 +136,15 @@ export async function POST(request: NextRequest) {
     })
 
     if (tenant) {
+      // Create password setup URL
+      const setupPasswordUrl = `${process.env.NEXTAUTH_URL || 'https://remise-rov8.onrender.com'}/reset-password?token=${setupToken}`
+      
       const emailResult = await EmailService.sendInvitationEmail(
         email,
         name,
         currentUser.name,
-        tenant.name
+        tenant.name,
+        setupPasswordUrl
       )
 
       if (!emailResult.success) {

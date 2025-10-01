@@ -183,7 +183,7 @@ export const EMAIL_TEMPLATES = {
   // User invitation email
   invitation: {
     subject: 'You\'ve been invited to join Crime Report System',
-    template: (inviteeName: string, inviterName: string, tenantName: string, loginUrl: string) => ({
+    template: (inviteeName: string, inviterName: string, tenantName: string, setupPasswordUrl: string) => ({
       subject: 'You\'ve been invited to join Crime Report System',
       html: `
         <!DOCTYPE html>
@@ -200,6 +200,7 @@ export const EMAIL_TEMPLATES = {
             .button { display: inline-block; background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%); color: white; padding: 16px 32px; text-decoration: none; border-radius: 8px; font-weight: 600; margin: 20px 0; }
             .invitation-details { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; margin: 20px 0; }
             .highlight { background: #ede9fe; border-left: 4px solid #8b5cf6; padding: 16px; margin: 20px 0; border-radius: 0 8px 8px 0; }
+            .security-note { background: #fef3c7; border: 1px solid #f59e0b; border-radius: 8px; padding: 16px; margin: 20px 0; }
           </style>
         </head>
         <body>
@@ -224,11 +225,15 @@ export const EMAIL_TEMPLATES = {
             
             <div class="highlight">
               <strong>🚀 Ready to get started?</strong><br>
-              Your account has been created and is ready to use. Simply click the button below to access the system.
+              Your account has been created! Click the button below to set up your secure password and access the system.
             </div>
             
             <div style="text-align: center;">
-              <a href="${loginUrl}" class="button">Access Crime Report System</a>
+              <a href="${setupPasswordUrl}" class="button">Set Up Your Password</a>
+            </div>
+            
+            <div class="security-note">
+              <strong>🔒 Security Note:</strong> This link will expire in 24 hours for security reasons. If you didn't expect this invitation, please ignore this email.
             </div>
             
             <p><strong>Need help?</strong> Contact ${inviterName} or our support team if you have any questions about getting started.</p>
@@ -383,10 +388,9 @@ export class EmailService {
   }
 
   // Send user invitation email
-  static async sendInvitationEmail(email: string, inviteeName: string, inviterName: string, tenantName: string) {
+  static async sendInvitationEmail(email: string, inviteeName: string, inviterName: string, tenantName: string, setupPasswordUrl: string) {
     try {
-      const loginUrl = `${EMAIL_CONFIG.websiteUrl}/login-simple`
-      const template = EMAIL_TEMPLATES.invitation.template(inviteeName, inviterName, tenantName, loginUrl)
+      const template = EMAIL_TEMPLATES.invitation.template(inviteeName, inviterName, tenantName, setupPasswordUrl)
       
       const result = await resend.emails.send({
         from: EMAIL_CONFIG.from,

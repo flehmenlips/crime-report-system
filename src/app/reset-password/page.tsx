@@ -11,6 +11,7 @@ function ResetPasswordContent() {
   const [error, setError] = useState('')
   const [tokenValid, setTokenValid] = useState(false)
   const [email, setEmail] = useState('')
+  const [isInvitationSetup, setIsInvitationSetup] = useState(false)
   const searchParams = useSearchParams()
   const router = useRouter()
 
@@ -29,6 +30,8 @@ function ResetPasswordContent() {
         if (data.success) {
           setTokenValid(true)
           setEmail(data.email)
+          // Check if this is an invitation setup (user has temp password)
+          setIsInvitationSetup(data.isInvitationSetup || false)
         } else {
           setError(data.error || 'Invalid or expired reset token')
         }
@@ -70,9 +73,13 @@ function ResetPasswordContent() {
       const data = await response.json()
 
       if (data.success) {
-        setMessage('Password reset successfully! Redirecting to login...')
+        if (isInvitationSetup) {
+          setMessage('Password set successfully! Welcome to Crime Report System. Redirecting to login...')
+        } else {
+          setMessage('Password reset successfully! Redirecting to login...')
+        }
         setTimeout(() => {
-          router.push('/login')
+          router.push('/login-simple')
         }, 2000)
       } else {
         setError(data.error || 'Failed to reset password')
@@ -160,13 +167,16 @@ function ResetPasswordContent() {
             color: '#1f2937',
             marginBottom: '8px'
           }}>
-            Reset Password
+            {isInvitationSetup ? 'Set Up Your Password' : 'Reset Password'}
           </h1>
           <p style={{
             color: '#6b7280',
             fontSize: '16px'
           }}>
-            {email && `Enter a new password for ${email}`}
+            {isInvitationSetup 
+              ? `Welcome! Set up your password to complete your account setup for ${email}`
+              : email && `Enter a new password for ${email}`
+            }
           </p>
         </div>
 
