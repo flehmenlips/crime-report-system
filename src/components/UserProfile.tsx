@@ -188,15 +188,17 @@ export function UserProfile({ className = '', showDetails = true, onProfileUpdat
             <div className="space-y-4">
               {/* Quick Actions Card - MOVED TO TOP */}
               <div style={{
-                background: 'linear-gradient(135deg, #f9fafb 0%, #f1f5f9 100%)',
+                background: 'rgba(30, 41, 59, 0.8)',
+                backdropFilter: 'blur(12px)',
                 borderRadius: '12px',
                 padding: '16px',
-                border: '1px solid #e2e8f0',
+                border: '1px solid rgba(71, 85, 105, 0.4)',
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
                 marginBottom: '16px'
               }}>
                 <h4 style={{
                   fontWeight: '600',
-                  color: '#111827',
+                  color: 'white',
                   fontSize: '14px',
                   marginBottom: '12px',
                   display: 'flex',
@@ -205,7 +207,7 @@ export function UserProfile({ className = '', showDetails = true, onProfileUpdat
                   <span style={{
                     width: '8px',
                     height: '8px',
-                    backgroundColor: '#6b7280',
+                    backgroundColor: 'rgba(255, 255, 255, 0.6)',
                     borderRadius: '50%',
                     marginRight: '8px'
                   }}></span>
@@ -311,15 +313,17 @@ export function UserProfile({ className = '', showDetails = true, onProfileUpdat
 
               {/* Account Information Card */}
               <div style={{
-                background: 'linear-gradient(135deg, #eff6ff 0%, #e0e7ff 100%)',
+                background: 'rgba(30, 41, 59, 0.8)',
+                backdropFilter: 'blur(12px)',
                 borderRadius: '12px',
                 padding: '16px',
-                border: '1px solid #dbeafe',
+                border: '1px solid rgba(71, 85, 105, 0.4)',
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
                 marginBottom: '16px'
               }}>
                 <h4 style={{
                   fontWeight: '600',
-                  color: '#111827',
+                  color: 'white',
                   fontSize: '14px',
                   marginBottom: '12px',
                   display: 'flex',
@@ -336,24 +340,24 @@ export function UserProfile({ className = '', showDetails = true, onProfileUpdat
                 </h4>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', fontSize: '14px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ color: '#6b7280', fontWeight: '500' }}>Email: </span>
-                    <span style={{ color: '#111827', fontWeight: '500' }}>{user.email}</span>
+                    <span style={{ color: 'rgba(255, 255, 255, 0.7)', fontWeight: '500' }}>Email: </span>
+                    <span style={{ color: 'white', fontWeight: '500' }}>{user.email}</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                    <span style={{ color: '#6b7280', fontWeight: '500' }}>User ID: </span>
+                    <span style={{ color: 'rgba(255, 255, 255, 0.7)', fontWeight: '500' }}>User ID: </span>
                     <span style={{ 
-                      color: '#111827', 
+                      color: 'white', 
                       fontFamily: 'monospace', 
                       fontSize: '12px', 
-                      backgroundColor: 'white', 
+                      backgroundColor: 'rgba(255, 255, 255, 0.1)', 
                       padding: '4px 8px', 
                       borderRadius: '4px', 
-                      border: '1px solid #e5e7eb' 
+                      border: '1px solid rgba(255, 255, 255, 0.2)' 
                     }}>{user.id}</span>
                   </div>
                   {accessLevelInfo && (
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span style={{ color: '#6b7280', fontWeight: '500' }}>Access Level: </span>
+                      <span style={{ color: 'rgba(255, 255, 255, 0.7)', fontWeight: '500' }}>Access Level: </span>
                       <span style={{
                         display: 'inline-flex',
                         alignItems: 'center',
@@ -363,21 +367,21 @@ export function UserProfile({ className = '', showDetails = true, onProfileUpdat
                         fontWeight: '500',
                         border: '1px solid',
                         ...(accessLevelInfo.level === 'owner' ? {
-                          backgroundColor: '#f3e8ff',
-                          color: '#6b21a8',
-                          borderColor: '#d8b4fe'
+                          backgroundColor: 'rgba(147, 51, 234, 0.2)',
+                          color: '#a855f7',
+                          borderColor: 'rgba(168, 85, 247, 0.4)'
                         } : accessLevelInfo.level === 'staff' ? {
-                          backgroundColor: '#dbeafe',
-                          color: '#1d4ed8',
-                          borderColor: '#93c5fd'
+                          backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                          color: '#60a5fa',
+                          borderColor: 'rgba(96, 165, 250, 0.4)'
                         } : accessLevelInfo.level === 'stakeholder' ? {
-                          backgroundColor: '#dcfce7',
-                          color: '#166534',
-                          borderColor: '#86efac'
+                          backgroundColor: 'rgba(34, 197, 94, 0.2)',
+                          color: '#4ade80',
+                          borderColor: 'rgba(74, 222, 128, 0.4)'
                         } : {
-                          backgroundColor: '#f3f4f6',
-                          color: '#374151',
-                          borderColor: '#d1d5db'
+                          backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                          color: 'rgba(255, 255, 255, 0.8)',
+                          borderColor: 'rgba(255, 255, 255, 0.2)'
                         })
                       }}>
                         {accessLevelInfo.displayName}
@@ -390,15 +394,17 @@ export function UserProfile({ className = '', showDetails = true, onProfileUpdat
               {/* Tenant Information Card */}
               {tenantInfo && (
                 <div style={{
-                  background: 'linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%)',
+                  background: 'rgba(30, 41, 59, 0.8)',
+                  backdropFilter: 'blur(12px)',
                   borderRadius: '12px',
                   padding: '16px',
-                  border: '1px solid #bbf7d0',
+                  border: '1px solid rgba(71, 85, 105, 0.4)',
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
                   marginBottom: '16px'
                 }}>
                   <h4 style={{
                     fontWeight: '600',
-                    color: '#111827',
+                    color: 'white',
                     fontSize: '14px',
                     marginBottom: '12px',
                     display: 'flex',
@@ -415,11 +421,11 @@ export function UserProfile({ className = '', showDetails = true, onProfileUpdat
                   </h4>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', fontSize: '14px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span style={{ color: '#6b7280', fontWeight: '500' }}>Property: </span>
-                      <span style={{ color: '#111827', fontWeight: '500' }}>{tenantInfo.name}</span>
+                      <span style={{ color: 'rgba(255, 255, 255, 0.7)', fontWeight: '500' }}>Property: </span>
+                      <span style={{ color: 'white', fontWeight: '500' }}>{tenantInfo.name}</span>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span style={{ color: '#6b7280', fontWeight: '500' }}>Status: </span>
+                      <span style={{ color: 'rgba(255, 255, 255, 0.7)', fontWeight: '500' }}>Status: </span>
                       <span style={{
                         display: 'inline-flex',
                         alignItems: 'center',
@@ -429,29 +435,29 @@ export function UserProfile({ className = '', showDetails = true, onProfileUpdat
                         fontWeight: '500',
                         border: '1px solid',
                         ...(tenantInfo.isActive ? {
-                          backgroundColor: '#dcfce7',
-                          color: '#166534',
-                          borderColor: '#86efac'
+                          backgroundColor: 'rgba(34, 197, 94, 0.2)',
+                          color: '#4ade80',
+                          borderColor: 'rgba(74, 222, 128, 0.4)'
                         } : {
-                          backgroundColor: '#fef2f2',
-                          color: '#991b1b',
-                          borderColor: '#fecaca'
+                          backgroundColor: 'rgba(239, 68, 68, 0.2)',
+                          color: '#f87171',
+                          borderColor: 'rgba(248, 113, 113, 0.4)'
                         })
                       }}>
                         {tenantInfo.isActive ? 'Active' : 'Inactive'}
                       </span>
                     </div>
                     {tenantInfo.description && (
-                      <div style={{ marginTop: '12px', paddingTop: '12px', borderTop: '1px solid #bbf7d0' }}>
-                        <span style={{ color: '#6b7280', fontWeight: '500', fontSize: '12px', display: 'block', marginBottom: '8px' }}>Description: </span>
+                      <div style={{ marginTop: '12px', paddingTop: '12px', borderTop: '1px solid rgba(255, 255, 255, 0.2)' }}>
+                        <span style={{ color: 'rgba(255, 255, 255, 0.7)', fontWeight: '500', fontSize: '12px', display: 'block', marginBottom: '8px' }}>Description: </span>
                         <span style={{ 
-                          color: '#374151', 
+                          color: 'white', 
                           fontSize: '12px', 
                           lineHeight: '1.5', 
-                          backgroundColor: 'white', 
+                          backgroundColor: 'rgba(255, 255, 255, 0.1)', 
                           padding: '12px', 
                           borderRadius: '8px', 
-                          border: '1px solid #bbf7d0',
+                          border: '1px solid rgba(255, 255, 255, 0.2)',
                           display: 'block'
                         }}>{tenantInfo.description}</span>
                       </div>
@@ -462,15 +468,17 @@ export function UserProfile({ className = '', showDetails = true, onProfileUpdat
 
               {/* Access Type Card */}
               <div style={{
-                background: 'linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%)',
+                background: 'rgba(30, 41, 59, 0.8)',
+                backdropFilter: 'blur(12px)',
                 borderRadius: '12px',
                 padding: '16px',
-                border: '1px solid #e9d5ff',
+                border: '1px solid rgba(71, 85, 105, 0.4)',
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
                 marginBottom: '16px'
               }}>
                 <h4 style={{
                   fontWeight: '600',
-                  color: '#111827',
+                  color: 'white',
                   fontSize: '14px',
                   marginBottom: '12px',
                   display: 'flex',
@@ -500,8 +508,8 @@ export function UserProfile({ className = '', showDetails = true, onProfileUpdat
                         <div style={{ width: '8px', height: '8px', backgroundColor: 'white', borderRadius: '50%' }}></div>
                       </div>
                       <div>
-                        <span style={{ fontSize: '14px', color: '#1d4ed8', fontWeight: '500' }}>Property Owner</span>
-                        <p style={{ fontSize: '12px', color: '#6b7280', margin: '4px 0 0 0' }}>Full control over your property data</p>
+                        <span style={{ fontSize: '14px', color: '#60a5fa', fontWeight: '500' }}>Property Owner</span>
+                        <p style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.7)', margin: '4px 0 0 0' }}>Full control over your property data</p>
                       </div>
                     </div>
                   ) : (
@@ -518,8 +526,8 @@ export function UserProfile({ className = '', showDetails = true, onProfileUpdat
                         <div style={{ width: '8px', height: '8px', backgroundColor: 'white', borderRadius: '50%' }}></div>
                       </div>
                       <div>
-                        <span style={{ fontSize: '14px', color: '#166534', fontWeight: '500' }}>Stakeholder Access</span>
-                        <p style={{ fontSize: '12px', color: '#6b7280', margin: '4px 0 0 0' }}>Controlled access to property data</p>
+                        <span style={{ fontSize: '14px', color: '#4ade80', fontWeight: '500' }}>Stakeholder Access</span>
+                        <p style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.7)', margin: '4px 0 0 0' }}>Controlled access to property data</p>
                       </div>
                     </div>
                   )}
@@ -529,15 +537,17 @@ export function UserProfile({ className = '', showDetails = true, onProfileUpdat
               {/* Permissions Card */}
               {permissions.length > 0 && (
                 <div style={{
-                  background: 'linear-gradient(135deg, #fff7ed 0%, #fed7aa 100%)',
+                  background: 'rgba(30, 41, 59, 0.8)',
+                  backdropFilter: 'blur(12px)',
                   borderRadius: '12px',
                   padding: '16px',
-                  border: '1px solid #fed7aa',
+                  border: '1px solid rgba(71, 85, 105, 0.4)',
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
                   marginBottom: '16px'
                 }}>
                   <h4 style={{
                     fontWeight: '600',
-                    color: '#111827',
+                    color: 'white',
                     fontSize: '14px',
                     marginBottom: '12px',
                     display: 'flex',
@@ -563,10 +573,10 @@ export function UserProfile({ className = '', showDetails = true, onProfileUpdat
                           borderRadius: '9999px',
                           fontSize: '12px',
                           fontWeight: '500',
-                          backgroundColor: 'white',
-                          color: '#ea580c',
-                          border: '1px solid #fed7aa',
-                          boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)'
+                          backgroundColor: 'rgba(249, 115, 22, 0.2)',
+                          color: '#fb923c',
+                          border: '1px solid rgba(251, 146, 60, 0.4)',
+                          boxShadow: '0 1px 2px rgba(0, 0, 0, 0.1)'
                         }}
                       >
                         {permission}
