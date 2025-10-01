@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { getCurrentUser } from '@/lib/auth-server'
+import { EmailService } from '@/lib/email'
 
 export async function GET(request: NextRequest) {
   try {
@@ -122,10 +123,32 @@ export async function POST(request: NextRequest) {
 
     console.log(`✅ User "${name}" invited to tenant "${currentUser.tenantId}"`)
 
+    // Send invitation email
+    const tenant = await prisma.tenant.findUnique({
+      where: { id: currentUser.tenantId }
+    })
+
+    if (tenant) {
+      const emailResult = await EmailService.sendInvitationEmail(
+        email,
+        name,
+        currentUser.name,
+        tenant.name
+      )
+
+      if (!emailResult.success) {
+        console.error('Failed to send invitation email:', emailResult.error)
+        // Don't fail the invitation if email fails, but log it
+      } else {
+        console.log(`📧 Invitation email sent to ${email}`)
+      }
+    }
+
     // Return user without password
     const { password: _, ...userWithoutPassword } = newUser
     return NextResponse.json({
       success: true,
+      message: 'User invited successfully and invitation email sent',
       user: userWithoutPassword
     })
 

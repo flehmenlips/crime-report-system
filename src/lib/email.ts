@@ -180,6 +180,69 @@ export const EMAIL_TEMPLATES = {
     })
   },
 
+  // User invitation email
+  invitation: {
+    subject: 'You\'ve been invited to join Crime Report System',
+    template: (inviteeName: string, inviterName: string, tenantName: string, loginUrl: string) => ({
+      subject: 'You\'ve been invited to join Crime Report System',
+      html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Invitation to Crime Report System</title>
+          <style>
+            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%); color: white; padding: 30px; border-radius: 12px 12px 0 0; text-align: center; }
+            .content { background: #ffffff; padding: 30px; border: 1px solid #e5e7eb; border-top: none; }
+            .footer { background: #f9fafb; padding: 20px; border-radius: 0 0 12px 12px; text-align: center; font-size: 14px; color: #6b7280; }
+            .button { display: inline-block; background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%); color: white; padding: 16px 32px; text-decoration: none; border-radius: 8px; font-weight: 600; margin: 20px 0; }
+            .invitation-details { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; margin: 20px 0; }
+            .highlight { background: #ede9fe; border-left: 4px solid #8b5cf6; padding: 16px; margin: 20px 0; border-radius: 0 8px 8px 0; }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h1>🎉 You're Invited!</h1>
+            <p>Join the Crime Report System</p>
+          </div>
+          <div class="content">
+            <h2>Hello ${inviteeName}!</h2>
+            <p><strong>${inviterName}</strong> has invited you to join the Crime Report System for <strong>${tenantName}</strong>.</p>
+            
+            <div class="invitation-details">
+              <h3>📋 What you can do:</h3>
+              <ul>
+                <li>📊 View and manage stolen item reports</li>
+                <li>📸 Upload and organize evidence</li>
+                <li>🔍 Search and filter reports</li>
+                <li>📈 Generate professional reports</li>
+                <li>👥 Collaborate with your team</li>
+              </ul>
+            </div>
+            
+            <div class="highlight">
+              <strong>🚀 Ready to get started?</strong><br>
+              Your account has been created and is ready to use. Simply click the button below to access the system.
+            </div>
+            
+            <div style="text-align: center;">
+              <a href="${loginUrl}" class="button">Access Crime Report System</a>
+            </div>
+            
+            <p><strong>Need help?</strong> Contact ${inviterName} or our support team if you have any questions about getting started.</p>
+          </div>
+          <div class="footer">
+            <p>© 2024 Crime Report System. All rights reserved.</p>
+            <p>This invitation was sent by ${inviterName} for ${tenantName}.</p>
+          </div>
+        </body>
+        </html>
+      `
+    })
+  },
+
   // New stolen item notification
   itemNotification: {
     subject: 'New Stolen Item Report - Crime Report System',
@@ -315,6 +378,27 @@ export class EmailService {
       return { success: true, messageId: result.data?.id }
     } catch (error) {
       console.error('Error sending item notification email:', error)
+      return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+    }
+  }
+
+  // Send user invitation email
+  static async sendInvitationEmail(email: string, inviteeName: string, inviterName: string, tenantName: string) {
+    try {
+      const loginUrl = `${EMAIL_CONFIG.websiteUrl}/login-simple`
+      const template = EMAIL_TEMPLATES.invitation.template(inviteeName, inviterName, tenantName, loginUrl)
+      
+      const result = await resend.emails.send({
+        from: EMAIL_CONFIG.from,
+        to: [email],
+        subject: template.subject,
+        html: template.html,
+      })
+      
+      console.log('Invitation email sent:', result)
+      return { success: true, messageId: result.data?.id }
+    } catch (error) {
+      console.error('Error sending invitation email:', error)
       return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
     }
   }

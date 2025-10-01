@@ -39,7 +39,7 @@ export function InviteUserModal({ tenantId, tenantName, onClose, onSuccess }: In
       const inviteResult = await inviteResponse.json()
 
       if (inviteResponse.ok) {
-        alert(`✅ User "${formData.name}" has been successfully added to ${tenantName}!`)
+        alert(`✅ User "${formData.name}" has been successfully added to ${tenantName}!\n📧 An invitation email has been sent to ${formData.email}`)
         onSuccess()
         onClose()
       } else {
