@@ -6,7 +6,9 @@ export async function GET(request: NextRequest) {
   try {
     // Get current user for tenant isolation
     const user = await getCurrentUser()
+    console.log('Evidence API - User check:', user ? `${user.name} (${user.role})` : 'null')
     if (!user) {
+      console.log('Evidence API - No user found, returning 401')
       return NextResponse.json(
         { error: 'Authentication required' },
         { status: 401 }

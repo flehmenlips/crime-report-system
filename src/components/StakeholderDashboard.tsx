@@ -34,6 +34,7 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
   const [detailViewItem, setDetailViewItem] = useState<StolenItem | null>(null)
   const [filteredItems, setFilteredItems] = useState<StolenItem[]>([])
   const [isFiltered, setIsFiltered] = useState(false)
+  const [viewMode, setViewMode] = useState<'cards' | 'list'>('cards')
 
   // Role-based access controls
   const canReadAll = () => user.role === 'law_enforcement' || user.role === 'insurance_agent' || user.role === 'banker'
@@ -571,33 +572,86 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
           boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)'
         }}>
           <div style={{ marginBottom: '24px' }}>
-            <h2 style={{ fontSize: '28px', fontWeight: '700', color: '#1f2937', marginBottom: '8px' }}>
-              Evidence Database
-            </h2>
-            <p style={{ color: '#6b7280', fontSize: '16px' }}>
-              {getRoleDisplayName(user.role)} view • {displayItems.length} items catalogued
-              {isFiltered && (
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+              <div>
+                <h2 style={{ fontSize: '28px', fontWeight: '700', color: '#1f2937', marginBottom: '8px' }}>
+                  Evidence Database
+                </h2>
+                <p style={{ color: '#6b7280', fontSize: '16px' }}>
+                  {getRoleDisplayName(user.role)} view • {displayItems.length} items catalogued
+                </p>
+              </div>
+              
+              {/* View Mode Toggle */}
+              <div style={{ display: 'flex', background: '#f3f4f6', borderRadius: '12px', padding: '4px' }}>
                 <button
-                  onClick={() => {
-                    setIsFiltered(false)
-                    setFilteredItems([])
-                  }}
+                  onClick={() => setViewMode('cards')}
                   style={{
-                    background: '#fef3c7',
-                    color: '#92400e',
+                    background: viewMode === 'cards' ? '#3b82f6' : 'transparent',
+                    color: viewMode === 'cards' ? 'white' : '#6b7280',
                     border: 'none',
-                    padding: '4px 8px',
-                    borderRadius: '6px',
-                    fontSize: '12px',
+                    padding: '8px 16px',
+                    borderRadius: '8px',
+                    fontSize: '14px',
                     fontWeight: '600',
                     cursor: 'pointer',
-                    marginLeft: '12px'
+                    transition: 'all 0.2s ease',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px'
                   }}
                 >
-                  Clear Filter
+                  <svg style={{ width: '16px', height: '16px' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                  </svg>
+                  Cards
                 </button>
-              )}
-            </p>
+                <button
+                  onClick={() => setViewMode('list')}
+                  style={{
+                    background: viewMode === 'list' ? '#3b82f6' : 'transparent',
+                    color: viewMode === 'list' ? 'white' : '#6b7280',
+                    border: 'none',
+                    padding: '8px 16px',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px'
+                  }}
+                >
+                  <svg style={{ width: '16px', height: '16px' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                  </svg>
+                  List
+                </button>
+              </div>
+            </div>
+            
+            {isFiltered && (
+              <button
+                onClick={() => {
+                  setIsFiltered(false)
+                  setFilteredItems([])
+                }}
+                style={{
+                  background: '#fef3c7',
+                  color: '#92400e',
+                  border: 'none',
+                  padding: '4px 8px',
+                  borderRadius: '6px',
+                  fontSize: '12px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  marginLeft: '12px'
+                }}
+              >
+                Clear Filter
+              </button>
+            )}
           </div>
 
           {displayItems.length === 0 ? (
@@ -613,7 +667,154 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
                 }
               </p>
             </div>
+          ) : viewMode === 'cards' ? (
+            // Card View
+            <div style={{ 
+              display: 'grid', 
+              gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))',
+              gap: '24px'
+            }}>
+              {displayItems.map((item) => (
+                <div key={item.id} style={{
+                  background: 'white',
+                  borderRadius: '16px',
+                  padding: '24px',
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+                  border: '1px solid #e5e7eb',
+                  transition: 'all 0.2s ease',
+                  cursor: 'pointer'
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-2px)'
+                  e.currentTarget.style.boxShadow = '0 8px 25px rgba(0, 0, 0, 0.15)'
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)'
+                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.1)'
+                }}
+                onClick={() => {
+                  setDetailViewItem(item)
+                  setShowDetailView(true)
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '16px' }}>
+                    <div style={{
+                      width: '56px',
+                      height: '56px',
+                      background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
+                      borderRadius: '16px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '24px',
+                      color: 'white'
+                    }}>
+                      📦
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <h3 style={{ 
+                        fontSize: '18px', 
+                        fontWeight: '700', 
+                        color: '#1f2937', 
+                        margin: '0 0 4px 0',
+                        lineHeight: '1.3'
+                      }}>
+                        {item.name}
+                      </h3>
+                      <p style={{ 
+                        fontSize: '12px', 
+                        color: '#6b7280', 
+                        margin: 0 
+                      }}>
+                        ID: {item.id} • {formatDate(item.dateLastSeen)}
+                      </p>
+                    </div>
+                    <div style={{ 
+                      fontSize: '20px', 
+                      fontWeight: '700', 
+                      color: '#059669' 
+                    }}>
+                      {formatCurrency(item.estimatedValue)}
+                    </div>
+                  </div>
+
+                  <div style={{ marginBottom: '16px' }}>
+                    <p style={{ 
+                      color: '#374151', 
+                      lineHeight: '1.5',
+                      margin: '0 0 8px 0'
+                    }}>
+                      {item.description.length > 120 
+                        ? `${item.description.substring(0, 120)}...`
+                        : item.description
+                      }
+                    </p>
+                    
+                    {item.serialNumber && (
+                      <div style={{ marginBottom: '12px' }}>
+                        <span style={{
+                          background: '#fef3c7',
+                          color: '#92400e',
+                          padding: '4px 8px',
+                          borderRadius: '6px',
+                          fontSize: '11px',
+                          fontWeight: '600',
+                          fontFamily: 'monospace'
+                        }}>
+                          Serial: {item.serialNumber}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                      {item.evidence?.filter(e => e.type === 'photo')?.length > 0 && (
+                        <span style={{
+                          background: '#dbeafe',
+                          color: '#1e40af',
+                          padding: '4px 8px',
+                          borderRadius: '6px',
+                          fontSize: '11px',
+                          fontWeight: '600'
+                        }}>
+                          📷 {item.evidence.filter(e => e.type === 'photo').length}
+                        </span>
+                      )}
+                      {item.evidence?.filter(e => e.type === 'video')?.length > 0 && (
+                        <span style={{
+                          background: '#dcfce7',
+                          color: '#166534',
+                          padding: '4px 8px',
+                          borderRadius: '6px',
+                          fontSize: '11px',
+                          fontWeight: '600'
+                        }}>
+                          🎥 {item.evidence.filter(e => e.type === 'video').length}
+                        </span>
+                      )}
+                      {item.evidence?.filter(e => e.type === 'document')?.length > 0 && (
+                        <span style={{
+                          background: '#fef3c7',
+                          color: '#92400e',
+                          padding: '4px 8px',
+                          borderRadius: '6px',
+                          fontSize: '11px',
+                          fontWeight: '600'
+                        }}>
+                          📄 {item.evidence.filter(e => e.type === 'document').length}
+                        </span>
+                      )}
+                    </div>
+                    
+                    <div style={{ fontSize: '12px', color: '#6b7280' }}>
+                      {item.locationLastSeen}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           ) : (
+            // List View (Table)
             <div style={{ overflowX: 'auto' }}>
               <table style={{ 
                 width: '100%', 

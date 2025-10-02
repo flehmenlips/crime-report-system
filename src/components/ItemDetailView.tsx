@@ -39,11 +39,15 @@ export function ItemDetailView({ item, onClose, onEdit, onDelete, onDuplicate, o
     try {
       console.log('Loading evidence for item:', item.id)
       const response = await fetch(`/api/evidence?itemId=${item.id}`)
+      console.log('Evidence API response status:', response.status)
       if (response.ok) {
         const data = await response.json()
         console.log('Evidence data received:', data)
         setEvidence(data.evidence || [])
         console.log('Evidence set:', data.evidence || [])
+      } else {
+        const errorData = await response.json()
+        console.error('Evidence API error:', errorData)
       }
     } catch (error) {
       console.error('Error loading evidence:', error)
