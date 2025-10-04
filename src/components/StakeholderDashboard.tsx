@@ -13,6 +13,7 @@ import { DashboardLoading, StatsLoading, ErrorState, EmptyState } from './Loadin
 import { ExportManager } from './ExportManager'
 import { QuickExport } from './QuickExport'
 import { ReportGenerator } from './ReportGenerator'
+import { ItemCardThumbnails } from './ItemCardThumbnails'
 import { getRoleDisplayName, getDashboardTitle } from '@/lib/auth'
 
 interface StakeholderDashboardProps {
@@ -705,15 +706,17 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
                     <div style={{
                       width: '56px',
                       height: '56px',
-                      background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
                       borderRadius: '16px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: '24px',
-                      color: 'white'
+                      overflow: 'hidden',
+                      flexShrink: 0
                     }}>
-                      📦
+                      <ItemCardThumbnails 
+                        item={item} 
+                        onImageClick={(cloudinaryId) => {
+                          setDetailViewItem(item)
+                          setShowDetailView(true)
+                        }}
+                      />
                     </div>
                     <div style={{ flex: 1 }}>
                       <h3 style={{ 
@@ -848,15 +851,17 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
                           <div style={{
                             width: '48px',
                             height: '48px',
-                            background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
                             borderRadius: '12px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            fontSize: '20px',
-                            color: 'white'
+                            overflow: 'hidden',
+                            flexShrink: 0
                           }}>
-                            📦
+                            <ItemCardThumbnails 
+                              item={item} 
+                              onImageClick={(cloudinaryId) => {
+                                setDetailViewItem(item)
+                                setShowDetailView(true)
+                              }}
+                            />
                           </div>
                           <div>
                             <div style={{ fontWeight: '600', color: '#1f2937', marginBottom: '2px' }}>
