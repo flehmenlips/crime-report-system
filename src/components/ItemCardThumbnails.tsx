@@ -49,14 +49,25 @@ export function ItemCardThumbnails({ item, onImageClick }: ItemCardThumbnailsPro
   const getCloudinaryThumbnailUrl = (cloudinaryId: string) => {
     const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'dhaacekdd'
     
+    console.log('ItemCardThumbnails getCloudinaryThumbnailUrl - cloudinaryId:', cloudinaryId)
+    
     // Handle different cloudinaryId formats
     if (cloudinaryId.startsWith('demo/')) {
       // Demo mode - show placeholder
+      console.log('ItemCardThumbnails using demo placeholder')
       return `https://via.placeholder.com/120x80/3b82f6/ffffff?text=Demo+Photo`
     }
     
-    // Real Cloudinary image
-    return `https://res.cloudinary.com/${cloudName}/image/upload/w_120,h_80,c_fill,f_auto,q_auto/${cloudinaryId}`
+    // If it's already a full URL, use it directly
+    if (cloudinaryId.startsWith('https://res.cloudinary.com/')) {
+      console.log('ItemCardThumbnails cloudinaryId is already a full URL')
+      return cloudinaryId
+    }
+    
+    // Real Cloudinary image - construct URL
+    const constructedUrl = `https://res.cloudinary.com/${cloudName}/image/upload/w_120,h_80,c_fill,f_auto,q_auto/${cloudinaryId}`
+    console.log('ItemCardThumbnails constructed URL:', constructedUrl)
+    return constructedUrl
   }
 
   const photos = evidence.filter(e => e.type === 'photo')
