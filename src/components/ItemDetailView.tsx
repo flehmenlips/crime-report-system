@@ -34,8 +34,6 @@ export function ItemDetailView({ item, onClose, onEdit, onDelete, onDuplicate, o
   }, [item.id])
 
   const loadEvidence = async () => {
-    if (loadingEvidence) return // Prevent duplicate calls
-    
     try {
       console.log('Loading evidence for item:', item.id)
       const response = await fetch(`/api/evidence?itemId=${item.id}`)
