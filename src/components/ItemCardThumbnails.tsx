@@ -19,19 +19,28 @@ export function ItemCardThumbnails({ item, onImageClick }: ItemCardThumbnailsPro
   const [evidence, setEvidence] = useState<Evidence[]>([])
   const [loading, setLoading] = useState(true)
 
+  // Debug logging
+  console.log('ItemCardThumbnails rendered for item:', item.name, 'ID:', item.id)
+
   useEffect(() => {
     loadEvidence()
   }, [item.id])
 
   const loadEvidence = async () => {
     try {
+      console.log('ItemCardThumbnails loading evidence for item:', item.id)
       const response = await fetch(`/api/evidence?itemId=${item.id}`)
+      console.log('ItemCardThumbnails evidence response status:', response.status)
       if (response.ok) {
         const data = await response.json()
+        console.log('ItemCardThumbnails evidence data:', data)
         setEvidence(data.evidence || [])
+      } else {
+        const errorData = await response.json()
+        console.error('ItemCardThumbnails evidence API error:', errorData)
       }
     } catch (error) {
-      console.error('Error loading evidence:', error)
+      console.error('ItemCardThumbnails error loading evidence:', error)
     } finally {
       setLoading(false)
     }
@@ -63,7 +72,8 @@ export function ItemCardThumbnails({ item, onImageClick }: ItemCardThumbnailsPro
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        marginBottom: '16px'
+        marginBottom: '16px',
+        position: 'relative'
       }}>
         <div style={{
           width: '16px',
@@ -73,6 +83,18 @@ export function ItemCardThumbnails({ item, onImageClick }: ItemCardThumbnailsPro
           borderRadius: '50%',
           animation: 'spin 1s linear infinite'
         }}></div>
+        <div style={{
+          position: 'absolute',
+          top: '4px',
+          right: '4px',
+          background: '#059669',
+          color: 'white',
+          fontSize: '8px',
+          padding: '2px 4px',
+          borderRadius: '4px'
+        }}>
+          LOADING
+        </div>
       </div>
     )
   }
@@ -87,11 +109,24 @@ export function ItemCardThumbnails({ item, onImageClick }: ItemCardThumbnailsPro
         alignItems: 'center',
         justifyContent: 'center',
         marginBottom: '16px',
-        border: '2px dashed #d1d5db'
+        border: '2px dashed #d1d5db',
+        position: 'relative'
       }}>
         <div style={{ textAlign: 'center', color: '#6b7280' }}>
           <div style={{ fontSize: '24px', marginBottom: '4px' }}>📁</div>
           <div style={{ fontSize: '12px', fontWeight: '500' }}>No Evidence</div>
+        </div>
+        <div style={{
+          position: 'absolute',
+          top: '4px',
+          right: '4px',
+          background: '#f59e0b',
+          color: 'white',
+          fontSize: '8px',
+          padding: '2px 4px',
+          borderRadius: '4px'
+        }}>
+          NO PHOTOS
         </div>
       </div>
     )
