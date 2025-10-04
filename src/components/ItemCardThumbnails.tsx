@@ -6,6 +6,7 @@ import { StolenItem } from '@/types'
 interface ItemCardThumbnailsProps {
   item: StolenItem
   onImageClick?: (cloudinaryId: string) => void
+  compact?: boolean // New prop for compact mode
 }
 
 interface Evidence {
@@ -15,7 +16,7 @@ interface Evidence {
   originalName: string | null
 }
 
-export function ItemCardThumbnails({ item, onImageClick }: ItemCardThumbnailsProps) {
+export function ItemCardThumbnails({ item, onImageClick, compact = false }: ItemCardThumbnailsProps) {
   const [evidence, setEvidence] = useState<Evidence[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -111,6 +112,25 @@ export function ItemCardThumbnails({ item, onImageClick }: ItemCardThumbnailsPro
   }
 
   if (photos.length === 0 && videos.length === 0 && documents.length === 0) {
+    if (compact) {
+      return (
+        <div style={{
+          width: '100%',
+          height: '100%',
+          background: 'linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%)',
+          borderRadius: '12px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          border: '2px dashed #d1d5db'
+        }}>
+          <div style={{ textAlign: 'center', color: '#6b7280' }}>
+            <div style={{ fontSize: '20px', marginBottom: '2px' }}>📁</div>
+          </div>
+        </div>
+      )
+    }
+    
     return (
       <div style={{
         height: '80px',
@@ -139,6 +159,37 @@ export function ItemCardThumbnails({ item, onImageClick }: ItemCardThumbnailsPro
         }}>
           NO PHOTOS
         </div>
+      </div>
+    )
+  }
+
+  // Compact mode - just show first photo without labels
+  if (compact && photos.length > 0) {
+    return (
+      <div style={{
+        width: '100%',
+        height: '100%',
+        borderRadius: '12px',
+        overflow: 'hidden',
+        cursor: 'pointer',
+        transition: 'transform 0.2s ease'
+      }}
+      onClick={() => onImageClick?.(photos[0].cloudinaryId)}
+      onMouseOver={(e) => {
+        e.currentTarget.style.transform = 'scale(1.05)'
+      }}
+      onMouseOut={(e) => {
+        e.currentTarget.style.transform = 'scale(1)'
+      }}>
+        <img
+          src={getCloudinaryThumbnailUrl(photos[0].cloudinaryId)}
+          alt={photos[0].originalName || 'Evidence photo'}
+          style={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover'
+          }}
+        />
       </div>
     )
   }
