@@ -36,6 +36,9 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
   const [isFiltered, setIsFiltered] = useState(false)
   const [viewMode, setViewMode] = useState<'cards' | 'list'>('cards')
 
+  // Debug logging
+  console.log('StakeholderDashboard rendered for user:', user?.name, 'role:', user?.role, 'viewMode:', viewMode)
+
   // Role-based access controls
   const canReadAll = () => user.role === 'law_enforcement' || user.role === 'insurance_agent' || user.role === 'banker'
   const canWriteAll = () => user.role === 'law_enforcement' || user.role === 'insurance_agent'
@@ -576,6 +579,7 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
               <div>
                 <h2 style={{ fontSize: '28px', fontWeight: '700', color: '#1f2937', marginBottom: '8px' }}>
                   Evidence Database
+                  <span style={{ fontSize: '12px', color: '#059669', marginLeft: '10px' }}>🚀 UPDATED</span>
                 </h2>
                 <p style={{ color: '#6b7280', fontSize: '16px' }}>
                   {getRoleDisplayName(user.role)} view • {displayItems.length} items catalogued
@@ -584,6 +588,7 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
               
               {/* View Mode Toggle */}
               <div style={{ display: 'flex', background: '#f3f4f6', borderRadius: '12px', padding: '4px' }}>
+                {console.log('Rendering view toggle for viewMode:', viewMode)}
                 <button
                   onClick={() => setViewMode('cards')}
                   style={{
