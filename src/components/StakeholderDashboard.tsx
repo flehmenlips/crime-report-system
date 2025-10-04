@@ -38,6 +38,7 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
 
   // Debug logging
   console.log('StakeholderDashboard rendered for user:', user?.name, 'role:', user?.role, 'viewMode:', viewMode)
+  console.log('Rendering view toggle for viewMode:', viewMode)
 
   // Role-based access controls
   const canReadAll = () => user.role === 'law_enforcement' || user.role === 'insurance_agent' || user.role === 'banker'
@@ -588,7 +589,6 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
               
               {/* View Mode Toggle */}
               <div style={{ display: 'flex', background: '#f3f4f6', borderRadius: '12px', padding: '4px' }}>
-                {console.log('Rendering view toggle for viewMode:', viewMode)}
                 <button
                   onClick={() => setViewMode('cards')}
                   style={{
