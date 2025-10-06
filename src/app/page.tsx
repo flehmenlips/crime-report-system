@@ -1550,7 +1550,7 @@ export default function Home() {
                   <div>
                     <h2 style={{ fontSize: '48px', fontWeight: '800', color: '#1f2937', marginBottom: '16px' }}>
                       Your Stolen Items
-                      <span style={{ fontSize: '16px', color: '#059669', marginLeft: '16px' }}>🚀 FIXED v5.4</span>
+                      <span style={{ fontSize: '16px', color: '#059669', marginLeft: '16px' }}>🎯 FINAL v5.5</span>
                     </h2>
                     <p style={{ fontSize: '20px', color: '#6b7280' }}>
                       {displayItems.length} items {isFiltered ? 'found' : 'documented'} • {formatCurrency(displayTotalValue)} {isFiltered ? 'filtered' : 'total'} value
@@ -2567,6 +2567,7 @@ export default function Home() {
                 setSelectedItem(item)
                 setShowSimpleUpload(true)
               }}
+              evidence={evidenceCache[detailViewItem.id]}
             />
           )}
 

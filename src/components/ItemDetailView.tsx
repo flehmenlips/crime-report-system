@@ -11,6 +11,7 @@ interface ItemDetailViewProps {
   onDelete: (item: StolenItem) => void
   onDuplicate: (item: StolenItem) => void
   onUploadEvidence: (item: StolenItem) => void
+  evidence?: any[] // Optional evidence data to avoid API calls
 }
 
 interface Evidence {
@@ -23,15 +24,24 @@ interface Evidence {
   documentData?: any  // Binary data for documents (Uint8Array or Buffer in frontend)
 }
 
-export function ItemDetailView({ item, onClose, onEdit, onDelete, onDuplicate, onUploadEvidence }: ItemDetailViewProps) {
+export function ItemDetailView({ item, onClose, onEdit, onDelete, onDuplicate, onUploadEvidence, evidence: propEvidence }: ItemDetailViewProps) {
   const [evidence, setEvidence] = useState<Evidence[]>([])
   const [loadingEvidence, setLoadingEvidence] = useState(true)
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
   const [showActionMenu, setShowActionMenu] = useState(false)
 
   useEffect(() => {
-    loadEvidence()
-  }, [item.id])
+    if (propEvidence && Array.isArray(propEvidence)) {
+      // Use provided evidence data (no API call needed)
+      console.log('✅ ItemDetailView using provided evidence data for item:', item.id, 'Evidence count:', propEvidence.length)
+      setEvidence(propEvidence)
+      setLoadingEvidence(false)
+    } else {
+      // Fallback to API call if no evidence provided
+      console.log('⚠️ ItemDetailView no evidence prop provided for item:', item.id, 'Making API call')
+      loadEvidence()
+    }
+  }, [item.id, propEvidence])
 
   const loadEvidence = async () => {
     try {
