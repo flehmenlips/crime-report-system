@@ -1550,7 +1550,7 @@ export default function Home() {
                   <div>
                     <h2 style={{ fontSize: '48px', fontWeight: '800', color: '#1f2937', marginBottom: '16px' }}>
                       Your Stolen Items
-                      <span style={{ fontSize: '16px', color: '#dc2626', marginLeft: '16px' }}>🔍 DEBUG v5.3</span>
+                      <span style={{ fontSize: '16px', color: '#059669', marginLeft: '16px' }}>🚀 FIXED v5.4</span>
                     </h2>
                     <p style={{ fontSize: '20px', color: '#6b7280' }}>
                       {displayItems.length} items {isFiltered ? 'found' : 'documented'} • {formatCurrency(displayTotalValue)} {isFiltered ? 'filtered' : 'total'} value
@@ -2738,6 +2738,13 @@ export default function Home() {
 
   // Stakeholder dashboard for all non-property owners
   return (
+    <>
+      <style jsx>{`
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      `}</style>
       <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)' }}>
         {/* PWA Service Worker - DISABLED FOR DEBUGGING */}
         {/* <PWAServiceWorker /> */}
@@ -2748,16 +2755,37 @@ export default function Home() {
         
         {/* Desktop View */}
       
-      <StakeholderDashboard 
-        user={user} 
-        items={allItems} 
-        onItemsUpdate={(updatedItems) => setAllItems(updatedItems)}
-        loading={loading}
-        error={error}
-        onRefresh={handleRefresh}
-        evidenceCache={evidenceCache}
-        evidenceLoaded={evidenceLoaded}
-      />
+      {evidenceLoaded ? (
+        <StakeholderDashboard 
+          user={user} 
+          items={allItems} 
+          onItemsUpdate={(updatedItems) => setAllItems(updatedItems)}
+          loading={loading}
+          error={error}
+          onRefresh={handleRefresh}
+          evidenceCache={evidenceCache}
+          evidenceLoaded={evidenceLoaded}
+        />
+      ) : (
+        <div style={{ textAlign: 'center', padding: '100px 20px' }}>
+          <div style={{
+            width: '64px',
+            height: '64px',
+            border: '4px solid #e5e7eb',
+            borderTop: '4px solid #3b82f6',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite',
+            margin: '0 auto 32px'
+          }}></div>
+          <h2 style={{ fontSize: '32px', fontWeight: '700', color: '#1f2937', marginBottom: '16px' }}>
+            Loading Evidence Data
+          </h2>
+          <p style={{ fontSize: '18px', color: '#6b7280' }}>
+            Preparing thumbnail images for {allItems.length} items...
+          </p>
+        </div>
+      )}
     </div>
+    </>
   )
 }

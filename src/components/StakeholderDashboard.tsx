@@ -705,7 +705,7 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
               <div>
                 <h2 style={{ fontSize: '28px', fontWeight: '700', color: '#1f2937', marginBottom: '8px' }}>
                   Evidence Database
-                  <span style={{ fontSize: '12px', color: '#dc2626', marginLeft: '10px' }}>🔍 DEBUG v5.3</span>
+                  <span style={{ fontSize: '12px', color: '#059669', marginLeft: '10px' }}>🚀 FIXED v5.4</span>
                 </h2>
                 <p style={{ color: '#6b7280', fontSize: '16px' }}>
                   {getRoleDisplayName(user.role)} view • {displayItems.length} items catalogued
