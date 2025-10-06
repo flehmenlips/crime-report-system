@@ -201,7 +201,60 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
   }
 
   const roleConfig = getRoleConfig()
-  const displayItems = isFiltered ? filteredItems : items
+  // Simple inline sorting function (no useMemo to avoid React errors)
+  const getSortedItems = (items: StolenItem[]) => {
+    if (!items || items.length === 0) return items
+    
+    return [...items].sort((a, b) => {
+      let aValue: any
+      let bValue: any
+
+      switch (sortField) {
+        case 'name':
+          aValue = a.name?.toLowerCase() || ''
+          bValue = b.name?.toLowerCase() || ''
+          break
+        case 'value':
+          aValue = a.estimatedValue || 0
+          bValue = b.estimatedValue || 0
+          break
+        case 'date':
+          aValue = new Date(a.dateLastSeen || a.createdAt || 0)
+          bValue = new Date(b.dateLastSeen || b.createdAt || 0)
+          break
+        case 'category':
+          aValue = (a as any).category?.toLowerCase() || 'uncategorized'
+          bValue = (b as any).category?.toLowerCase() || 'uncategorized'
+          break
+        case 'serialNumber':
+          aValue = a.serialNumber?.toLowerCase() || ''
+          bValue = b.serialNumber?.toLowerCase() || ''
+          break
+        case 'location':
+          aValue = a.locationLastSeen?.toLowerCase() || ''
+          bValue = b.locationLastSeen?.toLowerCase() || ''
+          break
+        case 'evidence':
+          aValue = (a.evidence?.length || 0)
+          bValue = (b.evidence?.length || 0)
+          break
+        default:
+          return 0
+      }
+
+      if (aValue < bValue) return sortOrder === 'asc' ? -1 : 1
+      if (aValue > bValue) return sortOrder === 'asc' ? 1 : -1
+      return 0
+    })
+  }
+
+  // Handle sorting changes
+  const handleSortChange = useCallback((newSortField: any, newSortOrder: any) => {
+    setSortField(newSortField)
+    setSortOrder(newSortOrder)
+  }, [])
+
+  const displayItems = isFiltered ? filteredItems : getSortedItems(items)
   const evidenceCount = items.reduce((total, item) => 
     total + (item.evidence?.filter(e => e.type === 'photo')?.length || 0) + 
     (item.evidence?.filter(e => e.type === 'video')?.length || 0) + 
@@ -637,7 +690,7 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
               <div>
                 <h2 style={{ fontSize: '28px', fontWeight: '700', color: '#1f2937', marginBottom: '8px' }}>
                   Evidence Database
-                  <span style={{ fontSize: '12px', color: '#dc2626', marginLeft: '10px' }}>🔧 DEBUG v3</span>
+                  <span style={{ fontSize: '12px', color: '#059669', marginLeft: '10px' }}>✅ SORTING v3</span>
                 </h2>
                 <p style={{ color: '#6b7280', fontSize: '16px' }}>
                   {getRoleDisplayName(user.role)} view • {displayItems.length} items catalogued
@@ -646,13 +699,13 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
               
               {/* Controls Row */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                {/* Sort Controls - TEMPORARILY DISABLED */}
-                {/* <SimpleSortControls 
+                {/* Sort Controls */}
+                <SimpleSortControls 
                   onSortChange={handleSortChange}
                   currentField={sortField}
                   currentOrder={sortOrder}
                   showLabel={false}
-                /> */}
+                />
                 
                 {/* View Mode Toggle */}
                 <div style={{ display: 'flex', background: '#f3f4f6', borderRadius: '12px', padding: '4px' }}>

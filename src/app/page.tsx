@@ -859,8 +859,61 @@ export default function Home() {
   //   setSortOrder(newSortOrder)
   // }, [])
 
-  // Use filtered items if search is active, otherwise use allItems
-  const displayItems = isFiltered ? filteredItems : allItems
+  // Simple inline sorting function (no useMemo to avoid React errors)
+  const getSortedItems = (items: StolenItem[]) => {
+    if (!items || items.length === 0) return items
+    
+    return [...items].sort((a, b) => {
+      let aValue: any
+      let bValue: any
+
+      switch (sortField) {
+        case 'name':
+          aValue = a.name?.toLowerCase() || ''
+          bValue = b.name?.toLowerCase() || ''
+          break
+        case 'value':
+          aValue = a.estimatedValue || 0
+          bValue = b.estimatedValue || 0
+          break
+        case 'date':
+          aValue = new Date(a.dateLastSeen || a.createdAt || 0)
+          bValue = new Date(b.dateLastSeen || b.createdAt || 0)
+          break
+        case 'category':
+          aValue = (a as any).category?.toLowerCase() || 'uncategorized'
+          bValue = (b as any).category?.toLowerCase() || 'uncategorized'
+          break
+        case 'serialNumber':
+          aValue = a.serialNumber?.toLowerCase() || ''
+          bValue = b.serialNumber?.toLowerCase() || ''
+          break
+        case 'location':
+          aValue = a.locationLastSeen?.toLowerCase() || ''
+          bValue = b.locationLastSeen?.toLowerCase() || ''
+          break
+        case 'evidence':
+          aValue = (a.evidence?.length || 0)
+          bValue = (b.evidence?.length || 0)
+          break
+        default:
+          return 0
+      }
+
+      if (aValue < bValue) return sortOrder === 'asc' ? -1 : 1
+      if (aValue > bValue) return sortOrder === 'asc' ? 1 : -1
+      return 0
+    })
+  }
+
+  // Handle sorting changes
+  const handleSortChange = useCallback((newSortField: any, newSortOrder: any) => {
+    setSortField(newSortField)
+    setSortOrder(newSortOrder)
+  }, [])
+
+  // Use filtered items if search is active, otherwise use sorted items
+  const displayItems = isFiltered ? filteredItems : getSortedItems(allItems)
   const displayTotalValue = displayItems.reduce((sum, item) => sum + item.estimatedValue, 0)
 
   if (userRole === 'property_owner' || userRole === 'super_admin') {
@@ -1441,7 +1494,7 @@ export default function Home() {
                   <div>
                     <h2 style={{ fontSize: '48px', fontWeight: '800', color: '#1f2937', marginBottom: '16px' }}>
                       Your Stolen Items
-                      <span style={{ fontSize: '16px', color: '#dc2626', marginLeft: '16px' }}>🔧 DEBUG v3</span>
+                      <span style={{ fontSize: '16px', color: '#059669', marginLeft: '16px' }}>✅ SORTING v3</span>
                     </h2>
                     <p style={{ fontSize: '20px', color: '#6b7280' }}>
                       {displayItems.length} items {isFiltered ? 'found' : 'documented'} • {formatCurrency(displayTotalValue)} {isFiltered ? 'filtered' : 'total'} value
@@ -1470,13 +1523,13 @@ export default function Home() {
                   </div>
                   
                   <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                    {/* Sort Controls - TEMPORARILY DISABLED */}
-                    {/* <SimpleSortControls 
+                    {/* Sort Controls */}
+                    <SimpleSortControls 
                       onSortChange={handleSortChange}
                       currentField={sortField}
                       currentOrder={sortOrder}
                       showLabel={true}
-                    /> */}
+                    />
                     
                     {/* View Mode Toggle */}
                     <div style={{ display: 'flex', background: '#f3f4f6', borderRadius: '12px', padding: '4px' }}>
