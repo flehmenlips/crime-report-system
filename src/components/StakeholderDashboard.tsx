@@ -37,7 +37,7 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
   const [filteredItems, setFilteredItems] = useState<StolenItem[]>([])
   const [isFiltered, setIsFiltered] = useState(false)
   const [viewMode, setViewMode] = useState<'cards' | 'list'>('cards')
-  const [sortedItems, setSortedItems] = useState<StolenItem[]>([])
+  // const [sortedItems, setSortedItems] = useState<StolenItem[]>([]) // Temporarily disabled
 
   // Debug logging
   console.log('StakeholderDashboard rendered for user:', user?.name, 'role:', user?.role, 'viewMode:', viewMode)
@@ -50,15 +50,15 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
   const canAddNotes = () => ['law_enforcement', 'insurance_agent', 'broker', 'banker', 'asset_manager'].includes(user.role)
   const canExportData = () => ['law_enforcement', 'insurance_agent', 'banker'].includes(user.role)
 
-  // Initialize sorted items when items change
-  useEffect(() => {
-    setSortedItems(items)
-  }, [items])
+  // Initialize sorted items when items change - TEMPORARILY DISABLED
+  // useEffect(() => {
+  //   setSortedItems(items)
+  // }, [items])
 
-  // Handle sorting changes
-  const handleSortChange = useCallback((newSortedItems: StolenItem[]) => {
-    setSortedItems(newSortedItems)
-  }, [])
+  // Handle sorting changes - TEMPORARILY DISABLED
+  // const handleSortChange = useCallback((newSortedItems: StolenItem[]) => {
+  //   setSortedItems(newSortedItems)
+  // }, [])
 
   // Get role-specific dashboard configuration
   const getRoleConfig = () => {
@@ -157,7 +157,7 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
   }
 
   const roleConfig = getRoleConfig()
-  const displayItems = isFiltered ? filteredItems : (sortedItems.length > 0 ? sortedItems : items)
+  const displayItems = isFiltered ? filteredItems : items
   const evidenceCount = items.reduce((total, item) => 
     total + (item.evidence?.filter(e => e.type === 'photo')?.length || 0) + 
     (item.evidence?.filter(e => e.type === 'video')?.length || 0) + 
@@ -593,7 +593,7 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
               <div>
                 <h2 style={{ fontSize: '28px', fontWeight: '700', color: '#1f2937', marginBottom: '8px' }}>
                   Evidence Database
-                  <span style={{ fontSize: '12px', color: '#f59e0b', marginLeft: '10px' }}>🔧 DEBUG v1</span>
+                  <span style={{ fontSize: '12px', color: '#dc2626', marginLeft: '10px' }}>🔧 DEBUG v2</span>
                 </h2>
                 <p style={{ color: '#6b7280', fontSize: '16px' }}>
                   {getRoleDisplayName(user.role)} view • {displayItems.length} items catalogued

@@ -2,7 +2,7 @@
 
 // import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useMemo } from 'react'
 import { EnhancedEvidenceUpload } from '@/components/EnhancedEvidenceUpload'
 import { EnhancedEvidenceManager } from '@/components/EnhancedEvidenceManager'
 import { PWAServiceWorker } from '@/components/PWAServiceWorker'
@@ -76,7 +76,7 @@ export default function Home() {
   const [showReportGenerator, setShowReportGenerator] = useState(false)
   const [filteredItems, setFilteredItems] = useState<StolenItem[]>([])
   const [isFiltered, setIsFiltered] = useState(false)
-  const [sortedItems, setSortedItems] = useState<StolenItem[]>([])
+  // const [sortedItems, setSortedItems] = useState<StolenItem[]>([]) // Temporarily disabled
   const [refreshKey, setRefreshKey] = useState(0) // Force re-render key
 
   // Enhanced RBAC user state
@@ -805,18 +805,19 @@ export default function Home() {
     item.evidence?.filter(e => e.type === 'document')?.length, 0
   ) ?? 0
   
-  // Initialize sorted items when allItems changes
-  useEffect(() => {
-    setSortedItems(allItems)
-  }, [allItems])
+  // Initialize sorted items when allItems changes - TEMPORARILY DISABLED
+  // useEffect(() => {
+  //   console.log('useEffect: allItems changed, length:', allItems?.length)
+  //   setSortedItems(allItems)
+  // }, [allItems])
 
-  // Handle sorting changes
-  const handleSortChange = useCallback((newSortedItems: StolenItem[]) => {
-    setSortedItems(newSortedItems)
-  }, [])
+  // Handle sorting changes - TEMPORARILY DISABLED
+  // const handleSortChange = useCallback((newSortedItems: StolenItem[]) => {
+  //   setSortedItems(newSortedItems)
+  // }, [])
 
-  // Use filtered items if search is active, otherwise use sorted items
-  const displayItems = isFiltered ? filteredItems : (sortedItems.length > 0 ? sortedItems : allItems)
+  // Use filtered items if search is active, otherwise use allItems
+  const displayItems = isFiltered ? filteredItems : allItems
   const displayTotalValue = displayItems.reduce((sum, item) => sum + item.estimatedValue, 0)
 
   if (userRole === 'property_owner' || userRole === 'super_admin') {
@@ -1397,7 +1398,7 @@ export default function Home() {
                   <div>
                     <h2 style={{ fontSize: '48px', fontWeight: '800', color: '#1f2937', marginBottom: '16px' }}>
                       Your Stolen Items
-                      <span style={{ fontSize: '16px', color: '#f59e0b', marginLeft: '16px' }}>🔧 DEBUG v1</span>
+                      <span style={{ fontSize: '16px', color: '#dc2626', marginLeft: '16px' }}>🔧 DEBUG v2</span>
                     </h2>
                     <p style={{ fontSize: '20px', color: '#6b7280' }}>
                       {displayItems.length} items {isFiltered ? 'found' : 'documented'} • {formatCurrency(displayTotalValue)} {isFiltered ? 'filtered' : 'total'} value
