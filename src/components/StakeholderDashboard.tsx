@@ -24,9 +24,10 @@ interface StakeholderDashboardProps {
   loading?: boolean
   error?: string | null
   onRefresh?: () => void
+  evidenceCache?: Record<string, any[]> // Optional evidence cache to avoid API calls
 }
 
-export function StakeholderDashboard({ user, items, onItemsUpdate, loading = false, error = null, onRefresh }: StakeholderDashboardProps) {
+export function StakeholderDashboard({ user, items, onItemsUpdate, loading = false, error = null, onRefresh, evidenceCache }: StakeholderDashboardProps) {
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false)
   const [showGenerateReport, setShowGenerateReport] = useState(false)
   const [showAnalytics, setShowAnalytics] = useState(false)
@@ -690,7 +691,7 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
               <div>
                 <h2 style={{ fontSize: '28px', fontWeight: '700', color: '#1f2937', marginBottom: '8px' }}>
                   Evidence Database
-                  <span style={{ fontSize: '12px', color: '#dc2626', marginLeft: '10px' }}>🔧 DEBUG v4</span>
+                  <span style={{ fontSize: '12px', color: '#059669', marginLeft: '10px' }}>🚀 OPTIMIZED v5</span>
                 </h2>
                 <p style={{ color: '#6b7280', fontSize: '16px' }}>
                   {getRoleDisplayName(user.role)} view • {displayItems.length} items catalogued
@@ -834,6 +835,7 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
                         key={`thumb-${item.id}-${Date.now()}`}
                         item={item} 
                         compact={true}
+                        evidence={evidenceCache?.[item.id]}
                         onImageClick={(cloudinaryId) => {
                           setDetailViewItem(item)
                           setShowDetailView(true)
@@ -981,6 +983,7 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
                               key={`thumb-list-${item.id}-${Date.now()}`}
                               item={item} 
                               compact={true}
+                              evidence={evidenceCache?.[item.id]}
                               onImageClick={(cloudinaryId) => {
                                 setDetailViewItem(item)
                                 setShowDetailView(true)

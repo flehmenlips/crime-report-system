@@ -7,6 +7,7 @@ interface ItemCardThumbnailsProps {
   item: StolenItem
   onImageClick?: (cloudinaryId: string) => void
   compact?: boolean // New prop for compact mode
+  evidence?: any[] // Optional evidence data to avoid API calls
 }
 
 interface Evidence {
@@ -16,16 +17,24 @@ interface Evidence {
   originalName: string | null
 }
 
-export function ItemCardThumbnails({ item, onImageClick, compact = false }: ItemCardThumbnailsProps) {
+export function ItemCardThumbnails({ item, onImageClick, compact = false, evidence: propEvidence }: ItemCardThumbnailsProps) {
   const [evidence, setEvidence] = useState<Evidence[]>([])
   const [loading, setLoading] = useState(true)
 
   // Debug logging
-  console.log('ItemCardThumbnails rendered for item:', item.name, 'ID:', item.id)
+  console.log('ItemCardThumbnails rendered for item:', item.name, 'ID:', item.id, 'Has evidence prop:', !!propEvidence)
 
   useEffect(() => {
-    loadEvidence()
-  }, [item.id])
+    if (propEvidence) {
+      // Use provided evidence data (no API call needed)
+      console.log('Using provided evidence data for item:', item.id, 'Evidence count:', propEvidence.length)
+      setEvidence(propEvidence)
+      setLoading(false)
+    } else {
+      // Fallback to API call if no evidence provided
+      loadEvidence()
+    }
+  }, [item.id, propEvidence])
 
   const loadEvidence = async () => {
     try {

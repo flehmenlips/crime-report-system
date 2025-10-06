@@ -83,6 +83,9 @@ export default function Home() {
   // Enhanced RBAC user state
   const [user, setUser] = useState<User | null>(null)
   const role = user?.role
+  
+  // Evidence data cache to avoid individual API calls per item
+  const [evidenceCache, setEvidenceCache] = useState<Record<string, any[]>>({})
 
   // Mobile and PWA state
   const [isMobile, setIsMobile] = useState(false)
@@ -94,6 +97,35 @@ export default function Home() {
   const canBulkUpload = () => canWriteAll(user) || user?.permissions?.includes('write:own')
   const canGenerateReports = () => canReadAll(user) || user?.permissions?.includes('generate:reports')
   const canAccessAdminFeatures = () => canAccessAdmin(user)
+
+  // Load evidence data for all items at once to avoid individual API calls
+  const loadAllEvidence = async (items: StolenItem[]) => {
+    try {
+      const evidencePromises = items.map(async (item) => {
+        try {
+          const response = await fetch(`/api/evidence?itemId=${item.id}`)
+          if (response.ok) {
+            const data = await response.json()
+            return { itemId: item.id, evidence: data.evidence || [] }
+          }
+          return { itemId: item.id, evidence: [] }
+        } catch (error) {
+          console.error(`Error loading evidence for item ${item.id}:`, error)
+          return { itemId: item.id, evidence: [] }
+        }
+      })
+      
+      const evidenceResults = await Promise.all(evidencePromises)
+      const cache: Record<string, any[]> = {}
+      evidenceResults.forEach(result => {
+        cache[result.itemId] = result.evidence
+      })
+      setEvidenceCache(cache)
+      console.log(`✅ Loaded evidence for ${items.length} items in batch`)
+    } catch (error) {
+      console.error('Error loading evidence batch:', error)
+    }
+  }
 
   const loadData = async (isRefresh = false) => {
     try {
@@ -115,6 +147,12 @@ export default function Home() {
       setLoading(false)
       setRefreshing(false)
       console.log('Data loading complete')
+      
+      // Load evidence for all items in batch to avoid individual API calls
+      if (loadedItems.length > 0) {
+        console.log('Loading evidence for all items in batch...')
+        await loadAllEvidence(loadedItems)
+      }
     } catch (error) {
       console.error('Error loading data:', error)
       const errorMessage = error instanceof Error ? error.message : 'Failed to load data'
@@ -1494,7 +1532,7 @@ export default function Home() {
                   <div>
                     <h2 style={{ fontSize: '48px', fontWeight: '800', color: '#1f2937', marginBottom: '16px' }}>
                       Your Stolen Items
-                      <span style={{ fontSize: '16px', color: '#dc2626', marginLeft: '16px' }}>🔧 DEBUG v4</span>
+                      <span style={{ fontSize: '16px', color: '#059669', marginLeft: '16px' }}>🚀 OPTIMIZED v5</span>
                     </h2>
                     <p style={{ fontSize: '20px', color: '#6b7280' }}>
                       {displayItems.length} items {isFiltered ? 'found' : 'documented'} • {formatCurrency(displayTotalValue)} {isFiltered ? 'filtered' : 'total'} value
@@ -2699,6 +2737,7 @@ export default function Home() {
         loading={loading}
         error={error}
         onRefresh={handleRefresh}
+        evidenceCache={evidenceCache}
       />
     </div>
   )
