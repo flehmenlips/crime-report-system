@@ -16,6 +16,12 @@ export function SortControls({ items, onSortChange, className = '', showLabel = 
   const [sortField, setSortField] = useState<SortField>('date')
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc')
 
+  // Safety check - don't render if onSortChange is not a function
+  if (typeof onSortChange !== 'function') {
+    console.warn('SortControls: onSortChange is not a function')
+    return null
+  }
+
   const sortItems = (field: SortField, order: SortOrder) => {
     // Safety check for items
     if (!items || !Array.isArray(items) || items.length === 0) {

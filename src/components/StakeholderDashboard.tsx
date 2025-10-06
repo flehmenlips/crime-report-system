@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { StolenItem, User, Role } from '@/types'
 import { formatCurrency, formatDate } from '@/lib/data'
 import { ItemDetailView } from './ItemDetailView'
@@ -56,9 +56,9 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
   }, [items])
 
   // Handle sorting changes
-  const handleSortChange = (newSortedItems: StolenItem[]) => {
+  const handleSortChange = useCallback((newSortedItems: StolenItem[]) => {
     setSortedItems(newSortedItems)
-  }
+  }, [])
 
   // Get role-specific dashboard configuration
   const getRoleConfig = () => {
@@ -593,7 +593,7 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
               <div>
                 <h2 style={{ fontSize: '28px', fontWeight: '700', color: '#1f2937', marginBottom: '8px' }}>
                   Evidence Database
-                  <span style={{ fontSize: '12px', color: '#059669', marginLeft: '10px' }}>🚀 UPDATED v4</span>
+                  <span style={{ fontSize: '12px', color: '#f59e0b', marginLeft: '10px' }}>🔧 DEBUG v1</span>
                 </h2>
                 <p style={{ color: '#6b7280', fontSize: '16px' }}>
                   {getRoleDisplayName(user.role)} view • {displayItems.length} items catalogued
@@ -602,12 +602,12 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
               
               {/* Controls Row */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                {/* Sort Controls */}
-                <SortControls 
+                {/* Sort Controls - Temporarily disabled for debugging */}
+                {/* <SortControls 
                   items={isFiltered ? filteredItems : items}
                   onSortChange={handleSortChange}
                   showLabel={false}
-                />
+                /> */}
                 
                 {/* View Mode Toggle */}
                 <div style={{ display: 'flex', background: '#f3f4f6', borderRadius: '12px', padding: '4px' }}>

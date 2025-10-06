@@ -2,7 +2,7 @@
 
 // import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { EnhancedEvidenceUpload } from '@/components/EnhancedEvidenceUpload'
 import { EnhancedEvidenceManager } from '@/components/EnhancedEvidenceManager'
 import { PWAServiceWorker } from '@/components/PWAServiceWorker'
@@ -811,9 +811,9 @@ export default function Home() {
   }, [allItems])
 
   // Handle sorting changes
-  const handleSortChange = (newSortedItems: StolenItem[]) => {
+  const handleSortChange = useCallback((newSortedItems: StolenItem[]) => {
     setSortedItems(newSortedItems)
-  }
+  }, [])
 
   // Use filtered items if search is active, otherwise use sorted items
   const displayItems = isFiltered ? filteredItems : (sortedItems.length > 0 ? sortedItems : allItems)
@@ -1397,7 +1397,7 @@ export default function Home() {
                   <div>
                     <h2 style={{ fontSize: '48px', fontWeight: '800', color: '#1f2937', marginBottom: '16px' }}>
                       Your Stolen Items
-                      <span style={{ fontSize: '16px', color: '#059669', marginLeft: '16px' }}>🚀 SORTING v1</span>
+                      <span style={{ fontSize: '16px', color: '#f59e0b', marginLeft: '16px' }}>🔧 DEBUG v1</span>
                     </h2>
                     <p style={{ fontSize: '20px', color: '#6b7280' }}>
                       {displayItems.length} items {isFiltered ? 'found' : 'documented'} • {formatCurrency(displayTotalValue)} {isFiltered ? 'filtered' : 'total'} value
@@ -1426,12 +1426,12 @@ export default function Home() {
                   </div>
                   
                   <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                    {/* Sort Controls */}
-                    <SortControls 
+                    {/* Sort Controls - Temporarily disabled for debugging */}
+                    {/* <SortControls 
                       items={isFiltered ? filteredItems : allItems}
                       onSortChange={handleSortChange}
                       showLabel={true}
-                    />
+                    /> */}
                     
                     {/* View Mode Toggle */}
                     <div style={{ display: 'flex', background: '#f3f4f6', borderRadius: '12px', padding: '4px' }}>
