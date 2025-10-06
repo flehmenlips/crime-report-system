@@ -243,8 +243,9 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
           bValue = b.locationLastSeen?.toLowerCase() || ''
           break
         case 'evidence':
-          aValue = (a.evidence?.length || 0)
-          bValue = (b.evidence?.length || 0)
+          // Use evidence cache if available, otherwise fall back to item.evidence
+          aValue = evidenceCache && evidenceCache[a.id] ? evidenceCache[a.id].length : (a.evidence?.length || 0)
+          bValue = evidenceCache && evidenceCache[b.id] ? evidenceCache[b.id].length : (b.evidence?.length || 0)
           break
         default:
           return 0
@@ -262,7 +263,7 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
     setSortOrder(newSortOrder)
   }
 
-  const displayItems = isFiltered ? filteredItems : items
+  const displayItems = isFiltered ? filteredItems : getSortedItems(items)
   const evidenceCount = items.reduce((total, item) => 
     total + (item.evidence?.filter(e => e.type === 'photo')?.length || 0) + 
     (item.evidence?.filter(e => e.type === 'video')?.length || 0) + 
@@ -705,7 +706,7 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
               <div>
                 <h2 style={{ fontSize: '28px', fontWeight: '700', color: '#1f2937', marginBottom: '8px' }}>
                   Evidence Database
-                  <span style={{ fontSize: '12px', color: '#059669', marginLeft: '10px' }}>🏆 COMPLETE v5.6</span>
+                  <span style={{ fontSize: '12px', color: '#3b82f6', marginLeft: '10px' }}>📊 SORT v6.0</span>
                 </h2>
                 <p style={{ color: '#6b7280', fontSize: '16px' }}>
                   {getRoleDisplayName(user.role)} view • {displayItems.length} items catalogued
@@ -714,13 +715,13 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
               
               {/* Controls Row */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                {/* Sort Controls - TEMPORARILY DISABLED */}
-                {/* <SimpleSortControls 
+                {/* Sort Controls */}
+                <SimpleSortControls 
                   onSortChange={handleSortChange}
                   currentField={sortField}
                   currentOrder={sortOrder}
                   showLabel={false}
-                /> */}
+                />
                 
                 {/* View Mode Toggle */}
                 <div style={{ display: 'flex', background: '#f3f4f6', borderRadius: '12px', padding: '4px' }}>

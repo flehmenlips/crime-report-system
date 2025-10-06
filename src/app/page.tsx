@@ -949,8 +949,9 @@ export default function Home() {
           bValue = b.locationLastSeen?.toLowerCase() || ''
           break
         case 'evidence':
-          aValue = (a.evidence?.length || 0)
-          bValue = (b.evidence?.length || 0)
+          // Use evidence cache if available, otherwise fall back to item.evidence
+          aValue = evidenceCache && evidenceCache[a.id] ? evidenceCache[a.id].length : (a.evidence?.length || 0)
+          bValue = evidenceCache && evidenceCache[b.id] ? evidenceCache[b.id].length : (b.evidence?.length || 0)
           break
         default:
           return 0
@@ -968,8 +969,8 @@ export default function Home() {
     setSortOrder(newSortOrder)
   }
 
-  // Use filtered items if search is active, otherwise use allItems (no sorting for now)
-  const displayItems = isFiltered ? filteredItems : allItems
+  // Use filtered items if search is active, otherwise use allItems with sorting
+  const displayItems = isFiltered ? filteredItems : getSortedItems(allItems)
   const displayTotalValue = displayItems.reduce((sum, item) => sum + item.estimatedValue, 0)
 
   if (userRole === 'property_owner' || userRole === 'super_admin') {
@@ -1550,7 +1551,7 @@ export default function Home() {
                   <div>
                     <h2 style={{ fontSize: '48px', fontWeight: '800', color: '#1f2937', marginBottom: '16px' }}>
                       Your Stolen Items
-                      <span style={{ fontSize: '16px', color: '#059669', marginLeft: '16px' }}>🏆 COMPLETE v5.6</span>
+                      <span style={{ fontSize: '16px', color: '#3b82f6', marginLeft: '16px' }}>📊 SORT v6.0</span>
                     </h2>
                     <p style={{ fontSize: '20px', color: '#6b7280' }}>
                       {displayItems.length} items {isFiltered ? 'found' : 'documented'} • {formatCurrency(displayTotalValue)} {isFiltered ? 'filtered' : 'total'} value
@@ -1579,13 +1580,13 @@ export default function Home() {
                   </div>
                   
                   <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                    {/* Sort Controls - TEMPORARILY DISABLED */}
-                    {/* <SimpleSortControls 
+                    {/* Sort Controls */}
+                    <SimpleSortControls 
                       onSortChange={handleSortChange}
                       currentField={sortField}
                       currentOrder={sortOrder}
                       showLabel={true}
-                    /> */}
+                    />
                     
                     {/* View Mode Toggle */}
                     <div style={{ display: 'flex', background: '#f3f4f6', borderRadius: '12px', padding: '4px' }}>
