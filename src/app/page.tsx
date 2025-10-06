@@ -1550,7 +1550,7 @@ export default function Home() {
                   <div>
                     <h2 style={{ fontSize: '48px', fontWeight: '800', color: '#1f2937', marginBottom: '16px' }}>
                       Your Stolen Items
-                      <span style={{ fontSize: '16px', color: '#059669', marginLeft: '16px' }}>🎯 FINAL v5.5</span>
+                      <span style={{ fontSize: '16px', color: '#059669', marginLeft: '16px' }}>🏆 COMPLETE v5.6</span>
                     </h2>
                     <p style={{ fontSize: '20px', color: '#6b7280' }}>
                       {displayItems.length} items {isFiltered ? 'found' : 'documented'} • {formatCurrency(displayTotalValue)} {isFiltered ? 'filtered' : 'total'} value
@@ -2018,7 +2018,7 @@ export default function Home() {
                     {/* Header with Action Menu */}
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                        <ItemCardIcon item={item} size={80} />
+                        <ItemCardIcon item={item} size={80} evidence={evidenceCache[item.id]} />
                         <div>
                           <h3 style={{ fontSize: '24px', fontWeight: '700', color: '#1f2937', marginBottom: '4px' }}>
                             {item.name}
@@ -2383,7 +2383,7 @@ export default function Home() {
                         )}
                         <td style={{ padding: '16px' }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                            <ItemCardIcon item={item} size={48} />
+                            <ItemCardIcon item={item} size={48} evidence={evidenceCache[item.id]} />
                             <div>
                               <div style={{ fontWeight: '600', color: '#1f2937', marginBottom: '2px' }}>
                                 {item.name}

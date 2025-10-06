@@ -6,6 +6,7 @@ import { StolenItem } from '@/types'
 interface ItemCardIconProps {
   item: StolenItem
   size?: number
+  evidence?: any[] // Optional evidence data to avoid API calls
 }
 
 interface Evidence {
@@ -15,14 +16,23 @@ interface Evidence {
   originalName: string | null
 }
 
-export function ItemCardIcon({ item, size = 64 }: ItemCardIconProps) {
+export function ItemCardIcon({ item, size = 64, evidence: propEvidence }: ItemCardIconProps) {
   const [evidence, setEvidence] = useState<Evidence[]>([])
   const [loading, setLoading] = useState(true)
   const [imageError, setImageError] = useState(false)
 
   useEffect(() => {
-    loadEvidence()
-  }, [item.id])
+    if (propEvidence && Array.isArray(propEvidence)) {
+      // Use provided evidence data (no API call needed)
+      console.log('✅ ItemCardIcon using provided evidence data for item:', item.id, 'Evidence count:', propEvidence.length)
+      setEvidence(propEvidence)
+      setLoading(false)
+    } else {
+      // Fallback to API call if no evidence provided
+      console.log('⚠️ ItemCardIcon no evidence prop provided for item:', item.id, 'Making API call')
+      loadEvidence()
+    }
+  }, [item.id, propEvidence])
 
   const loadEvidence = async () => {
     try {
