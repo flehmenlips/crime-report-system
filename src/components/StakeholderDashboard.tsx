@@ -248,13 +248,13 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
     })
   }
 
-  // Handle sorting changes
-  const handleSortChange = useCallback((newSortField: any, newSortOrder: any) => {
+  // Handle sorting changes - Simple function (no useCallback to avoid React errors)
+  const handleSortChange = (newSortField: any, newSortOrder: any) => {
     setSortField(newSortField)
     setSortOrder(newSortOrder)
-  }, [])
+  }
 
-  const displayItems = isFiltered ? filteredItems : getSortedItems(items)
+  const displayItems = isFiltered ? filteredItems : items
   const evidenceCount = items.reduce((total, item) => 
     total + (item.evidence?.filter(e => e.type === 'photo')?.length || 0) + 
     (item.evidence?.filter(e => e.type === 'video')?.length || 0) + 
@@ -690,7 +690,7 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
               <div>
                 <h2 style={{ fontSize: '28px', fontWeight: '700', color: '#1f2937', marginBottom: '8px' }}>
                   Evidence Database
-                  <span style={{ fontSize: '12px', color: '#059669', marginLeft: '10px' }}>✅ SORTING v3</span>
+                  <span style={{ fontSize: '12px', color: '#dc2626', marginLeft: '10px' }}>🔧 DEBUG v4</span>
                 </h2>
                 <p style={{ color: '#6b7280', fontSize: '16px' }}>
                   {getRoleDisplayName(user.role)} view • {displayItems.length} items catalogued
@@ -699,13 +699,13 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
               
               {/* Controls Row */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                {/* Sort Controls */}
-                <SimpleSortControls 
+                {/* Sort Controls - TEMPORARILY DISABLED */}
+                {/* <SimpleSortControls 
                   onSortChange={handleSortChange}
                   currentField={sortField}
                   currentOrder={sortOrder}
                   showLabel={false}
-                />
+                /> */}
                 
                 {/* View Mode Toggle */}
                 <div style={{ display: 'flex', background: '#f3f4f6', borderRadius: '12px', padding: '4px' }}>

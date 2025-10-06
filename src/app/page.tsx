@@ -906,14 +906,14 @@ export default function Home() {
     })
   }
 
-  // Handle sorting changes
-  const handleSortChange = useCallback((newSortField: any, newSortOrder: any) => {
+  // Handle sorting changes - Simple function (no useCallback to avoid React errors)
+  const handleSortChange = (newSortField: any, newSortOrder: any) => {
     setSortField(newSortField)
     setSortOrder(newSortOrder)
-  }, [])
+  }
 
-  // Use filtered items if search is active, otherwise use sorted items
-  const displayItems = isFiltered ? filteredItems : getSortedItems(allItems)
+  // Use filtered items if search is active, otherwise use allItems (no sorting for now)
+  const displayItems = isFiltered ? filteredItems : allItems
   const displayTotalValue = displayItems.reduce((sum, item) => sum + item.estimatedValue, 0)
 
   if (userRole === 'property_owner' || userRole === 'super_admin') {
@@ -1494,7 +1494,7 @@ export default function Home() {
                   <div>
                     <h2 style={{ fontSize: '48px', fontWeight: '800', color: '#1f2937', marginBottom: '16px' }}>
                       Your Stolen Items
-                      <span style={{ fontSize: '16px', color: '#059669', marginLeft: '16px' }}>✅ SORTING v3</span>
+                      <span style={{ fontSize: '16px', color: '#dc2626', marginLeft: '16px' }}>🔧 DEBUG v4</span>
                     </h2>
                     <p style={{ fontSize: '20px', color: '#6b7280' }}>
                       {displayItems.length} items {isFiltered ? 'found' : 'documented'} • {formatCurrency(displayTotalValue)} {isFiltered ? 'filtered' : 'total'} value
@@ -1523,13 +1523,13 @@ export default function Home() {
                   </div>
                   
                   <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                    {/* Sort Controls */}
-                    <SimpleSortControls 
+                    {/* Sort Controls - TEMPORARILY DISABLED */}
+                    {/* <SimpleSortControls 
                       onSortChange={handleSortChange}
                       currentField={sortField}
                       currentOrder={sortOrder}
                       showLabel={true}
-                    />
+                    /> */}
                     
                     {/* View Mode Toggle */}
                     <div style={{ display: 'flex', background: '#f3f4f6', borderRadius: '12px', padding: '4px' }}>
