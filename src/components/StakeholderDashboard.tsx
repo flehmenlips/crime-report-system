@@ -47,6 +47,10 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
   console.log('Rendering view toggle for viewMode:', viewMode)
   console.log('StakeholderDashboard evidenceCache keys:', evidenceCache ? Object.keys(evidenceCache).length : 'No cache')
   console.log('StakeholderDashboard evidenceLoaded:', evidenceLoaded)
+  console.log('StakeholderDashboard items count:', items.length)
+  if (evidenceCache && Object.keys(evidenceCache).length > 0) {
+    console.log('Sample evidence cache data:', Object.keys(evidenceCache).slice(0, 3).map(key => ({ itemId: key, evidenceCount: evidenceCache[key]?.length || 0 })))
+  }
 
   // Role-based access controls
   const canReadAll = () => user.role === 'law_enforcement' || user.role === 'insurance_agent' || user.role === 'banker'
@@ -701,7 +705,7 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
               <div>
                 <h2 style={{ fontSize: '28px', fontWeight: '700', color: '#1f2937', marginBottom: '8px' }}>
                   Evidence Database
-                  <span style={{ fontSize: '12px', color: '#059669', marginLeft: '10px' }}>⏳ LOADING v5.2</span>
+                  <span style={{ fontSize: '12px', color: '#dc2626', marginLeft: '10px' }}>🔍 DEBUG v5.3</span>
                 </h2>
                 <p style={{ color: '#6b7280', fontSize: '16px' }}>
                   {getRoleDisplayName(user.role)} view • {displayItems.length} items catalogued

@@ -101,33 +101,44 @@ export default function Home() {
 
   // Load evidence data for all items at once to avoid individual API calls
   const loadAllEvidence = async (items: StolenItem[]) => {
+    console.log('🔍 loadAllEvidence called with', items.length, 'items')
     try {
-      const evidencePromises = items.map(async (item) => {
+      console.log('📡 Starting Promise.all for evidence requests...')
+      const evidencePromises = items.map(async (item, index) => {
         try {
+          console.log(`📡 Requesting evidence for item ${index + 1}/${items.length}: ${item.id}`)
           const response = await fetch(`/api/evidence?itemId=${item.id}`)
           if (response.ok) {
             const data = await response.json()
+            console.log(`✅ Got evidence for item ${item.id}:`, data.evidence?.length || 0, 'items')
             return { itemId: item.id, evidence: data.evidence || [] }
+          } else {
+            console.error(`❌ Failed to get evidence for item ${item.id}:`, response.status)
+            return { itemId: item.id, evidence: [] }
           }
-          return { itemId: item.id, evidence: [] }
         } catch (error) {
-          console.error(`Error loading evidence for item ${item.id}:`, error)
+          console.error(`❌ Error loading evidence for item ${item.id}:`, error)
           return { itemId: item.id, evidence: [] }
         }
       })
       
+      console.log('⏳ Waiting for all evidence requests to complete...')
       const evidenceResults = await Promise.all(evidencePromises)
+      console.log('✅ All evidence requests completed')
+      
       const cache: Record<string, any[]> = {}
       evidenceResults.forEach(result => {
         cache[result.itemId] = result.evidence
       })
+      
       setEvidenceCache(cache)
       setEvidenceLoaded(true)
       console.log(`✅ Loaded evidence for ${items.length} items in batch`)
       console.log('Evidence cache populated with keys:', Object.keys(cache).length)
       console.log('Sample evidence data:', Object.keys(cache).slice(0, 3).map(key => ({ itemId: key, evidenceCount: cache[key].length })))
     } catch (error) {
-      console.error('Error loading evidence batch:', error)
+      console.error('❌ Error loading evidence batch:', error)
+      setEvidenceLoaded(false)
     }
   }
 
@@ -154,8 +165,11 @@ export default function Home() {
       
       // Load evidence for all items in batch to avoid individual API calls
       if (loadedItems.length > 0) {
-        console.log('Loading evidence for all items in batch...')
+        console.log('🔄 Starting batch evidence loading for', loadedItems.length, 'items...')
         await loadAllEvidence(loadedItems)
+        console.log('✅ Batch evidence loading completed')
+      } else {
+        console.log('⚠️ No items to load evidence for')
       }
     } catch (error) {
       console.error('Error loading data:', error)
@@ -1536,7 +1550,7 @@ export default function Home() {
                   <div>
                     <h2 style={{ fontSize: '48px', fontWeight: '800', color: '#1f2937', marginBottom: '16px' }}>
                       Your Stolen Items
-                      <span style={{ fontSize: '16px', color: '#059669', marginLeft: '16px' }}>⏳ LOADING v5.2</span>
+                      <span style={{ fontSize: '16px', color: '#dc2626', marginLeft: '16px' }}>🔍 DEBUG v5.3</span>
                     </h2>
                     <p style={{ fontSize: '20px', color: '#6b7280' }}>
                       {displayItems.length} items {isFiltered ? 'found' : 'documented'} • {formatCurrency(displayTotalValue)} {isFiltered ? 'filtered' : 'total'} value
