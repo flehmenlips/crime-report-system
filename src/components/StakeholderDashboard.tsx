@@ -25,9 +25,10 @@ interface StakeholderDashboardProps {
   error?: string | null
   onRefresh?: () => void
   evidenceCache?: Record<string, any[]> // Optional evidence cache to avoid API calls
+  evidenceLoaded?: boolean // Flag to indicate if evidence cache is ready
 }
 
-export function StakeholderDashboard({ user, items, onItemsUpdate, loading = false, error = null, onRefresh, evidenceCache }: StakeholderDashboardProps) {
+export function StakeholderDashboard({ user, items, onItemsUpdate, loading = false, error = null, onRefresh, evidenceCache, evidenceLoaded }: StakeholderDashboardProps) {
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false)
   const [showGenerateReport, setShowGenerateReport] = useState(false)
   const [showAnalytics, setShowAnalytics] = useState(false)
@@ -45,6 +46,7 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
   console.log('StakeholderDashboard rendered for user:', user?.name, 'role:', user?.role, 'viewMode:', viewMode)
   console.log('Rendering view toggle for viewMode:', viewMode)
   console.log('StakeholderDashboard evidenceCache keys:', evidenceCache ? Object.keys(evidenceCache).length : 'No cache')
+  console.log('StakeholderDashboard evidenceLoaded:', evidenceLoaded)
 
   // Role-based access controls
   const canReadAll = () => user.role === 'law_enforcement' || user.role === 'insurance_agent' || user.role === 'banker'
@@ -289,12 +291,19 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
   }
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      background: 'linear-gradient(135deg, #0f0f23 0%, #1e1b4b 50%, #312e81 100%)',
-      fontFamily: 'Inter, -apple-system, sans-serif',
-      color: 'white'
-    }}>
+    <>
+      <style jsx>{`
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      `}</style>
+      <div style={{
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #0f0f23 0%, #1e1b4b 50%, #312e81 100%)',
+        fontFamily: 'Inter, -apple-system, sans-serif',
+        color: 'white'
+      }}>
       {/* Role-Specific Header */}
       <div style={{
         background: 'rgba(255, 255, 255, 0.1)',
@@ -692,7 +701,7 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
               <div>
                 <h2 style={{ fontSize: '28px', fontWeight: '700', color: '#1f2937', marginBottom: '8px' }}>
                   Evidence Database
-                  <span style={{ fontSize: '12px', color: '#059669', marginLeft: '10px' }}>🚀 OPTIMIZED v5</span>
+                  <span style={{ fontSize: '12px', color: '#059669', marginLeft: '10px' }}>⏳ LOADING v5.2</span>
                 </h2>
                 <p style={{ color: '#6b7280', fontSize: '16px' }}>
                   {getRoleDisplayName(user.role)} view • {displayItems.length} items catalogued
@@ -793,6 +802,24 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
                   ? 'Waiting for property owner to document stolen items'
                   : 'No items available for your access level'
                 }
+              </p>
+            </div>
+          ) : !evidenceLoaded ? (
+            <div style={{ textAlign: 'center', padding: '64px 0' }}>
+              <div style={{
+                width: '48px',
+                height: '48px',
+                border: '4px solid #e5e7eb',
+                borderTop: '4px solid #3b82f6',
+                borderRadius: '50%',
+                animation: 'spin 1s linear infinite',
+                margin: '0 auto 24px'
+              }}></div>
+              <h3 style={{ fontSize: '24px', fontWeight: '600', color: '#1f2937', marginBottom: '8px' }}>
+                Loading Evidence Data
+              </h3>
+              <p style={{ color: '#6b7280' }}>
+                Preparing thumbnail images for {displayItems.length} items...
               </p>
             </div>
           ) : viewMode === 'cards' ? (
@@ -1171,5 +1198,6 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
         )}
       </div>
     </div>
+    </>
   )
 }

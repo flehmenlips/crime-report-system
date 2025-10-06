@@ -86,6 +86,7 @@ export default function Home() {
   
   // Evidence data cache to avoid individual API calls per item
   const [evidenceCache, setEvidenceCache] = useState<Record<string, any[]>>({})
+  const [evidenceLoaded, setEvidenceLoaded] = useState(false)
 
   // Mobile and PWA state
   const [isMobile, setIsMobile] = useState(false)
@@ -121,6 +122,7 @@ export default function Home() {
         cache[result.itemId] = result.evidence
       })
       setEvidenceCache(cache)
+      setEvidenceLoaded(true)
       console.log(`✅ Loaded evidence for ${items.length} items in batch`)
       console.log('Evidence cache populated with keys:', Object.keys(cache).length)
       console.log('Sample evidence data:', Object.keys(cache).slice(0, 3).map(key => ({ itemId: key, evidenceCount: cache[key].length })))
@@ -1534,7 +1536,7 @@ export default function Home() {
                   <div>
                     <h2 style={{ fontSize: '48px', fontWeight: '800', color: '#1f2937', marginBottom: '16px' }}>
                       Your Stolen Items
-                      <span style={{ fontSize: '16px', color: '#059669', marginLeft: '16px' }}>🚀 OPTIMIZED v5</span>
+                      <span style={{ fontSize: '16px', color: '#059669', marginLeft: '16px' }}>⏳ LOADING v5.2</span>
                     </h2>
                     <p style={{ fontSize: '20px', color: '#6b7280' }}>
                       {displayItems.length} items {isFiltered ? 'found' : 'documented'} • {formatCurrency(displayTotalValue)} {isFiltered ? 'filtered' : 'total'} value
@@ -2740,6 +2742,7 @@ export default function Home() {
         error={error}
         onRefresh={handleRefresh}
         evidenceCache={evidenceCache}
+        evidenceLoaded={evidenceLoaded}
       />
     </div>
   )
