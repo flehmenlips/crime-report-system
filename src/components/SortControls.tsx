@@ -17,6 +17,11 @@ export function SortControls({ items, onSortChange, className = '', showLabel = 
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc')
 
   const sortItems = (field: SortField, order: SortOrder) => {
+    // Safety check for items
+    if (!items || !Array.isArray(items) || items.length === 0) {
+      return
+    }
+
     const sorted = [...items].sort((a, b) => {
       let aValue: any
       let bValue: any
@@ -87,6 +92,11 @@ export function SortControls({ items, onSortChange, className = '', showLabel = 
       case 'evidence': return 'Evidence Count'
       default: return 'Name'
     }
+  }
+
+  // Don't render if items are not available
+  if (!items || !Array.isArray(items) || items.length === 0) {
+    return null
   }
 
   return (

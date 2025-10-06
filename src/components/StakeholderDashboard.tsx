@@ -157,7 +157,7 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
   }
 
   const roleConfig = getRoleConfig()
-  const displayItems = isFiltered ? filteredItems : sortedItems
+  const displayItems = isFiltered ? filteredItems : (sortedItems.length > 0 ? sortedItems : items)
   const evidenceCount = items.reduce((total, item) => 
     total + (item.evidence?.filter(e => e.type === 'photo')?.length || 0) + 
     (item.evidence?.filter(e => e.type === 'video')?.length || 0) + 

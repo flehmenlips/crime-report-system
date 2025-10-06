@@ -816,7 +816,7 @@ export default function Home() {
   }
 
   // Use filtered items if search is active, otherwise use sorted items
-  const displayItems = isFiltered ? filteredItems : sortedItems
+  const displayItems = isFiltered ? filteredItems : (sortedItems.length > 0 ? sortedItems : allItems)
   const displayTotalValue = displayItems.reduce((sum, item) => sum + item.estimatedValue, 0)
 
   if (userRole === 'property_owner' || userRole === 'super_admin') {
