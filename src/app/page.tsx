@@ -39,6 +39,7 @@ import { PerformanceStressTest } from '@/components/PerformanceStressTest'
 import { EdgeCaseStressTest } from '@/components/EdgeCaseStressTest'
 import { SuperAdminDashboard } from '@/components/SuperAdminDashboard'
 import { TenantUserManagement } from '@/components/TenantUserManagement'
+import { SortControls } from '@/components/SortControls'
 
 export default function Home() {
   const router = useRouter()
@@ -75,6 +76,7 @@ export default function Home() {
   const [showReportGenerator, setShowReportGenerator] = useState(false)
   const [filteredItems, setFilteredItems] = useState<StolenItem[]>([])
   const [isFiltered, setIsFiltered] = useState(false)
+  const [sortedItems, setSortedItems] = useState<StolenItem[]>([])
   const [refreshKey, setRefreshKey] = useState(0) // Force re-render key
 
   // Enhanced RBAC user state
@@ -803,8 +805,18 @@ export default function Home() {
     item.evidence?.filter(e => e.type === 'document')?.length, 0
   ) ?? 0
   
-  // Use filtered items if search is active, otherwise use all items
-  const displayItems = isFiltered ? filteredItems : allItems
+  // Initialize sorted items when allItems changes
+  useEffect(() => {
+    setSortedItems(allItems)
+  }, [allItems])
+
+  // Handle sorting changes
+  const handleSortChange = (newSortedItems: StolenItem[]) => {
+    setSortedItems(newSortedItems)
+  }
+
+  // Use filtered items if search is active, otherwise use sorted items
+  const displayItems = isFiltered ? filteredItems : sortedItems
   const displayTotalValue = displayItems.reduce((sum, item) => sum + item.estimatedValue, 0)
 
   if (userRole === 'property_owner' || userRole === 'super_admin') {
@@ -1385,6 +1397,7 @@ export default function Home() {
                   <div>
                     <h2 style={{ fontSize: '48px', fontWeight: '800', color: '#1f2937', marginBottom: '16px' }}>
                       Your Stolen Items
+                      <span style={{ fontSize: '16px', color: '#059669', marginLeft: '16px' }}>🚀 SORTING v1</span>
                     </h2>
                     <p style={{ fontSize: '20px', color: '#6b7280' }}>
                       {displayItems.length} items {isFiltered ? 'found' : 'documented'} • {formatCurrency(displayTotalValue)} {isFiltered ? 'filtered' : 'total'} value
@@ -1413,6 +1426,13 @@ export default function Home() {
                   </div>
                   
                   <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                    {/* Sort Controls */}
+                    <SortControls 
+                      items={isFiltered ? filteredItems : allItems}
+                      onSortChange={handleSortChange}
+                      showLabel={true}
+                    />
+                    
                     {/* View Mode Toggle */}
                     <div style={{ display: 'flex', background: '#f3f4f6', borderRadius: '12px', padding: '4px' }}>
                       <button

@@ -14,6 +14,7 @@ import { ExportManager } from './ExportManager'
 import { QuickExport } from './QuickExport'
 import { ReportGenerator } from './ReportGenerator'
 import { ItemCardThumbnails } from './ItemCardThumbnails'
+import { SortControls } from './SortControls'
 import { getRoleDisplayName, getDashboardTitle } from '@/lib/auth'
 
 interface StakeholderDashboardProps {
@@ -36,6 +37,7 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
   const [filteredItems, setFilteredItems] = useState<StolenItem[]>([])
   const [isFiltered, setIsFiltered] = useState(false)
   const [viewMode, setViewMode] = useState<'cards' | 'list'>('cards')
+  const [sortedItems, setSortedItems] = useState<StolenItem[]>([])
 
   // Debug logging
   console.log('StakeholderDashboard rendered for user:', user?.name, 'role:', user?.role, 'viewMode:', viewMode)
@@ -47,6 +49,16 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
   const canGenerateReports = () => ['law_enforcement', 'insurance_agent', 'banker', 'asset_manager'].includes(user.role)
   const canAddNotes = () => ['law_enforcement', 'insurance_agent', 'broker', 'banker', 'asset_manager'].includes(user.role)
   const canExportData = () => ['law_enforcement', 'insurance_agent', 'banker'].includes(user.role)
+
+  // Initialize sorted items when items change
+  useEffect(() => {
+    setSortedItems(items)
+  }, [items])
+
+  // Handle sorting changes
+  const handleSortChange = (newSortedItems: StolenItem[]) => {
+    setSortedItems(newSortedItems)
+  }
 
   // Get role-specific dashboard configuration
   const getRoleConfig = () => {
@@ -145,7 +157,7 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
   }
 
   const roleConfig = getRoleConfig()
-  const displayItems = isFiltered ? filteredItems : items
+  const displayItems = isFiltered ? filteredItems : sortedItems
   const evidenceCount = items.reduce((total, item) => 
     total + (item.evidence?.filter(e => e.type === 'photo')?.length || 0) + 
     (item.evidence?.filter(e => e.type === 'video')?.length || 0) + 
@@ -581,15 +593,24 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
               <div>
                 <h2 style={{ fontSize: '28px', fontWeight: '700', color: '#1f2937', marginBottom: '8px' }}>
                   Evidence Database
-                  <span style={{ fontSize: '12px', color: '#059669', marginLeft: '10px' }}>🚀 UPDATED v3</span>
+                  <span style={{ fontSize: '12px', color: '#059669', marginLeft: '10px' }}>🚀 UPDATED v4</span>
                 </h2>
                 <p style={{ color: '#6b7280', fontSize: '16px' }}>
                   {getRoleDisplayName(user.role)} view • {displayItems.length} items catalogued
                 </p>
               </div>
               
-              {/* View Mode Toggle */}
-              <div style={{ display: 'flex', background: '#f3f4f6', borderRadius: '12px', padding: '4px' }}>
+              {/* Controls Row */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                {/* Sort Controls */}
+                <SortControls 
+                  items={isFiltered ? filteredItems : items}
+                  onSortChange={handleSortChange}
+                  showLabel={false}
+                />
+                
+                {/* View Mode Toggle */}
+                <div style={{ display: 'flex', background: '#f3f4f6', borderRadius: '12px', padding: '4px' }}>
                 <button
                   onClick={() => setViewMode('cards')}
                   style={{
@@ -634,6 +655,7 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
                   </svg>
                   List
                 </button>
+                </div>
               </div>
             </div>
             
