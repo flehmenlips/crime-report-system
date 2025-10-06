@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { StolenItem, User, Role } from '@/types'
 import { formatCurrency, formatDate } from '@/lib/data'
 import { ItemDetailView } from './ItemDetailView'
@@ -14,7 +14,7 @@ import { ExportManager } from './ExportManager'
 import { QuickExport } from './QuickExport'
 import { ReportGenerator } from './ReportGenerator'
 import { ItemCardThumbnails } from './ItemCardThumbnails'
-import { SortControls } from './SortControls'
+import { SimpleSortControls } from './SimpleSortControls'
 import { getRoleDisplayName, getDashboardTitle } from '@/lib/auth'
 
 interface StakeholderDashboardProps {
@@ -37,7 +37,8 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
   const [filteredItems, setFilteredItems] = useState<StolenItem[]>([])
   const [isFiltered, setIsFiltered] = useState(false)
   const [viewMode, setViewMode] = useState<'cards' | 'list'>('cards')
-  // const [sortedItems, setSortedItems] = useState<StolenItem[]>([]) // Temporarily disabled
+  const [sortField, setSortField] = useState<'name' | 'value' | 'date' | 'category' | 'serialNumber' | 'location' | 'evidence'>('date')
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
 
   // Debug logging
   console.log('StakeholderDashboard rendered for user:', user?.name, 'role:', user?.role, 'viewMode:', viewMode)
@@ -50,15 +51,58 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
   const canAddNotes = () => ['law_enforcement', 'insurance_agent', 'broker', 'banker', 'asset_manager'].includes(user.role)
   const canExportData = () => ['law_enforcement', 'insurance_agent', 'banker'].includes(user.role)
 
-  // Initialize sorted items when items change - TEMPORARILY DISABLED
-  // useEffect(() => {
-  //   setSortedItems(items)
-  // }, [items])
+  // Stable sorting using useMemo
+  const sortedItems = useMemo(() => {
+    if (!items || items.length === 0) return []
+    
+    return [...items].sort((a, b) => {
+      let aValue: any
+      let bValue: any
 
-  // Handle sorting changes - TEMPORARILY DISABLED
-  // const handleSortChange = useCallback((newSortedItems: StolenItem[]) => {
-  //   setSortedItems(newSortedItems)
-  // }, [])
+      switch (sortField) {
+        case 'name':
+          aValue = a.name?.toLowerCase() || ''
+          bValue = b.name?.toLowerCase() || ''
+          break
+        case 'value':
+          aValue = a.estimatedValue || 0
+          bValue = b.estimatedValue || 0
+          break
+        case 'date':
+          aValue = new Date(a.dateLastSeen || a.createdAt || 0)
+          bValue = new Date(b.dateLastSeen || b.createdAt || 0)
+          break
+        case 'category':
+          aValue = (a as any).category?.toLowerCase() || 'uncategorized'
+          bValue = (b as any).category?.toLowerCase() || 'uncategorized'
+          break
+        case 'serialNumber':
+          aValue = a.serialNumber?.toLowerCase() || ''
+          bValue = b.serialNumber?.toLowerCase() || ''
+          break
+        case 'location':
+          aValue = a.locationLastSeen?.toLowerCase() || ''
+          bValue = b.locationLastSeen?.toLowerCase() || ''
+          break
+        case 'evidence':
+          aValue = (a.evidence?.length || 0)
+          bValue = (b.evidence?.length || 0)
+          break
+        default:
+          return 0
+      }
+
+      if (aValue < bValue) return sortOrder === 'asc' ? -1 : 1
+      if (aValue > bValue) return sortOrder === 'asc' ? 1 : -1
+      return 0
+    })
+  }, [items, sortField, sortOrder])
+
+  // Handle sorting changes
+  const handleSortChange = useCallback((newSortField: any, newSortOrder: any) => {
+    setSortField(newSortField)
+    setSortOrder(newSortOrder)
+  }, [])
 
   // Get role-specific dashboard configuration
   const getRoleConfig = () => {
@@ -157,7 +201,7 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
   }
 
   const roleConfig = getRoleConfig()
-  const displayItems = isFiltered ? filteredItems : items
+  const displayItems = isFiltered ? filteredItems : sortedItems
   const evidenceCount = items.reduce((total, item) => 
     total + (item.evidence?.filter(e => e.type === 'photo')?.length || 0) + 
     (item.evidence?.filter(e => e.type === 'video')?.length || 0) + 
@@ -593,7 +637,7 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
               <div>
                 <h2 style={{ fontSize: '28px', fontWeight: '700', color: '#1f2937', marginBottom: '8px' }}>
                   Evidence Database
-                  <span style={{ fontSize: '12px', color: '#dc2626', marginLeft: '10px' }}>🔧 DEBUG v2</span>
+                  <span style={{ fontSize: '12px', color: '#059669', marginLeft: '10px' }}>✅ SORTING v2</span>
                 </h2>
                 <p style={{ color: '#6b7280', fontSize: '16px' }}>
                   {getRoleDisplayName(user.role)} view • {displayItems.length} items catalogued
@@ -602,12 +646,13 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
               
               {/* Controls Row */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                {/* Sort Controls - Temporarily disabled for debugging */}
-                {/* <SortControls 
-                  items={isFiltered ? filteredItems : items}
+                {/* Sort Controls */}
+                <SimpleSortControls 
                   onSortChange={handleSortChange}
+                  currentField={sortField}
+                  currentOrder={sortOrder}
                   showLabel={false}
-                /> */}
+                />
                 
                 {/* View Mode Toggle */}
                 <div style={{ display: 'flex', background: '#f3f4f6', borderRadius: '12px', padding: '4px' }}>
