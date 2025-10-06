@@ -122,6 +122,8 @@ export default function Home() {
       })
       setEvidenceCache(cache)
       console.log(`✅ Loaded evidence for ${items.length} items in batch`)
+      console.log('Evidence cache populated with keys:', Object.keys(cache).length)
+      console.log('Sample evidence data:', Object.keys(cache).slice(0, 3).map(key => ({ itemId: key, evidenceCount: cache[key].length })))
     } catch (error) {
       console.error('Error loading evidence batch:', error)
     }

@@ -44,6 +44,7 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
   // Debug logging
   console.log('StakeholderDashboard rendered for user:', user?.name, 'role:', user?.role, 'viewMode:', viewMode)
   console.log('Rendering view toggle for viewMode:', viewMode)
+  console.log('StakeholderDashboard evidenceCache keys:', evidenceCache ? Object.keys(evidenceCache).length : 'No cache')
 
   // Role-based access controls
   const canReadAll = () => user.role === 'law_enforcement' || user.role === 'insurance_agent' || user.role === 'banker'

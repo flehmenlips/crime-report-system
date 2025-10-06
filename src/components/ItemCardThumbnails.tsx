@@ -22,16 +22,17 @@ export function ItemCardThumbnails({ item, onImageClick, compact = false, eviden
   const [loading, setLoading] = useState(true)
 
   // Debug logging
-  console.log('ItemCardThumbnails rendered for item:', item.name, 'ID:', item.id, 'Has evidence prop:', !!propEvidence)
+  console.log('ItemCardThumbnails rendered for item:', item.name, 'ID:', item.id, 'Has evidence prop:', !!propEvidence, 'Evidence count:', propEvidence?.length || 0)
 
   useEffect(() => {
-    if (propEvidence) {
+    if (propEvidence && Array.isArray(propEvidence)) {
       // Use provided evidence data (no API call needed)
-      console.log('Using provided evidence data for item:', item.id, 'Evidence count:', propEvidence.length)
+      console.log('✅ Using provided evidence data for item:', item.id, 'Evidence count:', propEvidence.length)
       setEvidence(propEvidence)
       setLoading(false)
     } else {
       // Fallback to API call if no evidence provided
+      console.log('⚠️ No evidence prop provided for item:', item.id, 'Making API call')
       loadEvidence()
     }
   }, [item.id, propEvidence])
