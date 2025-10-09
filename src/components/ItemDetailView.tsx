@@ -36,6 +36,8 @@ export function ItemDetailView({ item, onClose, onEdit, onDelete, onDuplicate, o
   const [loadingEvidence, setLoadingEvidence] = useState(true)
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
   const [showActionMenu, setShowActionMenu] = useState(false)
+  const [investigationNotes, setInvestigationNotes] = useState<any[]>([])
+  const [loadingNotes, setLoadingNotes] = useState(true)
 
   useEffect(() => {
     if (propEvidence && Array.isArray(propEvidence)) {
@@ -48,7 +50,28 @@ export function ItemDetailView({ item, onClose, onEdit, onDelete, onDuplicate, o
       console.log('⚠️ ItemDetailView no evidence prop provided for item:', item.id, 'Making API call')
       loadEvidence()
     }
+    
+    // Load investigation notes
+    loadInvestigationNotes()
   }, [item.id, propEvidence])
+
+  const loadInvestigationNotes = async () => {
+    try {
+      console.log('Loading investigation notes for item:', item.id)
+      const response = await fetch(`/api/notes?itemId=${item.id}`)
+      if (response.ok) {
+        const data = await response.json()
+        console.log('Investigation notes data received:', data)
+        setInvestigationNotes(data.notes || [])
+      } else {
+        console.error('Failed to load investigation notes:', response.status)
+      }
+    } catch (error) {
+      console.error('Error loading investigation notes:', error)
+    } finally {
+      setLoadingNotes(false)
+    }
+  }
 
   const loadEvidence = async () => {
     try {
@@ -337,7 +360,7 @@ export function ItemDetailView({ item, onClose, onEdit, onDelete, onDuplicate, o
             )}
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '20px', paddingRight: '140px' }}>
             <div style={{
               width: '80px',
               height: '80px',
@@ -363,12 +386,23 @@ export function ItemDetailView({ item, onClose, onEdit, onDelete, onDuplicate, o
                 </span>
               </div>
             </div>
-            <div style={{ textAlign: 'right' }}>
-              <div style={{ fontSize: '32px', fontWeight: '800', color: '#10b981', marginBottom: '4px' }}>
-                {formatCurrency(item.estimatedValue)}
-              </div>
-              <div style={{ fontSize: '14px', opacity: 0.8 }}>Current Value</div>
+          </div>
+          
+          {/* Current Value - positioned below the main header */}
+          <div style={{ 
+            position: 'absolute', 
+            top: '24px', 
+            right: '140px',
+            background: 'rgba(255, 255, 255, 0.15)',
+            padding: '12px 16px',
+            borderRadius: '12px',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(255, 255, 255, 0.2)'
+          }}>
+            <div style={{ fontSize: '20px', fontWeight: '700', color: '#10b981', marginBottom: '2px' }}>
+              {formatCurrency(item.estimatedValue)}
             </div>
+            <div style={{ fontSize: '12px', opacity: 0.8 }}>Current Value</div>
           </div>
         </div>
 
@@ -496,6 +530,126 @@ export function ItemDetailView({ item, onClose, onEdit, onDelete, onDuplicate, o
                   </div>
                 )}
               </div>
+            </div>
+          )}
+
+          {/* Investigation Notes */}
+          {permissions.canAddNotes && (
+            <div style={{ marginBottom: '32px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+                <h2 style={{ fontSize: '24px', fontWeight: '700', color: '#1f2937' }}>
+                  🔍 Investigation Notes
+                </h2>
+                {onViewNotes && (
+                  <button
+                    onClick={() => onViewNotes(item)}
+                    style={{
+                      background: 'linear-gradient(135deg, #dc2626 0%, #991b1b 100%)',
+                      color: 'white',
+                      border: 'none',
+                      padding: '8px 16px',
+                      borderRadius: '8px',
+                      cursor: 'pointer',
+                      fontSize: '14px',
+                      fontWeight: '600',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px'
+                    }}
+                  >
+                    <span>📝</span>
+                    Add Note
+                  </button>
+                )}
+              </div>
+              
+              {loadingNotes ? (
+                <div style={{
+                  background: '#f9fafb',
+                  padding: '24px',
+                  borderRadius: '12px',
+                  textAlign: 'center',
+                  border: '1px solid #e5e7eb'
+                }}>
+                  <div style={{
+                    width: '24px',
+                    height: '24px',
+                    border: '2px solid #e5e7eb',
+                    borderTop: '2px solid #dc2626',
+                    borderRadius: '50%',
+                    animation: 'spin 1s linear infinite',
+                    margin: '0 auto 12px'
+                  }}></div>
+                  <p style={{ color: '#6b7280', margin: 0 }}>Loading investigation notes...</p>
+                </div>
+              ) : investigationNotes.length === 0 ? (
+                <div style={{
+                  background: '#f9fafb',
+                  padding: '24px',
+                  borderRadius: '12px',
+                  textAlign: 'center',
+                  border: '2px dashed #d1d5db'
+                }}>
+                  <div style={{ fontSize: '32px', marginBottom: '12px' }}>📝</div>
+                  <p style={{ color: '#6b7280', margin: 0 }}>
+                    No investigation notes yet. Click "Add Note" to add the first note.
+                  </p>
+                </div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  {investigationNotes.map((note) => (
+                    <div key={note.id} style={{
+                      background: 'white',
+                      padding: '16px',
+                      borderRadius: '12px',
+                      border: note.isConfidential ? '2px solid #fef3c7' : '1px solid #e5e7eb',
+                      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)'
+                    }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <div style={{
+                            background: note.createdByRole === 'law_enforcement' ? '#fee2e2' : '#dbeafe',
+                            color: note.createdByRole === 'law_enforcement' ? '#991b1b' : '#1e40af',
+                            padding: '4px 8px',
+                            borderRadius: '6px',
+                            fontSize: '12px',
+                            fontWeight: '600',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '4px'
+                          }}>
+                            <span>{note.createdByRole === 'law_enforcement' ? '🚔' : '👤'}</span>
+                            <span>{note.createdByName}</span>
+                          </div>
+                          {note.isConfidential && (
+                            <div style={{
+                              background: '#fef3c7',
+                              color: '#92400e',
+                              padding: '4px 8px',
+                              borderRadius: '6px',
+                              fontSize: '12px',
+                              fontWeight: '600'
+                            }}>
+                              🔒 Confidential
+                            </div>
+                          )}
+                        </div>
+                        <div style={{ fontSize: '12px', color: '#6b7280' }}>
+                          {new Date(note.createdAt).toLocaleDateString()} {new Date(note.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </div>
+                      </div>
+                      <p style={{
+                        color: '#374151',
+                        lineHeight: '1.5',
+                        margin: 0,
+                        whiteSpace: 'pre-wrap'
+                      }}>
+                        {note.content}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 
@@ -839,6 +993,13 @@ export function ItemDetailView({ item, onClose, onEdit, onDelete, onDuplicate, o
           </div>
         </div>
       )}
+      
+      <style jsx>{`
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      `}</style>
     </div>
   )
 }
