@@ -104,35 +104,40 @@ export function EvidenceTags({ user, items, onClose }: EvidenceTagsProps) {
             case 'high-value':
               return item.estimatedValue >= 5000
             case 'electronics':
-              return item.category?.toLowerCase().includes('electronic') ||
-                     item.category?.toLowerCase().includes('computer') ||
-                     item.category?.toLowerCase().includes('phone') ||
+              const category = (item.category || 'other').toLowerCase()
+              return category.includes('electronic') ||
+                     category.includes('computer') ||
+                     category.includes('phone') ||
                      item.name.toLowerCase().includes('laptop') ||
                      item.name.toLowerCase().includes('phone') ||
                      item.name.toLowerCase().includes('computer') ||
                      item.name.toLowerCase().includes('tv') ||
                      item.name.toLowerCase().includes('camera')
             case 'tools':
-              return item.category?.toLowerCase().includes('tool') ||
+              const toolsCategory = (item.category || 'other').toLowerCase()
+              return toolsCategory.includes('tool') ||
                      item.name.toLowerCase().includes('tool') ||
                      item.name.toLowerCase().includes('equipment') ||
                      item.name.toLowerCase().includes('saw') ||
                      item.name.toLowerCase().includes('drill')
             case 'vehicles':
-              return item.category?.toLowerCase().includes('vehicle') ||
-                     item.category?.toLowerCase().includes('car') ||
+              const vehiclesCategory = (item.category || 'other').toLowerCase()
+              return vehiclesCategory.includes('vehicle') ||
+                     vehiclesCategory.includes('car') ||
                      item.name.toLowerCase().includes('car') ||
                      item.name.toLowerCase().includes('truck') ||
                      item.name.toLowerCase().includes('vehicle') ||
                      item.name.toLowerCase().includes('motorcycle')
             case 'jewelry':
-              return item.category?.toLowerCase().includes('jewelry') ||
+              const jewelryCategory = (item.category || 'other').toLowerCase()
+              return jewelryCategory.includes('jewelry') ||
                      item.name.toLowerCase().includes('ring') ||
                      item.name.toLowerCase().includes('necklace') ||
                      item.name.toLowerCase().includes('watch') ||
                      item.name.toLowerCase().includes('jewelry')
             case 'documents':
-              return item.category?.toLowerCase().includes('document') ||
+              const documentsCategory = (item.category || 'other').toLowerCase()
+              return documentsCategory.includes('document') ||
                      item.name.toLowerCase().includes('document') ||
                      item.name.toLowerCase().includes('certificate') ||
                      item.name.toLowerCase().includes('title')

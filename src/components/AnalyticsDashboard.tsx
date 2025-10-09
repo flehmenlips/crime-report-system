@@ -46,7 +46,7 @@ export function AnalyticsDashboard({ items, onClose }: AnalyticsDashboardProps) 
     // Category analysis
     const categories: { [key: string]: { count: number; value: number } } = {}
     items.forEach(item => {
-      const category = item.category || 'Uncategorized'
+      const category = item.category || 'other'
       if (!categories[category]) {
         categories[category] = { count: 0, value: 0 }
       }
@@ -217,7 +217,7 @@ export function AnalyticsDashboard({ items, onClose }: AnalyticsDashboardProps) 
                         </div>
                         <div>
                           <div className="font-semibold text-gray-900">{item.name}</div>
-                          <div className="text-sm text-gray-600">{item.category || 'Uncategorized'}</div>
+                          <div className="text-sm text-gray-600">{item.category || 'other'}</div>
                         </div>
                       </div>
                       <div className="text-right">

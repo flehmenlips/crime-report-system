@@ -81,7 +81,7 @@ export function CaseSummary({ user, items, onClose }: CaseSummaryProps) {
       // Calculate categories
       const categories: { [key: string]: number } = {}
       items.forEach(item => {
-        const category = item.category // Now guaranteed to exist
+        const category = item.category || 'other' // Handle null/undefined categories
         categories[category] = (categories[category] || 0) + 1
       })
 

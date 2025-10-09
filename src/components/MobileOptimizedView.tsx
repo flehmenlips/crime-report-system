@@ -46,7 +46,7 @@ export function MobileOptimizedView({
                            (item.serialNumber && item.serialNumber.toLowerCase().includes(searchQuery.toLowerCase()))
       
       const matchesCategory = selectedCategory === 'all' || 
-                             (item.category && item.category.toLowerCase() === selectedCategory.toLowerCase())
+                             ((item.category || 'other').toLowerCase() === selectedCategory.toLowerCase())
       
       return matchesSearch && matchesCategory
     })
@@ -63,7 +63,7 @@ export function MobileOptimizedView({
     })
 
   // Get unique categories
-  const categories = ['all', ...Array.from(new Set(items.map(item => item.category).filter(Boolean)))]
+  const categories = ['all', ...Array.from(new Set(items.map(item => item.category || 'other').filter(Boolean)))]
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
