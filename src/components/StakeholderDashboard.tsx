@@ -126,10 +126,9 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
           bgGradient: 'linear-gradient(135deg, #dc2626 0%, #991b1b 100%)',
           title: 'Law Enforcement Portal',
           subtitle: 'Investigation interface for stolen items case',
-          canEdit: false, // Law enforcement shouldn't edit core item data
-          canDelete: false, // Law enforcement shouldn't delete items
-          canUpload: true, // Law enforcement can add evidence for investigation
-          canAddNotes: true // Law enforcement can add investigation notes
+          canEdit: true,
+          canDelete: true,
+          canUpload: true
         }
       case 'insurance_agent':
         return {
@@ -1129,12 +1128,6 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
               if (!roleConfig.canUpload) {
                 alert(`⚠️ ${getRoleDisplayName(user.role)} users have read-only access. Please contact the property owner to add evidence.`)
               }
-            }}
-            permissions={{
-              canEdit: roleConfig.canEdit,
-              canDelete: roleConfig.canDelete,
-              canUpload: roleConfig.canUpload,
-              canAddNotes: roleConfig.canAddNotes
             }}
           />
         )}
