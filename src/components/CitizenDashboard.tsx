@@ -47,6 +47,7 @@ export function CitizenDashboard() {
         dateLastSeen: formData.dateLastSeen,
         locationLastSeen: formData.locationLastSeen,
         estimatedValue: formData.estimatedValue,
+        category: formData.category,
         evidence: [],
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
