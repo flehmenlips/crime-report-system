@@ -16,6 +16,8 @@ import { ReportGenerator } from './ReportGenerator'
 import { ItemCardThumbnails } from './ItemCardThumbnails'
 import { SimpleSortControls } from './SimpleSortControls'
 import { getRoleDisplayName, getDashboardTitle } from '@/lib/auth'
+import { CaseSummary } from './CaseSummary'
+import { EvidenceTags } from './EvidenceTags'
 
 interface StakeholderDashboardProps {
   user: User
@@ -36,6 +38,8 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
   const [showReportGenerator, setShowReportGenerator] = useState(false)
   const [showDetailView, setShowDetailView] = useState(false)
   const [detailViewItem, setDetailViewItem] = useState<StolenItem | null>(null)
+  const [showCaseSummary, setShowCaseSummary] = useState(false)
+  const [showEvidenceTags, setShowEvidenceTags] = useState(false)
   const [filteredItems, setFilteredItems] = useState<StolenItem[]>([])
   const [isFiltered, setIsFiltered] = useState(false)
   const [viewMode, setViewMode] = useState<'cards' | 'list'>('cards')
@@ -566,29 +570,51 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
             {/* Role-specific tools */}
             {user.role === 'law_enforcement' && (
               <>
-                <button style={{
-                  background: '#f8fafc',
-                  border: '2px solid #e2e8f0',
-                  padding: '16px',
-                  borderRadius: '12px',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease',
-                  textAlign: 'left'
-                }}>
+                <button 
+                  onClick={() => setShowCaseSummary(true)}
+                  style={{
+                    background: '#f8fafc',
+                    border: '2px solid #e2e8f0',
+                    padding: '16px',
+                    borderRadius: '12px',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    textAlign: 'left'
+                  }}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.background = '#f1f5f9'
+                    e.currentTarget.style.borderColor = '#cbd5e1'
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.background = '#f8fafc'
+                    e.currentTarget.style.borderColor = '#e2e8f0'
+                  }}
+                >
                   <div style={{ fontSize: '20px', marginBottom: '8px' }}>📋</div>
                   <div style={{ fontWeight: '600', color: '#1f2937', marginBottom: '4px' }}>Case Summary</div>
                   <div style={{ fontSize: '12px', color: '#6b7280' }}>Generate case overview</div>
                 </button>
                 
-                <button style={{
-                  background: '#f8fafc',
-                  border: '2px solid #e2e8f0',
-                  padding: '16px',
-                  borderRadius: '12px',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease',
-                  textAlign: 'left'
-                }}>
+                <button 
+                  onClick={() => setShowEvidenceTags(true)}
+                  style={{
+                    background: '#f8fafc',
+                    border: '2px solid #e2e8f0',
+                    padding: '16px',
+                    borderRadius: '12px',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    textAlign: 'left'
+                  }}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.background = '#f1f5f9'
+                    e.currentTarget.style.borderColor = '#cbd5e1'
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.background = '#f8fafc'
+                    e.currentTarget.style.borderColor = '#e2e8f0'
+                  }}
+                >
                   <div style={{ fontSize: '20px', marginBottom: '8px' }}>🏷️</div>
                   <div style={{ fontWeight: '600', color: '#1f2937', marginBottom: '4px' }}>Evidence Tags</div>
                   <div style={{ fontSize: '12px', color: '#6b7280' }}>Organize by categories</div>
@@ -1199,6 +1225,23 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
           <AnalyticsDashboard
             items={isFiltered ? filteredItems : items}
             onClose={() => setShowAnalytics(false)}
+          />
+        )}
+
+        {/* Law Enforcement Tools */}
+        {showCaseSummary && (
+          <CaseSummary
+            user={user}
+            items={isFiltered ? filteredItems : items}
+            onClose={() => setShowCaseSummary(false)}
+          />
+        )}
+
+        {showEvidenceTags && (
+          <EvidenceTags
+            user={user}
+            items={isFiltered ? filteredItems : items}
+            onClose={() => setShowEvidenceTags(false)}
           />
         )}
       </div>
