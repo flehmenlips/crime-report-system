@@ -1,8 +1,9 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { StolenItem, User, Evidence } from '@/types'
 import { formatCurrency, formatDate } from '@/lib/data'
+import { generateCaseSummaryPDF, CaseSummaryData } from '@/lib/pdf-export'
 
 interface CaseSummaryProps {
   user: User
@@ -26,6 +27,8 @@ interface CaseMetrics {
 export function CaseSummary({ user, items, onClose }: CaseSummaryProps) {
   const [metrics, setMetrics] = useState<CaseMetrics | null>(null)
   const [loading, setLoading] = useState(true)
+  const [exporting, setExporting] = useState(false)
+  const contentRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const calculateMetrics = () => {
@@ -112,6 +115,41 @@ export function CaseSummary({ user, items, onClose }: CaseSummaryProps) {
     calculateMetrics()
   }, [items])
 
+  const handleExportPDF = async () => {
+    if (!metrics) return
+    
+    setExporting(true)
+    try {
+      const pdfData: CaseSummaryData = {
+        totalItems: metrics.totalItems,
+        totalValue: metrics.totalValue,
+        evidenceCount: metrics.evidenceCount,
+        itemsWithPhotos: metrics.itemsWithPhotos,
+        itemsWithVideos: metrics.itemsWithVideos,
+        itemsWithDocuments: metrics.itemsWithDocuments,
+        categories: metrics.categories,
+        dateRange: metrics.dateRange,
+        topItemsByValue: metrics.topItemsByValue.map(item => ({
+          id: item.id,
+          name: item.name,
+          estimatedValue: item.estimatedValue,
+          category: item.category
+        })),
+        evidenceTypes: metrics.evidenceTypes,
+        generatedBy: user.name,
+        generatedAt: new Date().toLocaleString(),
+        caseName: `kenfeld-farm-case`
+      }
+      
+      await generateCaseSummaryPDF(pdfData)
+    } catch (error) {
+      console.error('PDF export failed:', error)
+      alert('Failed to generate PDF. Please try again.')
+    } finally {
+      setExporting(false)
+    }
+  }
+
   if (loading) {
     return (
       <div style={{
@@ -181,28 +219,38 @@ export function CaseSummary({ user, items, onClose }: CaseSummaryProps) {
   }
 
   return (
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      backgroundColor: 'rgba(0, 0, 0, 0.5)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      zIndex: 1000,
-      padding: '20px'
-    }}>
+    <>
+      <style>{`
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      `}</style>
       <div style={{
-        backgroundColor: 'white',
-        borderRadius: '16px',
-        maxWidth: '800px',
-        width: '100%',
-        maxHeight: '90vh',
-        overflow: 'auto',
-        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 1000,
+        padding: '20px'
       }}>
+      <div 
+        ref={contentRef}
+        style={{
+          backgroundColor: 'white',
+          borderRadius: '16px',
+          maxWidth: '800px',
+          width: '100%',
+          maxHeight: '90vh',
+          overflow: 'auto',
+          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
+        }}
+      >
         {/* Header */}
         <div style={{
           background: 'linear-gradient(135deg, #dc2626 0%, #991b1b 100%)',
@@ -398,29 +446,38 @@ export function CaseSummary({ user, items, onClose }: CaseSummaryProps) {
             borderTop: '1px solid #e2e8f0'
           }}>
             <button
-              onClick={() => {
-                // Generate PDF report
-                const reportData = {
-                  caseSummary: metrics,
-                  generatedBy: user.name,
-                  generatedAt: new Date().toLocaleString()
-                }
-                console.log('Generating PDF report:', reportData)
-                // TODO: Implement PDF generation
-                alert('PDF generation feature coming soon!')
-              }}
+              onClick={handleExportPDF}
+              disabled={exporting}
               style={{
                 padding: '12px 24px',
-                backgroundColor: '#dc2626',
+                backgroundColor: exporting ? '#9ca3af' : '#dc2626',
                 color: 'white',
                 border: 'none',
                 borderRadius: '8px',
-                cursor: 'pointer',
+                cursor: exporting ? 'not-allowed' : 'pointer',
                 fontSize: '14px',
-                fontWeight: '600'
+                fontWeight: '600',
+                opacity: exporting ? 0.7 : 1,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
               }}
             >
-              📄 Export PDF
+              {exporting ? (
+                <>
+                  <div style={{
+                    width: '16px',
+                    height: '16px',
+                    border: '2px solid #ffffff',
+                    borderTop: '2px solid transparent',
+                    borderRadius: '50%',
+                    animation: 'spin 1s linear infinite'
+                  }}></div>
+                  Generating PDF...
+                </>
+              ) : (
+                <>📄 Export PDF</>
+              )}
             </button>
             <button
               onClick={onClose}
@@ -441,5 +498,6 @@ export function CaseSummary({ user, items, onClose }: CaseSummaryProps) {
         </div>
       </div>
     </div>
+    </>
   )
 }
