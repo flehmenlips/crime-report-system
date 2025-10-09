@@ -126,9 +126,10 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
           bgGradient: 'linear-gradient(135deg, #dc2626 0%, #991b1b 100%)',
           title: 'Law Enforcement Portal',
           subtitle: 'Investigation interface for stolen items case',
-          canEdit: true,
-          canDelete: true,
-          canUpload: true
+          canEdit: false, // Law enforcement shouldn't edit core item data
+          canDelete: false, // Law enforcement shouldn't delete items
+          canUpload: true, // Law enforcement can add evidence for investigation
+          canAddNotes: true // Law enforcement can add investigation notes
         }
       case 'insurance_agent':
         return {
@@ -1104,28 +1105,34 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
               setDetailViewItem(null)
             }}
             onEdit={(item) => {
-              setShowDetailView(false)
-              setDetailViewItem(null)
-              if (!roleConfig.canEdit) {
+              if (roleConfig.canEdit) {
+                // Property owners can edit items - implement edit functionality
+                alert(`Edit functionality for "${item.name}" - Coming soon!`)
+              } else {
                 alert(`⚠️ ${getRoleDisplayName(user.role)} users have read-only access. Please contact the property owner for edits.`)
               }
             }}
             onDelete={(item) => {
-              setShowDetailView(false)
-              setDetailViewItem(null)
-              if (!roleConfig.canDelete) {
+              if (roleConfig.canDelete) {
+                // Property owners can delete items - implement delete functionality
+                alert(`Delete functionality for "${item.name}" - Coming soon!`)
+              } else {
                 alert(`⚠️ ${getRoleDisplayName(user.role)} users have read-only access. Please contact the property owner for deletions.`)
               }
             }}
             onDuplicate={(item) => {
-              setShowDetailView(false)
-              setDetailViewItem(null)
-              alert(`⚠️ ${getRoleDisplayName(user.role)} users have read-only access. Please contact the property owner for item management.`)
+              if (roleConfig.canEdit) {
+                // Property owners can duplicate items - implement duplicate functionality
+                alert(`Duplicate functionality for "${item.name}" - Coming soon!`)
+              } else {
+                alert(`⚠️ ${getRoleDisplayName(user.role)} users have read-only access. Please contact the property owner for item management.`)
+              }
             }}
             onUploadEvidence={(item) => {
-              setShowDetailView(false)
-              setDetailViewItem(null)
-              if (!roleConfig.canUpload) {
+              if (roleConfig.canUpload) {
+                // Law enforcement and property owners can upload evidence
+                alert(`Upload evidence for "${item.name}" - Coming soon!`)
+              } else {
                 alert(`⚠️ ${getRoleDisplayName(user.role)} users have read-only access. Please contact the property owner to add evidence.`)
               }
             }}
