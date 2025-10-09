@@ -153,6 +153,13 @@ export function EvidenceTags({ user, items, onClose }: EvidenceTagsProps) {
   const handleExportPDF = async () => {
     setExporting(true)
     try {
+      // Generate case name from user/tenant info or use timestamp
+      const caseName = user.company 
+        ? `${user.company.toLowerCase().replace(/\s+/g, '-')}-case`
+        : items[0]?.tenant?.name 
+          ? `${items[0].tenant.name.toLowerCase().replace(/\s+/g, '-')}-case`
+          : `case-${new Date().toISOString().split('T')[0]}`
+      
       const pdfData: EvidenceTagsData = {
         tagCategories: tagCategories.map(category => ({
           id: category.id,
@@ -168,7 +175,7 @@ export function EvidenceTags({ user, items, onClose }: EvidenceTagsProps) {
             dateLastSeen: item.dateLastSeen,
             evidence: item.evidence?.map(evidence => ({
               type: evidence.type,
-              filename: evidence.originalName
+              filename: evidence.originalName || `${evidence.type}-${evidence.id}` // Fallback to type-id if no originalName
             }))
           }))
         })),
@@ -176,7 +183,7 @@ export function EvidenceTags({ user, items, onClose }: EvidenceTagsProps) {
         totalEvidence: evidenceItems.length,
         generatedBy: user.name,
         generatedAt: new Date().toLocaleString(),
-        caseName: 'kenfeld-farm-case'
+        caseName: caseName
       }
       
       await generateEvidenceTagsPDF(pdfData)

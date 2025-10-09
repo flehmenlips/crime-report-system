@@ -120,6 +120,13 @@ export function CaseSummary({ user, items, onClose }: CaseSummaryProps) {
     
     setExporting(true)
     try {
+      // Generate case name from user/tenant info or use timestamp
+      const caseName = user.company 
+        ? `${user.company.toLowerCase().replace(/\s+/g, '-')}-case`
+        : items[0]?.tenant?.name 
+          ? `${items[0].tenant.name.toLowerCase().replace(/\s+/g, '-')}-case`
+          : `case-${new Date().toISOString().split('T')[0]}`
+      
       const pdfData: CaseSummaryData = {
         totalItems: metrics.totalItems,
         totalValue: metrics.totalValue,
@@ -138,7 +145,7 @@ export function CaseSummary({ user, items, onClose }: CaseSummaryProps) {
         evidenceTypes: metrics.evidenceTypes,
         generatedBy: user.name,
         generatedAt: new Date().toLocaleString(),
-        caseName: `kenfeld-farm-case`
+        caseName: caseName
       }
       
       await generateCaseSummaryPDF(pdfData)
