@@ -560,101 +560,657 @@ export function AnalyticsDashboard({ items, onClose }: AnalyticsDashboardProps) 
           )}
 
           {activeTab === 'trends' && (
-            <div className="space-y-6">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
               {/* Monthly Trend */}
-              <div className="bg-gray-50 p-6 rounded-xl">
-                <h3 className="text-xl font-bold text-gray-900 mb-4">📈 Monthly Trends</h3>
-                <div className="space-y-4">
-                  {Object.entries(analyticsData.monthlyTrend).map(([month, data]) => (
-                    <div key={month} className="bg-white p-4 rounded-lg">
-                      <div className="flex justify-between items-center mb-2">
-                        <span className="font-semibold text-gray-900">{month}</span>
-                        <span className="text-sm text-gray-600">{data.count} items • {formatCurrency(data.value)}</span>
+              <div style={{
+                background: '#f9fafb',
+                padding: '24px',
+                borderRadius: '16px',
+                border: '1px solid #e5e7eb'
+              }}>
+                <h3 style={{
+                  fontSize: '20px',
+                  fontWeight: '700',
+                  color: '#1f2937',
+                  marginBottom: '16px',
+                  margin: '0 0 16px 0'
+                }}>
+                  📈 Monthly Trends
+                </h3>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  {Object.entries(analyticsData.monthlyTrend)
+                    .sort(([a], [b]) => new Date(a).getTime() - new Date(b).getTime())
+                    .map(([month, data]) => (
+                    <div key={month} style={{
+                      background: 'white',
+                      padding: '20px',
+                      borderRadius: '12px',
+                      border: '1px solid #e5e7eb'
+                    }}>
+                      <div style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        marginBottom: '12px'
+                      }}>
+                        <span style={{
+                          fontWeight: '600',
+                          color: '#1f2937',
+                          fontSize: '16px'
+                        }}>
+                          {month}
+                        </span>
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '12px'
+                        }}>
+                          <span style={{
+                            fontSize: '14px',
+                            color: '#6b7280',
+                            background: '#f3f4f6',
+                            padding: '4px 8px',
+                            borderRadius: '6px',
+                            fontWeight: '600'
+                          }}>
+                            {data.count} items
+                          </span>
+                          <span style={{
+                            fontSize: '14px',
+                            color: '#059669',
+                            fontWeight: '700'
+                          }}>
+                            {formatCurrency(data.value)}
+                          </span>
+                        </div>
                       </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div style={{
+                        width: '100%',
+                        background: '#e5e7eb',
+                        borderRadius: '8px',
+                        height: '8px',
+                        overflow: 'hidden'
+                      }}>
                         <div 
-                          className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full transition-all duration-500"
-                          style={{ width: `${formatPercent(data.value, analyticsData.totalValue)}%` }}
+                          style={{
+                            background: 'linear-gradient(135deg, #3b82f6 0%, #7c3aed 100%)',
+                            height: '100%',
+                            borderRadius: '8px',
+                            transition: 'width 0.5s ease',
+                            width: `${formatPercent(data.value, analyticsData.totalValue)}%`
+                          }}
                         ></div>
+                      </div>
+                      <div style={{
+                        marginTop: '8px',
+                        fontSize: '12px',
+                        color: '#6b7280',
+                        textAlign: 'right'
+                      }}>
+                        {formatPercent(data.value, analyticsData.totalValue)}% of total value
                       </div>
                     </div>
                   ))}
+                </div>
+              </div>
+
+              {/* Trend Summary */}
+              <div style={{
+                background: '#f9fafb',
+                padding: '24px',
+                borderRadius: '16px',
+                border: '1px solid #e5e7eb'
+              }}>
+                <h3 style={{
+                  fontSize: '20px',
+                  fontWeight: '700',
+                  color: '#1f2937',
+                  marginBottom: '16px',
+                  margin: '0 0 16px 0'
+                }}>
+                  📊 Trend Analysis
+                </h3>
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                  gap: '16px'
+                }}>
+                  <div style={{
+                    background: 'white',
+                    padding: '20px',
+                    borderRadius: '12px',
+                    border: '1px solid #e5e7eb',
+                    textAlign: 'center'
+                  }}>
+                    <div style={{
+                      fontSize: '24px',
+                      fontWeight: '700',
+                      color: '#1f2937',
+                      marginBottom: '4px'
+                    }}>
+                      {Object.keys(analyticsData.monthlyTrend).length}
+                    </div>
+                    <div style={{
+                      fontSize: '14px',
+                      color: '#6b7280',
+                      fontWeight: '600'
+                    }}>
+                      Active Months
+                    </div>
+                  </div>
+                  <div style={{
+                    background: 'white',
+                    padding: '20px',
+                    borderRadius: '12px',
+                    border: '1px solid #e5e7eb',
+                    textAlign: 'center'
+                  }}>
+                    <div style={{
+                      fontSize: '24px',
+                      fontWeight: '700',
+                      color: '#059669',
+                      marginBottom: '4px'
+                    }}>
+                      {formatCurrency(
+                        Object.values(analyticsData.monthlyTrend)
+                          .reduce((sum, data) => sum + data.value, 0) / 
+                        Object.keys(analyticsData.monthlyTrend).length
+                      )}
+                    </div>
+                    <div style={{
+                      fontSize: '14px',
+                      color: '#6b7280',
+                      fontWeight: '600'
+                    }}>
+                      Avg Monthly Value
+                    </div>
+                  </div>
+                  <div style={{
+                    background: 'white',
+                    padding: '20px',
+                    borderRadius: '12px',
+                    border: '1px solid #e5e7eb',
+                    textAlign: 'center'
+                  }}>
+                    <div style={{
+                      fontSize: '24px',
+                      fontWeight: '700',
+                      color: '#dc2626',
+                      marginBottom: '4px'
+                    }}>
+                      {Math.max(...Object.values(analyticsData.monthlyTrend).map(d => d.count))}
+                    </div>
+                    <div style={{
+                      fontSize: '14px',
+                      color: '#6b7280',
+                      fontWeight: '600'
+                    }}>
+                      Peak Items/Month
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           )}
 
           {activeTab === 'categories' && (
-            <div className="space-y-6">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
               {/* Category Breakdown */}
-              <div className="bg-gray-50 p-6 rounded-xl">
-                <h3 className="text-xl font-bold text-gray-900 mb-4">📂 Category Analysis</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {Object.entries(analyticsData.categories).map(([category, data]) => (
-                    <div key={category} className="bg-white p-4 rounded-lg">
-                      <div className="flex justify-between items-start mb-2">
+              <div style={{
+                background: '#f9fafb',
+                padding: '24px',
+                borderRadius: '16px',
+                border: '1px solid #e5e7eb'
+              }}>
+                <h3 style={{
+                  fontSize: '20px',
+                  fontWeight: '700',
+                  color: '#1f2937',
+                  marginBottom: '16px',
+                  margin: '0 0 16px 0'
+                }}>
+                  📂 Category Analysis
+                </h3>
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+                  gap: '16px'
+                }}>
+                  {Object.entries(analyticsData.categories)
+                    .sort(([,a], [,b]) => b.value - a.value)
+                    .map(([category, data]) => (
+                    <div key={category} style={{
+                      background: 'white',
+                      padding: '20px',
+                      borderRadius: '12px',
+                      border: '1px solid #e5e7eb',
+                      position: 'relative'
+                    }}>
+                      <div style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'flex-start',
+                        marginBottom: '16px'
+                      }}>
                         <div>
-                          <h4 className="font-semibold text-gray-900">{category}</h4>
-                          <p className="text-sm text-gray-600">{data.count} items</p>
+                          <h4 style={{
+                            fontWeight: '600',
+                            color: '#1f2937',
+                            fontSize: '16px',
+                            marginBottom: '4px',
+                            textTransform: 'capitalize'
+                          }}>
+                            {category}
+                          </h4>
+                          <p style={{
+                            fontSize: '14px',
+                            color: '#6b7280',
+                            margin: 0
+                          }}>
+                            {data.count} {data.count === 1 ? 'item' : 'items'}
+                          </p>
                         </div>
-                        <div className="text-right">
-                          <div className="font-bold text-gray-900">{formatCurrency(data.value)}</div>
-                          <div className="text-sm text-gray-600">{formatPercent(data.value, analyticsData.totalValue)}% of total</div>
+                        <div style={{ textAlign: 'right' }}>
+                          <div style={{
+                            fontWeight: '700',
+                            color: '#1f2937',
+                            fontSize: '16px',
+                            marginBottom: '2px'
+                          }}>
+                            {formatCurrency(data.value)}
+                          </div>
+                          <div style={{
+                            fontSize: '12px',
+                            color: '#059669',
+                            fontWeight: '600',
+                            background: '#dcfce7',
+                            padding: '2px 6px',
+                            borderRadius: '4px'
+                          }}>
+                            {formatPercent(data.value, analyticsData.totalValue)}% of total
+                          </div>
                         </div>
                       </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div style={{
+                        width: '100%',
+                        background: '#e5e7eb',
+                        borderRadius: '8px',
+                        height: '8px',
+                        overflow: 'hidden'
+                      }}>
                         <div 
-                          className="bg-gradient-to-r from-green-500 to-blue-500 h-2 rounded-full transition-all duration-500"
-                          style={{ width: `${formatPercent(data.value, analyticsData.totalValue)}%` }}
+                          style={{
+                            background: 'linear-gradient(135deg, #059669 0%, #3b82f6 100%)',
+                            height: '100%',
+                            borderRadius: '8px',
+                            transition: 'width 0.5s ease',
+                            width: `${formatPercent(data.value, analyticsData.totalValue)}%`
+                          }}
                         ></div>
+                      </div>
+                      <div style={{
+                        marginTop: '8px',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        fontSize: '12px',
+                        color: '#6b7280'
+                      }}>
+                        <span>Avg: {formatCurrency(data.value / data.count)}</span>
+                        <span>{data.count} items</span>
                       </div>
                     </div>
                   ))}
+                </div>
+              </div>
+
+              {/* Category Summary */}
+              <div style={{
+                background: '#f9fafb',
+                padding: '24px',
+                borderRadius: '16px',
+                border: '1px solid #e5e7eb'
+              }}>
+                <h3 style={{
+                  fontSize: '20px',
+                  fontWeight: '700',
+                  color: '#1f2937',
+                  marginBottom: '16px',
+                  margin: '0 0 16px 0'
+                }}>
+                  📊 Category Summary
+                </h3>
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                  gap: '16px'
+                }}>
+                  <div style={{
+                    background: 'white',
+                    padding: '20px',
+                    borderRadius: '12px',
+                    border: '1px solid #e5e7eb',
+                    textAlign: 'center'
+                  }}>
+                    <div style={{
+                      fontSize: '24px',
+                      fontWeight: '700',
+                      color: '#1f2937',
+                      marginBottom: '4px'
+                    }}>
+                      {Object.keys(analyticsData.categories).length}
+                    </div>
+                    <div style={{
+                      fontSize: '14px',
+                      color: '#6b7280',
+                      fontWeight: '600'
+                    }}>
+                      Total Categories
+                    </div>
+                  </div>
+                  <div style={{
+                    background: 'white',
+                    padding: '20px',
+                    borderRadius: '12px',
+                    border: '1px solid #e5e7eb',
+                    textAlign: 'center'
+                  }}>
+                    <div style={{
+                      fontSize: '24px',
+                      fontWeight: '700',
+                      color: '#059669',
+                      marginBottom: '4px'
+                    }}>
+                      {Object.entries(analyticsData.categories)
+                        .sort(([,a], [,b]) => b.value - a.value)[0]?.[0] || 'N/A'}
+                    </div>
+                    <div style={{
+                      fontSize: '14px',
+                      color: '#6b7280',
+                      fontWeight: '600'
+                    }}>
+                      Top Category
+                    </div>
+                  </div>
+                  <div style={{
+                    background: 'white',
+                    padding: '20px',
+                    borderRadius: '12px',
+                    border: '1px solid #e5e7eb',
+                    textAlign: 'center'
+                  }}>
+                    <div style={{
+                      fontSize: '24px',
+                      fontWeight: '700',
+                      color: '#dc2626',
+                      marginBottom: '4px'
+                    }}>
+                      {Math.max(...Object.values(analyticsData.categories).map(d => d.count))}
+                    </div>
+                    <div style={{
+                      fontSize: '14px',
+                      color: '#6b7280',
+                      fontWeight: '600'
+                    }}>
+                      Most Items/Category
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           )}
 
           {activeTab === 'evidence' && (
-            <div className="space-y-6">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
               {/* Evidence Statistics */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="bg-gradient-to-r from-pink-500 to-pink-600 text-white p-6 rounded-xl">
-                  <div className="text-3xl font-bold">{analyticsData.evidenceStats.photosCount}</div>
-                  <div className="text-pink-100">📸 Photos</div>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                gap: '16px'
+              }}>
+                <div style={{
+                  background: 'linear-gradient(135deg, #ec4899 0%, #be185d 100%)',
+                  color: 'white',
+                  padding: '24px',
+                  borderRadius: '16px',
+                  textAlign: 'center'
+                }}>
+                  <div style={{ fontSize: '32px', fontWeight: '900', marginBottom: '8px' }}>
+                    {analyticsData.evidenceStats.photosCount}
+                  </div>
+                  <div style={{ color: 'rgba(255, 255, 255, 0.9)', fontSize: '16px', fontWeight: '600' }}>
+                    📸 Photos
+                  </div>
                 </div>
-                <div className="bg-gradient-to-r from-red-500 to-red-600 text-white p-6 rounded-xl">
-                  <div className="text-3xl font-bold">{analyticsData.evidenceStats.videosCount}</div>
-                  <div className="text-red-100">🎥 Videos</div>
+                <div style={{
+                  background: 'linear-gradient(135deg, #dc2626 0%, #991b1b 100%)',
+                  color: 'white',
+                  padding: '24px',
+                  borderRadius: '16px',
+                  textAlign: 'center'
+                }}>
+                  <div style={{ fontSize: '32px', fontWeight: '900', marginBottom: '8px' }}>
+                    {analyticsData.evidenceStats.videosCount}
+                  </div>
+                  <div style={{ color: 'rgba(255, 255, 255, 0.9)', fontSize: '16px', fontWeight: '600' }}>
+                    🎥 Videos
+                  </div>
                 </div>
-                <div className="bg-gradient-to-r from-indigo-500 to-indigo-600 text-white p-6 rounded-xl">
-                  <div className="text-3xl font-bold">{analyticsData.evidenceStats.documentsCount}</div>
-                  <div className="text-indigo-100">📄 Documents</div>
+                <div style={{
+                  background: 'linear-gradient(135deg, #6366f1 0%, #4338ca 100%)',
+                  color: 'white',
+                  padding: '24px',
+                  borderRadius: '16px',
+                  textAlign: 'center'
+                }}>
+                  <div style={{ fontSize: '32px', fontWeight: '900', marginBottom: '8px' }}>
+                    {analyticsData.evidenceStats.documentsCount}
+                  </div>
+                  <div style={{ color: 'rgba(255, 255, 255, 0.9)', fontSize: '16px', fontWeight: '600' }}>
+                    📄 Documents
+                  </div>
                 </div>
               </div>
 
               {/* Evidence Distribution */}
-              <div className="bg-gray-50 p-6 rounded-xl">
-                <h3 className="text-xl font-bold text-gray-900 mb-4">📊 Evidence Distribution</h3>
-                <div className="space-y-4">
+              <div style={{
+                background: '#f9fafb',
+                padding: '24px',
+                borderRadius: '16px',
+                border: '1px solid #e5e7eb'
+              }}>
+                <h3 style={{
+                  fontSize: '20px',
+                  fontWeight: '700',
+                  color: '#1f2937',
+                  marginBottom: '16px',
+                  margin: '0 0 16px 0'
+                }}>
+                  📊 Evidence Distribution
+                </h3>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                   {[
-                    { type: 'Photos', count: analyticsData.evidenceStats.photosCount, color: 'from-pink-500 to-pink-600' },
-                    { type: 'Videos', count: analyticsData.evidenceStats.videosCount, color: 'from-red-500 to-red-600' },
-                    { type: 'Documents', count: analyticsData.evidenceStats.documentsCount, color: 'from-indigo-500 to-indigo-600' }
-                  ].map(({ type, count, color }) => (
-                    <div key={type} className="bg-white p-4 rounded-lg">
-                      <div className="flex justify-between items-center mb-2">
-                        <span className="font-semibold text-gray-900">{type}</span>
-                        <span className="text-sm text-gray-600">{count} files</span>
+                    { 
+                      type: 'Photos', 
+                      count: analyticsData.evidenceStats.photosCount, 
+                      color: 'linear-gradient(135deg, #ec4899 0%, #be185d 100%)',
+                      icon: '📸'
+                    },
+                    { 
+                      type: 'Videos', 
+                      count: analyticsData.evidenceStats.videosCount, 
+                      color: 'linear-gradient(135deg, #dc2626 0%, #991b1b 100%)',
+                      icon: '🎥'
+                    },
+                    { 
+                      type: 'Documents', 
+                      count: analyticsData.evidenceStats.documentsCount, 
+                      color: 'linear-gradient(135deg, #6366f1 0%, #4338ca 100%)',
+                      icon: '📄'
+                    }
+                  ].map(({ type, count, color, icon }) => (
+                    <div key={type} style={{
+                      background: 'white',
+                      padding: '20px',
+                      borderRadius: '12px',
+                      border: '1px solid #e5e7eb'
+                    }}>
+                      <div style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        marginBottom: '12px'
+                      }}>
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '12px'
+                        }}>
+                          <span style={{ fontSize: '20px' }}>{icon}</span>
+                          <span style={{
+                            fontWeight: '600',
+                            color: '#1f2937',
+                            fontSize: '16px'
+                          }}>
+                            {type}
+                          </span>
+                        </div>
+                        <span style={{
+                          fontSize: '14px',
+                          color: '#6b7280',
+                          background: '#f3f4f6',
+                          padding: '4px 8px',
+                          borderRadius: '6px',
+                          fontWeight: '600'
+                        }}>
+                          {count} {count === 1 ? 'file' : 'files'}
+                        </span>
                       </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div style={{
+                        width: '100%',
+                        background: '#e5e7eb',
+                        borderRadius: '8px',
+                        height: '8px',
+                        overflow: 'hidden'
+                      }}>
                         <div 
-                          className={`bg-gradient-to-r ${color} h-2 rounded-full transition-all duration-500`}
-                          style={{ width: `${analyticsData.evidenceStats.totalEvidence > 0 ? formatPercent(count, analyticsData.evidenceStats.totalEvidence) : 0}%` }}
+                          style={{
+                            background: color,
+                            height: '100%',
+                            borderRadius: '8px',
+                            transition: 'width 0.5s ease',
+                            width: `${analyticsData.evidenceStats.totalEvidence > 0 ? formatPercent(count, analyticsData.evidenceStats.totalEvidence) : 0}%`
+                          }}
                         ></div>
+                      </div>
+                      <div style={{
+                        marginTop: '8px',
+                        fontSize: '12px',
+                        color: '#6b7280',
+                        textAlign: 'right'
+                      }}>
+                        {analyticsData.evidenceStats.totalEvidence > 0 ? formatPercent(count, analyticsData.evidenceStats.totalEvidence) : 0}% of total evidence
                       </div>
                     </div>
                   ))}
+                </div>
+              </div>
+
+              {/* Evidence Summary */}
+              <div style={{
+                background: '#f9fafb',
+                padding: '24px',
+                borderRadius: '16px',
+                border: '1px solid #e5e7eb'
+              }}>
+                <h3 style={{
+                  fontSize: '20px',
+                  fontWeight: '700',
+                  color: '#1f2937',
+                  marginBottom: '16px',
+                  margin: '0 0 16px 0'
+                }}>
+                  📈 Evidence Summary
+                </h3>
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                  gap: '16px'
+                }}>
+                  <div style={{
+                    background: 'white',
+                    padding: '20px',
+                    borderRadius: '12px',
+                    border: '1px solid #e5e7eb',
+                    textAlign: 'center'
+                  }}>
+                    <div style={{
+                      fontSize: '24px',
+                      fontWeight: '700',
+                      color: '#1f2937',
+                      marginBottom: '4px'
+                    }}>
+                      {analyticsData.evidenceStats.totalEvidence}
+                    </div>
+                    <div style={{
+                      fontSize: '14px',
+                      color: '#6b7280',
+                      fontWeight: '600'
+                    }}>
+                      Total Evidence Files
+                    </div>
+                  </div>
+                  <div style={{
+                    background: 'white',
+                    padding: '20px',
+                    borderRadius: '12px',
+                    border: '1px solid #e5e7eb',
+                    textAlign: 'center'
+                  }}>
+                    <div style={{
+                      fontSize: '24px',
+                      fontWeight: '700',
+                      color: '#059669',
+                      marginBottom: '4px'
+                    }}>
+                      {analyticsData.evidenceStats.totalEvidence > 0 
+                        ? (analyticsData.evidenceStats.totalEvidence / analyticsData.itemCount).toFixed(1)
+                        : '0'
+                      }
+                    </div>
+                    <div style={{
+                      fontSize: '14px',
+                      color: '#6b7280',
+                      fontWeight: '600'
+                    }}>
+                      Avg Files/Item
+                    </div>
+                  </div>
+                  <div style={{
+                    background: 'white',
+                    padding: '20px',
+                    borderRadius: '12px',
+                    border: '1px solid #e5e7eb',
+                    textAlign: 'center'
+                  }}>
+                    <div style={{
+                      fontSize: '24px',
+                      fontWeight: '700',
+                      color: '#dc2626',
+                      marginBottom: '4px'
+                    }}>
+                      {analyticsData.evidenceStats.totalEvidence > 0 
+                        ? Math.max(analyticsData.evidenceStats.photosCount, analyticsData.evidenceStats.videosCount, analyticsData.evidenceStats.documentsCount)
+                        : '0'
+                      }
+                    </div>
+                    <div style={{
+                      fontSize: '14px',
+                      color: '#6b7280',
+                      fontWeight: '600'
+                    }}>
+                      Most Common Type
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
