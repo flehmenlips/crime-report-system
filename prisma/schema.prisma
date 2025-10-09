@@ -8,55 +8,49 @@ datasource db {
 }
 
 model Tenant {
-  id          String   @id @default(uuid())
+  id          String       @id @default(uuid())
   name        String
   description String?
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  // Relationships
-  users       User[]
+  isActive    Boolean      @default(true)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
   items       StolenItem[]
+  users       User[]
 
   @@map("tenants")
 }
 
 model User {
-  id                String       @id @default(uuid())
-  email             String       @unique
-  name              String
-  username          String       @unique
-  password          String
-  createdAt         DateTime     @default(now())
-  updatedAt         DateTime     @updatedAt
-  role              Role         @default(property_owner)
-  address           String?
-  avatar            String?
-  bio               String?
-  city              String?
-  company           String?
-  country           String?
-  emailVerified     Boolean      @default(false)
-  isActive          Boolean      @default(true)
-  lastLoginAt       DateTime?
-  phone             String?
-  preferences       String?
-  state             String?
-  title             String?
-  zipCode           String?
-  accessLevel       AccessLevel? @default(owner)
-  tenantId          String?      @default("tenant-1")
-  items             StolenItem[]
-  
-  // Email verification fields
-  verificationToken String?
-  verificationExpires DateTime?
-  passwordResetToken String?
+  id                   String       @id @default(uuid())
+  email                String       @unique
+  name                 String
+  username             String       @unique
+  password             String
+  createdAt            DateTime     @default(now())
+  updatedAt            DateTime     @updatedAt
+  role                 Role         @default(property_owner)
+  address              String?
+  avatar               String?
+  bio                  String?
+  city                 String?
+  company              String?
+  country              String?
+  emailVerified        Boolean      @default(false)
+  isActive             Boolean      @default(true)
+  lastLoginAt          DateTime?
+  phone                String?
+  preferences          String?
+  state                String?
+  title                String?
+  zipCode              String?
+  accessLevel          AccessLevel? @default(owner)
+  tenantId             String?      @default("tenant-1")
   passwordResetExpires DateTime?
-
-  // Relationships
-  tenant        Tenant?      @relation(fields: [tenantId], references: [id])
+  passwordResetToken   String?
+  verificationExpires  DateTime?
+  verificationToken    String?
+  items                StolenItem[]
+  tenant               Tenant?      @relation(fields: [tenantId], references: [id])
 
   @@map("users")
 }
