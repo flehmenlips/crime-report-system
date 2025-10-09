@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { StolenItem, User, Evidence } from '@/types'
+import { generateEvidenceTagsPDF, EvidenceTagsData } from '@/lib/pdf-export'
 
 interface EvidenceTagsProps {
   user: User
@@ -24,6 +25,7 @@ interface EvidenceWithTags extends Evidence {
 }
 
 export function EvidenceTags({ user, items, onClose }: EvidenceTagsProps) {
+  const [exporting, setExporting] = useState(false)
   const [tagCategories, setTagCategories] = useState<TagCategory[]>([
     {
       id: 'high-value',
@@ -148,6 +150,44 @@ export function EvidenceTags({ user, items, onClose }: EvidenceTagsProps) {
     organizeEvidence()
   }, [items])
 
+  const handleExportPDF = async () => {
+    setExporting(true)
+    try {
+      const pdfData: EvidenceTagsData = {
+        tagCategories: tagCategories.map(category => ({
+          id: category.id,
+          name: category.name,
+          color: category.color,
+          description: category.description,
+          items: category.items.map(item => ({
+            id: item.id,
+            name: item.name,
+            estimatedValue: item.estimatedValue,
+            category: item.category,
+            description: item.description,
+            dateLastSeen: item.dateLastSeen,
+            evidence: item.evidence?.map(evidence => ({
+              type: evidence.type,
+              filename: evidence.originalName
+            }))
+          }))
+        })),
+        totalItems: items.length,
+        totalEvidence: evidenceItems.length,
+        generatedBy: user.name,
+        generatedAt: new Date().toLocaleString(),
+        caseName: 'kenfeld-farm-case'
+      }
+      
+      await generateEvidenceTagsPDF(pdfData)
+    } catch (error) {
+      console.error('PDF export failed:', error)
+      alert('Failed to generate PDF. Please try again.')
+    } finally {
+      setExporting(false)
+    }
+  }
+
   if (loading) {
     return (
       <div style={{
@@ -178,19 +218,26 @@ export function EvidenceTags({ user, items, onClose }: EvidenceTagsProps) {
   const selectedCategoryData = tagCategories.find(cat => cat.id === selectedCategory)
 
   return (
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      backgroundColor: 'rgba(0, 0, 0, 0.5)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      zIndex: 1000,
-      padding: '20px'
-    }}>
+    <>
+      <style>{`
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      `}</style>
+      <div style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 1000,
+        padding: '20px'
+      }}>
       <div style={{
         backgroundColor: 'white',
         borderRadius: '16px',
@@ -434,31 +481,38 @@ export function EvidenceTags({ user, items, onClose }: EvidenceTagsProps) {
           </div>
           <div style={{ display: 'flex', gap: '12px' }}>
             <button
-              onClick={() => {
-                // Export categorized evidence
-                const exportData = {
-                  categories: tagCategories,
-                  totalItems: items.length,
-                  totalEvidence: evidenceItems.length,
-                  generatedBy: user.name,
-                  generatedAt: new Date().toLocaleString()
-                }
-                console.log('Exporting categorized evidence:', exportData)
-                // TODO: Implement export functionality
-                alert('Export feature coming soon!')
-              }}
+              onClick={handleExportPDF}
+              disabled={exporting}
               style={{
                 padding: '8px 16px',
-                backgroundColor: '#059669',
+                backgroundColor: exporting ? '#9ca3af' : '#059669',
                 color: 'white',
                 border: 'none',
                 borderRadius: '6px',
-                cursor: 'pointer',
+                cursor: exporting ? 'not-allowed' : 'pointer',
                 fontSize: '12px',
-                fontWeight: '600'
+                fontWeight: '600',
+                opacity: exporting ? 0.7 : 1,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px'
               }}
             >
-              📊 Export Data
+              {exporting ? (
+                <>
+                  <div style={{
+                    width: '12px',
+                    height: '12px',
+                    border: '2px solid #ffffff',
+                    borderTop: '2px solid transparent',
+                    borderRadius: '50%',
+                    animation: 'spin 1s linear infinite'
+                  }}></div>
+                  Generating...
+                </>
+              ) : (
+                <>📊 Export PDF</>
+              )}
             </button>
             <button
               onClick={onClose}
@@ -479,5 +533,6 @@ export function EvidenceTags({ user, items, onClose }: EvidenceTagsProps) {
         </div>
       </div>
     </div>
+    </>
   )
 }

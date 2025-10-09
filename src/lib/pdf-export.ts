@@ -22,6 +22,32 @@ export interface CaseSummaryData {
   caseName?: string
 }
 
+export interface EvidenceTagsData {
+  tagCategories: Array<{
+    id: string
+    name: string
+    color: string
+    description: string
+    items: Array<{
+      id: number
+      name: string
+      estimatedValue: number
+      category: string | undefined
+      description: string
+      dateLastSeen: string
+      evidence: Array<{
+        type: string
+        filename: string | null
+      }>
+    }>
+  }>
+  totalItems: number
+  totalEvidence: number
+  generatedBy: string
+  generatedAt: string
+  caseName?: string
+}
+
 // Helper function to clean text for PDF compatibility
 const cleanTextForPDF = (text: string): string => {
   return text
@@ -180,6 +206,181 @@ export async function generateCaseSummaryPDF(
   } catch (error) {
     console.error('Error generating PDF:', error)
     throw new Error('Failed to generate PDF report')
+  }
+}
+
+export async function generateEvidenceTagsPDF(data: EvidenceTagsData): Promise<void> {
+  const pdf = new jsPDF('p', 'mm', 'a4')
+  const pageWidth = pdf.internal.pageSize.getWidth()
+  const pageHeight = pdf.internal.pageSize.getHeight()
+  let yPosition = 20
+
+  // Helper function to add text with word wrapping
+  const addText = (text: string, x: number, y: number, options: any = {}) => {
+    const { fontSize = 10, fontStyle = 'normal', color = '#000000', maxWidth = pageWidth - 40 } = options
+    pdf.setFontSize(fontSize)
+    pdf.setFont('helvetica', fontStyle)
+    pdf.setTextColor(color)
+    
+    const cleanText = cleanTextForPDF(text)
+    const lines = pdf.splitTextToSize(cleanText, maxWidth)
+    pdf.text(lines, x, y)
+    return y + (lines.length * (fontSize * 0.4))
+  }
+
+  // Helper function to add a section header
+  const addSectionHeader = (title: string, x: number, y: number) => {
+    const cleanTitle = cleanTextForPDF(title)
+    pdf.setFillColor(220, 38, 38) // Red background
+    pdf.rect(x, y - 5, pageWidth - 40, 8, 'F')
+    pdf.setTextColor(255, 255, 255) // White text
+    pdf.setFontSize(12)
+    pdf.setFont('helvetica', 'bold')
+    pdf.text(cleanTitle, x + 2, y + 2)
+    pdf.setTextColor(0, 0, 0) // Reset to black
+    return y + 12
+  }
+
+  // Helper function to add a category header
+  const addCategoryHeader = (category: any, x: number, y: number) => {
+    const categoryWidth = pageWidth - 40
+    const headerHeight = 10
+    
+    // Category background with color
+    const colorRgb = hexToRgb(category.color)
+    pdf.setFillColor(colorRgb.r, colorRgb.g, colorRgb.b)
+    pdf.rect(x, y, categoryWidth, headerHeight, 'F')
+    
+    // Category name and count
+    pdf.setTextColor(255, 255, 255)
+    pdf.setFontSize(11)
+    pdf.setFont('helvetica', 'bold')
+    const categoryText = `${cleanTextForPDF(category.name)} (${category.items.length} items)`
+    pdf.text(categoryText, x + 2, y + 7)
+    
+    // Description
+    pdf.setTextColor(200, 200, 200)
+    pdf.setFontSize(8)
+    pdf.setFont('helvetica', 'normal')
+    pdf.text(cleanTextForPDF(category.description), x + 2, y + 9.5)
+    
+    return y + headerHeight + 5
+  }
+
+  // Helper function to convert hex to RGB
+  const hexToRgb = (hex: string) => {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
+    return result ? {
+      r: parseInt(result[1], 16),
+      g: parseInt(result[2], 16),
+      b: parseInt(result[3], 16)
+    } : { r: 220, g: 38, b: 38 }
+  }
+
+  // Helper function to add item entry
+  const addItemEntry = (item: any, x: number, y: number, index: number) => {
+    const indent = 5
+    const itemY = y + (index * 15)
+    
+    // Item name and value
+    pdf.setTextColor(0, 0, 0)
+    pdf.setFontSize(9)
+    pdf.setFont('helvetica', 'bold')
+    const itemText = `${index + 1}. ${cleanTextForPDF(item.name)}`
+    pdf.text(itemText, x + indent, itemY)
+    
+    // Value on the right
+    pdf.setTextColor(5, 150, 105) // Green for value
+    const valueText = `$${item.estimatedValue.toLocaleString()}`
+    pdf.text(valueText, pageWidth - 50, itemY)
+    
+    // Category and date
+    pdf.setTextColor(100, 100, 100)
+    pdf.setFontSize(7)
+    pdf.setFont('helvetica', 'normal')
+    const detailsText = `${item.category || 'Uncategorized'} • ${item.dateLastSeen}`
+    pdf.text(cleanTextForPDF(detailsText), x + indent + 2, itemY + 4)
+    
+    // Evidence count if available
+    if (item.evidence && item.evidence.length > 0) {
+      pdf.setTextColor(124, 58, 237) // Purple for evidence
+      const evidenceText = `${item.evidence.length} evidence files`
+      pdf.text(cleanTextForPDF(evidenceText), x + indent + 2, itemY + 7)
+    }
+    
+    return itemY + 10
+  }
+
+  try {
+    // Header
+    pdf.setFillColor(153, 27, 27) // Dark red
+    pdf.rect(0, 0, pageWidth, 30, 'F')
+    
+    pdf.setTextColor(255, 255, 255)
+    pdf.setFontSize(20)
+    pdf.setFont('helvetica', 'bold')
+    pdf.text('EVIDENCE TAGS REPORT', 20, 20)
+    
+    pdf.setFontSize(10)
+    pdf.setFont('helvetica', 'normal')
+    pdf.text(`Generated by: ${cleanTextForPDF(data.generatedBy)}`, 20, 25)
+    pdf.text(`Generated on: ${cleanTextForPDF(data.generatedAt)}`, 20, 28)
+    
+    yPosition = 40
+
+    // Overview Section
+    yPosition = addSectionHeader('OVERVIEW', 20, yPosition)
+    yPosition = addText(`Total Items: ${data.totalItems}`, 25, yPosition)
+    yPosition = addText(`Total Evidence Files: ${data.totalEvidence}`, 25, yPosition)
+    yPosition = addText(`Categories: ${data.tagCategories.length}`, 25, yPosition)
+    
+    yPosition += 10
+
+    // Categories Section
+    yPosition = addSectionHeader('EVIDENCE CATEGORIES', 20, yPosition)
+    
+    data.tagCategories.forEach(category => {
+      if (category.items.length > 0) {
+        // Check if we need a new page
+        const estimatedHeight = 15 + (category.items.length * 12) + 10
+        if (yPosition + estimatedHeight > pageHeight - 30) {
+          pdf.addPage()
+          yPosition = 20
+        }
+        
+        yPosition = addCategoryHeader(category, 20, yPosition)
+        
+        // Add items in this category
+        category.items.forEach((item, index) => {
+          yPosition = addItemEntry(item, 20, yPosition, index)
+        })
+        
+        yPosition += 5
+      }
+    })
+
+    // Summary Section
+    yPosition = addSectionHeader('CATEGORY SUMMARY', 20, yPosition)
+    data.tagCategories.forEach(category => {
+      const summaryText = `${category.name}: ${category.items.length} items (${category.items.reduce((sum, item) => sum + item.estimatedValue, 0).toLocaleString()} total value)`
+      yPosition = addText(summaryText, 25, yPosition)
+    })
+
+    // Footer
+    const footerY = pageHeight - 20
+    pdf.setFontSize(8)
+    pdf.setFont('helvetica', 'normal')
+    pdf.setTextColor(128, 128, 128)
+    pdf.text('Generated by Crime Report System - Evidence Tags Module', 20, footerY)
+    pdf.text(`Page 1 of 1`, pageWidth - 30, footerY)
+
+    // Save the PDF
+    const fileName = `evidence-tags-${data.caseName || 'report'}-${new Date().toISOString().split('T')[0]}.pdf`
+    pdf.save(fileName)
+
+  } catch (error) {
+    console.error('Error generating Evidence Tags PDF:', error)
+    throw new Error('Failed to generate Evidence Tags PDF report')
   }
 }
 
