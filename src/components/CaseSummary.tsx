@@ -81,7 +81,7 @@ export function CaseSummary({ user, items, onClose }: CaseSummaryProps) {
       // Calculate categories
       const categories: { [key: string]: number } = {}
       items.forEach(item => {
-        const category = item.category || 'Uncategorized'
+        const category = item.category // Now guaranteed to exist
         categories[category] = (categories[category] || 0) + 1
       })
 
@@ -427,7 +427,7 @@ export function CaseSummary({ user, items, onClose }: CaseSummaryProps) {
                 }}>
                   <div>
                     <div style={{ fontSize: '14px', fontWeight: '600', color: '#374151' }}>{item.name}</div>
-                    <div style={{ fontSize: '12px', color: '#6b7280' }}>{item.category || 'Uncategorized'}</div>
+                    <div style={{ fontSize: '12px', color: '#6b7280' }}>{item.category}</div>
                   </div>
                   <div style={{ fontSize: '14px', fontWeight: '600', color: '#059669' }}>
                     {formatCurrency(item.estimatedValue)}

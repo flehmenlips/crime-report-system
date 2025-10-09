@@ -388,7 +388,7 @@ export function EvidenceTags({ user, items, onClose }: EvidenceTagsProps) {
                                 {item.name}
                               </h4>
                               <div style={{ fontSize: '12px', color: '#6b7280', marginBottom: '8px' }}>
-                                {item.category || 'Uncategorized'} • {item.dateLastSeen}
+                                {item.category} • {item.dateLastSeen}
                               </div>
                               <div style={{ fontSize: '14px', color: '#374151' }}>
                                 {item.description}

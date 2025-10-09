@@ -235,8 +235,8 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
           bValue = new Date(b.dateLastSeen || b.createdAt || 0)
           break
         case 'category':
-          aValue = (a as any).category?.toLowerCase() || 'uncategorized'
-          bValue = (b as any).category?.toLowerCase() || 'uncategorized'
+          aValue = a.category.toLowerCase()
+          bValue = b.category.toLowerCase()
           break
         case 'serialNumber':
           aValue = a.serialNumber?.toLowerCase() || ''

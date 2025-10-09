@@ -14,7 +14,7 @@ export interface CaseSummaryData {
     id: number
     name: string
     estimatedValue: number
-    category?: string
+    category: string
   }>
   evidenceTypes: { [key: string]: number }
   generatedBy: string
@@ -32,7 +32,7 @@ export interface EvidenceTagsData {
       id: number
       name: string
       estimatedValue: number
-      category: string | undefined
+      category: string
       description: string
       dateLastSeen: string
       evidence: Array<{
@@ -298,7 +298,7 @@ export async function generateEvidenceTagsPDF(data: EvidenceTagsData): Promise<v
     pdf.setTextColor(100, 100, 100)
     pdf.setFontSize(7)
     pdf.setFont('helvetica', 'normal')
-    const detailsText = `${item.category || 'Uncategorized'} • ${item.dateLastSeen}`
+    const detailsText = `${item.category} • ${item.dateLastSeen}`
     pdf.text(cleanTextForPDF(detailsText), x + indent + 2, itemY + 4)
     
     // Evidence count if available

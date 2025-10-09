@@ -65,7 +65,7 @@ model StolenItem {
   dateLastSeen     String
   locationLastSeen String
   estimatedValue   Float
-  category         String?
+  category         String     @default("other") // Required field with default value
   tags             String?
   notes            String?
   createdAt        DateTime   @default(now())

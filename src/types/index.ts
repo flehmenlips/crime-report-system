@@ -19,7 +19,7 @@ export interface StolenItem {
   locationLastSeen: string;
   estimatedValue: number;
   evidence: Evidence[];
-  category?: string;
+  category: string; // Required field for categorization logic
   tags?: string[];
   notes?: string;
   createdAt: string; // ISO date string
@@ -139,7 +139,7 @@ export interface ItemFormData {
   dateLastSeen: string;
   locationLastSeen: string;
   estimatedValue: number;
-  category?: string;
+  category: string; // Required field for categorization
   tags?: string[];
   notes?: string;
 }
