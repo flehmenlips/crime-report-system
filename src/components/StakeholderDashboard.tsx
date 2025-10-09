@@ -18,6 +18,8 @@ import { SimpleSortControls } from './SimpleSortControls'
 import { getRoleDisplayName, getDashboardTitle } from '@/lib/auth'
 import { CaseSummary } from './CaseSummary'
 import { EvidenceTags } from './EvidenceTags'
+import { UploadEvidenceModal } from './UploadEvidenceModal'
+import { InvestigationNotes } from './InvestigationNotes'
 
 interface StakeholderDashboardProps {
   user: User
@@ -40,6 +42,10 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
   const [detailViewItem, setDetailViewItem] = useState<StolenItem | null>(null)
   const [showCaseSummary, setShowCaseSummary] = useState(false)
   const [showEvidenceTags, setShowEvidenceTags] = useState(false)
+  const [showUploadEvidence, setShowUploadEvidence] = useState(false)
+  const [uploadEvidenceItem, setUploadEvidenceItem] = useState<StolenItem | null>(null)
+  const [showInvestigationNotes, setShowInvestigationNotes] = useState(false)
+  const [investigationNotesItem, setInvestigationNotesItem] = useState<StolenItem | null>(null)
   const [filteredItems, setFilteredItems] = useState<StolenItem[]>([])
   const [isFiltered, setIsFiltered] = useState(false)
   const [viewMode, setViewMode] = useState<'cards' | 'list'>('cards')
@@ -1125,8 +1131,16 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
             onUploadEvidence={(item) => {
               setShowDetailView(false)
               setDetailViewItem(null)
-              // Law enforcement and property owners can upload evidence
-              alert(`Upload evidence for "${item.name}" - Coming soon!`)
+              // Open upload evidence modal
+              setUploadEvidenceItem(item)
+              setShowUploadEvidence(true)
+            }}
+            onViewNotes={(item) => {
+              setShowDetailView(false)
+              setDetailViewItem(null)
+              // Open investigation notes modal
+              setInvestigationNotesItem(item)
+              setShowInvestigationNotes(true)
             }}
             permissions={{
               canEdit: roleConfig.canEdit,
@@ -1177,6 +1191,36 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
             user={user}
             items={isFiltered ? filteredItems : items}
             onClose={() => setShowEvidenceTags(false)}
+          />
+        )}
+
+        {/* Upload Evidence Modal */}
+        {showUploadEvidence && uploadEvidenceItem && (
+          <UploadEvidenceModal
+            item={uploadEvidenceItem}
+            user={user}
+            onClose={() => {
+              setShowUploadEvidence(false)
+              setUploadEvidenceItem(null)
+            }}
+            onUploadComplete={() => {
+              // Refresh data after upload
+              if (onRefresh) {
+                onRefresh()
+              }
+            }}
+          />
+        )}
+
+        {/* Investigation Notes Modal */}
+        {showInvestigationNotes && investigationNotesItem && (
+          <InvestigationNotes
+            item={investigationNotesItem}
+            user={user}
+            onClose={() => {
+              setShowInvestigationNotes(false)
+              setInvestigationNotesItem(null)
+            }}
           />
         )}
       </div>

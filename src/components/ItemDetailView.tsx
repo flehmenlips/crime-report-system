@@ -11,6 +11,7 @@ interface ItemDetailViewProps {
   onDelete: (item: StolenItem) => void
   onDuplicate: (item: StolenItem) => void
   onUploadEvidence: (item: StolenItem) => void
+  onViewNotes?: (item: StolenItem) => void
   evidence?: any[] // Optional evidence data to avoid API calls
   permissions?: {
     canEdit?: boolean
@@ -30,7 +31,7 @@ interface Evidence {
   documentData?: any  // Binary data for documents (Uint8Array or Buffer in frontend)
 }
 
-export function ItemDetailView({ item, onClose, onEdit, onDelete, onDuplicate, onUploadEvidence, evidence: propEvidence, permissions = { canEdit: true, canDelete: true, canUpload: true, canAddNotes: true } }: ItemDetailViewProps) {
+export function ItemDetailView({ item, onClose, onEdit, onDelete, onDuplicate, onUploadEvidence, onViewNotes, evidence: propEvidence, permissions = { canEdit: true, canDelete: true, canUpload: true, canAddNotes: true } }: ItemDetailViewProps) {
   const [evidence, setEvidence] = useState<Evidence[]>([])
   const [loadingEvidence, setLoadingEvidence] = useState(true)
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
@@ -250,6 +251,31 @@ export function ItemDetailView({ item, onClose, onEdit, onDelete, onDuplicate, o
                     >
                       <span style={{ fontSize: '16px' }}>📸</span>
                       <span style={{ fontWeight: '500' }}>Upload Evidence</span>
+                    </button>
+                  )}
+
+                  {permissions.canAddNotes && onViewNotes && (
+                    <button
+                      onClick={() => {
+                        setShowActionMenu(false)
+                        onViewNotes(item)
+                      }}
+                      style={{
+                        width: '100%',
+                        textAlign: 'left',
+                        padding: '12px 16px',
+                        border: 'none',
+                        background: 'transparent',
+                        borderRadius: '8px',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '12px',
+                        color: '#374151'
+                      }}
+                    >
+                      <span style={{ fontSize: '16px' }}>🔍</span>
+                      <span style={{ fontWeight: '500' }}>Investigation Notes</span>
                     </button>
                   )}
                   
