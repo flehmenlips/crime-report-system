@@ -126,9 +126,10 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
           bgGradient: 'linear-gradient(135deg, #dc2626 0%, #991b1b 100%)',
           title: 'Law Enforcement Portal',
           subtitle: 'Investigation interface for stolen items case',
-          canEdit: true,
-          canDelete: true,
-          canUpload: true
+          canEdit: false, // Law enforcement shouldn't edit core item data
+          canDelete: false, // Law enforcement shouldn't delete items
+          canUpload: true, // Law enforcement can add evidence for investigation
+          canAddNotes: true // Law enforcement can add investigation notes
         }
       case 'insurance_agent':
         return {
@@ -438,75 +439,6 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
             <h2 style={{ fontSize: '28px', fontWeight: '700', color: '#1f2937', margin: 0 }}>
               {getRoleDisplayName(user.role)} Tools
             </h2>
-            <div style={{ display: 'flex', gap: '12px' }}>
-              <button 
-                onClick={() => setShowAdvancedSearch(true)}
-                style={{
-                  background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
-                  color: 'white',
-                  border: 'none',
-                  padding: '12px 24px',
-                  borderRadius: '12px',
-                  fontWeight: '600',
-                  cursor: 'pointer',
-                  fontSize: '14px'
-                }}
-              >
-                🔍 Advanced Search
-              </button>
-              
-              {canGenerateReports() && (
-                <button 
-                  onClick={() => setShowGenerateReport(true)}
-                  style={{
-                    background: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
-                    color: 'white',
-                    border: 'none',
-                    padding: '12px 24px',
-                    borderRadius: '12px',
-                    fontWeight: '600',
-                    cursor: 'pointer',
-                    fontSize: '14px'
-                  }}
-                >
-                  📄 Generate Report
-                </button>
-              )}
-              
-              <button 
-                onClick={() => setShowAnalytics(true)}
-                style={{
-                  background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
-                  color: 'white',
-                  border: 'none',
-                  padding: '12px 24px',
-                  borderRadius: '12px',
-                  fontWeight: '600',
-                  cursor: 'pointer',
-                  fontSize: '14px'
-                }}
-              >
-                📊 Analytics
-              </button>
-              
-              {canExportData() && (
-                <button 
-                  onClick={() => alert('Export functionality coming soon!')}
-                  style={{
-                    background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
-                    color: 'white',
-                    border: 'none',
-                    padding: '12px 24px',
-                    borderRadius: '12px',
-                    fontWeight: '600',
-                    cursor: 'pointer',
-                    fontSize: '14px'
-                  }}
-                >
-                  📊 Export Data
-                </button>
-              )}
-            </div>
           </div>
           
           {/* Role-Specific Tool Grid */}
@@ -732,7 +664,6 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
               <div>
                 <h2 style={{ fontSize: '28px', fontWeight: '700', color: '#1f2937', marginBottom: '8px' }}>
                   Evidence Database
-                  <span style={{ fontSize: '12px', color: '#3b82f6', marginLeft: '10px' }}>📊 SORT v6.0</span>
                 </h2>
                 <p style={{ color: '#6b7280', fontSize: '16px' }}>
                   {getRoleDisplayName(user.role)} view • {displayItems.length} items catalogued
@@ -1198,6 +1129,12 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
               if (!roleConfig.canUpload) {
                 alert(`⚠️ ${getRoleDisplayName(user.role)} users have read-only access. Please contact the property owner to add evidence.`)
               }
+            }}
+            permissions={{
+              canEdit: roleConfig.canEdit,
+              canDelete: roleConfig.canDelete,
+              canUpload: roleConfig.canUpload,
+              canAddNotes: roleConfig.canAddNotes
             }}
           />
         )}

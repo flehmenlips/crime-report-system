@@ -173,7 +173,7 @@ export function TenantInfo({ user, className = '' }: TenantInfoProps) {
                 borderColor: 'rgba(107, 114, 128, 0.3)'
               })
             }}>
-              {user.accessLevel.charAt(0).toUpperCase() + user.accessLevel.slice(1)}
+{user.role === 'law_enforcement' ? 'Law Enforcement' : user.accessLevel.charAt(0).toUpperCase() + user.accessLevel.slice(1)}
             </span>
           )}
         </div>
