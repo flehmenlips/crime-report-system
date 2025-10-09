@@ -51,7 +51,10 @@ export interface EvidenceTagsData {
 // Helper function to clean text for PDF compatibility
 const cleanTextForPDF = (text: string): string => {
   return text
-    .replace(/[^\w\s\-$.,():]/g, '') // Remove special characters except basic punctuation
+    // Remove only problematic characters (emojis, control chars, special Unicode)
+    // Keep: letters, numbers, spaces, and common punctuation (. , - $ : ( ) ' " / # & @ % + =)
+    .replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '') // Remove emojis
+    .replace(/[\x00-\x1F\x7F-\x9F]/g, '') // Remove control characters
     .replace(/\s+/g, ' ') // Normalize whitespace
     .trim()
 }
