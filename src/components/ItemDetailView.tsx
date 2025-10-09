@@ -12,6 +12,12 @@ interface ItemDetailViewProps {
   onDuplicate: (item: StolenItem) => void
   onUploadEvidence: (item: StolenItem) => void
   evidence?: any[] // Optional evidence data to avoid API calls
+  permissions?: {
+    canEdit?: boolean
+    canDelete?: boolean
+    canUpload?: boolean
+    canAddNotes?: boolean
+  }
 }
 
 interface Evidence {
@@ -24,7 +30,7 @@ interface Evidence {
   documentData?: any  // Binary data for documents (Uint8Array or Buffer in frontend)
 }
 
-export function ItemDetailView({ item, onClose, onEdit, onDelete, onDuplicate, onUploadEvidence, evidence: propEvidence }: ItemDetailViewProps) {
+export function ItemDetailView({ item, onClose, onEdit, onDelete, onDuplicate, onUploadEvidence, evidence: propEvidence, permissions = { canEdit: true, canDelete: true, canUpload: true, canAddNotes: true } }: ItemDetailViewProps) {
   const [evidence, setEvidence] = useState<Evidence[]>([])
   const [loadingEvidence, setLoadingEvidence] = useState(true)
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
@@ -197,99 +203,109 @@ export function ItemDetailView({ item, onClose, onEdit, onDelete, onDuplicate, o
                 minWidth: '200px'
               }}>
                 <div style={{ padding: '8px' }}>
-                  <button
-                    onClick={() => {
-                      setShowActionMenu(false)
-                      onEdit(item)
-                    }}
-                    style={{
-                      width: '100%',
-                      textAlign: 'left',
-                      padding: '12px 16px',
-                      border: 'none',
-                      background: 'transparent',
-                      borderRadius: '8px',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '12px',
-                      color: '#374151'
-                    }}
-                  >
-                    <span style={{ fontSize: '16px' }}>✏️</span>
-                    <span style={{ fontWeight: '500' }}>Edit Item</span>
-                  </button>
+                  {permissions.canEdit && (
+                    <button
+                      onClick={() => {
+                        setShowActionMenu(false)
+                        onEdit(item)
+                      }}
+                      style={{
+                        width: '100%',
+                        textAlign: 'left',
+                        padding: '12px 16px',
+                        border: 'none',
+                        background: 'transparent',
+                        borderRadius: '8px',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '12px',
+                        color: '#374151'
+                      }}
+                    >
+                      <span style={{ fontSize: '16px' }}>✏️</span>
+                      <span style={{ fontWeight: '500' }}>Edit Item</span>
+                    </button>
+                  )}
                   
-                  <button
-                    onClick={() => {
-                      setShowActionMenu(false)
-                      onUploadEvidence(item)
-                    }}
-                    style={{
-                      width: '100%',
-                      textAlign: 'left',
-                      padding: '12px 16px',
-                      border: 'none',
-                      background: 'transparent',
-                      borderRadius: '8px',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '12px',
-                      color: '#374151'
-                    }}
-                  >
-                    <span style={{ fontSize: '16px' }}>📸</span>
-                    <span style={{ fontWeight: '500' }}>Upload Evidence</span>
-                  </button>
+                  {permissions.canUpload && (
+                    <button
+                      onClick={() => {
+                        setShowActionMenu(false)
+                        onUploadEvidence(item)
+                      }}
+                      style={{
+                        width: '100%',
+                        textAlign: 'left',
+                        padding: '12px 16px',
+                        border: 'none',
+                        background: 'transparent',
+                        borderRadius: '8px',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '12px',
+                        color: '#374151'
+                      }}
+                    >
+                      <span style={{ fontSize: '16px' }}>📸</span>
+                      <span style={{ fontWeight: '500' }}>Upload Evidence</span>
+                    </button>
+                  )}
                   
-                  <button
-                    onClick={() => {
-                      setShowActionMenu(false)
-                      onDuplicate(item)
-                    }}
-                    style={{
-                      width: '100%',
-                      textAlign: 'left',
-                      padding: '12px 16px',
-                      border: 'none',
-                      background: 'transparent',
-                      borderRadius: '8px',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '12px',
-                      color: '#374151'
-                    }}
-                  >
-                    <span style={{ fontSize: '16px' }}>📋</span>
-                    <span style={{ fontWeight: '500' }}>Duplicate Item</span>
-                  </button>
+                  {permissions.canEdit && (
+                    <button
+                      onClick={() => {
+                        setShowActionMenu(false)
+                        onDuplicate(item)
+                      }}
+                      style={{
+                        width: '100%',
+                        textAlign: 'left',
+                        padding: '12px 16px',
+                        border: 'none',
+                        background: 'transparent',
+                        borderRadius: '8px',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '12px',
+                        color: '#374151'
+                      }}
+                    >
+                      <span style={{ fontSize: '16px' }}>📋</span>
+                      <span style={{ fontWeight: '500' }}>Duplicate Item</span>
+                    </button>
+                  )}
                   
-                  <div style={{ height: '1px', background: '#e5e7eb', margin: '8px 16px' }}></div>
-                  
-                  <button
-                    onClick={() => {
-                      setShowActionMenu(false)
-                      onDelete(item)
-                    }}
-                    style={{
-                      width: '100%',
-                      textAlign: 'left',
-                      padding: '12px 16px',
-                      border: 'none',
-                      background: 'transparent',
-                      borderRadius: '8px',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '12px',
-                      color: '#dc2626'
-                    }}
-                  >
-                    <span style={{ fontSize: '16px' }}>🗑️</span>
-                    <span style={{ fontWeight: '500' }}>Delete Item</span>
-                  </button>
+                  {permissions.canDelete && (
+                    <>
+                      <div style={{ height: '1px', background: '#e5e7eb', margin: '8px 16px' }}></div>
+                      
+                      <button
+                        onClick={() => {
+                          setShowActionMenu(false)
+                          onDelete(item)
+                        }}
+                        style={{
+                          width: '100%',
+                          textAlign: 'left',
+                          padding: '12px 16px',
+                          border: 'none',
+                          background: 'transparent',
+                          borderRadius: '8px',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '12px',
+                          color: '#dc2626'
+                        }}
+                      >
+                        <span style={{ fontSize: '16px' }}>🗑️</span>
+                        <span style={{ fontWeight: '500' }}>Delete Item</span>
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
             )}
@@ -463,27 +479,29 @@ export function ItemDetailView({ item, onClose, onEdit, onDelete, onDuplicate, o
               <h2 style={{ fontSize: '24px', fontWeight: '700', color: '#1f2937' }}>
                 📸 Evidence Files
               </h2>
-              <button
-                onClick={() => onUploadEvidence(item)}
-                style={{
-                  background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
-                  color: 'white',
-                  border: 'none',
-                  padding: '12px 24px',
-                  borderRadius: '12px',
-                  cursor: 'pointer',
-                  fontWeight: '600',
-                  fontSize: '14px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px'
-                }}
-              >
-                <svg style={{ width: '16px', height: '16px' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                </svg>
-                Add Evidence
-              </button>
+              {permissions.canUpload && (
+                <button
+                  onClick={() => onUploadEvidence(item)}
+                  style={{
+                    background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+                    color: 'white',
+                    border: 'none',
+                    padding: '12px 24px',
+                    borderRadius: '12px',
+                    cursor: 'pointer',
+                    fontWeight: '600',
+                    fontSize: '14px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px'
+                  }}
+                >
+                  <svg style={{ width: '16px', height: '16px' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  </svg>
+                  Add Evidence
+                </button>
+              )}
             </div>
 
             {loadingEvidence ? (
@@ -703,27 +721,29 @@ export function ItemDetailView({ item, onClose, onEdit, onDelete, onDuplicate, o
             </div>
           </div>
           <div style={{ display: 'flex', gap: '12px' }}>
-            <button
-              onClick={() => onEdit(item)}
-              style={{
-                background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                color: 'white',
-                border: 'none',
-                padding: '12px 24px',
-                borderRadius: '12px',
-                cursor: 'pointer',
-                fontWeight: '600',
-                fontSize: '16px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px'
-              }}
-            >
-              <svg style={{ width: '16px', height: '16px' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-              </svg>
-              Edit Item
-            </button>
+            {permissions.canEdit && (
+              <button
+                onClick={() => onEdit(item)}
+                style={{
+                  background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                  color: 'white',
+                  border: 'none',
+                  padding: '12px 24px',
+                  borderRadius: '12px',
+                  cursor: 'pointer',
+                  fontWeight: '600',
+                  fontSize: '16px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}
+              >
+                <svg style={{ width: '16px', height: '16px' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+                Edit Item
+              </button>
+            )}
             <button
               onClick={onClose}
               style={{
