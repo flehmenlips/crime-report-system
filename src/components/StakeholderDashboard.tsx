@@ -1105,6 +1105,8 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
               setDetailViewItem(null)
             }}
             onEdit={(item) => {
+              setShowDetailView(false)
+              setDetailViewItem(null)
               if (roleConfig.canEdit) {
                 // Property owners can edit items - implement edit functionality
                 alert(`Edit functionality for "${item.name}" - Coming soon!`)
@@ -1113,6 +1115,8 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
               }
             }}
             onDelete={(item) => {
+              setShowDetailView(false)
+              setDetailViewItem(null)
               if (roleConfig.canDelete) {
                 // Property owners can delete items - implement delete functionality
                 alert(`Delete functionality for "${item.name}" - Coming soon!`)
@@ -1121,6 +1125,8 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
               }
             }}
             onDuplicate={(item) => {
+              setShowDetailView(false)
+              setDetailViewItem(null)
               if (roleConfig.canEdit) {
                 // Property owners can duplicate items - implement duplicate functionality
                 alert(`Duplicate functionality for "${item.name}" - Coming soon!`)
@@ -1129,6 +1135,8 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
               }
             }}
             onUploadEvidence={(item) => {
+              setShowDetailView(false)
+              setDetailViewItem(null)
               if (roleConfig.canUpload) {
                 // Law enforcement and property owners can upload evidence
                 alert(`Upload evidence for "${item.name}" - Coming soon!`)
