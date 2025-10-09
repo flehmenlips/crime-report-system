@@ -58,11 +58,11 @@ export function AdvancedSearch({ items, onClose, onResults }: AdvancedSearchProp
     const tags = new Set<string>()
     
     items.forEach(item => {
-      if ((item as any).category) {
-        categories.add((item as any).category)
+      if (item.category) {
+        categories.add(item.category)
       }
-      if ((item as any).tags && Array.isArray((item as any).tags)) {
-        (item as any).tags.forEach((tag: string) => tags.add(tag))
+      if (item.tags && Array.isArray(item.tags)) {
+        item.tags.forEach((tag: string) => tags.add(tag))
       }
     })
     
@@ -86,7 +86,7 @@ export function AdvancedSearch({ items, onClose, onResults }: AdvancedSearchProp
     }
     
     const timer = setTimeout(() => {
-      performSearch()
+      setShowResults(true)
     }, 300) // 300ms debounce
     
     setSearchDebounceTimer(timer)
@@ -123,7 +123,7 @@ export function AdvancedSearch({ items, onClose, onResults }: AdvancedSearchProp
 
         // Category filter with null safety
         if (filters.category && filters.category.trim()) {
-          const itemCategory = (item as any).category || 'Uncategorized'
+          const itemCategory = item.category || 'other'
           if (itemCategory !== filters.category) {
             return false
           }
@@ -131,7 +131,7 @@ export function AdvancedSearch({ items, onClose, onResults }: AdvancedSearchProp
 
         // Tags filter with null safety
         if (filters.tags && filters.tags.length > 0) {
-          const itemTags = (item as any).tags || []
+          const itemTags = item.tags || []
           if (!Array.isArray(itemTags)) {
             return false
           }
@@ -243,9 +243,14 @@ export function AdvancedSearch({ items, onClose, onResults }: AdvancedSearchProp
 
   const performSearch = () => {
     setShowResults(true)
-    setSearchResultsState(searchResults)
-    onResults(searchResults)
   }
+
+  // Update parent component with search results
+  useEffect(() => {
+    if (showResults) {
+      onResults(searchResults)
+    }
+  }, [searchResults, showResults, onResults])
 
   const clearFilters = () => {
     setFilters({

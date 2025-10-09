@@ -167,7 +167,7 @@ export function DataManager({
 
       // Category filter
       if (filters?.category && filters.category !== 'all') {
-        const itemCategory = (item as any).category || 'Uncategorized'
+        const itemCategory = item.category || 'other'
         if (itemCategory !== filters.category) return false
       }
 

@@ -84,7 +84,7 @@ export function EnhancedSearch({ items, user, onResults, onClose }: EnhancedSear
     // Category filter
     if (filters.category && filters.category !== 'all') {
       filtered = filtered.filter(item => {
-        const itemCategory = (item as any).category || 'Uncategorized'
+        const itemCategory = item.category || 'other'
         return itemCategory === filters.category
       })
     }
