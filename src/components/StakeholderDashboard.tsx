@@ -20,7 +20,7 @@ import { CaseSummary } from './CaseSummary'
 import { EvidenceTags } from './EvidenceTags'
 import { UploadEvidenceModal } from './UploadEvidenceModal'
 import { InvestigationNotes } from './InvestigationNotes'
-import { CaseDetails } from './CaseDetails'
+import { CaseDetailsView } from './CaseDetailsView'
 import { useViewPreferences } from '@/contexts/UserPreferencesContext'
 
 interface StakeholderDashboardProps {
@@ -1255,7 +1255,7 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
 
         {/* Case Details Modal */}
         {showCaseDetails && (
-          <CaseDetails
+          <CaseDetailsView
             user={user}
             onClose={() => setShowCaseDetails(false)}
           />

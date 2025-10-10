@@ -41,6 +41,8 @@ import { SuperAdminDashboard } from '@/components/SuperAdminDashboard'
 import { TenantUserManagement } from '@/components/TenantUserManagement'
 import { SimpleSortControls } from '@/components/SimpleSortControls'
 import { UserPreferencesProvider, useUserPreferences } from '@/contexts/UserPreferencesContext'
+import { CaseDetailsView } from '@/components/CaseDetailsView'
+import { CaseDetailsForm } from '@/components/CaseDetailsForm'
 
 interface AppContentInnerProps {
   initialUser: User | null
@@ -73,6 +75,9 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
   const [showEdgeCaseTest, setShowEdgeCaseTest] = useState(false)
   const [showSuperAdminDashboard, setShowSuperAdminDashboard] = useState(false)
   const [showTenantUserManagement, setShowTenantUserManagement] = useState(false)
+  const [showCaseDetailsView, setShowCaseDetailsView] = useState(false)
+  const [showCaseDetailsForm, setShowCaseDetailsForm] = useState(false)
+  const [editingCaseId, setEditingCaseId] = useState<string | null>(null)
   const [viewMode, setViewMode] = useState<'cards' | 'list'>('cards')
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false)
   const [showGenerateReport, setShowGenerateReport] = useState(false)
@@ -1468,6 +1473,73 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
                 Analytics
               </button>
 
+              {/* Case Details - Property owners can create/edit */}
+              {user?.role === 'property_owner' && (
+                <>
+                  <button
+                    onClick={() => setShowCaseDetailsView(true)}
+                    style={{
+                      background: 'linear-gradient(135deg, #1f2937 0%, #374151 50%, #4b5563 100%)',
+                      color: 'white',
+                      border: 'none',
+                      padding: '20px 32px',
+                      borderRadius: '16px',
+                      cursor: 'pointer',
+                      fontWeight: '600',
+                      fontSize: '18px',
+                      boxShadow: '0 10px 25px rgba(31, 41, 55, 0.3)',
+                      transition: 'all 0.3s ease',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '12px'
+                    }}
+                    onMouseOver={(e) => {
+                      e.currentTarget.style.transform = 'translateY(-4px)'
+                      e.currentTarget.style.boxShadow = '0 20px 40px rgba(31, 41, 55, 0.4)'
+                    }}
+                    onMouseOut={(e) => {
+                      e.currentTarget.style.transform = 'translateY(0)'
+                      e.currentTarget.style.boxShadow = '0 10px 25px rgba(31, 41, 55, 0.3)'
+                    }}
+                  >
+                    <span style={{ fontSize: '20px' }}>🏛️</span>
+                    Case Details
+                  </button>
+
+                  <button
+                    onClick={() => setShowCaseDetailsForm(true)}
+                    style={{
+                      background: 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 50%, #5b21b6 100%)',
+                      color: 'white',
+                      border: 'none',
+                      padding: '20px 32px',
+                      borderRadius: '16px',
+                      cursor: 'pointer',
+                      fontWeight: '600',
+                      fontSize: '18px',
+                      boxShadow: '0 10px 25px rgba(124, 58, 237, 0.3)',
+                      transition: 'all 0.3s ease',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '12px'
+                    }}
+                    onMouseOver={(e) => {
+                      e.currentTarget.style.transform = 'translateY(-4px)'
+                      e.currentTarget.style.boxShadow = '0 20px 40px rgba(124, 58, 237, 0.4)'
+                    }}
+                    onMouseOut={(e) => {
+                      e.currentTarget.style.transform = 'translateY(0)'
+                      e.currentTarget.style.boxShadow = '0 10px 25px rgba(124, 58, 237, 0.3)'
+                    }}
+                  >
+                    <span style={{ fontSize: '20px' }}>📝</span>
+                    Create/Edit Case Report
+                  </button>
+                </>
+              )}
+
               {/* Manage Users - Only available to property owners */}
               {user?.role === 'property_owner' && user?.tenant && (
                 <button
@@ -2729,6 +2801,40 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
               onUpdate={() => {
                 // Refresh user profile to get updated tenant data
                 refreshUser()
+              }}
+            />
+          )}
+
+          {/* Case Details View Modal */}
+          {showCaseDetailsView && user && (
+            <CaseDetailsView
+              user={user}
+              caseId={editingCaseId}
+              onClose={() => {
+                setShowCaseDetailsView(false)
+                setEditingCaseId(null)
+              }}
+              onEdit={(caseId) => {
+                setEditingCaseId(caseId)
+                setShowCaseDetailsView(false)
+                setShowCaseDetailsForm(true)
+              }}
+            />
+          )}
+
+          {/* Case Details Form Modal */}
+          {showCaseDetailsForm && user && (
+            <CaseDetailsForm
+              user={user}
+              caseId={editingCaseId}
+              onClose={() => {
+                setShowCaseDetailsForm(false)
+                setEditingCaseId(null)
+              }}
+              onSave={() => {
+                // Refresh to show updated case
+                setShowCaseDetailsForm(false)
+                setEditingCaseId(null)
               }}
             />
           )}
