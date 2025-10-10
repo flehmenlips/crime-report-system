@@ -10,6 +10,15 @@ export async function PUT(
 ) {
   try {
     const noteId = parseInt(params.id)
+    
+    // Validate ID is a valid number
+    if (isNaN(noteId)) {
+      return NextResponse.json(
+        { error: 'Invalid note ID' },
+        { status: 400 }
+      )
+    }
+    
     const body = await request.json()
     const { content, isConfidential } = body
 
@@ -81,6 +90,14 @@ export async function DELETE(
 ) {
   try {
     const noteId = parseInt(params.id)
+    
+    // Validate ID is a valid number
+    if (isNaN(noteId)) {
+      return NextResponse.json(
+        { error: 'Invalid note ID' },
+        { status: 400 }
+      )
+    }
 
     // Check if note exists
     const existingNote = await prisma.investigationNote.findUnique({
