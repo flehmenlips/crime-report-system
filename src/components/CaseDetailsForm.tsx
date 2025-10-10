@@ -86,15 +86,10 @@ export function CaseDetailsForm({ user, caseId, onClose, onSave }: CaseDetailsFo
 
   const isEditMode = !!caseId
 
-  useEffect(() => {
-    if (caseId) {
-      loadCaseDetails()
-    }
-  }, [caseId])
-
   const loadCaseDetails = async () => {
     try {
       setLoading(true)
+      console.log('🔍 Loading case details for caseId:', caseId)
       const response = await fetch(`/api/case-details?tenantId=${user.tenant?.id}&userId=${user.id}`)
       
       if (!response.ok) {
@@ -102,10 +97,12 @@ export function CaseDetailsForm({ user, caseId, onClose, onSave }: CaseDetailsFo
       }
 
       const data = await response.json()
+      console.log('📦 Received case details data:', data)
       const caseData = data.caseDetails.find((c: any) => c.id === caseId)
+      console.log('🎯 Found matching case:', caseData ? caseData.caseName : 'NOT FOUND')
       
       if (caseData) {
-        setFormData({
+        const loadedFormData = {
           caseName: caseData.caseName,
           caseNumber: caseData.caseNumber || '',
           dateReported: new Date(caseData.dateReported).toISOString().split('T')[0],
@@ -115,19 +112,33 @@ export function CaseDetailsForm({ user, caseId, onClose, onSave }: CaseDetailsFo
           priority: caseData.priority,
           assignedOfficer: caseData.assignedOfficer || '',
           description: caseData.description
-        })
+        }
+        console.log('✅ Setting form data:', loadedFormData)
+        setFormData(loadedFormData)
         setTimeline(caseData.timeline || [])
         setSuspects(caseData.suspects || [])
         setEvidence(caseData.caseEvidence || [])
         setUpdates(caseData.updates || [])
+      } else {
+        console.warn('⚠️ No case found with id:', caseId)
       }
     } catch (err) {
-      console.error('Error loading case details:', err)
+      console.error('❌ Error loading case details:', err)
       setError(err instanceof Error ? err.message : 'Failed to load case details')
     } finally {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    if (caseId) {
+      console.log('🚀 useEffect triggered with caseId:', caseId)
+      loadCaseDetails()
+    } else {
+      console.log('📝 Creating new case (no caseId)')
+      setLoading(false)
+    }
+  }, [caseId])
 
   const handleSave = async () => {
     try {

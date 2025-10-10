@@ -1508,7 +1508,29 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
                   </button>
 
                   <button
-                    onClick={() => setShowCaseDetailsForm(true)}
+                    onClick={async () => {
+                      // Check if a case exists first to determine if editing or creating
+                      try {
+                        const response = await fetch(`/api/case-details?tenantId=${user.tenant?.id}&userId=${user.id}`)
+                        if (response.ok) {
+                          const data = await response.json()
+                          if (data.caseDetails && data.caseDetails.length > 0) {
+                            // Case exists, set it for editing
+                            setEditingCaseId(data.caseDetails[0].id)
+                          } else {
+                            // No case exists, create new
+                            setEditingCaseId(null)
+                          }
+                        } else {
+                          // Error or no case, create new
+                          setEditingCaseId(null)
+                        }
+                      } catch (err) {
+                        console.error('Error checking for existing case:', err)
+                        setEditingCaseId(null)
+                      }
+                      setShowCaseDetailsForm(true)
+                    }}
                     style={{
                       background: 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 50%, #5b21b6 100%)',
                       color: 'white',
