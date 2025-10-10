@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { StolenItem } from '@/types'
 import { formatCurrency, formatDate } from '@/lib/data'
 import { DynamicCategorySelector } from './DynamicCategorySelector'
+import { EvidenceCaption } from './EvidenceCaption'
 
 interface ItemDetailViewProps {
   item: StolenItem
@@ -30,6 +31,9 @@ interface Evidence {
   cloudinaryId: string
   originalName: string | null
   description: string | null
+  uploadedBy?: string
+  uploadedByName?: string
+  uploadedByRole?: string
   createdAt: string
   documentData?: any  // Binary data for documents (Uint8Array or Buffer in frontend)
 }
@@ -37,7 +41,7 @@ interface Evidence {
 export function ItemDetailView({ item, onClose, onEdit, onDelete, onDuplicate, onUploadEvidence, onViewNotes, evidence: propEvidence, permissions = { canEdit: true, canDelete: true, canUpload: true, canAddNotes: true }, user, onCategoryUpdate }: ItemDetailViewProps) {
   const [evidence, setEvidence] = useState<Evidence[]>([])
   const [loadingEvidence, setLoadingEvidence] = useState(true)
-  const [selectedImage, setSelectedImage] = useState<string | null>(null)
+  const [selectedEvidence, setSelectedEvidence] = useState<Evidence | null>(null)
   const [showActionMenu, setShowActionMenu] = useState(false)
   const [investigationNotes, setInvestigationNotes] = useState<any[]>([])
   const [editingCategory, setEditingCategory] = useState(false)
@@ -776,7 +780,7 @@ export function ItemDetailView({ item, onClose, onEdit, onDelete, onDuplicate, o
                       {photos.map((photo) => (
                         <div
                           key={photo.id}
-                          onClick={() => setSelectedImage(photo.cloudinaryId)}
+                          onClick={() => setSelectedEvidence(photo)}
                           style={{
                             borderRadius: '12px',
                             overflow: 'hidden',
@@ -800,10 +804,52 @@ export function ItemDetailView({ item, onClose, onEdit, onDelete, onDuplicate, o
                               objectFit: 'cover'
                             }}
                           />
-                          <div style={{ padding: '8px', background: 'white' }}>
-                            <p style={{ fontSize: '12px', color: '#6b7280', margin: 0, fontWeight: '500' }}>
-                              {photo.originalName || 'Photo Evidence'}
-                            </p>
+                          <div style={{ padding: '12px', background: 'white' }}>
+                            {photo.description ? (
+                              <>
+                                <p style={{ 
+                                  fontSize: '13px', 
+                                  color: '#1f2937', 
+                                  margin: '0 0 4px 0', 
+                                  lineHeight: '1.5',
+                                  fontWeight: '500'
+                                }}>
+                                  {photo.description}
+                                </p>
+                                <p style={{ 
+                                  fontSize: '10px', 
+                                  color: '#9ca3af', 
+                                  margin: 0,
+                                  whiteSpace: 'nowrap',
+                                  overflow: 'hidden',
+                                  textOverflow: 'ellipsis'
+                                }}>
+                                  {photo.originalName || 'Photo Evidence'}
+                                </p>
+                              </>
+                            ) : (
+                              <>
+                                <p style={{ 
+                                  fontSize: '12px', 
+                                  color: '#f59e0b', 
+                                  margin: '0 0 4px 0',
+                                  fontStyle: 'italic',
+                                  fontWeight: '500'
+                                }}>
+                                  ⚠️ No description added
+                                </p>
+                                <p style={{ 
+                                  fontSize: '10px', 
+                                  color: '#9ca3af', 
+                                  margin: 0,
+                                  whiteSpace: 'nowrap',
+                                  overflow: 'hidden',
+                                  textOverflow: 'ellipsis'
+                                }}>
+                                  {photo.originalName || 'Photo Evidence'}
+                                </p>
+                              </>
+                            )}
                           </div>
                         </div>
                       ))}
@@ -830,9 +876,45 @@ export function ItemDetailView({ item, onClose, onEdit, onDelete, onDuplicate, o
                           }}
                         >
                           <div style={{ fontSize: '32px', marginBottom: '8px' }}>🎥</div>
-                          <p style={{ fontSize: '14px', color: '#1f2937', fontWeight: '600', margin: 0 }}>
-                            {video.originalName || 'Video Evidence'}
-                          </p>
+                          {video.description ? (
+                            <>
+                              <p style={{ 
+                                fontSize: '13px', 
+                                color: '#1f2937', 
+                                fontWeight: '500', 
+                                margin: '0 0 4px 0',
+                                lineHeight: '1.5'
+                              }}>
+                                {video.description}
+                              </p>
+                              <p style={{ 
+                                fontSize: '10px', 
+                                color: '#9ca3af', 
+                                margin: 0
+                              }}>
+                                {video.originalName || 'Video Evidence'}
+                              </p>
+                            </>
+                          ) : (
+                            <>
+                              <p style={{ 
+                                fontSize: '12px', 
+                                color: '#f59e0b', 
+                                margin: '0 0 4px 0',
+                                fontStyle: 'italic',
+                                fontWeight: '500'
+                              }}>
+                                ⚠️ No description added
+                              </p>
+                              <p style={{ 
+                                fontSize: '10px', 
+                                color: '#9ca3af', 
+                                margin: 0
+                              }}>
+                                {video.originalName || 'Video Evidence'}
+                              </p>
+                            </>
+                          )}
                         </div>
                       ))}
                     </div>
@@ -849,36 +931,7 @@ export function ItemDetailView({ item, onClose, onEdit, onDelete, onDuplicate, o
                       {documents.map((doc) => (
                         <div
                           key={doc.id}
-                          onClick={() => {
-                            console.log('Document clicked:', doc)
-                            
-                            const originalName = doc.originalName || 'document'
-                            
-                            let viewUrl = ''
-                            
-                            if (doc.documentData) {
-                              // New DB-stored document: Use serve-document for viewing
-                              console.log('Opening new DB document in popup via /api/serve-document')
-                              viewUrl = `/api/serve-document/${doc.id}?mode=view`
-                            } else if (doc.cloudinaryId) {
-                              // Legacy Cloudinary document: Use proxy for viewing
-                              console.log('Opening legacy document in popup via proxy')
-                              let url = doc.cloudinaryId
-                              if (url?.includes('/raw/upload/')) {
-                                url = url.replace('/raw/upload/', '/image/upload/')
-                              }
-                              url = url?.replace(/(\.[a-zA-Z0-9]+)\.\1$/, '$1') || '#'
-                              
-                              viewUrl = `/api/document-proxy?url=${encodeURIComponent(url)}&filename=${encodeURIComponent(originalName)}`
-                            } else {
-                              console.warn('Document has no data:', doc)
-                              alert('No document data available')
-                              return
-                            }
-                            
-                            // Open in popup window (new tab)
-                            window.open(viewUrl, '_blank', 'width=800,height=600')
-                          }}
+                          onClick={() => setSelectedEvidence(doc)}
                           style={{
                             background: '#fffbeb',
                             borderRadius: '12px',
@@ -900,14 +953,65 @@ export function ItemDetailView({ item, onClose, onEdit, onDelete, onDuplicate, o
                           }}
                         >
                           <div style={{ fontSize: '32px', marginBottom: '8px' }}>📄</div>
-                          <p style={{ fontSize: '14px', color: '#1f2937', fontWeight: '600', marginBottom: '4px', margin: '0 0 4px 0' }}>
-                            {doc.originalName || 'Document'}
-                          </p>
-                          <p style={{ fontSize: '12px', color: '#92400e', fontWeight: '500', margin: 0 }}>
-                            {doc.originalName?.split('.').pop()?.toUpperCase() || 'DOC'} • Click to view
-                          </p>
-                          
-                          {/* Removed alternative access methods for cleanup */}
+                          {doc.description ? (
+                            <>
+                              <p style={{ 
+                                fontSize: '13px', 
+                                color: '#1f2937', 
+                                fontWeight: '500', 
+                                margin: '0 0 4px 0',
+                                lineHeight: '1.5'
+                              }}>
+                                {doc.description}
+                              </p>
+                              <p style={{ 
+                                fontSize: '10px', 
+                                color: '#92400e', 
+                                margin: '0 0 4px 0'
+                              }}>
+                                {doc.originalName?.split('.').pop()?.toUpperCase() || 'DOC'} • Click to view/edit
+                              </p>
+                              <p style={{ 
+                                fontSize: '10px', 
+                                color: '#d97706', 
+                                margin: 0,
+                                whiteSpace: 'nowrap',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis'
+                              }}>
+                                {doc.originalName || 'Document'}
+                              </p>
+                            </>
+                          ) : (
+                            <>
+                              <p style={{ 
+                                fontSize: '12px', 
+                                color: '#f59e0b', 
+                                margin: '0 0 4px 0',
+                                fontStyle: 'italic',
+                                fontWeight: '500'
+                              }}>
+                                ⚠️ No description added
+                              </p>
+                              <p style={{ 
+                                fontSize: '10px', 
+                                color: '#92400e', 
+                                margin: '0 0 4px 0'
+                              }}>
+                                {doc.originalName?.split('.').pop()?.toUpperCase() || 'DOC'} • Click to view/edit
+                              </p>
+                              <p style={{ 
+                                fontSize: '10px', 
+                                color: '#d97706', 
+                                margin: 0,
+                                whiteSpace: 'nowrap',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis'
+                              }}>
+                                {doc.originalName || 'Document'}
+                              </p>
+                            </>
+                          )}
                         </div>
                       ))}
                     </div>
@@ -1011,9 +1115,9 @@ export function ItemDetailView({ item, onClose, onEdit, onDelete, onDuplicate, o
       </div>
 
       {/* Full-size Image Modal */}
-      {selectedImage && (
+      {selectedEvidence && (
         <div
-          onClick={() => setSelectedImage(null)}
+          onClick={() => setSelectedEvidence(null)}
           style={{
             position: 'fixed',
             inset: 0,
@@ -1022,41 +1126,193 @@ export function ItemDetailView({ item, onClose, onEdit, onDelete, onDuplicate, o
             alignItems: 'center',
             justifyContent: 'center',
             zIndex: 60,
-            padding: '32px'
+            padding: '32px',
+            overflowY: 'auto'
           }}
         >
-          <div style={{ position: 'relative', maxWidth: '90vw', maxHeight: '90vh' }}>
+          <div 
+            onClick={(e) => e.stopPropagation()}
+            style={{ 
+              position: 'relative', 
+              maxWidth: '1200px',
+              width: '100%',
+              background: '#ffffff',
+              borderRadius: '16px',
+              padding: '32px',
+              maxHeight: '90vh',
+              overflowY: 'auto'
+            }}
+          >
             <button
-              onClick={(e) => {
-                e.stopPropagation()
-                setSelectedImage(null)
-              }}
+              onClick={() => setSelectedEvidence(null)}
               style={{
                 position: 'absolute',
-                top: '-16px',
-                right: '-16px',
-                background: 'rgba(255, 255, 255, 0.9)',
+                top: '16px',
+                right: '16px',
+                background: '#f3f4f6',
                 border: 'none',
                 borderRadius: '50%',
                 padding: '12px',
                 cursor: 'pointer',
-                zIndex: 61
+                zIndex: 61,
+                transition: 'background-color 0.2s ease'
               }}
+              onMouseEnter={(e) => (e.target as HTMLButtonElement).style.backgroundColor = '#e5e7eb'}
+              onMouseLeave={(e) => (e.target as HTMLButtonElement).style.backgroundColor = '#f3f4f6'}
             >
               <svg style={{ width: '20px', height: '20px', color: '#1f2937' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
-            <img
-              src={getCloudinaryFullUrl(selectedImage)}
-              alt="Evidence"
-              style={{
-                maxWidth: '100%',
-                maxHeight: '100%',
-                borderRadius: '12px',
-                boxShadow: '0 25px 50px rgba(0, 0, 0, 0.5)'
+
+            {/* File Name */}
+            <h3 style={{ 
+              fontSize: '20px', 
+              fontWeight: '600', 
+              color: '#1f2937',
+              marginBottom: '16px',
+              paddingRight: '40px'
+            }}>
+              {selectedEvidence.originalName || 'Evidence File'}
+            </h3>
+
+            {/* Evidence Preview */}
+            <div style={{ 
+              marginBottom: '24px',
+              display: 'flex',
+              justifyContent: 'center',
+              background: '#f9fafb',
+              borderRadius: '12px',
+              padding: '16px'
+            }}>
+              {selectedEvidence.type === 'photo' && (
+                <img
+                  src={getCloudinaryFullUrl(selectedEvidence.cloudinaryId)}
+                  alt="Evidence"
+                  style={{
+                    maxWidth: '100%',
+                    maxHeight: '600px',
+                    borderRadius: '8px',
+                    boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)'
+                  }}
+                />
+              )}
+              
+              {selectedEvidence.type === 'video' && (
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ fontSize: '80px', marginBottom: '16px' }}>🎥</div>
+                  <p style={{ fontSize: '16px', color: '#6b7280', marginBottom: '16px' }}>
+                    Video File: {selectedEvidence.originalName}
+                  </p>
+                  {selectedEvidence.cloudinaryId && (
+                    <a
+                      href={selectedEvidence.cloudinaryId}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        display: 'inline-block',
+                        background: '#3b82f6',
+                        color: 'white',
+                        padding: '12px 24px',
+                        borderRadius: '8px',
+                        textDecoration: 'none',
+                        fontWeight: '500'
+                      }}
+                    >
+                      ▶️ Open Video in New Tab
+                    </a>
+                  )}
+                </div>
+              )}
+              
+              {selectedEvidence.type === 'document' && (
+                <div style={{ textAlign: 'center', width: '100%' }}>
+                  <div style={{ fontSize: '80px', marginBottom: '16px' }}>📄</div>
+                  <p style={{ fontSize: '16px', color: '#6b7280', marginBottom: '8px' }}>
+                    Document: {selectedEvidence.originalName}
+                  </p>
+                  <p style={{ fontSize: '14px', color: '#92400e', marginBottom: '16px', fontWeight: '600' }}>
+                    {selectedEvidence.originalName?.split('.').pop()?.toUpperCase() || 'DOCUMENT'}
+                  </p>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      const originalName = selectedEvidence.originalName || 'document'
+                      let viewUrl = ''
+                      
+                      if (selectedEvidence.documentData) {
+                        viewUrl = `/api/serve-document/${selectedEvidence.id}?mode=view`
+                      } else if (selectedEvidence.cloudinaryId) {
+                        let url = selectedEvidence.cloudinaryId
+                        if (url?.includes('/raw/upload/')) {
+                          url = url.replace('/raw/upload/', '/image/upload/')
+                        }
+                        url = url?.replace(/(\.[a-zA-Z0-9]+)\.\1$/, '$1') || '#'
+                        viewUrl = `/api/document-proxy?url=${encodeURIComponent(url)}&filename=${encodeURIComponent(originalName)}`
+                      }
+                      
+                      if (viewUrl) {
+                        window.open(viewUrl, '_blank', 'width=800,height=600')
+                      }
+                    }}
+                    style={{
+                      background: '#f59e0b',
+                      color: 'white',
+                      padding: '12px 24px',
+                      borderRadius: '8px',
+                      border: 'none',
+                      cursor: 'pointer',
+                      fontWeight: '500',
+                      fontSize: '14px'
+                    }}
+                  >
+                    📄 Open Document in New Tab
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Evidence Caption */}
+            <EvidenceCaption
+              evidenceId={selectedEvidence.id}
+              initialDescription={selectedEvidence.description}
+              canEdit={permissions.canEdit || false}
+              onUpdate={(newDescription) => {
+                // Update local evidence state
+                setEvidence(prevEvidence => 
+                  prevEvidence.map(e => 
+                    e.id === selectedEvidence.id 
+                      ? { ...e, description: newDescription }
+                      : e
+                  )
+                )
+                // Update selected evidence
+                setSelectedEvidence(prev => prev ? { ...prev, description: newDescription } : null)
               }}
             />
+
+            {/* Metadata */}
+            <div style={{
+              marginTop: '24px',
+              padding: '16px',
+              background: '#f9fafb',
+              borderRadius: '8px',
+              fontSize: '14px',
+              color: '#6b7280'
+            }}>
+              <div style={{ marginBottom: '8px' }}>
+                <strong>Uploaded by:</strong> {selectedEvidence.uploadedByName || 'Unknown'} ({selectedEvidence.uploadedByRole || 'Unknown'})
+              </div>
+              <div>
+                <strong>Upload date:</strong> {new Date(selectedEvidence.createdAt).toLocaleDateString('en-US', { 
+                  year: 'numeric', 
+                  month: 'long', 
+                  day: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit'
+                })}
+              </div>
+            </div>
           </div>
         </div>
       )}
