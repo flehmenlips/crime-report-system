@@ -2640,6 +2640,8 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
                 tags: (editingFormItem as any).tags || [],
                 notes: (editingFormItem as any).notes || ''
               } : undefined}
+              tenantId={user.tenant?.id}
+              userId={user.id}
               onClose={() => {
                 setShowModernForm(false)
                 setEditingFormItem(null)
@@ -2679,6 +2681,21 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
                 setShowSimpleUpload(true)
               }}
               evidence={evidenceCache[detailViewItem.id]}
+              user={user}
+              onCategoryUpdate={(itemId: number, newCategory: string) => {
+                // Update the item in the local state
+                setAllItems((prevItems: StolenItem[]) => 
+                  prevItems.map((item: StolenItem) => 
+                    item.id === itemId 
+                      ? { ...item, category: newCategory }
+                      : item
+                  )
+                )
+                // Update the detail view item if it's the same item
+                if (detailViewItem && detailViewItem.id === itemId) {
+                  setDetailViewItem(prev => prev ? { ...prev, category: newCategory } : null)
+                }
+              }}
             />
           )}
 
@@ -2736,6 +2753,7 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
           {showAdvancedSearch && (
             <AdvancedSearch
               items={allItems}
+              user={user}
               onClose={() => setShowAdvancedSearch(false)}
               onResults={(results) => {
                 setFilteredItems(results)
@@ -2757,6 +2775,7 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
           {showAnalytics && (
             <AnalyticsDashboard
               items={isFiltered ? filteredItems : allItems}
+              user={user}
               onClose={() => setShowAnalytics(false)}
             />
           )}

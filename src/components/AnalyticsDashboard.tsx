@@ -2,10 +2,12 @@
 
 import { useState, useEffect } from 'react'
 import { StolenItem } from '@/types'
+import { useCategories } from '@/hooks/useCategories'
 
 interface AnalyticsDashboardProps {
   items: StolenItem[]
   onClose: () => void
+  user?: any
 }
 
 interface AnalyticsData {
@@ -28,9 +30,12 @@ interface AnalyticsData {
   }>
 }
 
-export function AnalyticsDashboard({ items, onClose }: AnalyticsDashboardProps) {
+export function AnalyticsDashboard({ items, onClose, user }: AnalyticsDashboardProps) {
   const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null)
   const [activeTab, setActiveTab] = useState<'overview' | 'trends' | 'categories' | 'evidence'>('overview')
+  
+  // Get all available categories from API
+  const { categories: availableCategories } = useCategories(user?.tenant?.id)
 
   useEffect(() => {
     if (items.length === 0) {
@@ -776,9 +781,19 @@ export function AnalyticsDashboard({ items, onClose }: AnalyticsDashboardProps) 
                   gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
                   gap: '16px'
                 }}>
-                  {Object.entries(analyticsData.categories)
-                    .sort(([,a], [,b]) => b.value - a.value)
-                    .map(([category, data]) => (
+                  {availableCategories
+                    .map(cat => {
+                      const itemData = analyticsData.categories[cat.name]
+                      return {
+                        name: cat.name,
+                        description: cat.description,
+                        isSystem: cat.isSystem,
+                        count: itemData?.count || 0,
+                        value: itemData?.value || 0
+                      }
+                    })
+                    .sort((a, b) => b.value - a.value)
+                    .map((category) => (
                     <div key={category} style={{
                       background: 'white',
                       padding: '20px',
@@ -793,21 +808,45 @@ export function AnalyticsDashboard({ items, onClose }: AnalyticsDashboardProps) 
                         marginBottom: '16px'
                       }}>
                         <div>
-                          <h4 style={{
-                            fontWeight: '600',
-                            color: '#1f2937',
-                            fontSize: '16px',
-                            marginBottom: '4px',
-                            textTransform: 'capitalize'
-                          }}>
-                            {category}
-                          </h4>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                            <h4 style={{
+                              fontWeight: '600',
+                              color: '#1f2937',
+                              fontSize: '16px',
+                              margin: 0,
+                              textTransform: 'capitalize'
+                            }}>
+                              {category.name}
+                            </h4>
+                            {category.isSystem && (
+                              <span style={{
+                                background: '#f3f4f6',
+                                color: '#6b7280',
+                                fontSize: '10px',
+                                padding: '2px 6px',
+                                borderRadius: '4px',
+                                fontWeight: '500'
+                              }}>
+                                SYSTEM
+                              </span>
+                            )}
+                          </div>
+                          {category.description && (
+                            <p style={{
+                              fontSize: '12px',
+                              color: '#9ca3af',
+                              margin: '0 0 8px 0',
+                              fontStyle: 'italic'
+                            }}>
+                              {category.description}
+                            </p>
+                          )}
                           <p style={{
                             fontSize: '14px',
                             color: '#6b7280',
                             margin: 0
                           }}>
-                            {data.count} {data.count === 1 ? 'item' : 'items'}
+                            {category.count} {category.count === 1 ? 'item' : 'items'}
                           </p>
                         </div>
                         <div style={{ textAlign: 'right' }}>

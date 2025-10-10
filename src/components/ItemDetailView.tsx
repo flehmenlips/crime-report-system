@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { StolenItem } from '@/types'
 import { formatCurrency, formatDate } from '@/lib/data'
+import { DynamicCategorySelector } from './DynamicCategorySelector'
 
 interface ItemDetailViewProps {
   item: StolenItem
@@ -19,6 +20,8 @@ interface ItemDetailViewProps {
     canUpload?: boolean
     canAddNotes?: boolean
   }
+  user?: any
+  onCategoryUpdate?: (itemId: number, newCategory: string) => void
 }
 
 interface Evidence {
@@ -31,12 +34,14 @@ interface Evidence {
   documentData?: any  // Binary data for documents (Uint8Array or Buffer in frontend)
 }
 
-export function ItemDetailView({ item, onClose, onEdit, onDelete, onDuplicate, onUploadEvidence, onViewNotes, evidence: propEvidence, permissions = { canEdit: true, canDelete: true, canUpload: true, canAddNotes: true } }: ItemDetailViewProps) {
+export function ItemDetailView({ item, onClose, onEdit, onDelete, onDuplicate, onUploadEvidence, onViewNotes, evidence: propEvidence, permissions = { canEdit: true, canDelete: true, canUpload: true, canAddNotes: true }, user, onCategoryUpdate }: ItemDetailViewProps) {
   const [evidence, setEvidence] = useState<Evidence[]>([])
   const [loadingEvidence, setLoadingEvidence] = useState(true)
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
   const [showActionMenu, setShowActionMenu] = useState(false)
   const [investigationNotes, setInvestigationNotes] = useState<any[]>([])
+  const [editingCategory, setEditingCategory] = useState(false)
+  const [currentCategory, setCurrentCategory] = useState(item.category || '')
   const [loadingNotes, setLoadingNotes] = useState(true)
 
   useEffect(() => {
@@ -91,6 +96,35 @@ export function ItemDetailView({ item, onClose, onEdit, onDelete, onDuplicate, o
       console.error('Error loading evidence:', error)
     } finally {
       setLoadingEvidence(false)
+    }
+  }
+
+  const handleCategoryUpdate = async (newCategory: string) => {
+    try {
+      const response = await fetch(`/api/items/${item.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          ...item,
+          category: newCategory
+        })
+      })
+
+      if (response.ok) {
+        setCurrentCategory(newCategory)
+        setEditingCategory(false)
+        // Call the parent callback if provided
+        if (onCategoryUpdate) {
+          onCategoryUpdate(item.id, newCategory)
+        }
+        console.log('✅ Category updated successfully')
+      } else {
+        console.error('Failed to update category')
+      }
+    } catch (error) {
+      console.error('Error updating category:', error)
     }
   }
 
@@ -487,17 +521,50 @@ export function ItemDetailView({ item, onClose, onEdit, onDelete, onDuplicate, o
                 📋 Organization & Notes
               </h2>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px' }}>
-                {item.category && (
+                {currentCategory && (
                   <div style={{ background: '#f0fdf4', padding: '20px', borderRadius: '16px', border: '2px solid #bbf7d0' }}>
-                    <div style={{ fontSize: '14px', color: '#6b7280', marginBottom: '8px', fontWeight: '600' }}>📂 Category</div>
-                    <div style={{
-                      fontSize: '18px',
-                      fontWeight: '600',
-                      color: '#166534',
-                      textTransform: 'capitalize'
-                    }}>
-                      {item.category}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                      <div style={{ fontSize: '14px', color: '#6b7280', fontWeight: '600' }}>📂 Category</div>
+                      {permissions.canEdit && user && (
+                        <button
+                          onClick={() => setEditingCategory(!editingCategory)}
+                          style={{
+                            background: 'none',
+                            border: 'none',
+                            color: '#6b7280',
+                            cursor: 'pointer',
+                            fontSize: '14px',
+                            padding: '4px 8px',
+                            borderRadius: '6px',
+                            transition: 'background-color 0.2s ease'
+                          }}
+                          onMouseEnter={(e) => (e.target as HTMLButtonElement).style.backgroundColor = '#e5e7eb'}
+                          onMouseLeave={(e) => (e.target as HTMLButtonElement).style.backgroundColor = 'transparent'}
+                        >
+                          {editingCategory ? '✖️ Cancel' : '✏️ Edit'}
+                        </button>
+                      )}
                     </div>
+                    
+                    {editingCategory && user ? (
+                      <div style={{ marginTop: '12px' }}>
+                        <DynamicCategorySelector
+                          value={currentCategory}
+                          onChange={handleCategoryUpdate}
+                          tenantId={user.tenant?.id}
+                          userId={user.id}
+                        />
+                      </div>
+                    ) : (
+                      <div style={{
+                        fontSize: '18px',
+                        fontWeight: '600',
+                        color: '#166534',
+                        textTransform: 'capitalize'
+                      }}>
+                        {currentCategory}
+                      </div>
+                    )}
                   </div>
                 )}
 

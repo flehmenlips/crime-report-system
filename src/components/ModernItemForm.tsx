@@ -2,15 +2,18 @@
 
 import { useState, useEffect } from 'react'
 import { ItemFormData } from '@/types'
+import { DynamicCategorySelector } from './DynamicCategorySelector'
 
 interface ModernItemFormProps {
   onClose: () => void
   onSubmit: (data: ItemFormData) => void
   initialData?: Partial<ItemFormData>
   mode?: 'create' | 'edit'
+  tenantId?: string
+  userId?: string
 }
 
-export function ModernItemForm({ onClose, onSubmit, initialData, mode = 'create' }: ModernItemFormProps) {
+export function ModernItemForm({ onClose, onSubmit, initialData, mode = 'create', tenantId, userId }: ModernItemFormProps) {
   const [currentStep, setCurrentStep] = useState(1)
   const [formData, setFormData] = useState<ItemFormData>({
     name: initialData?.name || '',
@@ -618,27 +621,36 @@ export function ModernItemForm({ onClose, onSubmit, initialData, mode = 'create'
                   <label style={{ display: 'block', fontSize: '16px', fontWeight: '600', color: '#1f2937', marginBottom: '8px' }}>
                     Category
                   </label>
-                  <select
-                    value={formData.category}
-                    onChange={(e) => updateField('category', e.target.value)}
-                    style={{
-                      width: '100%',
-                      padding: '16px',
-                      border: '2px solid #e5e7eb',
-                      borderRadius: '12px',
-                      fontSize: '16px',
-                      transition: 'border-color 0.2s ease',
-                      outline: 'none',
-                      background: 'white'
-                    }}
-                  >
-                    <option value="">Select a category</option>
-                    <option value="tractors">Tractors</option>
-                    <option value="equipment">Farm Equipment</option>
-                    <option value="vehicles">Vehicles</option>
-                    <option value="tools">Tools</option>
-                    <option value="other">Other</option>
-                  </select>
+                  {tenantId && userId ? (
+                    <DynamicCategorySelector
+                      value={formData.category}
+                      onChange={(value) => updateField('category', value)}
+                      tenantId={tenantId}
+                      userId={userId}
+                    />
+                  ) : (
+                    <select
+                      value={formData.category}
+                      onChange={(e) => updateField('category', e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: '16px',
+                        border: '2px solid #e5e7eb',
+                        borderRadius: '12px',
+                        fontSize: '16px',
+                        transition: 'border-color 0.2s ease',
+                        outline: 'none',
+                        background: 'white'
+                      }}
+                    >
+                      <option value="">Select a category</option>
+                      <option value="tractors">Tractors</option>
+                      <option value="equipment">Farm Equipment</option>
+                      <option value="vehicles">Vehicles</option>
+                      <option value="tools">Tools</option>
+                      <option value="other">Other</option>
+                    </select>
+                  )}
                 </div>
 
                 <div>

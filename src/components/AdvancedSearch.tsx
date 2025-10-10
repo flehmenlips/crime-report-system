@@ -2,11 +2,13 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { StolenItem } from '@/types'
+import { useCategories } from '@/hooks/useCategories'
 
 interface AdvancedSearchProps {
   items: StolenItem[]
   onClose: () => void
   onResults: (filteredItems: StolenItem[]) => void
+  user?: any
 }
 
 interface SearchFilters {
@@ -27,7 +29,7 @@ interface SearchFilters {
   hasDocuments: boolean | null
 }
 
-export function AdvancedSearch({ items, onClose, onResults }: AdvancedSearchProps) {
+export function AdvancedSearch({ items, onClose, onResults, user }: AdvancedSearchProps) {
   const [filters, setFilters] = useState<SearchFilters>({
     name: '',
     description: '',
@@ -52,23 +54,31 @@ export function AdvancedSearch({ items, onClose, onResults }: AdvancedSearchProp
   const [availableTags, setAvailableTags] = useState<string[]>([])
   const [searchDebounceTimer, setSearchDebounceTimer] = useState<NodeJS.Timeout | null>(null)
 
+  // Get categories from API (includes all categories, even those without items)
+  const { categories: apiCategories, loading: categoriesLoading } = useCategories(user?.tenant?.id)
+  
   useEffect(() => {
     // Extract unique categories and tags from items
-    const categories = new Set<string>()
+    const itemCategories = new Set<string>()
     const tags = new Set<string>()
     
     items.forEach(item => {
       if (item.category) {
-        categories.add(item.category)
+        itemCategories.add(item.category)
       }
       if (item.tags && Array.isArray(item.tags)) {
         item.tags.forEach((tag: string) => tags.add(tag))
       }
     })
     
-    setAvailableCategories(Array.from(categories).sort())
+    // Combine API categories with item categories
+    const allCategories = new Set<string>()
+    apiCategories.forEach(cat => allCategories.add(cat.name))
+    itemCategories.forEach(cat => allCategories.add(cat))
+    
+    setAvailableCategories(Array.from(allCategories).sort())
     setAvailableTags(Array.from(tags).sort())
-  }, [items])
+  }, [items, apiCategories])
 
   // Cleanup debounce timer on unmount
   useEffect(() => {
