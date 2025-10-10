@@ -2,10 +2,10 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { getCurrentUser } from '@/lib/auth-server'
 
-// PUT - Update evidence details (description/caption)
-export async function PUT(
+// GET - Fetch single evidence details
+export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Authentication check
@@ -17,7 +17,71 @@ export async function PUT(
       )
     }
 
-    const evidenceId = parseInt(params.id)
+    const { id } = await params
+    const evidenceId = parseInt(id)
+    
+    if (isNaN(evidenceId)) {
+      return NextResponse.json(
+        { error: 'Invalid evidence ID' },
+        { status: 400 }
+      )
+    }
+
+    // Fetch evidence with associated item for authorization
+    const evidence = await prisma.evidence.findUnique({
+      where: { id: evidenceId },
+      include: {
+        item: true
+      }
+    })
+
+    if (!evidence) {
+      return NextResponse.json(
+        { error: 'Evidence not found' },
+        { status: 404 }
+      )
+    }
+
+    // Authorization check - verify tenant isolation
+    if (user.role !== 'super_admin' && 
+        user.role !== 'law_enforcement' && 
+        evidence.item.tenantId !== user.tenantId) {
+      return NextResponse.json(
+        { error: 'Unauthorized to access this evidence' },
+        { status: 403 }
+      )
+    }
+
+    return NextResponse.json(evidence)
+  } catch (error) {
+    console.error('❌ Error fetching evidence:', error)
+    return NextResponse.json(
+      {
+        error: 'Failed to fetch evidence',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      },
+      { status: 500 }
+    )
+  }
+}
+
+// PUT - Update evidence details (description/caption)
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    // Authentication check
+    const user = await getCurrentUser()
+    if (!user) {
+      return NextResponse.json(
+        { error: 'Authentication required' },
+        { status: 401 }
+      )
+    }
+
+    const { id } = await params
+    const evidenceId = parseInt(id)
     
     if (isNaN(evidenceId)) {
       return NextResponse.json(
@@ -92,7 +156,7 @@ export async function PUT(
 // DELETE - Delete evidence file
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Authentication check
@@ -104,7 +168,8 @@ export async function DELETE(
       )
     }
 
-    const evidenceId = parseInt(params.id)
+    const { id } = await params
+    const evidenceId = parseInt(id)
     
     if (isNaN(evidenceId)) {
       return NextResponse.json(
