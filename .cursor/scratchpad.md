@@ -1,18 +1,44 @@
-# CrimeReport - Birkenfeld Farm Theft Police Report Website
+# CrimeReport - Professional Crime Reporting & Investigation System
 
-## 🎉 PRODUCTION DEPLOYMENT SUCCESS! 
-**Version v1.0.0 - LIVE at https://remise-rov8.onrender.com**
+## 🎉 MAJOR RELEASE v1.1.0 COMPLETED! 
+**Version v1.1.0 - LIVE at https://remise-rov8.onrender.com**
 
-✅ **Successfully deployed to production with:**
-- PostgreSQL database with hybrid storage (documents in BYTEA, media in Cloudinary)
-- Custom authentication system working perfectly
-- All core features functional in production
-- 8 stolen items loaded with $87,105 total value
-- 13 evidence files displaying correctly
-- Ready for Phase 10 advanced features
+✅ **Successfully released v1.1.0 with:**
+- **Complete Law Enforcement Portal** with professional investigation tools
+- **Multi-Perspective Architecture** supporting 11 user roles
+- **Evidence Upload System** with Cloudinary integration
+- **Investigation Notes** with confidentiality markers
+- **Professional Analytics Dashboard** with trends analysis
+- **PDF Export Functionality** for case summaries and evidence
+- **Role-Based Access Control** with granular permissions
+- **Enhanced UI/UX** with modern professional styling
 
-**Git Tag:** v1.0.0-production
-**Commit:** 7a120af - Production deployment milestone
+**Git Tag:** v1.1.0
+**Commit:** cf227a0 - Version 1.1.0 release milestone
+**Status:** ✅ Merged to main, ready for v1.2.0 development
+
+## 🗺️ CURRENT DEVELOPMENT STATUS
+
+### Active Branch: `feature/roadmap-v1.2.0`
+**Target**: Enhanced Collaboration & Customization Features
+
+### Next Priority Features:
+1. **Evidence Comments & Annotations System** 🗨️
+   - Property owner and stakeholder comments on evidence files
+   - Comment threads and professional annotations
+   - Role-based visibility and notification system
+
+2. **Notification & Alert System** 🔔
+   - Real-time WebSocket notifications
+   - Email alerts for significant events
+   - In-app notification center with preferences
+
+3. **Dynamic Category Management** 🏷️
+   - Custom categories for different use cases (farm, urban, manufacturing, retail)
+   - Category templates and hierarchy support
+   - Bulk category updates and migration tools
+
+### Development Roadmap: See `DEVELOPMENT_ROADMAP_v1.2.0.md`
 
 ## Background and Motivation
 This project involves creating and refining a comprehensive, secure, and user-friendly web application for presenting stolen items from the Birkenfeld farm theft. The website serves law enforcement, investigators, attorneys, and other stakeholders by providing organized access to detailed item information, evidence, and documentation.

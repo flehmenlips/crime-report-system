@@ -20,6 +20,8 @@ import { CaseSummary } from './CaseSummary'
 import { EvidenceTags } from './EvidenceTags'
 import { UploadEvidenceModal } from './UploadEvidenceModal'
 import { InvestigationNotes } from './InvestigationNotes'
+import { CaseDetailsView } from './CaseDetailsView'
+import { useViewPreferences } from '@/contexts/UserPreferencesContext'
 
 interface StakeholderDashboardProps {
   user: User
@@ -33,6 +35,9 @@ interface StakeholderDashboardProps {
 }
 
 export function StakeholderDashboard({ user, items, onItemsUpdate, loading = false, error = null, onRefresh, evidenceCache, evidenceLoaded }: StakeholderDashboardProps) {
+  // Use user preferences for view and sort settings
+  const { viewMode, sortField, sortOrder, setViewMode, setSortField, setSortOrder } = useViewPreferences()
+  
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false)
   const [showGenerateReport, setShowGenerateReport] = useState(false)
   const [showAnalytics, setShowAnalytics] = useState(false)
@@ -46,11 +51,9 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
   const [uploadEvidenceItem, setUploadEvidenceItem] = useState<StolenItem | null>(null)
   const [showInvestigationNotes, setShowInvestigationNotes] = useState(false)
   const [investigationNotesItem, setInvestigationNotesItem] = useState<StolenItem | null>(null)
+  const [showCaseDetails, setShowCaseDetails] = useState(false)
   const [filteredItems, setFilteredItems] = useState<StolenItem[]>([])
   const [isFiltered, setIsFiltered] = useState(false)
-  const [viewMode, setViewMode] = useState<'cards' | 'list'>('cards')
-  const [sortField, setSortField] = useState<'name' | 'value' | 'date' | 'category' | 'serialNumber' | 'location' | 'evidence'>('date')
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
 
   // Debug logging
   console.log('StakeholderDashboard rendered for user:', user?.name, 'role:', user?.role, 'viewMode:', viewMode)
@@ -503,6 +506,32 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
               <div style={{ fontSize: '20px', marginBottom: '8px' }}>📊</div>
               <div style={{ fontWeight: '600', color: '#1f2937', marginBottom: '4px' }}>Analytics</div>
               <div style={{ fontSize: '12px', color: '#6b7280' }}>Value and trend analysis</div>
+            </button>
+            
+            {/* Case Details - Available to all */}
+            <button 
+              onClick={() => setShowCaseDetails(true)}
+              style={{
+                background: '#f8fafc',
+                border: '2px solid #e2e8f0',
+                padding: '16px',
+                borderRadius: '12px',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                textAlign: 'left'
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.background = '#f1f5f9'
+                e.currentTarget.style.borderColor = '#cbd5e1'
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.background = '#f8fafc'
+                e.currentTarget.style.borderColor = '#e2e8f0'
+              }}
+            >
+              <div style={{ fontSize: '20px', marginBottom: '8px' }}>🏛️</div>
+              <div style={{ fontWeight: '600', color: '#1f2937', marginBottom: '4px' }}>Case Details</div>
+              <div style={{ fontSize: '12px', color: '#6b7280' }}>View case overview & timeline</div>
             </button>
             
             {/* Role-specific tools */}
@@ -1221,6 +1250,14 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
               setShowInvestigationNotes(false)
               setInvestigationNotesItem(null)
             }}
+          />
+        )}
+
+        {/* Case Details Modal */}
+        {showCaseDetails && (
+          <CaseDetailsView
+            user={user}
+            onClose={() => setShowCaseDetails(false)}
           />
         )}
       </div>

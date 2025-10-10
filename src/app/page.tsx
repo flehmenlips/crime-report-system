@@ -40,8 +40,15 @@ import { EdgeCaseStressTest } from '@/components/EdgeCaseStressTest'
 import { SuperAdminDashboard } from '@/components/SuperAdminDashboard'
 import { TenantUserManagement } from '@/components/TenantUserManagement'
 import { SimpleSortControls } from '@/components/SimpleSortControls'
+import { UserPreferencesProvider, useUserPreferences } from '@/contexts/UserPreferencesContext'
+import { CaseDetailsView } from '@/components/CaseDetailsView'
+import { CaseDetailsForm } from '@/components/CaseDetailsForm'
 
-export default function Home() {
+interface AppContentInnerProps {
+  initialUser: User | null
+}
+
+function AppContentInner({ initialUser }: AppContentInnerProps) {
   const router = useRouter()
   const [allItems, setAllItems] = useState<StolenItem[]>([])
   const [totalValue, setTotalValue] = useState(0)
@@ -68,6 +75,9 @@ export default function Home() {
   const [showEdgeCaseTest, setShowEdgeCaseTest] = useState(false)
   const [showSuperAdminDashboard, setShowSuperAdminDashboard] = useState(false)
   const [showTenantUserManagement, setShowTenantUserManagement] = useState(false)
+  const [showCaseDetailsView, setShowCaseDetailsView] = useState(false)
+  const [showCaseDetailsForm, setShowCaseDetailsForm] = useState(false)
+  const [editingCaseId, setEditingCaseId] = useState<string | null>(null)
   const [viewMode, setViewMode] = useState<'cards' | 'list'>('cards')
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false)
   const [showGenerateReport, setShowGenerateReport] = useState(false)
@@ -80,8 +90,8 @@ export default function Home() {
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
   const [refreshKey, setRefreshKey] = useState(0) // Force re-render key
 
-  // Enhanced RBAC user state
-  const [user, setUser] = useState<User | null>(null)
+  // Enhanced RBAC user state - initialize with passed user to avoid duplicate loading
+  const [user, setUser] = useState<User | null>(initialUser)
   const role = user?.role
   
   // Evidence data cache to avoid individual API calls per item
@@ -186,31 +196,26 @@ export default function Home() {
     loadData(true)
   }
 
-  // Check for user session and load full profile with tenant data
-  const checkAuth = async () => {
+  // Refresh user profile (used when tenant settings are updated)
+  const refreshUser = async () => {
     try {
       const response = await fetch('/api/user/profile')
       if (response.ok) {
         const userData = await response.json()
-        console.log('Loaded user profile:', userData.user)
+        console.log('Refreshed user profile:', userData.user)
         setUser(userData.user)
-      } else {
-        router.push('/login-simple')
-        return
       }
     } catch (error) {
-      console.error('Auth check failed:', error)
-      router.push('/login-simple')
-      return
+      console.error('User refresh failed:', error)
     }
   }
 
   useEffect(() => {
     // Mark as hydrated to prevent hydration mismatch
     setIsHydrated(true)
-    console.log('Main page hydrated')
+    console.log('Main page hydrated with user:', initialUser?.name)
     
-    checkAuth()
+    // User is passed as prop, no need to load again
     loadData()
   }, [])
 
@@ -1467,6 +1472,73 @@ export default function Home() {
                 <span style={{ fontSize: '20px' }}>📊</span>
                 Analytics
               </button>
+
+              {/* Case Details - Property owners can create/edit */}
+              {user?.role === 'property_owner' && (
+                <>
+                  <button
+                    onClick={() => setShowCaseDetailsView(true)}
+                    style={{
+                      background: 'linear-gradient(135deg, #1f2937 0%, #374151 50%, #4b5563 100%)',
+                      color: 'white',
+                      border: 'none',
+                      padding: '20px 32px',
+                      borderRadius: '16px',
+                      cursor: 'pointer',
+                      fontWeight: '600',
+                      fontSize: '18px',
+                      boxShadow: '0 10px 25px rgba(31, 41, 55, 0.3)',
+                      transition: 'all 0.3s ease',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '12px'
+                    }}
+                    onMouseOver={(e) => {
+                      e.currentTarget.style.transform = 'translateY(-4px)'
+                      e.currentTarget.style.boxShadow = '0 20px 40px rgba(31, 41, 55, 0.4)'
+                    }}
+                    onMouseOut={(e) => {
+                      e.currentTarget.style.transform = 'translateY(0)'
+                      e.currentTarget.style.boxShadow = '0 10px 25px rgba(31, 41, 55, 0.3)'
+                    }}
+                  >
+                    <span style={{ fontSize: '20px' }}>🏛️</span>
+                    Case Details
+                  </button>
+
+                  <button
+                    onClick={() => setShowCaseDetailsForm(true)}
+                    style={{
+                      background: 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 50%, #5b21b6 100%)',
+                      color: 'white',
+                      border: 'none',
+                      padding: '20px 32px',
+                      borderRadius: '16px',
+                      cursor: 'pointer',
+                      fontWeight: '600',
+                      fontSize: '18px',
+                      boxShadow: '0 10px 25px rgba(124, 58, 237, 0.3)',
+                      transition: 'all 0.3s ease',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '12px'
+                    }}
+                    onMouseOver={(e) => {
+                      e.currentTarget.style.transform = 'translateY(-4px)'
+                      e.currentTarget.style.boxShadow = '0 20px 40px rgba(124, 58, 237, 0.4)'
+                    }}
+                    onMouseOut={(e) => {
+                      e.currentTarget.style.transform = 'translateY(0)'
+                      e.currentTarget.style.boxShadow = '0 10px 25px rgba(124, 58, 237, 0.3)'
+                    }}
+                  >
+                    <span style={{ fontSize: '20px' }}>📝</span>
+                    Create/Edit Case Report
+                  </button>
+                </>
+              )}
 
               {/* Manage Users - Only available to property owners */}
               {user?.role === 'property_owner' && user?.tenant && (
@@ -2728,7 +2800,41 @@ export default function Home() {
               onClose={() => setShowTenantUserManagement(false)}
               onUpdate={() => {
                 // Refresh user profile to get updated tenant data
-                checkAuth()
+                refreshUser()
+              }}
+            />
+          )}
+
+          {/* Case Details View Modal */}
+          {showCaseDetailsView && user && (
+            <CaseDetailsView
+              user={user}
+              caseId={editingCaseId}
+              onClose={() => {
+                setShowCaseDetailsView(false)
+                setEditingCaseId(null)
+              }}
+              onEdit={(caseId) => {
+                setEditingCaseId(caseId)
+                setShowCaseDetailsView(false)
+                setShowCaseDetailsForm(true)
+              }}
+            />
+          )}
+
+          {/* Case Details Form Modal */}
+          {showCaseDetailsForm && user && (
+            <CaseDetailsForm
+              user={user}
+              caseId={editingCaseId}
+              onClose={() => {
+                setShowCaseDetailsForm(false)
+                setEditingCaseId(null)
+              }}
+              onSave={() => {
+                // Refresh to show updated case
+                setShowCaseDetailsForm(false)
+                setEditingCaseId(null)
               }}
             />
           )}
@@ -2790,4 +2896,79 @@ export default function Home() {
     </div>
     </>
   )
+}
+
+// Wrapper to provide UserPreferencesContext after user is loaded
+function AppContent() {
+  const [user, setUser] = useState<User | null>(null)
+  const [userLoading, setUserLoading] = useState(true)
+  const router = useRouter()
+
+  // Load user on mount
+  useEffect(() => {
+    const loadUser = async () => {
+      try {
+        const response = await fetch('/api/user/profile')
+        if (response.ok) {
+          const userData = await response.json()
+          // Fix: Use userData.user instead of userData directly
+          setUser(userData.user)
+        } else {
+          router.push('/login-simple')
+        }
+      } catch (error) {
+        console.error('Error loading user:', error)
+        router.push('/login-simple')
+      } finally {
+        setUserLoading(false)
+      }
+    }
+
+    loadUser()
+  }, [router])
+
+  if (userLoading) {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #0f0f23 0%, #1e1b4b 50%, #312e81 100%)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontFamily: 'Inter, -apple-system, sans-serif'
+      }}>
+        <div style={{
+          background: 'rgba(255, 255, 255, 0.95)',
+          borderRadius: '20px',
+          padding: '48px',
+          textAlign: 'center',
+          boxShadow: '0 25px 50px rgba(0, 0, 0, 0.3)'
+        }}>
+          <div style={{
+            width: '48px',
+            height: '48px',
+            border: '4px solid #e5e7eb',
+            borderTop: '4px solid #3b82f6',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite',
+            margin: '0 auto 24px'
+          }}></div>
+          <h2 style={{ fontSize: '24px', fontWeight: '600', color: '#1f2937', marginBottom: '8px' }}>
+            Loading Application
+          </h2>
+          <p style={{ color: '#6b7280' }}>Setting up your personalized experience...</p>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <UserPreferencesProvider user={user}>
+      <AppContentInner initialUser={user} />
+    </UserPreferencesProvider>
+  )
+}
+
+export default function Home() {
+  return <AppContent />
 }

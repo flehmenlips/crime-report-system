@@ -8,14 +8,15 @@ datasource db {
 }
 
 model Tenant {
-  id          String       @id @default(uuid())
+  id          String        @id @default(uuid())
   name        String
   description String?
-  isActive    Boolean      @default(true)
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  isActive    Boolean       @default(true)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
   items       StolenItem[]
   users       User[]
+  caseDetails CaseDetails[]
 
   @@map("tenants")
 }
@@ -113,6 +114,120 @@ model InvestigationNote {
   item            StolenItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
 
   @@map("investigation_notes")
+}
+
+model CaseDetails {
+  id                String          @id @default(cuid())
+  tenantId          String
+  caseName          String
+  caseNumber        String?
+  dateReported      DateTime
+  dateOccurred      DateTime
+  location          String          @db.Text
+  status            String          @default("open") // open, investigating, closed
+  priority          String          @default("medium") // low, medium, high, critical
+  assignedOfficer   String?
+  description       String          @db.Text
+  createdBy         String
+  createdByName     String
+  createdByRole     String
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  
+  // Relations
+  tenant            Tenant          @relation(fields: [tenantId], references: [id])
+  timeline          CaseTimelineEvent[]
+  suspects          CaseSuspect[]
+  caseEvidence      CaseEvidence[]
+  updates           CaseUpdate[]
+  permissions       CasePermission[]
+
+  @@map("case_details")
+}
+
+model CaseTimelineEvent {
+  id              String       @id @default(cuid())
+  caseId          String
+  date            DateTime
+  time            String
+  event           String
+  description     String       @db.Text
+  createdBy       String
+  createdByName   String
+  createdByRole   String
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  case            CaseDetails  @relation(fields: [caseId], references: [id], onDelete: Cascade)
+
+  @@map("case_timeline_events")
+}
+
+model CaseSuspect {
+  id              String       @id @default(cuid())
+  caseId          String
+  name            String
+  description     String       @db.Text
+  address         String?
+  phone           String?
+  status          String       @default("active") // active, cleared, arrested
+  createdBy       String
+  createdByName   String
+  createdByRole   String
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  case            CaseDetails  @relation(fields: [caseId], references: [id], onDelete: Cascade)
+
+  @@map("case_suspects")
+}
+
+model CaseEvidence {
+  id              String       @id @default(cuid())
+  caseId          String
+  type            String
+  description     String       @db.Text
+  location        String
+  collectedBy     String
+  dateCollected   DateTime
+  createdBy       String
+  createdByName   String
+  createdByRole   String
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  case            CaseDetails  @relation(fields: [caseId], references: [id], onDelete: Cascade)
+
+  @@map("case_evidence")
+}
+
+model CaseUpdate {
+  id              String       @id @default(cuid())
+  caseId          String
+  date            DateTime
+  update          String       @db.Text
+  createdBy       String
+  createdByName   String
+  createdByRole   String
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  case            CaseDetails  @relation(fields: [caseId], references: [id], onDelete: Cascade)
+
+  @@map("case_updates")
+}
+
+model CasePermission {
+  id              String       @id @default(cuid())
+  caseId          String
+  userId          String
+  canView         Boolean      @default(true)
+  canEdit         Boolean      @default(false)
+  canDelete       Boolean      @default(false)
+  grantedBy       String
+  grantedByName   String
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  case            CaseDetails  @relation(fields: [caseId], references: [id], onDelete: Cascade)
+
+  @@unique([caseId, userId])
+  @@map("case_permissions")
 }
 
 enum Role {

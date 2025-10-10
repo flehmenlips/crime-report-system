@@ -27,6 +27,10 @@ export function InvestigationNotes({ item, user, onClose }: InvestigationNotesPr
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [editingNote, setEditingNote] = useState<Note | null>(null)
+  const [editContent, setEditContent] = useState('')
+  const [editConfidential, setEditConfidential] = useState(false)
+  const [deletingNote, setDeletingNote] = useState<number | null>(null)
 
   useEffect(() => {
     loadNotes()
@@ -93,6 +97,90 @@ export function InvestigationNotes({ item, user, onClose }: InvestigationNotesPr
     } finally {
       setSaving(false)
     }
+  }
+
+  const handleEditNote = async (noteId: number) => {
+    try {
+      setSaving(true)
+      setError(null)
+
+      const response = await fetch(`/api/notes/${noteId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          content: editContent,
+          isConfidential: editConfidential
+        })
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to update note')
+      }
+
+      // Reload notes to get updated data
+      await loadNotes()
+      
+      // Reset edit state
+      setEditingNote(null)
+      setEditContent('')
+      setEditConfidential(false)
+
+    } catch (err) {
+      console.error('Error updating note:', err)
+      setError(err instanceof Error ? err.message : 'Failed to update note')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const handleDeleteNote = async (noteId: number) => {
+    try {
+      setDeletingNote(noteId)
+      setError(null)
+
+      const response = await fetch(`/api/notes/${noteId}`, {
+        method: 'DELETE'
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to delete note')
+      }
+
+      // Reload notes to get updated data
+      await loadNotes()
+
+    } catch (err) {
+      console.error('Error deleting note:', err)
+      setError(err instanceof Error ? err.message : 'Failed to delete note')
+    } finally {
+      setDeletingNote(null)
+    }
+  }
+
+  const handleDuplicateNote = (note: Note) => {
+    setNewNote(note.content)
+    setIsConfidential(note.isConfidential)
+    // Scroll to the add note section
+    const addNoteSection = document.querySelector('[data-add-note-section]')
+    if (addNoteSection) {
+      addNoteSection.scrollIntoView({ behavior: 'smooth' })
+    }
+  }
+
+  const startEditNote = (note: Note) => {
+    setEditingNote(note)
+    setEditContent(note.content)
+    setEditConfidential(note.isConfidential)
+  }
+
+  const cancelEdit = () => {
+    setEditingNote(null)
+    setEditContent('')
+    setEditConfidential(false)
   }
 
   const getRoleBadgeColor = (role: string) => {
@@ -178,13 +266,16 @@ export function InvestigationNotes({ item, user, onClose }: InvestigationNotesPr
         {/* Content */}
         <div style={{ flex: 1, overflow: 'auto', padding: '32px' }}>
           {/* Add New Note */}
-          <div style={{
-            background: '#f9fafb',
-            borderRadius: '16px',
-            padding: '24px',
-            marginBottom: '32px',
-            border: '2px solid #e5e7eb'
-          }}>
+          <div 
+            data-add-note-section
+            style={{
+              background: '#f9fafb',
+              borderRadius: '16px',
+              padding: '24px',
+              marginBottom: '32px',
+              border: '2px solid #e5e7eb'
+            }}
+          >
             <label style={{ display: 'block', fontWeight: '600', color: '#1f2937', marginBottom: '12px' }}>
               Add Investigation Note
             </label>
@@ -299,6 +390,9 @@ export function InvestigationNotes({ item, user, onClose }: InvestigationNotesPr
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 {notes.map((note) => {
                   const roleBadge = getRoleBadgeColor(note.createdByRole)
+                  // Fix: Ensure consistent ID type comparison (both should be strings)
+                  const canEdit = user.role === 'law_enforcement' || String(user.id) === String(note.createdBy)
+                  
                   return (
                     <div
                       key={note.id}
@@ -310,47 +404,223 @@ export function InvestigationNotes({ item, user, onClose }: InvestigationNotesPr
                         boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)'
                       }}
                     >
-                      <div style={{ display: 'flex', alignItems: 'start', justifyContent: 'space-between', marginBottom: '12px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                          <div style={{
-                            background: roleBadge.bg,
-                            color: roleBadge.color,
-                            padding: '6px 12px',
-                            borderRadius: '8px',
-                            fontSize: '12px',
-                            fontWeight: '600',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '6px'
-                          }}>
-                            <span>{roleBadge.icon}</span>
-                            <span>{note.createdByName}</span>
-                          </div>
-                          {note.isConfidential && (
-                            <div style={{
-                              background: '#fef3c7',
-                              color: '#92400e',
-                              padding: '6px 12px',
-                              borderRadius: '8px',
-                              fontSize: '12px',
-                              fontWeight: '600'
-                            }}>
-                              🔒 Confidential
+                      {editingNote?.id === note.id ? (
+                        // Edit Mode
+                        <div>
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                              <div style={{
+                                background: roleBadge.bg,
+                                color: roleBadge.color,
+                                padding: '6px 12px',
+                                borderRadius: '8px',
+                                fontSize: '12px',
+                                fontWeight: '600',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '6px'
+                              }}>
+                                <span>{roleBadge.icon}</span>
+                                <span>{note.createdByName}</span>
+                              </div>
+                              {editConfidential && (
+                                <div style={{
+                                  background: '#fef3c7',
+                                  color: '#92400e',
+                                  padding: '6px 12px',
+                                  borderRadius: '8px',
+                                  fontSize: '12px',
+                                  fontWeight: '600'
+                                }}>
+                                  🔒 Confidential
+                                </div>
+                              )}
                             </div>
-                          )}
+                            <div style={{ fontSize: '12px', color: '#6b7280' }}>
+                              {formatDate(note.createdAt)} • Editing
+                            </div>
+                          </div>
+                          
+                          <textarea
+                            value={editContent}
+                            onChange={(e) => setEditContent(e.target.value)}
+                            style={{
+                              width: '100%',
+                              padding: '12px',
+                              borderRadius: '8px',
+                              border: '2px solid #e5e7eb',
+                              fontSize: '14px',
+                              fontFamily: 'inherit',
+                              minHeight: '100px',
+                              resize: 'vertical',
+                              marginBottom: '12px'
+                            }}
+                          />
+                          
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                            <label style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '8px',
+                              cursor: 'pointer',
+                              fontSize: '14px',
+                              color: '#6b7280'
+                            }}>
+                              <input
+                                type="checkbox"
+                                checked={editConfidential}
+                                onChange={(e) => setEditConfidential(e.target.checked)}
+                                style={{
+                                  width: '16px',
+                                  height: '16px',
+                                  cursor: 'pointer'
+                                }}
+                              />
+                              <span>🔒 Mark as confidential</span>
+                            </label>
+                            
+                            <div style={{ display: 'flex', gap: '8px' }}>
+                              <button
+                                onClick={cancelEdit}
+                                disabled={saving}
+                                style={{
+                                  background: '#6b7280',
+                                  color: 'white',
+                                  border: 'none',
+                                  padding: '8px 16px',
+                                  borderRadius: '8px',
+                                  cursor: saving ? 'not-allowed' : 'pointer',
+                                  fontSize: '12px',
+                                  fontWeight: '600'
+                                }}
+                              >
+                                Cancel
+                              </button>
+                              <button
+                                onClick={() => handleEditNote(note.id)}
+                                disabled={!editContent.trim() || saving}
+                                style={{
+                                  background: !editContent.trim() || saving
+                                    ? '#d1d5db'
+                                    : 'linear-gradient(135deg, #059669 0%, #047857 100%)',
+                                  color: 'white',
+                                  border: 'none',
+                                  padding: '8px 16px',
+                                  borderRadius: '8px',
+                                  cursor: !editContent.trim() || saving ? 'not-allowed' : 'pointer',
+                                  fontSize: '12px',
+                                  fontWeight: '600'
+                                }}
+                              >
+                                {saving ? 'Saving...' : 'Save Changes'}
+                              </button>
+                            </div>
+                          </div>
                         </div>
-                        <div style={{ fontSize: '12px', color: '#6b7280' }}>
-                          {formatDate(note.createdAt)}
+                      ) : (
+                        // View Mode
+                        <div>
+                          <div style={{ display: 'flex', alignItems: 'start', justifyContent: 'space-between', marginBottom: '12px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                              <div style={{
+                                background: roleBadge.bg,
+                                color: roleBadge.color,
+                                padding: '6px 12px',
+                                borderRadius: '8px',
+                                fontSize: '12px',
+                                fontWeight: '600',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '6px'
+                              }}>
+                                <span>{roleBadge.icon}</span>
+                                <span>{note.createdByName}</span>
+                              </div>
+                              {note.isConfidential && (
+                                <div style={{
+                                  background: '#fef3c7',
+                                  color: '#92400e',
+                                  padding: '6px 12px',
+                                  borderRadius: '8px',
+                                  fontSize: '12px',
+                                  fontWeight: '600'
+                                }}>
+                                  🔒 Confidential
+                                </div>
+                              )}
+                            </div>
+                            
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                              <div style={{ fontSize: '12px', color: '#6b7280' }}>
+                                {formatDate(note.createdAt)}
+                              </div>
+                              
+                              {canEdit && (
+                                <div style={{ display: 'flex', gap: '4px' }}>
+                                  <button
+                                    onClick={() => startEditNote(note)}
+                                    style={{
+                                      background: '#f3f4f6',
+                                      border: '1px solid #d1d5db',
+                                      padding: '4px 8px',
+                                      borderRadius: '6px',
+                                      cursor: 'pointer',
+                                      fontSize: '11px',
+                                      color: '#374151'
+                                    }}
+                                    title="Edit note"
+                                  >
+                                    ✏️
+                                  </button>
+                                  <button
+                                    onClick={() => handleDuplicateNote(note)}
+                                    style={{
+                                      background: '#f3f4f6',
+                                      border: '1px solid #d1d5db',
+                                      padding: '4px 8px',
+                                      borderRadius: '6px',
+                                      cursor: 'pointer',
+                                      fontSize: '11px',
+                                      color: '#374151'
+                                    }}
+                                    title="Duplicate note"
+                                  >
+                                    📋
+                                  </button>
+                                  <button
+                                    onClick={() => {
+                                      if (confirm('Are you sure you want to delete this note? This action cannot be undone.')) {
+                                        handleDeleteNote(note.id)
+                                      }
+                                    }}
+                                    disabled={deletingNote === note.id}
+                                    style={{
+                                      background: deletingNote === note.id ? '#fca5a5' : '#fee2e2',
+                                      border: '1px solid #fecaca',
+                                      padding: '4px 8px',
+                                      borderRadius: '6px',
+                                      cursor: deletingNote === note.id ? 'not-allowed' : 'pointer',
+                                      fontSize: '11px',
+                                      color: '#991b1b'
+                                    }}
+                                    title="Delete note"
+                                  >
+                                    {deletingNote === note.id ? '⏳' : '🗑️'}
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                          <p style={{
+                            color: '#374151',
+                            lineHeight: '1.6',
+                            margin: 0,
+                            whiteSpace: 'pre-wrap'
+                          }}>
+                            {note.content}
+                          </p>
                         </div>
-                      </div>
-                      <p style={{
-                        color: '#374151',
-                        lineHeight: '1.6',
-                        margin: 0,
-                        whiteSpace: 'pre-wrap'
-                      }}>
-                        {note.content}
-                      </p>
+                      )}
                     </div>
                   )
                 })}
