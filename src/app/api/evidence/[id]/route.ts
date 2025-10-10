@@ -52,7 +52,11 @@ export async function GET(
       )
     }
 
-    return NextResponse.json(evidence)
+    // Return evidence with properly serialized dates
+    return NextResponse.json({
+      ...evidence,
+      createdAt: evidence.createdAt.toISOString()
+    })
   } catch (error) {
     console.error('❌ Error fetching evidence:', error)
     return NextResponse.json(
