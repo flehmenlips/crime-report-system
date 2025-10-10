@@ -2,12 +2,14 @@
 
 import { useState, useEffect } from 'react'
 import { User } from '@/types'
+import { CasePermissions } from './CasePermissions'
 
 interface CaseDetailsViewProps {
   user: User
   caseId?: string | null
   onClose: () => void
   onEdit?: (caseId: string) => void
+  onManagePermissions?: (caseId: string) => void
 }
 
 interface CaseDetailsData {
@@ -32,11 +34,12 @@ interface CaseDetailsData {
   updatedAt: string
 }
 
-export function CaseDetailsView({ user, caseId, onClose, onEdit }: CaseDetailsViewProps) {
+export function CaseDetailsView({ user, caseId, onClose, onEdit, onManagePermissions }: CaseDetailsViewProps) {
   const [caseDetails, setCaseDetails] = useState<CaseDetailsData | null>(null)
   const [activeTab, setActiveTab] = useState<'overview' | 'timeline' | 'suspects' | 'evidence' | 'updates'>('overview')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [showPermissions, setShowPermissions] = useState(false)
 
   // Check if user can edit this case
   const canEdit = caseDetails && (
@@ -314,23 +317,47 @@ export function CaseDetailsView({ user, caseId, onClose, onEdit }: CaseDetailsVi
                 </p>
               </div>
               
-              {canEdit && onEdit && (
-                <button
-                  onClick={() => onEdit(caseDetails.id)}
-                  style={{
-                    background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
-                    border: 'none',
-                    padding: '12px 24px',
-                    borderRadius: '12px',
-                    cursor: 'pointer',
-                    color: 'white',
-                    fontWeight: '600',
-                    fontSize: '14px'
-                  }}
-                >
-                  ✏️ Edit Case
-                </button>
-              )}
+              <div style={{ display: 'flex', gap: '12px' }}>
+                {/* Show Manage Permissions button for property owners who created the case */}
+                {user.role === 'property_owner' && caseDetails.createdBy === user.id && (
+                  <button
+                    onClick={() => setShowPermissions(true)}
+                    style={{
+                      background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                      border: 'none',
+                      padding: '12px 24px',
+                      borderRadius: '12px',
+                      cursor: 'pointer',
+                      color: 'white',
+                      fontWeight: '600',
+                      fontSize: '14px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px'
+                    }}
+                  >
+                    🔐 Manage Permissions
+                  </button>
+                )}
+                
+                {canEdit && onEdit && (
+                  <button
+                    onClick={() => onEdit(caseDetails.id)}
+                    style={{
+                      background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+                      border: 'none',
+                      padding: '12px 24px',
+                      borderRadius: '12px',
+                      cursor: 'pointer',
+                      color: 'white',
+                      fontWeight: '600',
+                      fontSize: '14px'
+                    }}
+                  >
+                    ✏️ Edit Case
+                  </button>
+                )}
+              </div>
             </div>
 
             {/* Case Info Bar */}
@@ -805,6 +832,15 @@ export function CaseDetailsView({ user, caseId, onClose, onEdit }: CaseDetailsVi
           </div>
         </div>
       </div>
+
+      {/* Permissions Management Modal */}
+      {showPermissions && caseDetails && (
+        <CasePermissions
+          caseId={caseDetails.id}
+          user={user}
+          onClose={() => setShowPermissions(false)}
+        />
+      )}
     </>
   )
 }
