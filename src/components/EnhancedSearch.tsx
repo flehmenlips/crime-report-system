@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react'
 import { StolenItem, User } from '@/types'
+import { useCategories } from '@/hooks/useCategories'
 
 interface EnhancedSearchProps {
   items: StolenItem[]
@@ -45,15 +46,31 @@ export function EnhancedSearch({ items, user, onResults, onClose }: EnhancedSear
     sortOrder: 'desc'
   })
 
-  // Get unique categories from items
-  const categories = useMemo(() => {
+  // Get categories from API (includes all categories, even those without items)
+  const { categories: apiCategories, loading: categoriesLoading } = useCategories(user?.tenant?.id)
+  
+  // Also get unique categories from items (for backward compatibility)
+  const itemCategories = useMemo(() => {
     const categorySet = new Set<string>()
     items.forEach(item => {
       const category = (item as any).category || 'Uncategorized'
       categorySet.add(category)
     })
-    return Array.from(categorySet).sort()
+    return Array.from(categorySet)
   }, [items])
+
+  // Combine API categories with item categories to ensure we have all categories
+  const categories = useMemo(() => {
+    const allCategories = new Set<string>()
+    
+    // Add API categories
+    apiCategories.forEach(cat => allCategories.add(cat.name))
+    
+    // Add item categories (in case there are items with categories not in API)
+    itemCategories.forEach(cat => allCategories.add(cat))
+    
+    return Array.from(allCategories).sort()
+  }, [apiCategories, itemCategories])
 
   // Get unique locations from items
   const locations = useMemo(() => {

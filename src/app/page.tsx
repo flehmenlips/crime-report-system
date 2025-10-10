@@ -40,7 +40,7 @@ import { EdgeCaseStressTest } from '@/components/EdgeCaseStressTest'
 import { SuperAdminDashboard } from '@/components/SuperAdminDashboard'
 import { TenantUserManagement } from '@/components/TenantUserManagement'
 import { SimpleSortControls } from '@/components/SimpleSortControls'
-import { UserPreferencesProvider, useUserPreferences } from '@/contexts/UserPreferencesContext'
+import { UserPreferencesProvider, useUserPreferences, useViewPreferences } from '@/contexts/UserPreferencesContext'
 import { CaseDetailsView } from '@/components/CaseDetailsView'
 import { CaseDetailsForm } from '@/components/CaseDetailsForm'
 
@@ -78,7 +78,7 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
   const [showCaseDetailsView, setShowCaseDetailsView] = useState(false)
   const [showCaseDetailsForm, setShowCaseDetailsForm] = useState(false)
   const [editingCaseId, setEditingCaseId] = useState<string | null>(null)
-  const [viewMode, setViewMode] = useState<'cards' | 'list'>('cards')
+  const [existingCaseId, setExistingCaseId] = useState<string | null>(null)
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false)
   const [showGenerateReport, setShowGenerateReport] = useState(false)
   const [showAnalytics, setShowAnalytics] = useState(false)
@@ -86,9 +86,10 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
   const [showReportGenerator, setShowReportGenerator] = useState(false)
   const [filteredItems, setFilteredItems] = useState<StolenItem[]>([])
   const [isFiltered, setIsFiltered] = useState(false)
-  const [sortField, setSortField] = useState<'name' | 'value' | 'date' | 'category' | 'serialNumber' | 'location' | 'evidence'>('date')
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
   const [refreshKey, setRefreshKey] = useState(0) // Force re-render key
+  
+  // Use persistent user preferences for view mode and sorting
+  const { viewMode, sortField, sortOrder, setViewMode, setSortField, setSortOrder } = useViewPreferences()
 
   // Enhanced RBAC user state - initialize with passed user to avoid duplicate loading
   const [user, setUser] = useState<User | null>(initialUser)
@@ -152,6 +153,31 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
     }
   }
 
+  // Check if user has an existing case (for property owners)
+  const checkExistingCase = async () => {
+    if (!user?.tenant?.id || user?.role !== 'property_owner') {
+      setExistingCaseId(null)
+      return
+    }
+
+    try {
+      const response = await fetch(`/api/case-details?tenantId=${user.tenant.id}&userId=${user.id}`)
+      if (response.ok) {
+        const data = await response.json()
+        if (data.caseDetails && data.caseDetails.length > 0) {
+          setExistingCaseId(data.caseDetails[0].id)
+        } else {
+          setExistingCaseId(null)
+        }
+      } else {
+        setExistingCaseId(null)
+      }
+    } catch (err) {
+      console.error('Error checking for existing case:', err)
+      setExistingCaseId(null)
+    }
+  }
+
   const loadData = async (isRefresh = false) => {
     try {
       if (isRefresh) {
@@ -181,6 +207,9 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
       } else {
         console.log('⚠️ No items to load evidence for')
       }
+      
+      // Check for existing case (for property owners)
+      await checkExistingCase()
     } catch (error) {
       console.error('Error loading data:', error)
       const errorMessage = error instanceof Error ? error.message : 'Failed to load data'
@@ -1508,7 +1537,16 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
                   </button>
 
                   <button
-                    onClick={() => setShowCaseDetailsForm(true)}
+                    onClick={() => {
+                      if (existingCaseId) {
+                        // Case exists, open for editing
+                        setEditingCaseId(existingCaseId)
+                      } else {
+                        // No case exists, create new
+                        setEditingCaseId(null)
+                      }
+                      setShowCaseDetailsForm(true)
+                    }}
                     style={{
                       background: 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 50%, #5b21b6 100%)',
                       color: 'white',
@@ -1534,8 +1572,8 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
                       e.currentTarget.style.boxShadow = '0 10px 25px rgba(124, 58, 237, 0.3)'
                     }}
                   >
-                    <span style={{ fontSize: '20px' }}>📝</span>
-                    Create/Edit Case Report
+                    <span style={{ fontSize: '20px' }}>{existingCaseId ? '✏️' : '📝'}</span>
+                    {existingCaseId ? 'Edit Case Report' : 'Create Case Report'}
                   </button>
                 </>
               )}
@@ -2602,6 +2640,8 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
                 tags: (editingFormItem as any).tags || [],
                 notes: (editingFormItem as any).notes || ''
               } : undefined}
+              tenantId={user.tenant?.id}
+              userId={user.id}
               onClose={() => {
                 setShowModernForm(false)
                 setEditingFormItem(null)
@@ -2641,6 +2681,21 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
                 setShowSimpleUpload(true)
               }}
               evidence={evidenceCache[detailViewItem.id]}
+              user={user}
+              onCategoryUpdate={(itemId: number, newCategory: string) => {
+                // Update the item in the local state
+                setAllItems((prevItems: StolenItem[]) => 
+                  prevItems.map((item: StolenItem) => 
+                    item.id === itemId 
+                      ? { ...item, category: newCategory }
+                      : item
+                  )
+                )
+                // Update the detail view item if it's the same item
+                if (detailViewItem && detailViewItem.id === itemId) {
+                  setDetailViewItem(prev => prev ? { ...prev, category: newCategory } : null)
+                }
+              }}
             />
           )}
 
@@ -2698,6 +2753,7 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
           {showAdvancedSearch && (
             <AdvancedSearch
               items={allItems}
+              user={user}
               onClose={() => setShowAdvancedSearch(false)}
               onResults={(results) => {
                 setFilteredItems(results)
@@ -2719,6 +2775,7 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
           {showAnalytics && (
             <AnalyticsDashboard
               items={isFiltered ? filteredItems : allItems}
+              user={user}
               onClose={() => setShowAnalytics(false)}
             />
           )}
@@ -2831,10 +2888,12 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
                 setShowCaseDetailsForm(false)
                 setEditingCaseId(null)
               }}
-              onSave={() => {
+              onSave={async () => {
                 // Refresh to show updated case
                 setShowCaseDetailsForm(false)
                 setEditingCaseId(null)
+                // Check for existing case again to update button label
+                await checkExistingCase()
               }}
             />
           )}

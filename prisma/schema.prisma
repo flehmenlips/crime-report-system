@@ -17,6 +17,7 @@ model Tenant {
   items       StolenItem[]
   users       User[]
   caseDetails CaseDetails[]
+  categories  Category[]
 
   @@map("tenants")
 }
@@ -249,4 +250,21 @@ enum AccessLevel {
   staff
   stakeholder
   view_only
+}
+
+model Category {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  tenantId    String
+  isSystem    Boolean  @default(false) // System categories cannot be deleted
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdBy   String
+  
+  tenant      Tenant   @relation(fields: [tenantId], references: [id])
+  
+  @@unique([tenantId, name]) // Ensure unique category names per tenant
+  @@map("categories")
 }
