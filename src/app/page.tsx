@@ -40,7 +40,7 @@ import { EdgeCaseStressTest } from '@/components/EdgeCaseStressTest'
 import { SuperAdminDashboard } from '@/components/SuperAdminDashboard'
 import { TenantUserManagement } from '@/components/TenantUserManagement'
 import { SimpleSortControls } from '@/components/SimpleSortControls'
-import { UserPreferencesProvider, useUserPreferences } from '@/contexts/UserPreferencesContext'
+import { UserPreferencesProvider, useUserPreferences, useViewPreferences } from '@/contexts/UserPreferencesContext'
 import { CaseDetailsView } from '@/components/CaseDetailsView'
 import { CaseDetailsForm } from '@/components/CaseDetailsForm'
 
@@ -79,7 +79,6 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
   const [showCaseDetailsForm, setShowCaseDetailsForm] = useState(false)
   const [editingCaseId, setEditingCaseId] = useState<string | null>(null)
   const [existingCaseId, setExistingCaseId] = useState<string | null>(null)
-  const [viewMode, setViewMode] = useState<'cards' | 'list'>('cards')
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false)
   const [showGenerateReport, setShowGenerateReport] = useState(false)
   const [showAnalytics, setShowAnalytics] = useState(false)
@@ -87,9 +86,10 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
   const [showReportGenerator, setShowReportGenerator] = useState(false)
   const [filteredItems, setFilteredItems] = useState<StolenItem[]>([])
   const [isFiltered, setIsFiltered] = useState(false)
-  const [sortField, setSortField] = useState<'name' | 'value' | 'date' | 'category' | 'serialNumber' | 'location' | 'evidence'>('date')
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
   const [refreshKey, setRefreshKey] = useState(0) // Force re-render key
+  
+  // Use persistent user preferences for view mode and sorting
+  const { viewMode, sortField, sortOrder, setViewMode, setSortField, setSortOrder } = useViewPreferences()
 
   // Enhanced RBAC user state - initialize with passed user to avoid duplicate loading
   const [user, setUser] = useState<User | null>(initialUser)
