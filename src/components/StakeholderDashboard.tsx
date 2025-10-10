@@ -20,6 +20,7 @@ import { CaseSummary } from './CaseSummary'
 import { EvidenceTags } from './EvidenceTags'
 import { UploadEvidenceModal } from './UploadEvidenceModal'
 import { InvestigationNotes } from './InvestigationNotes'
+import { useViewPreferences } from '@/contexts/UserPreferencesContext'
 
 interface StakeholderDashboardProps {
   user: User
@@ -33,6 +34,9 @@ interface StakeholderDashboardProps {
 }
 
 export function StakeholderDashboard({ user, items, onItemsUpdate, loading = false, error = null, onRefresh, evidenceCache, evidenceLoaded }: StakeholderDashboardProps) {
+  // Use user preferences for view and sort settings
+  const { viewMode, sortField, sortOrder, setViewMode, setSortField, setSortOrder } = useViewPreferences()
+  
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false)
   const [showGenerateReport, setShowGenerateReport] = useState(false)
   const [showAnalytics, setShowAnalytics] = useState(false)
@@ -48,9 +52,6 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
   const [investigationNotesItem, setInvestigationNotesItem] = useState<StolenItem | null>(null)
   const [filteredItems, setFilteredItems] = useState<StolenItem[]>([])
   const [isFiltered, setIsFiltered] = useState(false)
-  const [viewMode, setViewMode] = useState<'cards' | 'list'>('cards')
-  const [sortField, setSortField] = useState<'name' | 'value' | 'date' | 'category' | 'serialNumber' | 'location' | 'evidence'>('date')
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
 
   // Debug logging
   console.log('StakeholderDashboard rendered for user:', user?.name, 'role:', user?.role, 'viewMode:', viewMode)

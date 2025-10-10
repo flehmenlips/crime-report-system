@@ -40,8 +40,9 @@ import { EdgeCaseStressTest } from '@/components/EdgeCaseStressTest'
 import { SuperAdminDashboard } from '@/components/SuperAdminDashboard'
 import { TenantUserManagement } from '@/components/TenantUserManagement'
 import { SimpleSortControls } from '@/components/SimpleSortControls'
+import { UserPreferencesProvider, useUserPreferences } from '@/contexts/UserPreferencesContext'
 
-export default function Home() {
+function AppContent() {
   const router = useRouter()
   const [allItems, setAllItems] = useState<StolenItem[]>([])
   const [totalValue, setTotalValue] = useState(0)
@@ -2789,5 +2790,70 @@ export default function Home() {
       )}
     </div>
     </>
+  )
+}
+
+export default function Home() {
+  const [user, setUser] = useState<User | null>(null)
+  const [userLoading, setUserLoading] = useState(true)
+
+  // Load user on mount
+  useEffect(() => {
+    const loadUser = async () => {
+      try {
+        const response = await fetch('/api/user/profile')
+        if (response.ok) {
+          const userData = await response.json()
+          setUser(userData)
+        }
+      } catch (error) {
+        console.error('Error loading user:', error)
+      } finally {
+        setUserLoading(false)
+      }
+    }
+
+    loadUser()
+  }, [])
+
+  if (userLoading) {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #0f0f23 0%, #1e1b4b 50%, #312e81 100%)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontFamily: 'Inter, -apple-system, sans-serif'
+      }}>
+        <div style={{
+          background: 'rgba(255, 255, 255, 0.95)',
+          borderRadius: '20px',
+          padding: '48px',
+          textAlign: 'center',
+          boxShadow: '0 25px 50px rgba(0, 0, 0, 0.3)'
+        }}>
+          <div style={{
+            width: '48px',
+            height: '48px',
+            border: '4px solid #e5e7eb',
+            borderTop: '4px solid #3b82f6',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite',
+            margin: '0 auto 24px'
+          }}></div>
+          <h2 style={{ fontSize: '24px', fontWeight: '600', color: '#1f2937', marginBottom: '8px' }}>
+            Loading User Preferences
+          </h2>
+          <p style={{ color: '#6b7280' }}>Setting up your personalized experience...</p>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <UserPreferencesProvider user={user}>
+      <AppContent />
+    </UserPreferencesProvider>
   )
 }
