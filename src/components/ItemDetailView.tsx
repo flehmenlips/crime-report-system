@@ -805,9 +805,33 @@ export function ItemDetailView({ item, onClose, onEdit, onDelete, onDuplicate, o
                             }}
                           />
                           <div style={{ padding: '8px', background: 'white' }}>
-                            <p style={{ fontSize: '12px', color: '#6b7280', margin: 0, fontWeight: '500' }}>
+                            <p style={{ fontSize: '12px', color: '#6b7280', margin: '0 0 4px 0', fontWeight: '500' }}>
                               {photo.originalName || 'Photo Evidence'}
                             </p>
+                            {photo.description && (
+                              <p style={{ 
+                                fontSize: '11px', 
+                                color: '#374151', 
+                                margin: 0, 
+                                lineHeight: '1.4',
+                                fontStyle: 'italic',
+                                whiteSpace: 'nowrap',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis'
+                              }}>
+                                📝 {photo.description}
+                              </p>
+                            )}
+                            {!photo.description && (
+                              <p style={{ 
+                                fontSize: '11px', 
+                                color: '#9ca3af', 
+                                margin: 0,
+                                fontStyle: 'italic'
+                              }}>
+                                No description
+                              </p>
+                            )}
                           </div>
                         </div>
                       ))}
@@ -834,9 +858,33 @@ export function ItemDetailView({ item, onClose, onEdit, onDelete, onDuplicate, o
                           }}
                         >
                           <div style={{ fontSize: '32px', marginBottom: '8px' }}>🎥</div>
-                          <p style={{ fontSize: '14px', color: '#1f2937', fontWeight: '600', margin: 0 }}>
+                          <p style={{ fontSize: '14px', color: '#1f2937', fontWeight: '600', margin: '0 0 4px 0' }}>
                             {video.originalName || 'Video Evidence'}
                           </p>
+                          {video.description && (
+                            <p style={{ 
+                              fontSize: '11px', 
+                              color: '#374151', 
+                              margin: 0, 
+                              lineHeight: '1.4',
+                              fontStyle: 'italic',
+                              whiteSpace: 'nowrap',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis'
+                            }}>
+                              📝 {video.description}
+                            </p>
+                          )}
+                          {!video.description && (
+                            <p style={{ 
+                              fontSize: '11px', 
+                              color: '#9ca3af', 
+                              margin: 0,
+                              fontStyle: 'italic'
+                            }}>
+                              No description
+                            </p>
+                          )}
                         </div>
                       ))}
                     </div>
@@ -904,12 +952,36 @@ export function ItemDetailView({ item, onClose, onEdit, onDelete, onDuplicate, o
                           }}
                         >
                           <div style={{ fontSize: '32px', marginBottom: '8px' }}>📄</div>
-                          <p style={{ fontSize: '14px', color: '#1f2937', fontWeight: '600', marginBottom: '4px', margin: '0 0 4px 0' }}>
+                          <p style={{ fontSize: '14px', color: '#1f2937', fontWeight: '600', margin: '0 0 4px 0' }}>
                             {doc.originalName || 'Document'}
                           </p>
-                          <p style={{ fontSize: '12px', color: '#92400e', fontWeight: '500', margin: 0 }}>
+                          <p style={{ fontSize: '12px', color: '#92400e', fontWeight: '500', margin: '0 0 8px 0' }}>
                             {doc.originalName?.split('.').pop()?.toUpperCase() || 'DOC'} • Click to view
                           </p>
+                          {doc.description && (
+                            <p style={{ 
+                              fontSize: '11px', 
+                              color: '#78350f', 
+                              margin: 0, 
+                              lineHeight: '1.4',
+                              fontStyle: 'italic',
+                              whiteSpace: 'nowrap',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis'
+                            }}>
+                              📝 {doc.description}
+                            </p>
+                          )}
+                          {!doc.description && (
+                            <p style={{ 
+                              fontSize: '11px', 
+                              color: '#d97706', 
+                              margin: 0,
+                              fontStyle: 'italic'
+                            }}>
+                              No description
+                            </p>
+                          )}
                           
                           {/* Removed alternative access methods for cleanup */}
                         </div>
