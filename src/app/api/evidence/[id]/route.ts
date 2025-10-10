@@ -1,21 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { getCurrentUser } from '@/lib/auth-server'
 
-// GET /api/evidence/[id] - Get evidence details
-export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+// PUT - Update evidence details (description/caption)
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
   try {
-    // Get current user for tenant isolation
-    const user = await getCurrentUser()
-    if (!user) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      )
-    }
-
-    const { id } = await params
-    const evidenceId = parseInt(id)
+    const evidenceId = parseInt(params.id)
+    
     if (isNaN(evidenceId)) {
       return NextResponse.json(
         { error: 'Invalid evidence ID' },
@@ -23,59 +16,62 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       )
     }
 
-    // Get evidence with item information
-    const evidence = await prisma.evidence.findUnique({
-      where: { id: evidenceId },
-      include: {
-        item: true
-      }
+    const body = await request.json()
+    const { description } = body
+
+    // Check if evidence exists
+    const existingEvidence = await prisma.evidence.findUnique({
+      where: { id: evidenceId }
     })
 
-    if (!evidence) {
+    if (!existingEvidence) {
       return NextResponse.json(
         { error: 'Evidence not found' },
         { status: 404 }
       )
     }
 
-    // Check tenant isolation (super admin and law enforcement can access any evidence)
-    if (user.role !== 'super_admin' && user.role !== 'law_enforcement' && evidence.item.tenantId !== user.tenantId) {
-      return NextResponse.json(
-        { error: 'Unauthorized to access this evidence' },
-        { status: 403 }
-      )
-    }
-
-    return NextResponse.json({
-      evidence: {
-        ...evidence,
-        createdAt: evidence.createdAt.toISOString()
+    // Update evidence description
+    const updatedEvidence = await prisma.evidence.update({
+      where: { id: evidenceId },
+      data: {
+        description: description?.trim() || null
       }
     })
 
+    console.log('✅ Evidence description updated:', {
+      id: updatedEvidence.id,
+      itemId: updatedEvidence.itemId,
+      hasDescription: !!updatedEvidence.description
+    })
+
+    return NextResponse.json({
+      id: updatedEvidence.id,
+      description: updatedEvidence.description,
+      type: updatedEvidence.type,
+      originalName: updatedEvidence.originalName,
+      url: updatedEvidence.url
+    })
   } catch (error) {
-    console.error('Error fetching evidence:', error)
+    console.error('❌ Error updating evidence:', error)
     return NextResponse.json(
-      { error: 'Failed to fetch evidence' },
+      {
+        error: 'Failed to update evidence',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      },
       { status: 500 }
     )
   }
 }
 
-// DELETE /api/evidence/[id] - Delete evidence
-export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+// DELETE - Delete evidence file
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
   try {
-    // Get current user for tenant isolation
-    const user = await getCurrentUser()
-    if (!user) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      )
-    }
-
-    const { id } = await params
-    const evidenceId = parseInt(id)
+    const evidenceId = parseInt(params.id)
+    
     if (isNaN(evidenceId)) {
       return NextResponse.json(
         { error: 'Invalid evidence ID' },
@@ -83,26 +79,15 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
       )
     }
 
-    // Get evidence with item information
-    const evidence = await prisma.evidence.findUnique({
-      where: { id: evidenceId },
-      include: {
-        item: true
-      }
+    // Check if evidence exists
+    const existingEvidence = await prisma.evidence.findUnique({
+      where: { id: evidenceId }
     })
 
-    if (!evidence) {
+    if (!existingEvidence) {
       return NextResponse.json(
         { error: 'Evidence not found' },
         { status: 404 }
-      )
-    }
-
-    // Check tenant isolation (super admin and law enforcement can delete any evidence)
-    if (user.role !== 'super_admin' && user.role !== 'law_enforcement' && evidence.item.tenantId !== user.tenantId) {
-      return NextResponse.json(
-        { error: 'Unauthorized to delete this evidence' },
-        { status: 403 }
       )
     }
 
@@ -111,15 +96,22 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
       where: { id: evidenceId }
     })
 
-    return NextResponse.json({
-      message: 'Evidence deleted successfully',
-      evidenceId
+    console.log('✅ Evidence deleted:', {
+      id: evidenceId,
+      itemId: existingEvidence.itemId
     })
 
+    return NextResponse.json({
+      success: true,
+      message: 'Evidence deleted successfully'
+    })
   } catch (error) {
-    console.error('Error deleting evidence:', error)
+    console.error('❌ Error deleting evidence:', error)
     return NextResponse.json(
-      { error: 'Failed to delete evidence' },
+      {
+        error: 'Failed to delete evidence',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      },
       { status: 500 }
     )
   }

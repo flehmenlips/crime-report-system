@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { StolenItem } from '@/types'
 import { formatCurrency, formatDate } from '@/lib/data'
 import { DynamicCategorySelector } from './DynamicCategorySelector'
+import { EvidenceCaption } from './EvidenceCaption'
 
 interface ItemDetailViewProps {
   item: StolenItem
@@ -30,6 +31,9 @@ interface Evidence {
   cloudinaryId: string
   originalName: string | null
   description: string | null
+  uploadedBy?: string
+  uploadedByName?: string
+  uploadedByRole?: string
   createdAt: string
   documentData?: any  // Binary data for documents (Uint8Array or Buffer in frontend)
 }
@@ -37,7 +41,7 @@ interface Evidence {
 export function ItemDetailView({ item, onClose, onEdit, onDelete, onDuplicate, onUploadEvidence, onViewNotes, evidence: propEvidence, permissions = { canEdit: true, canDelete: true, canUpload: true, canAddNotes: true }, user, onCategoryUpdate }: ItemDetailViewProps) {
   const [evidence, setEvidence] = useState<Evidence[]>([])
   const [loadingEvidence, setLoadingEvidence] = useState(true)
-  const [selectedImage, setSelectedImage] = useState<string | null>(null)
+  const [selectedEvidence, setSelectedEvidence] = useState<Evidence | null>(null)
   const [showActionMenu, setShowActionMenu] = useState(false)
   const [investigationNotes, setInvestigationNotes] = useState<any[]>([])
   const [editingCategory, setEditingCategory] = useState(false)
@@ -776,7 +780,7 @@ export function ItemDetailView({ item, onClose, onEdit, onDelete, onDuplicate, o
                       {photos.map((photo) => (
                         <div
                           key={photo.id}
-                          onClick={() => setSelectedImage(photo.cloudinaryId)}
+                          onClick={() => setSelectedEvidence(photo)}
                           style={{
                             borderRadius: '12px',
                             overflow: 'hidden',
@@ -1011,9 +1015,9 @@ export function ItemDetailView({ item, onClose, onEdit, onDelete, onDuplicate, o
       </div>
 
       {/* Full-size Image Modal */}
-      {selectedImage && (
+      {selectedEvidence && (
         <div
-          onClick={() => setSelectedImage(null)}
+          onClick={() => setSelectedEvidence(null)}
           style={{
             position: 'fixed',
             inset: 0,
@@ -1022,41 +1026,118 @@ export function ItemDetailView({ item, onClose, onEdit, onDelete, onDuplicate, o
             alignItems: 'center',
             justifyContent: 'center',
             zIndex: 60,
-            padding: '32px'
+            padding: '32px',
+            overflowY: 'auto'
           }}
         >
-          <div style={{ position: 'relative', maxWidth: '90vw', maxHeight: '90vh' }}>
+          <div 
+            onClick={(e) => e.stopPropagation()}
+            style={{ 
+              position: 'relative', 
+              maxWidth: '1200px',
+              width: '100%',
+              background: '#ffffff',
+              borderRadius: '16px',
+              padding: '32px',
+              maxHeight: '90vh',
+              overflowY: 'auto'
+            }}
+          >
             <button
-              onClick={(e) => {
-                e.stopPropagation()
-                setSelectedImage(null)
-              }}
+              onClick={() => setSelectedEvidence(null)}
               style={{
                 position: 'absolute',
-                top: '-16px',
-                right: '-16px',
-                background: 'rgba(255, 255, 255, 0.9)',
+                top: '16px',
+                right: '16px',
+                background: '#f3f4f6',
                 border: 'none',
                 borderRadius: '50%',
                 padding: '12px',
                 cursor: 'pointer',
-                zIndex: 61
+                zIndex: 61,
+                transition: 'background-color 0.2s ease'
               }}
+              onMouseEnter={(e) => (e.target as HTMLButtonElement).style.backgroundColor = '#e5e7eb'}
+              onMouseLeave={(e) => (e.target as HTMLButtonElement).style.backgroundColor = '#f3f4f6'}
             >
               <svg style={{ width: '20px', height: '20px', color: '#1f2937' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
-            <img
-              src={getCloudinaryFullUrl(selectedImage)}
-              alt="Evidence"
-              style={{
-                maxWidth: '100%',
-                maxHeight: '100%',
-                borderRadius: '12px',
-                boxShadow: '0 25px 50px rgba(0, 0, 0, 0.5)'
+
+            {/* File Name */}
+            <h3 style={{ 
+              fontSize: '20px', 
+              fontWeight: '600', 
+              color: '#1f2937',
+              marginBottom: '16px',
+              paddingRight: '40px'
+            }}>
+              {selectedEvidence.originalName || 'Evidence File'}
+            </h3>
+
+            {/* Image */}
+            <div style={{ 
+              marginBottom: '24px',
+              display: 'flex',
+              justifyContent: 'center',
+              background: '#f9fafb',
+              borderRadius: '12px',
+              padding: '16px'
+            }}>
+              <img
+                src={getCloudinaryFullUrl(selectedEvidence.cloudinaryId)}
+                alt="Evidence"
+                style={{
+                  maxWidth: '100%',
+                  maxHeight: '600px',
+                  borderRadius: '8px',
+                  boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)'
+                }}
+              />
+            </div>
+
+            {/* Evidence Caption */}
+            <EvidenceCaption
+              evidenceId={selectedEvidence.id}
+              initialDescription={selectedEvidence.description}
+              canEdit={permissions.canEdit || false}
+              onUpdate={(newDescription) => {
+                // Update local evidence state
+                setEvidence(prevEvidence => 
+                  prevEvidence.map(e => 
+                    e.id === selectedEvidence.id 
+                      ? { ...e, description: newDescription }
+                      : e
+                  )
+                )
+                // Update selected evidence
+                setSelectedEvidence(prev => prev ? { ...prev, description: newDescription } : null)
               }}
             />
+
+            {/* Metadata */}
+            <div style={{
+              marginTop: '24px',
+              padding: '16px',
+              background: '#f9fafb',
+              borderRadius: '8px',
+              fontSize: '14px',
+              color: '#6b7280'
+            }}>
+              <div style={{ marginBottom: '8px' }}>
+                <strong>Uploaded by:</strong> {selectedEvidence.uploadedByName || 'Unknown'} ({selectedEvidence.uploadedByRole || 'Unknown'})
+              </div>
+              <div>
+                <strong>Upload date:</strong> {new Date(selectedEvidence.createdAt).toLocaleDateString('en-US', { 
+                  year: 'numeric', 
+                  month: 'long', 
+                  day: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit'
+                })}
+              </div>
+            </div>
           </div>
         </div>
       )}
