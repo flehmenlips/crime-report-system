@@ -78,6 +78,7 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
   const [showCaseDetailsView, setShowCaseDetailsView] = useState(false)
   const [showCaseDetailsForm, setShowCaseDetailsForm] = useState(false)
   const [editingCaseId, setEditingCaseId] = useState<string | null>(null)
+  const [existingCaseId, setExistingCaseId] = useState<string | null>(null)
   const [viewMode, setViewMode] = useState<'cards' | 'list'>('cards')
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false)
   const [showGenerateReport, setShowGenerateReport] = useState(false)
@@ -152,6 +153,31 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
     }
   }
 
+  // Check if user has an existing case (for property owners)
+  const checkExistingCase = async () => {
+    if (!user?.tenant?.id || user?.role !== 'property_owner') {
+      setExistingCaseId(null)
+      return
+    }
+
+    try {
+      const response = await fetch(`/api/case-details?tenantId=${user.tenant.id}&userId=${user.id}`)
+      if (response.ok) {
+        const data = await response.json()
+        if (data.caseDetails && data.caseDetails.length > 0) {
+          setExistingCaseId(data.caseDetails[0].id)
+        } else {
+          setExistingCaseId(null)
+        }
+      } else {
+        setExistingCaseId(null)
+      }
+    } catch (err) {
+      console.error('Error checking for existing case:', err)
+      setExistingCaseId(null)
+    }
+  }
+
   const loadData = async (isRefresh = false) => {
     try {
       if (isRefresh) {
@@ -181,6 +207,9 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
       } else {
         console.log('⚠️ No items to load evidence for')
       }
+      
+      // Check for existing case (for property owners)
+      await checkExistingCase()
     } catch (error) {
       console.error('Error loading data:', error)
       const errorMessage = error instanceof Error ? error.message : 'Failed to load data'
@@ -1508,25 +1537,12 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
                   </button>
 
                   <button
-                    onClick={async () => {
-                      // Check if a case exists first to determine if editing or creating
-                      try {
-                        const response = await fetch(`/api/case-details?tenantId=${user.tenant?.id}&userId=${user.id}`)
-                        if (response.ok) {
-                          const data = await response.json()
-                          if (data.caseDetails && data.caseDetails.length > 0) {
-                            // Case exists, set it for editing
-                            setEditingCaseId(data.caseDetails[0].id)
-                          } else {
-                            // No case exists, create new
-                            setEditingCaseId(null)
-                          }
-                        } else {
-                          // Error or no case, create new
-                          setEditingCaseId(null)
-                        }
-                      } catch (err) {
-                        console.error('Error checking for existing case:', err)
+                    onClick={() => {
+                      if (existingCaseId) {
+                        // Case exists, open for editing
+                        setEditingCaseId(existingCaseId)
+                      } else {
+                        // No case exists, create new
                         setEditingCaseId(null)
                       }
                       setShowCaseDetailsForm(true)
@@ -1556,8 +1572,8 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
                       e.currentTarget.style.boxShadow = '0 10px 25px rgba(124, 58, 237, 0.3)'
                     }}
                   >
-                    <span style={{ fontSize: '20px' }}>📝</span>
-                    Create/Edit Case Report
+                    <span style={{ fontSize: '20px' }}>{existingCaseId ? '✏️' : '📝'}</span>
+                    {existingCaseId ? 'Edit Case Report' : 'Create Case Report'}
                   </button>
                 </>
               )}
@@ -2853,10 +2869,12 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
                 setShowCaseDetailsForm(false)
                 setEditingCaseId(null)
               }}
-              onSave={() => {
+              onSave={async () => {
                 // Refresh to show updated case
                 setShowCaseDetailsForm(false)
                 setEditingCaseId(null)
+                // Check for existing case again to update button label
+                await checkExistingCase()
               }}
             />
           )}
