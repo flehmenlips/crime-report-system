@@ -953,7 +953,7 @@ export function CaseDetailsForm({ user, caseId, onClose, onSave }: CaseDetailsFo
                     </div>
                   )}
 
-                  {suspects.length === 0 ? (
+                  {!editingSuspect && suspects.length === 0 && (
                     <div style={{
                       textAlign: 'center',
                       padding: '32px',
@@ -966,7 +966,9 @@ export function CaseDetailsForm({ user, caseId, onClose, onSave }: CaseDetailsFo
                         No suspects added yet. Click "Add Suspect" to add suspect information.
                       </p>
                     </div>
-                  ) : (
+                  )}
+
+                  {!editingSuspect && suspects.length > 0 && (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                       {suspects.map((suspect) => (
                         <div key={suspect.id} style={{
@@ -1173,81 +1175,172 @@ export function CaseDetailsForm({ user, caseId, onClose, onSave }: CaseDetailsFo
                       </div>
                     </div>
                   )}
+                </div>
 
-                  {suspects.length === 0 && !editingSuspect && (
+                {/* Evidence Section */}
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+                    <h3 style={{ fontSize: '18px', fontWeight: '700', color: '#1f2937', margin: 0 }}>
+                      🔍 Evidence Documentation
+                    </h3>
+                    <button
+                      onClick={() => setEditingEvidence({
+                        type: '',
+                        description: '',
+                        location: '',
+                        collectedBy: user.name,
+                        dateCollected: new Date().toISOString().split('T')[0]
+                      })}
+                      style={{
+                        background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                        color: 'white',
+                        border: 'none',
+                        padding: '8px 16px',
+                        borderRadius: '8px',
+                        cursor: 'pointer',
+                        fontSize: '13px',
+                        fontWeight: '600'
+                      }}
+                    >
+                      ➕ Add Evidence
+                    </button>
+                  </div>
+
+                  {editingEvidence && (
+                    <div style={{
+                      background: '#f9fafb',
+                      borderRadius: '12px',
+                      padding: '16px',
+                      marginBottom: '16px',
+                      border: '2px solid #3b82f6'
+                    }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
+                        <input
+                          type="text"
+                          value={editingEvidence.type}
+                          onChange={(e) => setEditingEvidence({ ...editingEvidence, type: e.target.value })}
+                          placeholder="Evidence type (e.g., 'Photographs', 'Video')"
+                          style={{
+                            padding: '10px',
+                            borderRadius: '8px',
+                            border: '1px solid #d1d5db',
+                            fontSize: '14px'
+                          }}
+                        />
+                        <input
+                          type="date"
+                          value={editingEvidence.dateCollected}
+                          onChange={(e) => setEditingEvidence({ ...editingEvidence, dateCollected: e.target.value })}
+                          style={{
+                            padding: '10px',
+                            borderRadius: '8px',
+                            border: '1px solid #d1d5db',
+                            fontSize: '14px'
+                          }}
+                        />
+                      </div>
+                      
+                      <textarea
+                        value={editingEvidence.description}
+                        onChange={(e) => setEditingEvidence({ ...editingEvidence, description: e.target.value })}
+                        placeholder="Evidence description..."
+                        style={{
+                          width: '100%',
+                          padding: '10px',
+                          borderRadius: '8px',
+                          border: '1px solid #d1d5db',
+                          fontSize: '14px',
+                          minHeight: '60px',
+                          marginBottom: '12px'
+                        }}
+                      />
+                      
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
+                        <input
+                          type="text"
+                          value={editingEvidence.location}
+                          onChange={(e) => setEditingEvidence({ ...editingEvidence, location: e.target.value })}
+                          placeholder="Evidence location"
+                          style={{
+                            padding: '10px',
+                            borderRadius: '8px',
+                            border: '1px solid #d1d5db',
+                            fontSize: '14px'
+                          }}
+                        />
+                        <input
+                          type="text"
+                          value={editingEvidence.collectedBy}
+                          onChange={(e) => setEditingEvidence({ ...editingEvidence, collectedBy: e.target.value })}
+                          placeholder="Collected by"
+                          style={{
+                            padding: '10px',
+                            borderRadius: '8px',
+                            border: '1px solid #d1d5db',
+                            fontSize: '14px'
+                          }}
+                        />
+                      </div>
+                      
+                      <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                        <button
+                          onClick={() => setEditingEvidence(null)}
+                          style={{
+                            background: '#6b7280',
+                            color: 'white',
+                            border: 'none',
+                            padding: '6px 12px',
+                            borderRadius: '6px',
+                            cursor: 'pointer',
+                            fontSize: '13px'
+                          }}
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          onClick={() => {
+                            if (editingEvidence.type && editingEvidence.description && editingEvidence.location && editingEvidence.collectedBy) {
+                              if (editingEvidence.id) {
+                                setEvidence(evidence.map(e => e.id === editingEvidence.id ? editingEvidence : e))
+                              } else {
+                                setEvidence([...evidence, { ...editingEvidence, id: `temp-${Date.now()}` }])
+                              }
+                              setEditingEvidence(null)
+                            }
+                          }}
+                          disabled={!editingEvidence.type || !editingEvidence.description || !editingEvidence.location || !editingEvidence.collectedBy}
+                          style={{
+                            background: !editingEvidence.type || !editingEvidence.description || !editingEvidence.location || !editingEvidence.collectedBy ? '#d1d5db' : 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                            color: 'white',
+                            border: 'none',
+                            padding: '6px 12px',
+                            borderRadius: '6px',
+                            cursor: !editingEvidence.type || !editingEvidence.description || !editingEvidence.location || !editingEvidence.collectedBy ? 'not-allowed' : 'pointer',
+                            fontSize: '13px'
+                          }}
+                        >
+                          Save
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {!editingEvidence && evidence.length === 0 && (
                     <div style={{
                       textAlign: 'center',
-                      padding: '24px',
+                      padding: '32px',
                       background: '#f9fafb',
                       borderRadius: '12px',
                       border: '2px dashed #d1d5db'
                     }}>
+                      <div style={{ fontSize: '36px', marginBottom: '12px' }}>🔍</div>
                       <p style={{ color: '#6b7280', margin: 0, fontSize: '14px' }}>
-                        No suspects added yet.
+                        No evidence documented yet. This section is optional.
                       </p>
                     </div>
                   )}
 
-                  {suspects.length > 0 && !editingSuspect && (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                      {suspects.map((suspect) => (
-                        <div key={suspect.id} style={{
-                          background: 'white',
-                          borderRadius: '8px',
-                          padding: '12px',
-                          border: '1px solid #e5e7eb',
-                          display: 'flex',
-                          justifyContent: 'space-between'
-                        }}>
-                          <div>
-                            <h4 style={{ fontSize: '14px', fontWeight: '600', color: '#1f2937', margin: '0 0 4px 0' }}>
-                              {suspect.name}
-                            </h4>
-                            <p style={{ margin: 0, color: '#6b7280', fontSize: '12px' }}>
-                              {suspect.description}
-                            </p>
-                          </div>
-                          
-                          <div style={{ display: 'flex', gap: '4px' }}>
-                            <button
-                              onClick={() => setEditingSuspect(suspect)}
-                              style={{
-                                background: '#f3f4f6',
-                                border: 'none',
-                                padding: '4px 8px',
-                                borderRadius: '6px',
-                                cursor: 'pointer',
-                                fontSize: '11px'
-                              }}
-                            >
-                              ✏️
-                            </button>
-                            <button
-                              onClick={() => setSuspects(suspects.filter(s => s.id !== suspect.id))}
-                              style={{
-                                background: '#fee2e2',
-                                border: 'none',
-                                padding: '4px 8px',
-                                borderRadius: '6px',
-                                cursor: 'pointer',
-                                fontSize: '11px'
-                              }}
-                            >
-                              🗑️
-                            </button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                {/* Evidence Section */}
-                {evidence.length > 0 && (
-                  <div>
-                    <h4 style={{ fontSize: '16px', fontWeight: '600', color: '#1f2937', marginBottom: '12px' }}>
-                      Evidence Items ({evidence.length})
-                    </h4>
+                  {!editingEvidence && evidence.length > 0 && (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                       {evidence.map((item) => (
                         <div key={item.id} style={{
@@ -1267,24 +1360,39 @@ export function CaseDetailsForm({ user, caseId, onClose, onSave }: CaseDetailsFo
                             </p>
                           </div>
                           
-                          <button
-                            onClick={() => setEvidence(evidence.filter(e => e.id !== item.id))}
-                            style={{
-                              background: '#fee2e2',
-                              border: 'none',
-                              padding: '4px 8px',
-                              borderRadius: '6px',
-                              cursor: 'pointer',
-                              fontSize: '11px'
-                            }}
-                          >
-                            🗑️
-                          </button>
+                          <div style={{ display: 'flex', gap: '4px' }}>
+                            <button
+                              onClick={() => setEditingEvidence(item)}
+                              style={{
+                                background: '#f3f4f6',
+                                border: 'none',
+                                padding: '4px 8px',
+                                borderRadius: '6px',
+                                cursor: 'pointer',
+                                fontSize: '11px'
+                              }}
+                            >
+                              ✏️
+                            </button>
+                            <button
+                              onClick={() => setEvidence(evidence.filter(e => e.id !== item.id))}
+                              style={{
+                                background: '#fee2e2',
+                                border: 'none',
+                                padding: '4px 8px',
+                                borderRadius: '6px',
+                                cursor: 'pointer',
+                                fontSize: '11px'
+                              }}
+                            >
+                              🗑️
+                            </button>
+                          </div>
                         </div>
                       ))}
                     </div>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
             )}
 
