@@ -804,33 +804,51 @@ export function ItemDetailView({ item, onClose, onEdit, onDelete, onDuplicate, o
                               objectFit: 'cover'
                             }}
                           />
-                          <div style={{ padding: '8px', background: 'white' }}>
-                            <p style={{ fontSize: '12px', color: '#6b7280', margin: '0 0 4px 0', fontWeight: '500' }}>
-                              {photo.originalName || 'Photo Evidence'}
-                            </p>
-                            {photo.description && (
-                              <p style={{ 
-                                fontSize: '11px', 
-                                color: '#374151', 
-                                margin: 0, 
-                                lineHeight: '1.4',
-                                fontStyle: 'italic',
-                                whiteSpace: 'nowrap',
-                                overflow: 'hidden',
-                                textOverflow: 'ellipsis'
-                              }}>
-                                📝 {photo.description}
-                              </p>
-                            )}
-                            {!photo.description && (
-                              <p style={{ 
-                                fontSize: '11px', 
-                                color: '#9ca3af', 
-                                margin: 0,
-                                fontStyle: 'italic'
-                              }}>
-                                No description
-                              </p>
+                          <div style={{ padding: '12px', background: 'white' }}>
+                            {photo.description ? (
+                              <>
+                                <p style={{ 
+                                  fontSize: '13px', 
+                                  color: '#1f2937', 
+                                  margin: '0 0 4px 0', 
+                                  lineHeight: '1.5',
+                                  fontWeight: '500'
+                                }}>
+                                  {photo.description}
+                                </p>
+                                <p style={{ 
+                                  fontSize: '10px', 
+                                  color: '#9ca3af', 
+                                  margin: 0,
+                                  whiteSpace: 'nowrap',
+                                  overflow: 'hidden',
+                                  textOverflow: 'ellipsis'
+                                }}>
+                                  {photo.originalName || 'Photo Evidence'}
+                                </p>
+                              </>
+                            ) : (
+                              <>
+                                <p style={{ 
+                                  fontSize: '12px', 
+                                  color: '#f59e0b', 
+                                  margin: '0 0 4px 0',
+                                  fontStyle: 'italic',
+                                  fontWeight: '500'
+                                }}>
+                                  ⚠️ No description added
+                                </p>
+                                <p style={{ 
+                                  fontSize: '10px', 
+                                  color: '#9ca3af', 
+                                  margin: 0,
+                                  whiteSpace: 'nowrap',
+                                  overflow: 'hidden',
+                                  textOverflow: 'ellipsis'
+                                }}>
+                                  {photo.originalName || 'Photo Evidence'}
+                                </p>
+                              </>
                             )}
                           </div>
                         </div>
@@ -858,32 +876,44 @@ export function ItemDetailView({ item, onClose, onEdit, onDelete, onDuplicate, o
                           }}
                         >
                           <div style={{ fontSize: '32px', marginBottom: '8px' }}>🎥</div>
-                          <p style={{ fontSize: '14px', color: '#1f2937', fontWeight: '600', margin: '0 0 4px 0' }}>
-                            {video.originalName || 'Video Evidence'}
-                          </p>
-                          {video.description && (
-                            <p style={{ 
-                              fontSize: '11px', 
-                              color: '#374151', 
-                              margin: 0, 
-                              lineHeight: '1.4',
-                              fontStyle: 'italic',
-                              whiteSpace: 'nowrap',
-                              overflow: 'hidden',
-                              textOverflow: 'ellipsis'
-                            }}>
-                              📝 {video.description}
-                            </p>
-                          )}
-                          {!video.description && (
-                            <p style={{ 
-                              fontSize: '11px', 
-                              color: '#9ca3af', 
-                              margin: 0,
-                              fontStyle: 'italic'
-                            }}>
-                              No description
-                            </p>
+                          {video.description ? (
+                            <>
+                              <p style={{ 
+                                fontSize: '13px', 
+                                color: '#1f2937', 
+                                fontWeight: '500', 
+                                margin: '0 0 4px 0',
+                                lineHeight: '1.5'
+                              }}>
+                                {video.description}
+                              </p>
+                              <p style={{ 
+                                fontSize: '10px', 
+                                color: '#9ca3af', 
+                                margin: 0
+                              }}>
+                                {video.originalName || 'Video Evidence'}
+                              </p>
+                            </>
+                          ) : (
+                            <>
+                              <p style={{ 
+                                fontSize: '12px', 
+                                color: '#f59e0b', 
+                                margin: '0 0 4px 0',
+                                fontStyle: 'italic',
+                                fontWeight: '500'
+                              }}>
+                                ⚠️ No description added
+                              </p>
+                              <p style={{ 
+                                fontSize: '10px', 
+                                color: '#9ca3af', 
+                                margin: 0
+                              }}>
+                                {video.originalName || 'Video Evidence'}
+                              </p>
+                            </>
                           )}
                         </div>
                       ))}
@@ -901,36 +931,7 @@ export function ItemDetailView({ item, onClose, onEdit, onDelete, onDuplicate, o
                       {documents.map((doc) => (
                         <div
                           key={doc.id}
-                          onClick={() => {
-                            console.log('Document clicked:', doc)
-                            
-                            const originalName = doc.originalName || 'document'
-                            
-                            let viewUrl = ''
-                            
-                            if (doc.documentData) {
-                              // New DB-stored document: Use serve-document for viewing
-                              console.log('Opening new DB document in popup via /api/serve-document')
-                              viewUrl = `/api/serve-document/${doc.id}?mode=view`
-                            } else if (doc.cloudinaryId) {
-                              // Legacy Cloudinary document: Use proxy for viewing
-                              console.log('Opening legacy document in popup via proxy')
-                              let url = doc.cloudinaryId
-                              if (url?.includes('/raw/upload/')) {
-                                url = url.replace('/raw/upload/', '/image/upload/')
-                              }
-                              url = url?.replace(/(\.[a-zA-Z0-9]+)\.\1$/, '$1') || '#'
-                              
-                              viewUrl = `/api/document-proxy?url=${encodeURIComponent(url)}&filename=${encodeURIComponent(originalName)}`
-                            } else {
-                              console.warn('Document has no data:', doc)
-                              alert('No document data available')
-                              return
-                            }
-                            
-                            // Open in popup window (new tab)
-                            window.open(viewUrl, '_blank', 'width=800,height=600')
-                          }}
+                          onClick={() => setSelectedEvidence(doc)}
                           style={{
                             background: '#fffbeb',
                             borderRadius: '12px',
@@ -952,38 +953,65 @@ export function ItemDetailView({ item, onClose, onEdit, onDelete, onDuplicate, o
                           }}
                         >
                           <div style={{ fontSize: '32px', marginBottom: '8px' }}>📄</div>
-                          <p style={{ fontSize: '14px', color: '#1f2937', fontWeight: '600', margin: '0 0 4px 0' }}>
-                            {doc.originalName || 'Document'}
-                          </p>
-                          <p style={{ fontSize: '12px', color: '#92400e', fontWeight: '500', margin: '0 0 8px 0' }}>
-                            {doc.originalName?.split('.').pop()?.toUpperCase() || 'DOC'} • Click to view
-                          </p>
-                          {doc.description && (
-                            <p style={{ 
-                              fontSize: '11px', 
-                              color: '#78350f', 
-                              margin: 0, 
-                              lineHeight: '1.4',
-                              fontStyle: 'italic',
-                              whiteSpace: 'nowrap',
-                              overflow: 'hidden',
-                              textOverflow: 'ellipsis'
-                            }}>
-                              📝 {doc.description}
-                            </p>
+                          {doc.description ? (
+                            <>
+                              <p style={{ 
+                                fontSize: '13px', 
+                                color: '#1f2937', 
+                                fontWeight: '500', 
+                                margin: '0 0 4px 0',
+                                lineHeight: '1.5'
+                              }}>
+                                {doc.description}
+                              </p>
+                              <p style={{ 
+                                fontSize: '10px', 
+                                color: '#92400e', 
+                                margin: '0 0 4px 0'
+                              }}>
+                                {doc.originalName?.split('.').pop()?.toUpperCase() || 'DOC'} • Click to view/edit
+                              </p>
+                              <p style={{ 
+                                fontSize: '10px', 
+                                color: '#d97706', 
+                                margin: 0,
+                                whiteSpace: 'nowrap',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis'
+                              }}>
+                                {doc.originalName || 'Document'}
+                              </p>
+                            </>
+                          ) : (
+                            <>
+                              <p style={{ 
+                                fontSize: '12px', 
+                                color: '#f59e0b', 
+                                margin: '0 0 4px 0',
+                                fontStyle: 'italic',
+                                fontWeight: '500'
+                              }}>
+                                ⚠️ No description added
+                              </p>
+                              <p style={{ 
+                                fontSize: '10px', 
+                                color: '#92400e', 
+                                margin: '0 0 4px 0'
+                              }}>
+                                {doc.originalName?.split('.').pop()?.toUpperCase() || 'DOC'} • Click to view/edit
+                              </p>
+                              <p style={{ 
+                                fontSize: '10px', 
+                                color: '#d97706', 
+                                margin: 0,
+                                whiteSpace: 'nowrap',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis'
+                              }}>
+                                {doc.originalName || 'Document'}
+                              </p>
+                            </>
                           )}
-                          {!doc.description && (
-                            <p style={{ 
-                              fontSize: '11px', 
-                              color: '#d97706', 
-                              margin: 0,
-                              fontStyle: 'italic'
-                            }}>
-                              No description
-                            </p>
-                          )}
-                          
-                          {/* Removed alternative access methods for cleanup */}
                         </div>
                       ))}
                     </div>
@@ -1148,7 +1176,7 @@ export function ItemDetailView({ item, onClose, onEdit, onDelete, onDuplicate, o
               {selectedEvidence.originalName || 'Evidence File'}
             </h3>
 
-            {/* Image */}
+            {/* Evidence Preview */}
             <div style={{ 
               marginBottom: '24px',
               display: 'flex',
@@ -1157,16 +1185,91 @@ export function ItemDetailView({ item, onClose, onEdit, onDelete, onDuplicate, o
               borderRadius: '12px',
               padding: '16px'
             }}>
-              <img
-                src={getCloudinaryFullUrl(selectedEvidence.cloudinaryId)}
-                alt="Evidence"
-                style={{
-                  maxWidth: '100%',
-                  maxHeight: '600px',
-                  borderRadius: '8px',
-                  boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)'
-                }}
-              />
+              {selectedEvidence.type === 'photo' && (
+                <img
+                  src={getCloudinaryFullUrl(selectedEvidence.cloudinaryId)}
+                  alt="Evidence"
+                  style={{
+                    maxWidth: '100%',
+                    maxHeight: '600px',
+                    borderRadius: '8px',
+                    boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)'
+                  }}
+                />
+              )}
+              
+              {selectedEvidence.type === 'video' && (
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ fontSize: '80px', marginBottom: '16px' }}>🎥</div>
+                  <p style={{ fontSize: '16px', color: '#6b7280', marginBottom: '16px' }}>
+                    Video File: {selectedEvidence.originalName}
+                  </p>
+                  {selectedEvidence.cloudinaryId && (
+                    <a
+                      href={selectedEvidence.cloudinaryId}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        display: 'inline-block',
+                        background: '#3b82f6',
+                        color: 'white',
+                        padding: '12px 24px',
+                        borderRadius: '8px',
+                        textDecoration: 'none',
+                        fontWeight: '500'
+                      }}
+                    >
+                      ▶️ Open Video in New Tab
+                    </a>
+                  )}
+                </div>
+              )}
+              
+              {selectedEvidence.type === 'document' && (
+                <div style={{ textAlign: 'center', width: '100%' }}>
+                  <div style={{ fontSize: '80px', marginBottom: '16px' }}>📄</div>
+                  <p style={{ fontSize: '16px', color: '#6b7280', marginBottom: '8px' }}>
+                    Document: {selectedEvidence.originalName}
+                  </p>
+                  <p style={{ fontSize: '14px', color: '#92400e', marginBottom: '16px', fontWeight: '600' }}>
+                    {selectedEvidence.originalName?.split('.').pop()?.toUpperCase() || 'DOCUMENT'}
+                  </p>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      const originalName = selectedEvidence.originalName || 'document'
+                      let viewUrl = ''
+                      
+                      if (selectedEvidence.documentData) {
+                        viewUrl = `/api/serve-document/${selectedEvidence.id}?mode=view`
+                      } else if (selectedEvidence.cloudinaryId) {
+                        let url = selectedEvidence.cloudinaryId
+                        if (url?.includes('/raw/upload/')) {
+                          url = url.replace('/raw/upload/', '/image/upload/')
+                        }
+                        url = url?.replace(/(\.[a-zA-Z0-9]+)\.\1$/, '$1') || '#'
+                        viewUrl = `/api/document-proxy?url=${encodeURIComponent(url)}&filename=${encodeURIComponent(originalName)}`
+                      }
+                      
+                      if (viewUrl) {
+                        window.open(viewUrl, '_blank', 'width=800,height=600')
+                      }
+                    }}
+                    style={{
+                      background: '#f59e0b',
+                      color: 'white',
+                      padding: '12px 24px',
+                      borderRadius: '8px',
+                      border: 'none',
+                      cursor: 'pointer',
+                      fontWeight: '500',
+                      fontSize: '14px'
+                    }}
+                  >
+                    📄 Open Document in New Tab
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* Evidence Caption */}
