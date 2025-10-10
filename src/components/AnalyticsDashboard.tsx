@@ -794,7 +794,7 @@ export function AnalyticsDashboard({ items, onClose, user }: AnalyticsDashboardP
                     })
                     .sort((a, b) => b.value - a.value)
                     .map((category) => (
-                    <div key={category} style={{
+                    <div key={category.name} style={{
                       background: 'white',
                       padding: '20px',
                       borderRadius: '12px',
@@ -856,7 +856,7 @@ export function AnalyticsDashboard({ items, onClose, user }: AnalyticsDashboardP
                             fontSize: '16px',
                             marginBottom: '2px'
                           }}>
-                            {formatCurrency(data.value)}
+                            {formatCurrency(category.value)}
                           </div>
                           <div style={{
                             fontSize: '12px',
@@ -866,7 +866,7 @@ export function AnalyticsDashboard({ items, onClose, user }: AnalyticsDashboardP
                             padding: '2px 6px',
                             borderRadius: '4px'
                           }}>
-                            {formatPercent(data.value, analyticsData.totalValue)}% of total
+                            {formatPercent(category.value, analyticsData.totalValue)}% of total
                           </div>
                         </div>
                       </div>
@@ -883,7 +883,7 @@ export function AnalyticsDashboard({ items, onClose, user }: AnalyticsDashboardP
                             height: '100%',
                             borderRadius: '8px',
                             transition: 'width 0.5s ease',
-                            width: `${formatPercent(data.value, analyticsData.totalValue)}%`
+                            width: `${formatPercent(category.value, analyticsData.totalValue)}%`
                           }}
                         ></div>
                       </div>
@@ -894,8 +894,8 @@ export function AnalyticsDashboard({ items, onClose, user }: AnalyticsDashboardP
                         fontSize: '12px',
                         color: '#6b7280'
                       }}>
-                        <span>Avg: {formatCurrency(data.value / data.count)}</span>
-                        <span>{data.count} items</span>
+                        <span>Avg: {formatCurrency(category.count > 0 ? category.value / category.count : 0)}</span>
+                        <span>{category.count} items</span>
                       </div>
                     </div>
                   ))}
