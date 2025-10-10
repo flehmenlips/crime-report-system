@@ -42,7 +42,11 @@ import { TenantUserManagement } from '@/components/TenantUserManagement'
 import { SimpleSortControls } from '@/components/SimpleSortControls'
 import { UserPreferencesProvider, useUserPreferences } from '@/contexts/UserPreferencesContext'
 
-function AppContent() {
+interface AppContentInnerProps {
+  initialUser: User | null
+}
+
+function AppContentInner({ initialUser }: AppContentInnerProps) {
   const router = useRouter()
   const [allItems, setAllItems] = useState<StolenItem[]>([])
   const [totalValue, setTotalValue] = useState(0)
@@ -81,8 +85,8 @@ function AppContent() {
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
   const [refreshKey, setRefreshKey] = useState(0) // Force re-render key
 
-  // Enhanced RBAC user state
-  const [user, setUser] = useState<User | null>(null)
+  // Enhanced RBAC user state - initialize with passed user to avoid duplicate loading
+  const [user, setUser] = useState<User | null>(initialUser)
   const role = user?.role
   
   // Evidence data cache to avoid individual API calls per item
@@ -187,31 +191,26 @@ function AppContent() {
     loadData(true)
   }
 
-  // Check for user session and load full profile with tenant data
-  const checkAuth = async () => {
+  // Refresh user profile (used when tenant settings are updated)
+  const refreshUser = async () => {
     try {
       const response = await fetch('/api/user/profile')
       if (response.ok) {
         const userData = await response.json()
-        console.log('Loaded user profile:', userData.user)
+        console.log('Refreshed user profile:', userData.user)
         setUser(userData.user)
-      } else {
-        router.push('/login-simple')
-        return
       }
     } catch (error) {
-      console.error('Auth check failed:', error)
-      router.push('/login-simple')
-      return
+      console.error('User refresh failed:', error)
     }
   }
 
   useEffect(() => {
     // Mark as hydrated to prevent hydration mismatch
     setIsHydrated(true)
-    console.log('Main page hydrated')
+    console.log('Main page hydrated with user:', initialUser?.name)
     
-    checkAuth()
+    // User is passed as prop, no need to load again
     loadData()
   }, [])
 
@@ -2729,7 +2728,7 @@ function AppContent() {
               onClose={() => setShowTenantUserManagement(false)}
               onUpdate={() => {
                 // Refresh user profile to get updated tenant data
-                checkAuth()
+                refreshUser()
               }}
             />
           )}
@@ -2793,9 +2792,11 @@ function AppContent() {
   )
 }
 
-export default function Home() {
+// Wrapper to provide UserPreferencesContext after user is loaded
+function AppContent() {
   const [user, setUser] = useState<User | null>(null)
   const [userLoading, setUserLoading] = useState(true)
+  const router = useRouter()
 
   // Load user on mount
   useEffect(() => {
@@ -2804,17 +2805,21 @@ export default function Home() {
         const response = await fetch('/api/user/profile')
         if (response.ok) {
           const userData = await response.json()
-          setUser(userData)
+          // Fix: Use userData.user instead of userData directly
+          setUser(userData.user)
+        } else {
+          router.push('/login-simple')
         }
       } catch (error) {
         console.error('Error loading user:', error)
+        router.push('/login-simple')
       } finally {
         setUserLoading(false)
       }
     }
 
     loadUser()
-  }, [])
+  }, [router])
 
   if (userLoading) {
     return (
@@ -2843,7 +2848,7 @@ export default function Home() {
             margin: '0 auto 24px'
           }}></div>
           <h2 style={{ fontSize: '24px', fontWeight: '600', color: '#1f2937', marginBottom: '8px' }}>
-            Loading User Preferences
+            Loading Application
           </h2>
           <p style={{ color: '#6b7280' }}>Setting up your personalized experience...</p>
         </div>
@@ -2853,7 +2858,11 @@ export default function Home() {
 
   return (
     <UserPreferencesProvider user={user}>
-      <AppContent />
+      <AppContentInner initialUser={user} />
     </UserPreferencesProvider>
   )
+}
+
+export default function Home() {
+  return <AppContent />
 }

@@ -390,7 +390,8 @@ export function InvestigationNotes({ item, user, onClose }: InvestigationNotesPr
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 {notes.map((note) => {
                   const roleBadge = getRoleBadgeColor(note.createdByRole)
-                  const canEdit = user.role === 'law_enforcement' || user.id === note.createdBy
+                  // Fix: Ensure consistent ID type comparison (both should be strings)
+                  const canEdit = user.role === 'law_enforcement' || String(user.id) === String(note.createdBy)
                   
                   return (
                     <div
