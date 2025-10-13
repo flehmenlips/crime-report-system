@@ -27,6 +27,7 @@ interface UserPreferencesContextType {
   preferences: UserPreferences
   updatePreferences: (updates: Partial<UserPreferences>) => void
   resetPreferences: () => void
+  clearStorageQuota: () => void
   isLoading: boolean
 }
 
@@ -50,9 +51,32 @@ interface UserPreferencesProviderProps {
   user: User | null
 }
 
+// Utility function to clean up localStorage
+const cleanupLocalStorage = () => {
+  try {
+    // Clear any corrupted or oversized preference data
+    Object.keys(localStorage).forEach(key => {
+      if (key.startsWith('user_preferences_')) {
+        const value = localStorage.getItem(key)
+        if (value && value.length > 100000) { // 100KB limit per user
+          console.warn(`Removing oversized preference data for key: ${key}`)
+          localStorage.removeItem(key)
+        }
+      }
+    })
+  } catch (error) {
+    console.error('Error during localStorage cleanup:', error)
+  }
+}
+
 export function UserPreferencesProvider({ children, user }: UserPreferencesProviderProps) {
   const [preferences, setPreferences] = useState<UserPreferences>(defaultPreferences)
   const [isLoading, setIsLoading] = useState(true)
+
+  // Clean up localStorage on mount
+  useEffect(() => {
+    cleanupLocalStorage()
+  }, [])
 
   // Load preferences from localStorage when user changes
   useEffect(() => {
@@ -92,9 +116,45 @@ export function UserPreferencesProvider({ children, user }: UserPreferencesProvi
     const savePreferences = () => {
       try {
         const key = `user_preferences_${user.id}`
-        localStorage.setItem(key, JSON.stringify(preferences))
+        const preferencesJson = JSON.stringify(preferences)
+        
+        // Check if the data is too large for localStorage
+        if (preferencesJson.length > 5000000) { // 5MB limit
+          console.warn('User preferences too large for localStorage, clearing old data')
+          // Clear all user preference keys to free up space
+          Object.keys(localStorage).forEach(storageKey => {
+            if (storageKey.startsWith('user_preferences_')) {
+              localStorage.removeItem(storageKey)
+            }
+          })
+        }
+        
+        localStorage.setItem(key, preferencesJson)
+        console.log('✅ User preferences saved successfully')
       } catch (error) {
         console.error('Error saving user preferences:', error)
+        
+        // If it's a quota exceeded error, try to clear some space
+        if (error instanceof Error && error.name === 'QuotaExceededError') {
+          console.warn('localStorage quota exceeded, attempting cleanup...')
+          try {
+            // Clear all user preference keys to free up space
+            Object.keys(localStorage).forEach(storageKey => {
+              if (storageKey.startsWith('user_preferences_')) {
+                localStorage.removeItem(storageKey)
+              }
+            })
+            
+            // Try saving again with just the current user's preferences
+            const key = `user_preferences_${user.id}`
+            localStorage.setItem(key, JSON.stringify(preferences))
+            console.log('✅ User preferences saved after cleanup')
+          } catch (cleanupError) {
+            console.error('Failed to save preferences even after cleanup:', cleanupError)
+            // If we still can't save, at least the preferences are in memory
+            console.warn('Preferences will be lost on page refresh due to storage quota')
+          }
+        }
       }
     }
 
@@ -109,10 +169,25 @@ export function UserPreferencesProvider({ children, user }: UserPreferencesProvi
     setPreferences(defaultPreferences)
   }
 
+  const clearStorageQuota = () => {
+    try {
+      // Clear all user preference keys
+      Object.keys(localStorage).forEach(key => {
+        if (key.startsWith('user_preferences_')) {
+          localStorage.removeItem(key)
+        }
+      })
+      console.log('✅ Cleared all user preference storage')
+    } catch (error) {
+      console.error('Error clearing storage quota:', error)
+    }
+  }
+
   const value: UserPreferencesContextType = {
     preferences,
     updatePreferences,
     resetPreferences,
+    clearStorageQuota,
     isLoading
   }
 

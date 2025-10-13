@@ -14,6 +14,7 @@ interface Evidence {
   id: number
   type: string
   cloudinaryId: string
+  url?: string | null
   originalName: string | null
 }
 
@@ -57,10 +58,10 @@ export function ItemCardThumbnails({ item, onImageClick, compact = false, eviden
     }
   }
 
-  const getCloudinaryThumbnailUrl = (cloudinaryId: string) => {
+  const getCloudinaryThumbnailUrl = (cloudinaryId: string, url?: string | null) => {
     const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'dhaacekdd'
     
-    console.log('ItemCardThumbnails getCloudinaryThumbnailUrl - cloudinaryId:', cloudinaryId)
+    console.log('ItemCardThumbnails getCloudinaryThumbnailUrl - cloudinaryId:', cloudinaryId, 'url:', url)
     
     // Handle different cloudinaryId formats
     if (cloudinaryId.startsWith('demo/')) {
@@ -69,15 +70,35 @@ export function ItemCardThumbnails({ item, onImageClick, compact = false, eviden
       return `https://via.placeholder.com/120x80/3b82f6/ffffff?text=Demo+Photo`
     }
     
-    // If it's already a full URL, use it directly
-    if (cloudinaryId.startsWith('https://res.cloudinary.com/')) {
-      console.log('ItemCardThumbnails cloudinaryId is already a full URL')
-      return cloudinaryId
+    // If we have a direct URL, convert it to thumbnail format
+    if (url && url.startsWith('https://res.cloudinary.com/')) {
+      const thumbnailUrl = url.replace(
+        /\/image\/upload\/[^/]*\//,
+        '/image/upload/w_120,h_80,c_fill,f_auto,q_auto/'
+      ).replace(
+        /\/raw\/upload\/[^/]*\//,
+        '/image/upload/w_120,h_80,c_fill,f_auto,q_auto/'
+      )
+      console.log('ItemCardThumbnails using url field:', thumbnailUrl)
+      return thumbnailUrl
     }
     
-    // Real Cloudinary image - construct URL
+    // If it's already a full URL in cloudinaryId, convert to thumbnail
+    if (cloudinaryId.startsWith('https://res.cloudinary.com/')) {
+      const thumbnailUrl = cloudinaryId.replace(
+        /\/image\/upload\/[^/]*\//,
+        '/image/upload/w_120,h_80,c_fill,f_auto,q_auto/'
+      ).replace(
+        /\/raw\/upload\/[^/]*\//,
+        '/image/upload/w_120,h_80,c_fill,f_auto,q_auto/'
+      )
+      console.log('ItemCardThumbnails cloudinaryId is already a full URL, converted:', thumbnailUrl)
+      return thumbnailUrl
+    }
+    
+    // Real Cloudinary image - construct URL from public_id
     const constructedUrl = `https://res.cloudinary.com/${cloudName}/image/upload/w_120,h_80,c_fill,f_auto,q_auto/${cloudinaryId}`
-    console.log('ItemCardThumbnails constructed URL:', constructedUrl)
+    console.log('ItemCardThumbnails constructed URL from public_id:', constructedUrl)
     return constructedUrl
   }
 
@@ -192,7 +213,7 @@ export function ItemCardThumbnails({ item, onImageClick, compact = false, eviden
         e.currentTarget.style.transform = 'scale(1)'
       }}>
         <img
-          src={getCloudinaryThumbnailUrl(photos[0].cloudinaryId)}
+          src={getCloudinaryThumbnailUrl(photos[0].cloudinaryId, photos[0].url)}
           alt={photos[0].originalName || 'Evidence photo'}
           style={{
             width: '100%',
@@ -233,7 +254,7 @@ export function ItemCardThumbnails({ item, onImageClick, compact = false, eviden
                 }}
               >
                 <img
-                  src={getCloudinaryThumbnailUrl(photo.cloudinaryId)}
+                  src={getCloudinaryThumbnailUrl(photo.cloudinaryId, photo.url)}
                   alt={photo.originalName || 'Evidence photo'}
                   style={{
                     width: '100%',

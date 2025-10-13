@@ -13,6 +13,7 @@ interface Evidence {
   id: number
   type: string
   cloudinaryId: string
+  url?: string | null
   originalName: string | null
 }
 
@@ -48,13 +49,24 @@ export function ItemCardIcon({ item, size = 64, evidence: propEvidence }: ItemCa
     }
   }
 
-  const getCloudinaryThumbnailUrl = (cloudinaryId: string) => {
+  const getCloudinaryThumbnailUrl = (cloudinaryId: string, url?: string | null) => {
     // Handle different cloudinaryId formats
     if (cloudinaryId.startsWith('demo/')) {
       return `https://via.placeholder.com/${size}x${size}/6366f1/ffffff?text=Demo`
     }
     
-    // If it's already a full URL, convert to thumbnail
+    // If we have a direct URL, convert it to thumbnail format
+    if (url && url.startsWith('https://res.cloudinary.com/')) {
+      return url.replace(
+        /\/image\/upload\/[^/]*\//,
+        `/image/upload/w_${size},h_${size},c_fill,f_auto,q_auto/`
+      ).replace(
+        /\/raw\/upload\/[^/]*\//,
+        `/image/upload/w_${size},h_${size},c_fill,f_auto,q_auto/`
+      )
+    }
+    
+    // If it's already a full URL in cloudinaryId, convert to thumbnail
     if (cloudinaryId.startsWith('https://res.cloudinary.com/')) {
       return cloudinaryId.replace(
         /\/image\/upload\/[^/]*\//,
@@ -111,7 +123,7 @@ export function ItemCardIcon({ item, size = 64, evidence: propEvidence }: ItemCa
         position: 'relative'
       }}>
         <img
-          src={getCloudinaryThumbnailUrl(firstPhoto.cloudinaryId)}
+          src={getCloudinaryThumbnailUrl(firstPhoto.cloudinaryId, firstPhoto.url)}
           alt={item.name}
           style={{
             width: '100%',
