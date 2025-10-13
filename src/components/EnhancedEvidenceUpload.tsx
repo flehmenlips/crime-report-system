@@ -110,7 +110,7 @@ export function EnhancedEvidenceUpload({ item, onClose, onSuccess }: EnhancedEvi
       const evidenceType = getEvidenceType(file)
       const allowedTypes = {
         photo: ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'],
-        video: ['video/mp4', 'video/mov', 'video/avi', 'video/webm'],
+        video: ['video/mp4', 'video/mov', 'video/quicktime', 'video/avi', 'video/webm'],
         document: ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain']
       }
 
