@@ -85,7 +85,24 @@ export function EnhancedEvidenceManager({ item, onClose, onUpdate }: EnhancedEvi
     }
   }
 
-  // Get file icon based on type
+  // Get Cloudinary thumbnail URL
+  const getCloudinaryThumbnailUrl = (cloudinaryId: string) => {
+    if (!cloudinaryId) return ''
+    
+    // If it's already a full URL, convert to thumbnail
+    if (cloudinaryId.startsWith('https://res.cloudinary.com/')) {
+      return cloudinaryId.replace(
+        /\/image\/upload\/[^/]*\//,
+        '/image/upload/w_200,h_150,c_fill,f_auto,q_auto/'
+      )
+    }
+    
+    // For public_id format, construct URL
+    const cloudName = 'dhaacekdd'
+    return `https://res.cloudinary.com/${cloudName}/image/upload/w_200,h_150,c_fill,f_auto,q_auto/${cloudinaryId}`
+  }
+
+  // Get file icon based on type (fallback)
   const getFileIcon = (evidence: Evidence) => {
     switch (evidence.type) {
       case 'photo':
@@ -462,7 +479,7 @@ export function EnhancedEvidenceManager({ item, onClose, onUpdate }: EnhancedEvi
                   }}
                   onClick={() => setSelectedEvidence(evidenceItem)}
                 >
-                  {/* File Icon/Preview */}
+                  {/* File Preview */}
                   <div style={{
                     width: viewMode === 'grid' ? '100%' : '60px',
                     height: viewMode === 'grid' ? '120px' : '60px',
@@ -474,9 +491,56 @@ export function EnhancedEvidenceManager({ item, onClose, onUpdate }: EnhancedEvi
                     justifyContent: 'center',
                     fontSize: viewMode === 'grid' ? '48px' : '24px',
                     flexShrink: 0,
-                    border: '2px solid rgba(0, 0, 0, 0.05)'
+                    border: '2px solid rgba(0, 0, 0, 0.05)',
+                    overflow: 'hidden',
+                    position: 'relative'
                   }}>
-                    {getFileIcon(evidenceItem)}
+                    {evidenceItem.cloudinaryId && (evidenceItem.type === 'photo' || evidenceItem.type === 'video') ? (
+                      <>
+                        <img
+                          src={getCloudinaryThumbnailUrl(evidenceItem.cloudinaryId)}
+                          alt={`${evidenceItem.type} preview`}
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            objectFit: 'cover',
+                            borderRadius: '10px'
+                          }}
+                          onError={(e) => {
+                            // Fallback to icon if thumbnail fails
+                            const target = e.target as HTMLImageElement
+                            target.style.display = 'none'
+                            const parent = target.parentElement
+                            if (parent) {
+                              parent.innerHTML = `<div style="font-size: ${viewMode === 'grid' ? '48px' : '24px'};">${getFileIcon(evidenceItem)}</div>`
+                            }
+                          }}
+                        />
+                        {evidenceItem.type === 'video' && (
+                          <div style={{
+                            position: 'absolute',
+                            top: '50%',
+                            left: '50%',
+                            transform: 'translate(-50%, -50%)',
+                            background: 'rgba(0, 0, 0, 0.6)',
+                            borderRadius: '50%',
+                            width: viewMode === 'grid' ? '32px' : '20px',
+                            height: viewMode === 'grid' ? '32px' : '20px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: viewMode === 'grid' ? '16px' : '12px',
+                            color: 'white'
+                          }}>
+                            ▶️
+                          </div>
+                        )}
+                      </>
+                    ) : (
+                      <div style={{ fontSize: viewMode === 'grid' ? '48px' : '24px' }}>
+                        {getFileIcon(evidenceItem)}
+                      </div>
+                    )}
                   </div>
 
                   {/* File Info */}

@@ -867,15 +867,94 @@ export function ItemDetailView({ item, onClose, onEdit, onDelete, onDuplicate, o
                       {videos.map((video) => (
                         <div
                           key={video.id}
+                          onClick={() => setSelectedEvidence(video)}
                           style={{
                             background: '#f3f4f6',
                             borderRadius: '12px',
                             padding: '16px',
                             border: '2px solid #e5e7eb',
-                            textAlign: 'center'
+                            textAlign: 'center',
+                            cursor: 'pointer',
+                            transition: 'all 0.2s ease'
+                          }}
+                          onMouseOver={(e) => {
+                            e.currentTarget.style.background = '#e5e7eb'
+                            e.currentTarget.style.transform = 'translateY(-2px)'
+                            e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.1)'
+                          }}
+                          onMouseOut={(e) => {
+                            e.currentTarget.style.background = '#f3f4f6'
+                            e.currentTarget.style.transform = 'translateY(0)'
+                            e.currentTarget.style.boxShadow = 'none'
                           }}
                         >
-                          <div style={{ fontSize: '32px', marginBottom: '8px' }}>🎥</div>
+                          {/* Video Thumbnail */}
+                          <div style={{ 
+                            position: 'relative',
+                            width: '100%',
+                            height: '120px',
+                            background: '#1f2937',
+                            borderRadius: '8px',
+                            overflow: 'hidden',
+                            marginBottom: '12px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                          }}>
+                            {video.cloudinaryId ? (
+                              <>
+                                <img
+                                  src={getCloudinaryThumbnailUrl(video.cloudinaryId)}
+                                  alt="Video thumbnail"
+                                  style={{
+                                    width: '100%',
+                                    height: '100%',
+                                    objectFit: 'cover'
+                                  }}
+                                  onError={(e) => {
+                                    // Fallback to video icon if thumbnail fails
+                                    const target = e.target as HTMLImageElement
+                                    target.style.display = 'none'
+                                    const parent = target.parentElement
+                                    if (parent) {
+                                      parent.innerHTML = '<div style="font-size: 48px; color: #6b7280;">🎥</div>'
+                                    }
+                                  }}
+                                />
+                                {/* Play button overlay */}
+                                <div style={{
+                                  position: 'absolute',
+                                  top: '50%',
+                                  left: '50%',
+                                  transform: 'translate(-50%, -50%)',
+                                  background: 'rgba(0, 0, 0, 0.7)',
+                                  borderRadius: '50%',
+                                  width: '48px',
+                                  height: '48px',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  fontSize: '20px',
+                                  color: 'white',
+                                  cursor: 'pointer',
+                                  transition: 'all 0.2s ease'
+                                }}
+                                onMouseOver={(e) => {
+                                  e.currentTarget.style.background = 'rgba(0, 0, 0, 0.9)'
+                                  e.currentTarget.style.transform = 'translate(-50%, -50%) scale(1.1)'
+                                }}
+                                onMouseOut={(e) => {
+                                  e.currentTarget.style.background = 'rgba(0, 0, 0, 0.7)'
+                                  e.currentTarget.style.transform = 'translate(-50%, -50%) scale(1)'
+                                }}
+                                >
+                                  ▶️
+                                </div>
+                              </>
+                            ) : (
+                              <div style={{ fontSize: '48px', color: '#6b7280' }}>🎥</div>
+                            )}
+                          </div>
                           {video.description ? (
                             <>
                               <p style={{ 
@@ -1200,27 +1279,56 @@ export function ItemDetailView({ item, onClose, onEdit, onDelete, onDuplicate, o
               
               {selectedEvidence.type === 'video' && (
                 <div style={{ textAlign: 'center' }}>
-                  <div style={{ fontSize: '80px', marginBottom: '16px' }}>🎥</div>
-                  <p style={{ fontSize: '16px', color: '#6b7280', marginBottom: '16px' }}>
-                    Video File: {selectedEvidence.originalName}
-                  </p>
-                  {selectedEvidence.cloudinaryId && (
-                    <a
-                      href={selectedEvidence.cloudinaryId}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{
-                        display: 'inline-block',
-                        background: '#3b82f6',
-                        color: 'white',
-                        padding: '12px 24px',
-                        borderRadius: '8px',
-                        textDecoration: 'none',
-                        fontWeight: '500'
-                      }}
-                    >
-                      ▶️ Open Video in New Tab
-                    </a>
+                  {selectedEvidence.cloudinaryId ? (
+                    <>
+                      {/* Video Player */}
+                      <video
+                        controls
+                        style={{
+                          maxWidth: '100%',
+                          maxHeight: '600px',
+                          borderRadius: '8px',
+                          boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)',
+                          backgroundColor: '#000'
+                        }}
+                        poster={getCloudinaryThumbnailUrl(selectedEvidence.cloudinaryId)}
+                      >
+                        <source src={getCloudinaryFullUrl(selectedEvidence.cloudinaryId)} type="video/mp4" />
+                        <source src={selectedEvidence.cloudinaryId} type="video/quicktime" />
+                        Your browser does not support the video tag.
+                      </video>
+                      
+                      {/* Fallback Link */}
+                      <div style={{ marginTop: '16px' }}>
+                        <a
+                          href={selectedEvidence.cloudinaryId}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{
+                            display: 'inline-block',
+                            background: '#6b7280',
+                            color: 'white',
+                            padding: '8px 16px',
+                            borderRadius: '6px',
+                            textDecoration: 'none',
+                            fontSize: '14px',
+                            fontWeight: '500'
+                          }}
+                        >
+                          🔗 Open in New Tab
+                        </a>
+                      </div>
+                    </>
+                  ) : (
+                    <div>
+                      <div style={{ fontSize: '80px', marginBottom: '16px' }}>🎥</div>
+                      <p style={{ fontSize: '16px', color: '#6b7280', marginBottom: '16px' }}>
+                        Video File: {selectedEvidence.originalName}
+                      </p>
+                      <p style={{ fontSize: '14px', color: '#ef4444' }}>
+                        ⚠️ Video source not available
+                      </p>
+                    </div>
                   )}
                 </div>
               )}
