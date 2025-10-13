@@ -238,7 +238,7 @@ export function CaseDetailsForm({ user, caseId, onClose, onSave }: CaseDetailsFo
         }
         
         // Only remove from local state if API call succeeded
-        setTimeline(timeline.filter(e => e.id !== eventId))
+        setTimeline(prevTimeline => prevTimeline.filter(e => e.id !== eventId))
       } catch (error) {
         console.error('Failed to delete timeline event:', error)
         // Show user-friendly error message
@@ -246,7 +246,7 @@ export function CaseDetailsForm({ user, caseId, onClose, onSave }: CaseDetailsFo
       }
     } else {
       // For temp IDs, just remove from local state
-      setTimeline(timeline.filter(e => e.id !== eventId))
+      setTimeline(prevTimeline => prevTimeline.filter(e => e.id !== eventId))
     }
   }
 
@@ -263,7 +263,7 @@ export function CaseDetailsForm({ user, caseId, onClose, onSave }: CaseDetailsFo
         }
         
         // Only remove from local state if API call succeeded
-        setSuspects(suspects.filter(s => s.id !== suspectId))
+        setSuspects(prevSuspects => prevSuspects.filter(s => s.id !== suspectId))
       } catch (error) {
         console.error('Failed to delete suspect:', error)
         // Show user-friendly error message
@@ -271,7 +271,7 @@ export function CaseDetailsForm({ user, caseId, onClose, onSave }: CaseDetailsFo
       }
     } else {
       // For temp IDs, just remove from local state
-      setSuspects(suspects.filter(s => s.id !== suspectId))
+      setSuspects(prevSuspects => prevSuspects.filter(s => s.id !== suspectId))
     }
   }
 
@@ -288,7 +288,7 @@ export function CaseDetailsForm({ user, caseId, onClose, onSave }: CaseDetailsFo
         }
         
         // Only remove from local state if API call succeeded
-        setEvidence(evidence.filter(e => e.id !== evidenceId))
+        setEvidence(prevEvidence => prevEvidence.filter(e => e.id !== evidenceId))
       } catch (error) {
         console.error('Failed to delete evidence:', error)
         // Show user-friendly error message
@@ -296,7 +296,7 @@ export function CaseDetailsForm({ user, caseId, onClose, onSave }: CaseDetailsFo
       }
     } else {
       // For temp IDs, just remove from local state
-      setEvidence(evidence.filter(e => e.id !== evidenceId))
+      setEvidence(prevEvidence => prevEvidence.filter(e => e.id !== evidenceId))
     }
   }
 
