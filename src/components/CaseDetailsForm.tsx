@@ -229,45 +229,75 @@ export function CaseDetailsForm({ user, caseId, onClose, onSave }: CaseDetailsFo
     if (!eventId.startsWith('temp-')) {
       // Only delete from database if it's a real ID
       try {
-        await fetch(`/api/case-details/timeline?id=${eventId}`, {
+        const response = await fetch(`/api/case-details/timeline?id=${eventId}`, {
           method: 'DELETE'
         })
+        
+        if (!response.ok) {
+          throw new Error(`Failed to delete timeline event: ${response.status}`)
+        }
+        
+        // Only remove from local state if API call succeeded
+        setTimeline(timeline.filter(e => e.id !== eventId))
       } catch (error) {
         console.error('Failed to delete timeline event:', error)
+        // Show user-friendly error message
+        alert('Failed to delete timeline event. Please try again.')
       }
+    } else {
+      // For temp IDs, just remove from local state
+      setTimeline(timeline.filter(e => e.id !== eventId))
     }
-    // Always remove from local state
-    setTimeline(timeline.filter(e => e.id !== eventId))
   }
 
   const handleDeleteSuspect = async (suspectId: string) => {
     if (!suspectId.startsWith('temp-')) {
       // Only delete from database if it's a real ID
       try {
-        await fetch(`/api/case-details/suspects?id=${suspectId}`, {
+        const response = await fetch(`/api/case-details/suspects?id=${suspectId}`, {
           method: 'DELETE'
         })
+        
+        if (!response.ok) {
+          throw new Error(`Failed to delete suspect: ${response.status}`)
+        }
+        
+        // Only remove from local state if API call succeeded
+        setSuspects(suspects.filter(s => s.id !== suspectId))
       } catch (error) {
         console.error('Failed to delete suspect:', error)
+        // Show user-friendly error message
+        alert('Failed to delete suspect. Please try again.')
       }
+    } else {
+      // For temp IDs, just remove from local state
+      setSuspects(suspects.filter(s => s.id !== suspectId))
     }
-    // Always remove from local state
-    setSuspects(suspects.filter(s => s.id !== suspectId))
   }
 
   const handleDeleteEvidence = async (evidenceId: string) => {
     if (!evidenceId.startsWith('temp-')) {
       // Only delete from database if it's a real ID
       try {
-        await fetch(`/api/case-details/evidence?id=${evidenceId}`, {
+        const response = await fetch(`/api/case-details/evidence?id=${evidenceId}`, {
           method: 'DELETE'
         })
+        
+        if (!response.ok) {
+          throw new Error(`Failed to delete evidence: ${response.status}`)
+        }
+        
+        // Only remove from local state if API call succeeded
+        setEvidence(evidence.filter(e => e.id !== evidenceId))
       } catch (error) {
         console.error('Failed to delete evidence:', error)
+        // Show user-friendly error message
+        alert('Failed to delete evidence. Please try again.')
       }
+    } else {
+      // For temp IDs, just remove from local state
+      setEvidence(evidence.filter(e => e.id !== evidenceId))
     }
-    // Always remove from local state
-    setEvidence(evidence.filter(e => e.id !== evidenceId))
   }
 
   const saveChildEntities = async (caseId: string) => {
