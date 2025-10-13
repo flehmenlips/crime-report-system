@@ -2,6 +2,7 @@ export interface Evidence {
   id: number
   type: 'photo' | 'video' | 'document'
   cloudinaryId: string | null
+  url?: string | null
   documentData?: Buffer | Uint8Array | null
   originalName: string | null
   description: string | null

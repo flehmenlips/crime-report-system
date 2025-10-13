@@ -29,6 +29,7 @@ interface Evidence {
   id: number
   type: string
   cloudinaryId: string
+  url?: string
   originalName: string | null
   description: string | null
   uploadedBy?: string
@@ -1289,15 +1290,15 @@ export function ItemDetailView({ item, onClose, onEdit, onDelete, onDuplicate, o
                         }}
                         poster={getCloudinaryThumbnailUrl(selectedEvidence.cloudinaryId)}
                       >
-                        <source src={getCloudinaryFullUrl(selectedEvidence.cloudinaryId)} type="video/mp4" />
-                        <source src={selectedEvidence.cloudinaryId} type="video/quicktime" />
+                        <source src={selectedEvidence.url || getCloudinaryFullUrl(selectedEvidence.cloudinaryId)} type="video/mp4" />
+                        <source src={selectedEvidence.url || getCloudinaryFullUrl(selectedEvidence.cloudinaryId)} type="video/quicktime" />
                         Your browser does not support the video tag.
                       </video>
                       
                       {/* Fallback Link */}
                       <div style={{ marginTop: '16px' }}>
                         <a
-                          href={selectedEvidence.cloudinaryId}
+                          href={selectedEvidence.url || getCloudinaryFullUrl(selectedEvidence.cloudinaryId)}
                           target="_blank"
                           rel="noopener noreferrer"
                           style={{
