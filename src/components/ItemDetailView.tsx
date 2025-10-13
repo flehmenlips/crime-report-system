@@ -134,13 +134,24 @@ export function ItemDetailView({ item, onClose, onEdit, onDelete, onDuplicate, o
     }
   }
 
-  const getCloudinaryThumbnailUrl = (cloudinaryId: string) => {
+  const getCloudinaryThumbnailUrl = (cloudinaryId: string, url?: string) => {
     // Handle different cloudinaryId formats
     if (cloudinaryId.startsWith('demo/')) {
       return `https://via.placeholder.com/200x150/6366f1/ffffff?text=Demo+File`
     }
     
-    // If it's already a full URL, convert to thumbnail
+    // If we have a direct URL, convert it to thumbnail format
+    if (url && url.startsWith('https://res.cloudinary.com/')) {
+      return url.replace(
+        /\/image\/upload\/[^/]*\//,
+        '/image/upload/w_200,h_150,c_fill,f_auto,q_auto/'
+      ).replace(
+        /\/raw\/upload\/[^/]*\//,
+        '/image/upload/w_200,h_150,c_fill,f_auto,q_auto/'
+      )
+    }
+    
+    // If it's already a full URL in cloudinaryId, convert to thumbnail
     if (cloudinaryId.startsWith('https://res.cloudinary.com/')) {
       return cloudinaryId.replace(
         /\/image\/upload\/[^/]*\//,
@@ -156,8 +167,19 @@ export function ItemDetailView({ item, onClose, onEdit, onDelete, onDuplicate, o
     return `https://res.cloudinary.com/${cloudName}/image/upload/w_200,h_150,c_fill,f_auto,q_auto/${cloudinaryId}`
   }
 
-  const getCloudinaryFullUrl = (cloudinaryId: string) => {
-    // If it's already a full URL, convert to full size
+  const getCloudinaryFullUrl = (cloudinaryId: string, url?: string) => {
+    // If we have a direct URL, convert it to full size format
+    if (url && url.startsWith('https://res.cloudinary.com/')) {
+      return url.replace(
+        /\/image\/upload\/[^/]*\//,
+        '/image/upload/w_1200,h_800,c_limit,f_auto,q_auto/'
+      ).replace(
+        /\/raw\/upload\/[^/]*\//,
+        '/image/upload/w_1200,h_800,c_limit,f_auto,q_auto/'
+      )
+    }
+    
+    // If it's already a full URL in cloudinaryId, convert to full size
     if (cloudinaryId.startsWith('https://res.cloudinary.com/')) {
       return cloudinaryId.replace(
         /\/image\/upload\/[^/]*\//,
@@ -798,7 +820,7 @@ export function ItemDetailView({ item, onClose, onEdit, onDelete, onDuplicate, o
                           }}
                         >
                           <img
-                            src={getCloudinaryThumbnailUrl(photo.cloudinaryId)}
+                            src={getCloudinaryThumbnailUrl(photo.cloudinaryId, photo.url || undefined)}
                             alt={photo.originalName || 'Evidence photo'}
                             style={{
                               width: '100%',
@@ -906,7 +928,7 @@ export function ItemDetailView({ item, onClose, onEdit, onDelete, onDuplicate, o
                             {video.cloudinaryId && !failedThumbnails.has(video.id) ? (
                               <>
                                 <img
-                                  src={getCloudinaryThumbnailUrl(video.cloudinaryId)}
+                                  src={getCloudinaryThumbnailUrl(video.cloudinaryId, video.url || undefined)}
                                   alt="Video thumbnail"
                                   style={{
                                     width: '100%',
@@ -1263,7 +1285,7 @@ export function ItemDetailView({ item, onClose, onEdit, onDelete, onDuplicate, o
             }}>
               {selectedEvidence.type === 'photo' && (
                 <img
-                  src={getCloudinaryFullUrl(selectedEvidence.cloudinaryId)}
+                  src={getCloudinaryFullUrl(selectedEvidence.cloudinaryId, selectedEvidence.url || undefined)}
                   alt="Evidence"
                   style={{
                     maxWidth: '100%',
@@ -1288,17 +1310,17 @@ export function ItemDetailView({ item, onClose, onEdit, onDelete, onDuplicate, o
                           boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)',
                           backgroundColor: '#000'
                         }}
-                        poster={getCloudinaryThumbnailUrl(selectedEvidence.cloudinaryId)}
+                        poster={getCloudinaryThumbnailUrl(selectedEvidence.cloudinaryId, selectedEvidence.url || undefined)}
                       >
-                        <source src={selectedEvidence.url || getCloudinaryFullUrl(selectedEvidence.cloudinaryId)} type="video/mp4" />
-                        <source src={selectedEvidence.url || getCloudinaryFullUrl(selectedEvidence.cloudinaryId)} type="video/quicktime" />
+                        <source src={selectedEvidence.url || getCloudinaryFullUrl(selectedEvidence.cloudinaryId, selectedEvidence.url || undefined)} type="video/mp4" />
+                        <source src={selectedEvidence.url || getCloudinaryFullUrl(selectedEvidence.cloudinaryId, selectedEvidence.url || undefined)} type="video/quicktime" />
                         Your browser does not support the video tag.
                       </video>
                       
                       {/* Fallback Link */}
                       <div style={{ marginTop: '16px' }}>
                         <a
-                          href={selectedEvidence.url || getCloudinaryFullUrl(selectedEvidence.cloudinaryId)}
+                          href={selectedEvidence.url || getCloudinaryFullUrl(selectedEvidence.cloudinaryId, selectedEvidence.url || undefined)}
                           target="_blank"
                           rel="noopener noreferrer"
                           style={{

@@ -87,10 +87,18 @@ export function EnhancedEvidenceManager({ item, onClose, onUpdate }: EnhancedEvi
   }
 
   // Get Cloudinary thumbnail URL
-  const getCloudinaryThumbnailUrl = (cloudinaryId: string) => {
+  const getCloudinaryThumbnailUrl = (cloudinaryId: string, url?: string) => {
     if (!cloudinaryId) return ''
     
-    // If it's already a full URL, convert to thumbnail
+    // If we have a direct URL, convert it to thumbnail format
+    if (url && url.startsWith('https://res.cloudinary.com/')) {
+      return url.replace(
+        /\/image\/upload\/[^/]*\//,
+        '/image/upload/w_200,h_150,c_fill,f_auto,q_auto/'
+      )
+    }
+    
+    // If it's already a full URL in cloudinaryId, convert to thumbnail
     if (cloudinaryId.startsWith('https://res.cloudinary.com/')) {
       return cloudinaryId.replace(
         /\/image\/upload\/[^/]*\//,
@@ -499,7 +507,7 @@ export function EnhancedEvidenceManager({ item, onClose, onUpdate }: EnhancedEvi
                     {evidenceItem.cloudinaryId && (evidenceItem.type === 'photo' || evidenceItem.type === 'video') && !failedThumbnails.has(evidenceItem.id) ? (
                       <>
                         <img
-                          src={getCloudinaryThumbnailUrl(evidenceItem.cloudinaryId)}
+                          src={getCloudinaryThumbnailUrl(evidenceItem.cloudinaryId, evidenceItem.url || undefined)}
                           alt={`${evidenceItem.type} preview`}
                           style={{
                             width: '100%',
