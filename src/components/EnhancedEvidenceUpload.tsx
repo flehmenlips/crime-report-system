@@ -90,10 +90,10 @@ export function EnhancedEvidenceUpload({ item, onClose, onSuccess }: EnhancedEvi
     for (const file of files) {
       console.log(`🔍 VALIDATING FILE: ${file.name} (${(file.size / 1024 / 1024).toFixed(1)}MB)`)
       
-      // Enhanced file size validation (10MB limit for stress testing)
-      const maxFileSize = 10 * 1024 * 1024 // 10MB
+      // Enhanced file size validation (50MB limit to match API)
+      const maxFileSize = 50 * 1024 * 1024 // 50MB
       if (file.size > maxFileSize) {
-        const errorMsg = `File too large: ${file.name} (${(file.size / 1024 / 1024).toFixed(1)}MB). Maximum size is 10MB.`
+        const errorMsg = `File too large: ${file.name} (${(file.size / 1024 / 1024).toFixed(1)}MB). Maximum size is 50MB.`
         validationErrors.push(errorMsg)
         newUploadFiles.push({
           file,
@@ -164,10 +164,10 @@ export function EnhancedEvidenceUpload({ item, onClose, onSuccess }: EnhancedEvi
     try {
       console.log(`🚀 UPLOADING FILE: ${file.name} (${file.size} bytes) - Attempt ${retryCount + 1}`)
       
-      // File size validation (10MB limit)
-      const maxFileSize = 10 * 1024 * 1024 // 10MB
+      // File size validation (50MB limit to match API)
+      const maxFileSize = 50 * 1024 * 1024 // 50MB
       if (file.size > maxFileSize) {
-        throw new Error(`File too large: ${file.name} (${(file.size / 1024 / 1024).toFixed(1)}MB). Maximum size is 10MB.`)
+        throw new Error(`File too large: ${file.name} (${(file.size / 1024 / 1024).toFixed(1)}MB). Maximum size is 50MB.`)
       }
 
       // Update status to uploading
