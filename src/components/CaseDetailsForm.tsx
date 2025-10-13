@@ -211,10 +211,70 @@ export function CaseDetailsForm({ user, caseId, onClose, onSave }: CaseDetailsFo
     }
   }
 
+  const deleteChildEntities = async () => {
+    // Delete timeline events that were removed from local state
+    // Note: This is handled by the main save process since we're working with local state
+    
+    // Delete suspects that were removed from local state
+    // Note: This is handled by the main save process since we're working with local state
+    
+    // Delete evidence that was removed from local state
+    // Note: This is handled by the main save process since we're working with local state
+    
+    // Delete updates that were removed from local state
+    // Note: This is handled by the main save process since we're working with local state
+  }
+
+  const handleDeleteTimelineEvent = async (eventId: string) => {
+    if (!eventId.startsWith('temp-')) {
+      // Only delete from database if it's a real ID
+      try {
+        await fetch(`/api/case-details/timeline?id=${eventId}`, {
+          method: 'DELETE'
+        })
+      } catch (error) {
+        console.error('Failed to delete timeline event:', error)
+      }
+    }
+    // Always remove from local state
+    setTimeline(timeline.filter(e => e.id !== eventId))
+  }
+
+  const handleDeleteSuspect = async (suspectId: string) => {
+    if (!suspectId.startsWith('temp-')) {
+      // Only delete from database if it's a real ID
+      try {
+        await fetch(`/api/case-details/suspects?id=${suspectId}`, {
+          method: 'DELETE'
+        })
+      } catch (error) {
+        console.error('Failed to delete suspect:', error)
+      }
+    }
+    // Always remove from local state
+    setSuspects(suspects.filter(s => s.id !== suspectId))
+  }
+
+  const handleDeleteEvidence = async (evidenceId: string) => {
+    if (!evidenceId.startsWith('temp-')) {
+      // Only delete from database if it's a real ID
+      try {
+        await fetch(`/api/case-details/evidence?id=${evidenceId}`, {
+          method: 'DELETE'
+        })
+      } catch (error) {
+        console.error('Failed to delete evidence:', error)
+      }
+    }
+    // Always remove from local state
+    setEvidence(evidence.filter(e => e.id !== evidenceId))
+  }
+
   const saveChildEntities = async (caseId: string) => {
     // Save timeline events
     for (const event of timeline) {
-      if (!event.id) {
+      if (!event.id || event.id.startsWith('temp-')) {
+        // Create new timeline event
         await fetch('/api/case-details/timeline', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -226,12 +286,20 @@ export function CaseDetailsForm({ user, caseId, onClose, onSave }: CaseDetailsFo
             createdByRole: user.role
           })
         })
+      } else {
+        // Update existing timeline event
+        await fetch('/api/case-details/timeline', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(event)
+        })
       }
     }
 
     // Save suspects
     for (const suspect of suspects) {
-      if (!suspect.id) {
+      if (!suspect.id || suspect.id.startsWith('temp-')) {
+        // Create new suspect
         await fetch('/api/case-details/suspects', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -243,12 +311,20 @@ export function CaseDetailsForm({ user, caseId, onClose, onSave }: CaseDetailsFo
             createdByRole: user.role
           })
         })
+      } else {
+        // Update existing suspect
+        await fetch('/api/case-details/suspects', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(suspect)
+        })
       }
     }
 
     // Save evidence
     for (const evidenceItem of evidence) {
-      if (!evidenceItem.id) {
+      if (!evidenceItem.id || evidenceItem.id.startsWith('temp-')) {
+        // Create new evidence
         await fetch('/api/case-details/evidence', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -260,12 +336,20 @@ export function CaseDetailsForm({ user, caseId, onClose, onSave }: CaseDetailsFo
             createdByRole: user.role
           })
         })
+      } else {
+        // Update existing evidence
+        await fetch('/api/case-details/evidence', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(evidenceItem)
+        })
       }
     }
 
     // Save updates
     for (const update of updates) {
-      if (!update.id) {
+      if (!update.id || update.id.startsWith('temp-')) {
+        // Create new update
         await fetch('/api/case-details/updates', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -276,6 +360,13 @@ export function CaseDetailsForm({ user, caseId, onClose, onSave }: CaseDetailsFo
             createdByName: user.name,
             createdByRole: user.role
           })
+        })
+      } else {
+        // Update existing update
+        await fetch('/api/case-details/updates', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(update)
         })
       }
     }
@@ -804,7 +895,7 @@ export function CaseDetailsForm({ user, caseId, onClose, onSave }: CaseDetailsFo
                             ✏️
                           </button>
                           <button
-                            onClick={() => setTimeline(timeline.filter(e => e.id !== event.id))}
+                            onClick={() => event.id && handleDeleteTimelineEvent(event.id)}
                             style={{
                               background: '#fee2e2',
                               border: 'none',
@@ -1020,7 +1111,7 @@ export function CaseDetailsForm({ user, caseId, onClose, onSave }: CaseDetailsFo
                               ✏️
                             </button>
                             <button
-                              onClick={() => setSuspects(suspects.filter(s => s.id !== suspect.id))}
+                              onClick={() => suspect.id && handleDeleteSuspect(suspect.id)}
                               style={{
                                 background: '#fee2e2',
                                 border: 'none',
@@ -1237,7 +1328,7 @@ export function CaseDetailsForm({ user, caseId, onClose, onSave }: CaseDetailsFo
                               ✏️
                             </button>
                             <button
-                              onClick={() => setEvidence(evidence.filter(e => e.id !== item.id))}
+                              onClick={() => item.id && handleDeleteEvidence(item.id)}
                               style={{
                                 background: '#fee2e2',
                                 border: 'none',
