@@ -143,6 +143,7 @@ export async function PUT(
       description: updatedEvidence.description,
       type: updatedEvidence.type,
       originalName: updatedEvidence.originalName,
+      cloudinaryId: updatedEvidence.cloudinaryId,
       url: updatedEvidence.url
     })
   } catch (error) {

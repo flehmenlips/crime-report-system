@@ -144,7 +144,8 @@ export async function POST(request: NextRequest) {
       const evidence = await prisma.evidence.create({
         data: {
           type: evidenceType,
-          cloudinaryId: (cloudinaryResult as any)?.secure_url ?? null,
+          cloudinaryId: (cloudinaryResult as any)?.public_id ?? null,
+          url: (cloudinaryResult as any)?.secure_url ?? null,
           documentData,
           originalName: file.name,
           description: `${evidenceType} evidence for ${item.name}`,
