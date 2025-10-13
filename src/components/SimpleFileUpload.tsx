@@ -65,6 +65,7 @@ export function SimpleFileUpload({ item, onClose, onSuccess }: SimpleFileUploadP
         formData.append('file', file)
         formData.append('itemId', item.id.toString())
         formData.append('type', evidenceType)
+        // Note: User info will be captured server-side from authentication
 
         // Simulate progress for user feedback
         const progressInterval = setInterval(() => {

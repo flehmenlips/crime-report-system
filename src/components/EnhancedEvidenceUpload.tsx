@@ -180,6 +180,7 @@ export function EnhancedEvidenceUpload({ item, onClose, onSuccess }: EnhancedEvi
       formData.append('file', file)
       formData.append('itemId', item.id.toString())
       formData.append('type', uploadFile.evidenceType)
+      // Note: User info will be captured server-side from authentication
 
       // Enhanced progress tracking with timeout
       progressInterval = setInterval(() => {
