@@ -305,7 +305,7 @@ export function CaseDetailsForm({ user, caseId, onClose, onSave }: CaseDetailsFo
     for (const event of timeline) {
       if (!event.id || event.id.startsWith('temp-')) {
         // Create new timeline event
-        await fetch('/api/case-details/timeline', {
+        const response = await fetch('/api/case-details/timeline', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -316,13 +316,23 @@ export function CaseDetailsForm({ user, caseId, onClose, onSave }: CaseDetailsFo
             createdByRole: user.role
           })
         })
+        
+        if (!response.ok) {
+          const errorData = await response.json()
+          throw new Error(`Failed to save timeline event: ${errorData.error || response.statusText}`)
+        }
       } else {
         // Update existing timeline event
-        await fetch('/api/case-details/timeline', {
+        const response = await fetch('/api/case-details/timeline', {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(event)
         })
+        
+        if (!response.ok) {
+          const errorData = await response.json()
+          throw new Error(`Failed to update timeline event: ${errorData.error || response.statusText}`)
+        }
       }
     }
 
@@ -330,7 +340,7 @@ export function CaseDetailsForm({ user, caseId, onClose, onSave }: CaseDetailsFo
     for (const suspect of suspects) {
       if (!suspect.id || suspect.id.startsWith('temp-')) {
         // Create new suspect
-        await fetch('/api/case-details/suspects', {
+        const response = await fetch('/api/case-details/suspects', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -341,13 +351,23 @@ export function CaseDetailsForm({ user, caseId, onClose, onSave }: CaseDetailsFo
             createdByRole: user.role
           })
         })
+        
+        if (!response.ok) {
+          const errorData = await response.json()
+          throw new Error(`Failed to save suspect: ${errorData.error || response.statusText}`)
+        }
       } else {
         // Update existing suspect
-        await fetch('/api/case-details/suspects', {
+        const response = await fetch('/api/case-details/suspects', {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(suspect)
         })
+        
+        if (!response.ok) {
+          const errorData = await response.json()
+          throw new Error(`Failed to update suspect: ${errorData.error || response.statusText}`)
+        }
       }
     }
 
@@ -355,7 +375,7 @@ export function CaseDetailsForm({ user, caseId, onClose, onSave }: CaseDetailsFo
     for (const evidenceItem of evidence) {
       if (!evidenceItem.id || evidenceItem.id.startsWith('temp-')) {
         // Create new evidence
-        await fetch('/api/case-details/evidence', {
+        const response = await fetch('/api/case-details/evidence', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -366,13 +386,23 @@ export function CaseDetailsForm({ user, caseId, onClose, onSave }: CaseDetailsFo
             createdByRole: user.role
           })
         })
+        
+        if (!response.ok) {
+          const errorData = await response.json()
+          throw new Error(`Failed to save evidence: ${errorData.error || response.statusText}`)
+        }
       } else {
         // Update existing evidence
-        await fetch('/api/case-details/evidence', {
+        const response = await fetch('/api/case-details/evidence', {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(evidenceItem)
         })
+        
+        if (!response.ok) {
+          const errorData = await response.json()
+          throw new Error(`Failed to update evidence: ${errorData.error || response.statusText}`)
+        }
       }
     }
 
@@ -380,7 +410,7 @@ export function CaseDetailsForm({ user, caseId, onClose, onSave }: CaseDetailsFo
     for (const update of updates) {
       if (!update.id || update.id.startsWith('temp-')) {
         // Create new update
-        await fetch('/api/case-details/updates', {
+        const response = await fetch('/api/case-details/updates', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -391,13 +421,23 @@ export function CaseDetailsForm({ user, caseId, onClose, onSave }: CaseDetailsFo
             createdByRole: user.role
           })
         })
+        
+        if (!response.ok) {
+          const errorData = await response.json()
+          throw new Error(`Failed to save update: ${errorData.error || response.statusText}`)
+        }
       } else {
         // Update existing update
-        await fetch('/api/case-details/updates', {
+        const response = await fetch('/api/case-details/updates', {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(update)
         })
+        
+        if (!response.ok) {
+          const errorData = await response.json()
+          throw new Error(`Failed to update update: ${errorData.error || response.statusText}`)
+        }
       }
     }
   }
