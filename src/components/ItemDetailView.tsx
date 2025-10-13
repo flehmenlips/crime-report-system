@@ -43,6 +43,7 @@ export function ItemDetailView({ item, onClose, onEdit, onDelete, onDuplicate, o
   const [loadingEvidence, setLoadingEvidence] = useState(true)
   const [selectedEvidence, setSelectedEvidence] = useState<Evidence | null>(null)
   const [showActionMenu, setShowActionMenu] = useState(false)
+  const [failedThumbnails, setFailedThumbnails] = useState<Set<number>>(new Set())
   const [investigationNotes, setInvestigationNotes] = useState<any[]>([])
   const [editingCategory, setEditingCategory] = useState(false)
   const [currentCategory, setCurrentCategory] = useState(item.category || '')
@@ -901,7 +902,7 @@ export function ItemDetailView({ item, onClose, onEdit, onDelete, onDuplicate, o
                             alignItems: 'center',
                             justifyContent: 'center'
                           }}>
-                            {video.cloudinaryId ? (
+                            {video.cloudinaryId && !failedThumbnails.has(video.id) ? (
                               <>
                                 <img
                                   src={getCloudinaryThumbnailUrl(video.cloudinaryId)}
@@ -911,14 +912,9 @@ export function ItemDetailView({ item, onClose, onEdit, onDelete, onDuplicate, o
                                     height: '100%',
                                     objectFit: 'cover'
                                   }}
-                                  onError={(e) => {
-                                    // Fallback to video icon if thumbnail fails
-                                    const target = e.target as HTMLImageElement
-                                    target.style.display = 'none'
-                                    const parent = target.parentElement
-                                    if (parent) {
-                                      parent.innerHTML = '<div style="font-size: 48px; color: #6b7280;">🎥</div>'
-                                    }
+                                  onError={() => {
+                                    // Mark this thumbnail as failed using React state
+                                    setFailedThumbnails(prev => new Set(prev).add(video.id))
                                   }}
                                 />
                                 {/* Play button overlay */}

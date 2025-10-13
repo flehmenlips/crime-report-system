@@ -16,6 +16,7 @@ export function EnhancedEvidenceManager({ item, onClose, onUpdate }: EnhancedEvi
   const [evidence, setEvidence] = useState<Evidence[]>(item.evidence || [])
   const [selectedEvidence, setSelectedEvidence] = useState<Evidence | null>(null)
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
+  const [failedThumbnails, setFailedThumbnails] = useState<Set<number>>(new Set())
 
   // Filter evidence based on active tab
   const filteredEvidence = evidence.filter(e => {
@@ -495,7 +496,7 @@ export function EnhancedEvidenceManager({ item, onClose, onUpdate }: EnhancedEvi
                     overflow: 'hidden',
                     position: 'relative'
                   }}>
-                    {evidenceItem.cloudinaryId && (evidenceItem.type === 'photo' || evidenceItem.type === 'video') ? (
+                    {evidenceItem.cloudinaryId && (evidenceItem.type === 'photo' || evidenceItem.type === 'video') && !failedThumbnails.has(evidenceItem.id) ? (
                       <>
                         <img
                           src={getCloudinaryThumbnailUrl(evidenceItem.cloudinaryId)}
@@ -506,14 +507,9 @@ export function EnhancedEvidenceManager({ item, onClose, onUpdate }: EnhancedEvi
                             objectFit: 'cover',
                             borderRadius: '10px'
                           }}
-                          onError={(e) => {
-                            // Fallback to icon if thumbnail fails
-                            const target = e.target as HTMLImageElement
-                            target.style.display = 'none'
-                            const parent = target.parentElement
-                            if (parent) {
-                              parent.innerHTML = `<div style="font-size: ${viewMode === 'grid' ? '48px' : '24px'};">${getFileIcon(evidenceItem)}</div>`
-                            }
+                          onError={() => {
+                            // Mark this thumbnail as failed using React state
+                            setFailedThumbnails(prev => new Set(prev).add(evidenceItem.id))
                           }}
                         />
                         {evidenceItem.type === 'video' && (
