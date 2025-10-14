@@ -8,9 +8,11 @@ interface UserProfileProps {
   className?: string
   showDetails?: boolean
   onProfileUpdate?: (updatedUser: User) => void
+  textColor?: string
+  textColorSecondary?: string
 }
 
-export function UserProfile({ className = '', showDetails = true, onProfileUpdate }: UserProfileProps) {
+export function UserProfile({ className = '', showDetails = true, onProfileUpdate, textColor = 'white', textColorSecondary = 'rgba(255, 255, 255, 0.8)' }: UserProfileProps) {
   const [user, setUser] = useState<User | null>(null)
   const [isExpanded, setIsExpanded] = useState(false)
   const [showProfileManagement, setShowProfileManagement] = useState(false)
@@ -109,9 +111,10 @@ export function UserProfile({ className = '', showDetails = true, onProfileUpdat
           boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)'
         }}>
           <span style={{
-            color: 'white',
+            color: textColor,
             fontSize: '18px',
-            fontWeight: 'bold'
+            fontWeight: 'bold',
+            transition: 'color 0.3s ease-in-out'
           }}>
             {user.name.charAt(0).toUpperCase()}
           </span>
@@ -129,21 +132,23 @@ export function UserProfile({ className = '', showDetails = true, onProfileUpdat
             boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)'
           }}>
             <p style={{
-              color: 'white',
+              color: textColor,
               fontWeight: '600',
               fontSize: '16px',
               margin: '0 0 4px 0',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap'
+              whiteSpace: 'nowrap',
+              transition: 'color 0.3s ease-in-out'
             }}>
               {user.name}
             </p>
             <p style={{
-              color: 'rgba(255, 255, 255, 0.8)',
+              color: textColorSecondary,
               fontSize: '14px',
               margin: '0',
-              fontWeight: '500'
+              fontWeight: '500',
+              transition: 'color 0.3s ease-in-out'
             }}>
               {getRoleDisplayName(user.role)}
             </p>

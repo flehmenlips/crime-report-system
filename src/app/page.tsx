@@ -85,6 +85,7 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
   const [evidenceLoading, setEvidenceLoading] = useState(false)
   const [evidenceProgress, setEvidenceProgress] = useState(0)
   const [initialDataLoaded, setInitialDataLoaded] = useState(false)
+  const [scrollY, setScrollY] = useState(0)
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false)
   const [showGenerateReport, setShowGenerateReport] = useState(false)
   const [showAnalytics, setShowAnalytics] = useState(false)
@@ -273,6 +274,22 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
     // User is passed as prop, no need to load again
     loadData()
   }, [])
+
+  // Add scroll listener for dynamic text color
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrollY(window.scrollY)
+    }
+
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  // Determine text color based on scroll position
+  // When scrolled past the header area (around 200px), switch to dark text
+  const isScrolled = scrollY > 200
+  const textColor = isScrolled ? '#1e293b' : 'white' // Dark blue when scrolled, white when at top
+  const textColorSecondary = isScrolled ? '#475569' : 'rgba(255, 255, 255, 0.8)'
 
   // Close action menus when clicking outside
   useEffect(() => {
@@ -1083,25 +1100,26 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
                     fontSize: '32px', 
                     fontWeight: '800', 
                     margin: 0,
-                    background: 'linear-gradient(135deg, #ffffff 0%, #e2e8f0 100%)',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent'
+                    color: textColor,
+                    transition: 'color 0.3s ease-in-out'
                   }}>
                     {getDashboardTitle(user)}
                   </h1>
-                  <p style={{ color: 'rgba(255, 255, 255, 0.8)', margin: 0, fontWeight: '500' }}>
+                  <p style={{ color: textColorSecondary, margin: 0, fontWeight: '500', transition: 'color 0.3s ease-in-out' }}>
                     Birkenfeld Farm Theft • Case #2023-12020
                   </p>
                 </div>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
                 {/* <NotificationBell /> */}
-              <TenantInfo user={user} />
+              <TenantInfo user={user} textColor={textColor} textColorSecondary={textColorSecondary} />
               <UserProfile 
                 showDetails={true} 
                 onProfileUpdate={(updatedUser) => {
                   setUser(updatedUser)
                 }}
+                textColor={textColor}
+                textColorSecondary={textColorSecondary}
               />
               </div>
             </div>

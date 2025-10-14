@@ -7,9 +7,11 @@ import { isPropertyOwner, isStakeholder } from '@/lib/auth'
 interface TenantInfoProps {
   user: User | null
   className?: string
+  textColor?: string
+  textColorSecondary?: string
 }
 
-export function TenantInfo({ user, className = '' }: TenantInfoProps) {
+export function TenantInfo({ user, className = '', textColor = 'white', textColorSecondary = 'rgba(255, 255, 255, 0.8)' }: TenantInfoProps) {
   const [tenantData, setTenantData] = useState<Tenant | null>(null)
   const [loading, setLoading] = useState(true)
 
@@ -96,20 +98,22 @@ export function TenantInfo({ user, className = '' }: TenantInfoProps) {
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <h3 style={{
-            color: 'white',
+            color: textColor,
             fontWeight: '600',
             fontSize: '14px',
             margin: '0 0 2px 0',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap'
+            whiteSpace: 'nowrap',
+            transition: 'color 0.3s ease-in-out'
           }}>
             {tenant.name}
           </h3>
           <p style={{
-            color: 'rgba(255, 255, 255, 0.7)',
+            color: textColorSecondary,
             fontSize: '12px',
-            margin: '0'
+            margin: '0',
+            transition: 'color 0.3s ease-in-out'
           }}>
             {isPropertyOwner(user) ? 'Your Property' : 'Accessing Property'}
           </p>
@@ -125,10 +129,11 @@ export function TenantInfo({ user, className = '' }: TenantInfoProps) {
       {tenant.description && (
         <div style={{ marginTop: '12px', paddingTop: '12px', borderTop: '1px solid rgba(255, 255, 255, 0.2)' }}>
           <p style={{
-            color: 'rgba(255, 255, 255, 0.8)',
+            color: textColorSecondary,
             fontSize: '12px',
             lineHeight: '1.5',
-            margin: '0'
+            margin: '0',
+            transition: 'color 0.3s ease-in-out'
           }}>
             {tenant.description}
           </p>
@@ -144,7 +149,7 @@ export function TenantInfo({ user, className = '' }: TenantInfoProps) {
               borderRadius: '50%',
               backgroundColor: isPropertyOwner(user) ? '#3b82f6' : '#22c55e'
             }}></div>
-            <span style={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+            <span style={{ color: textColorSecondary, transition: 'color 0.3s ease-in-out' }}>
               {isPropertyOwner(user) ? 'Owner Access' : 'Stakeholder Access'}
             </span>
           </div>
@@ -183,7 +188,7 @@ export function TenantInfo({ user, className = '' }: TenantInfoProps) {
       <div style={{ marginTop: '12px', paddingTop: '12px', borderTop: '1px solid rgba(255, 255, 255, 0.2)' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '12px' }}>
           {isPropertyOwner(user) ? (
-            <div style={{ color: 'rgba(255, 255, 255, 0.8)' }}>
+            <div style={{ color: textColorSecondary, transition: 'color 0.3s ease-in-out' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
                 <span style={{ color: '#60a5fa' }}>✓</span>
                 <span>Full data access and management</span>
@@ -198,7 +203,7 @@ export function TenantInfo({ user, className = '' }: TenantInfoProps) {
               </div>
             </div>
           ) : (
-            <div style={{ color: 'rgba(255, 255, 255, 0.8)' }}>
+            <div style={{ color: textColorSecondary, transition: 'color 0.3s ease-in-out' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
                 <span style={{ color: '#4ade80' }}>✓</span>
                 <span>Read-only access to property data</span>
