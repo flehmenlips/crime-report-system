@@ -1,6 +1,6 @@
 'use client'
 
-import { SkeletonLoader, DashboardSkeleton, StatsSkeleton, ItemsListSkeleton, ItemsTableSkeleton } from './SkeletonLoader'
+import { SkeletonLoader } from './SkeletonLoader'
 
 interface LoadingStateProps {
   type?: 'dashboard' | 'stats' | 'items' | 'table' | 'profile' | 'custom'
@@ -21,19 +21,19 @@ export function LoadingState({
   const renderContent = () => {
     switch (type) {
       case 'dashboard':
-        return <DashboardSkeleton />
+        return <SkeletonLoader type="dashboard" count={count} />
       
       case 'stats':
-        return <StatsSkeleton count={count} />
+        return <SkeletonLoader type="card" count={count} />
       
       case 'items':
-        return <ItemsListSkeleton count={count} />
+        return <SkeletonLoader type="item-card" count={count} />
       
       case 'table':
-        return <ItemsTableSkeleton />
+        return <SkeletonLoader type="list" count={count} />
       
       case 'profile':
-        return <SkeletonLoader type="profile" />
+        return <SkeletonLoader type="card" count={count} />
       
       default:
         return (
@@ -72,7 +72,7 @@ export function ItemsLoading({ count = 6 }: { count?: number }) {
         <div className="h-6 bg-gray-300 rounded w-1/3 mb-2 animate-pulse"></div>
         <div className="h-4 bg-gray-300 rounded w-1/2 animate-pulse"></div>
       </div>
-      <ItemsListSkeleton count={count} />
+      <SkeletonLoader type="item-card" count={count} />
     </div>
   )
 }
@@ -80,7 +80,7 @@ export function ItemsLoading({ count = 6 }: { count?: number }) {
 export function StatsLoading() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      <StatsSkeleton count={4} />
+      <SkeletonLoader type="card" count={4} />
     </div>
   )
 }
@@ -92,7 +92,7 @@ export function TableLoading() {
         <div className="h-6 bg-gray-300 rounded w-1/4 mb-2 animate-pulse"></div>
         <div className="h-4 bg-gray-300 rounded w-1/3 animate-pulse"></div>
       </div>
-      <ItemsTableSkeleton />
+      <SkeletonLoader type="list" count={1} />
     </div>
   )
 }

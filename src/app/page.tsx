@@ -1675,13 +1675,21 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
           </div>
 
           {/* Modern Item Grid */}
-          <div style={{
-            background: 'rgba(255, 255, 255, 0.95)',
-            borderRadius: '24px',
-            padding: '48px',
-            boxShadow: '0 20px 40px rgba(0, 0, 0, 0.1)',
-            border: '1px solid rgba(255, 255, 255, 0.2)'
-          }}>
+          <ProgressiveLoader
+            loading={!initialDataLoaded}
+            skeletonType="dashboard"
+            skeletonCount={3}
+            loadingMessage="Loading Property Dashboard..."
+            showProgress={evidenceLoading}
+            progress={evidenceProgress}
+          >
+            <div style={{
+              background: 'rgba(255, 255, 255, 0.95)',
+              borderRadius: '24px',
+              padding: '48px',
+              boxShadow: '0 20px 40px rgba(0, 0, 0, 0.1)',
+              border: '1px solid rgba(255, 255, 255, 0.2)'
+            }}>
               <div style={{ marginBottom: '32px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
                   <div>
@@ -1992,15 +2000,7 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
               )}
             </div>
 
-            <ProgressiveLoader
-              loading={!initialDataLoaded}
-              skeletonType="dashboard"
-              skeletonCount={3}
-              loadingMessage="Loading Property Dashboard..."
-              showProgress={evidenceLoading}
-              progress={evidenceProgress}
-            >
-              {displayItems.length === 0 ? (
+            {displayItems.length === 0 ? (
               <div style={{ 
                 background: 'white', 
                 borderRadius: '24px', 
@@ -2598,7 +2598,8 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
                 </table>
               </div>
             )}
-          </div>
+            </div>
+          </ProgressiveLoader>
 
           {/* Modern Item Form Modal */}
           {showModernForm && (
@@ -2875,44 +2876,8 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
             />
           )}
         </div>
-        
-        {/* Evidence loading overlay */}
-        {evidenceLoading && (
-          <div style={{
-            position: 'fixed',
-            bottom: '32px',
-            right: '32px',
-            background: 'rgba(255, 255, 255, 0.95)',
-            borderRadius: '12px',
-            padding: '16px 20px',
-            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-            border: '1px solid rgba(229, 231, 235, 0.8)',
-            zIndex: 1000,
-            display: 'flex',
-            alignItems: 'center',
-            gap: '12px'
-          }}>
-            <div style={{
-              width: '20px',
-              height: '20px',
-              border: '2px solid #e5e7eb',
-              borderTop: '2px solid #3b82f6',
-              borderRadius: '50%',
-              animation: 'spin 1s linear infinite'
-            }}></div>
-            <div>
-              <div style={{ fontSize: '14px', fontWeight: '600', color: '#1f2937' }}>
-                Loading Evidence
-              </div>
-              <div style={{ fontSize: '12px', color: '#6b7280' }}>
-                {evidenceProgress}% complete
-              </div>
-            </div>
-          </div>
-        )}
-        
-        </ProgressiveLoader>
       </div>
+    </div>
     )
   }
 
