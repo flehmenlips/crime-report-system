@@ -278,11 +278,17 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
   }
 
   const displayItems = isFiltered ? filteredItems : getSortedItems(items)
-  const evidenceCount = items.reduce((total, item) => 
-    total + (item.evidence?.filter(e => e.type === 'photo')?.length || 0) + 
-    (item.evidence?.filter(e => e.type === 'video')?.length || 0) + 
-    (item.evidence?.filter(e => e.type === 'document')?.length || 0), 0
+  
+  // Calculate evidence count from evidenceCache instead of item.evidence
+  // since evidence is now loaded progressively
+  const evidenceCount = Object.values(evidenceCache || {}).reduce((total, evidenceList) => 
+    total + evidenceList.length, 0
   )
+  
+  // Calculate items with photos from evidenceCache
+  const itemsWithPhotos = Object.entries(evidenceCache || {}).filter(([itemId, evidenceList]) => 
+    evidenceList.some(e => e.type === 'photo')
+  ).length
 
   // Show loading state
   if (loading) {
@@ -430,7 +436,7 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
             boxShadow: '0 10px 25px rgba(234, 88, 12, 0.3)'
           }}>
             <div style={{ fontSize: '48px', fontWeight: '900', color: 'white', marginBottom: '12px' }}>
-              {items.filter(item => item.evidence?.filter(e => e.type === 'photo')?.length > 0).length}
+              {itemsWithPhotos}
             </div>
             <div style={{ color: 'white', fontSize: '18px', fontWeight: '600' }}>Items w/ Photos</div>
           </div>
