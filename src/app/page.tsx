@@ -43,6 +43,7 @@ import { SimpleSortControls } from '@/components/SimpleSortControls'
 import { UserPreferencesProvider, useUserPreferences, useViewPreferences } from '@/contexts/UserPreferencesContext'
 import { CaseDetailsView } from '@/components/CaseDetailsView'
 import { CaseDetailsForm } from '@/components/CaseDetailsForm'
+import { ProgressiveLoader } from '@/components/ProgressiveLoader'
 
 interface AppContentInnerProps {
   initialUser: User | null
@@ -79,6 +80,11 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
   const [showCaseDetailsForm, setShowCaseDetailsForm] = useState(false)
   const [editingCaseId, setEditingCaseId] = useState<string | null>(null)
   const [existingCaseId, setExistingCaseId] = useState<string | null>(null)
+  
+  // Progressive loading states
+  const [evidenceLoading, setEvidenceLoading] = useState(false)
+  const [evidenceProgress, setEvidenceProgress] = useState(0)
+  const [initialDataLoaded, setInitialDataLoaded] = useState(false)
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false)
   const [showGenerateReport, setShowGenerateReport] = useState(false)
   const [showAnalytics, setShowAnalytics] = useState(false)
@@ -110,46 +116,63 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
   const canGenerateReports = () => canReadAll(user) || user?.permissions?.includes('generate:reports')
   const canAccessAdminFeatures = () => canAccessAdmin(user)
 
-  // Load evidence data for all items at once to avoid individual API calls
-  const loadAllEvidence = async (items: StolenItem[]) => {
-    console.log('🔍 loadAllEvidence called with', items.length, 'items')
+  // Load evidence data progressively in background
+  const loadEvidenceInBackground = async (items: StolenItem[]) => {
+    console.log('🔍 loadEvidenceInBackground called with', items.length, 'items')
+    setEvidenceLoading(true)
+    setEvidenceProgress(0)
+    
     try {
-      console.log('📡 Starting Promise.all for evidence requests...')
-      const evidencePromises = items.map(async (item, index) => {
-        try {
-          console.log(`📡 Requesting evidence for item ${index + 1}/${items.length}: ${item.id}`)
-          const response = await fetch(`/api/evidence?itemId=${item.id}`)
-          if (response.ok) {
-            const data = await response.json()
-            console.log(`✅ Got evidence for item ${item.id}:`, data.evidence?.length || 0, 'items')
-            return { itemId: item.id, evidence: data.evidence || [] }
-          } else {
-            console.error(`❌ Failed to get evidence for item ${item.id}:`, response.status)
+      const cache: Record<string, any[]> = {}
+      const batchSize = 5 // Process 5 items at a time to avoid overwhelming the server
+      
+      for (let i = 0; i < items.length; i += batchSize) {
+        const batch = items.slice(i, i + batchSize)
+        console.log(`📡 Processing evidence batch ${Math.floor(i/batchSize) + 1}/${Math.ceil(items.length/batchSize)} (items ${i + 1}-${Math.min(i + batchSize, items.length)})`)
+        
+        const batchPromises = batch.map(async (item) => {
+          try {
+            const response = await fetch(`/api/evidence?itemId=${item.id}`)
+            if (response.ok) {
+              const data = await response.json()
+              console.log(`✅ Got evidence for item ${item.id}:`, data.evidence?.length || 0, 'items')
+              return { itemId: item.id, evidence: data.evidence || [] }
+            } else {
+              console.error(`❌ Failed to get evidence for item ${item.id}:`, response.status)
+              return { itemId: item.id, evidence: [] }
+            }
+          } catch (error) {
+            console.error(`❌ Error loading evidence for item ${item.id}:`, error)
             return { itemId: item.id, evidence: [] }
           }
-        } catch (error) {
-          console.error(`❌ Error loading evidence for item ${item.id}:`, error)
-          return { itemId: item.id, evidence: [] }
+        })
+        
+        const batchResults = await Promise.all(batchPromises)
+        batchResults.forEach(result => {
+          cache[result.itemId] = result.evidence
+        })
+        
+        // Update progress and cache incrementally
+        const progress = Math.round(((i + batchSize) / items.length) * 100)
+        setEvidenceProgress(Math.min(100, progress))
+        setEvidenceCache({ ...cache }) // Trigger re-render with new evidence data
+        
+        console.log(`✅ Batch ${Math.floor(i/batchSize) + 1} complete. Progress: ${progress}%`)
+        
+        // Small delay between batches to prevent overwhelming the server
+        if (i + batchSize < items.length) {
+          await new Promise(resolve => setTimeout(resolve, 100))
         }
-      })
+      }
       
-      console.log('⏳ Waiting for all evidence requests to complete...')
-      const evidenceResults = await Promise.all(evidencePromises)
-      console.log('✅ All evidence requests completed')
-      
-      const cache: Record<string, any[]> = {}
-      evidenceResults.forEach(result => {
-        cache[result.itemId] = result.evidence
-      })
-      
-      setEvidenceCache(cache)
       setEvidenceLoaded(true)
-      console.log(`✅ Loaded evidence for ${items.length} items in batch`)
+      setEvidenceLoading(false)
+      console.log(`✅ Progressive evidence loading completed for ${items.length} items`)
       console.log('Evidence cache populated with keys:', Object.keys(cache).length)
-      console.log('Sample evidence data:', Object.keys(cache).slice(0, 3).map(key => ({ itemId: key, evidenceCount: cache[key].length })))
     } catch (error) {
-      console.error('❌ Error loading evidence batch:', error)
+      console.error('❌ Error in progressive evidence loading:', error)
       setEvidenceLoaded(false)
+      setEvidenceLoading(false)
     }
   }
 
@@ -193,23 +216,25 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
       const total = await getTotalValue()
       console.log('Total value:', total)
       
+      // Set initial data immediately - this allows UI to render
       setAllItems(loadedItems)
       setTotalValue(total)
+      setInitialDataLoaded(true)
       setLoading(false)
       setRefreshing(false)
-      console.log('Data loading complete')
+      console.log('✅ Initial data loading complete - UI can now render')
       
-      // Load evidence for all items in batch to avoid individual API calls
+      // Check for existing case (for property owners) - do this in background
+      checkExistingCase()
+      
+      // Load evidence in background - non-blocking
       if (loadedItems.length > 0) {
-        console.log('🔄 Starting batch evidence loading for', loadedItems.length, 'items...')
-        await loadAllEvidence(loadedItems)
-        console.log('✅ Batch evidence loading completed')
+        console.log('🔄 Starting background evidence loading for', loadedItems.length, 'items...')
+        loadEvidenceInBackground(loadedItems)
       } else {
         console.log('⚠️ No items to load evidence for')
+        setEvidenceLoaded(true)
       }
-      
-      // Check for existing case (for property owners)
-      await checkExistingCase()
     } catch (error) {
       console.error('Error loading data:', error)
       const errorMessage = error instanceof Error ? error.message : 'Failed to load data'
@@ -218,6 +243,7 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
       setTotalValue(0)
       setLoading(false)
       setRefreshing(false)
+      setInitialDataLoaded(false)
     }
   }
 
@@ -1966,64 +1992,15 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
               )}
             </div>
 
-            {loading ? (
-              // Skeleton loading for items grid
-              <div style={{ 
-                display: 'grid', 
-                gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', 
-                gap: '32px' 
-              }}>
-                {[1, 2, 3].map((i) => (
-                  <div key={i} style={{
-                    background: 'white',
-                    borderRadius: '20px',
-                    padding: '32px',
-                    boxShadow: '0 20px 40px rgba(0, 0, 0, 0.08)',
-                    border: '1px solid rgba(0, 0, 0, 0.05)',
-                    animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
-                  }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '24px' }}>
-                      <div style={{
-                        width: '80px',
-                        height: '80px',
-                        background: '#e5e7eb',
-                        borderRadius: '12px',
-                        animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
-                      }}></div>
-                      <div style={{ flex: 1 }}>
-                        <div style={{
-                          height: '24px',
-                          background: '#e5e7eb',
-                          borderRadius: '6px',
-                          marginBottom: '8px',
-                          animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
-                        }}></div>
-                        <div style={{
-                          height: '16px',
-                          background: '#e5e7eb',
-                          borderRadius: '4px',
-                          width: '60%',
-                          animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
-                        }}></div>
-                      </div>
-                    </div>
-                    <div style={{
-                      height: '16px',
-                      background: '#e5e7eb',
-                      borderRadius: '4px',
-                      marginBottom: '16px',
-                      animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
-                    }}></div>
-                    <div style={{
-                      height: '40px',
-                      background: '#e5e7eb',
-                      borderRadius: '8px',
-                      animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
-                    }}></div>
-                  </div>
-                ))}
-              </div>
-            ) : displayItems.length === 0 ? (
+            <ProgressiveLoader
+              loading={!initialDataLoaded}
+              skeletonType="dashboard"
+              skeletonCount={3}
+              loadingMessage="Loading Property Dashboard..."
+              showProgress={evidenceLoading}
+              progress={evidenceProgress}
+            >
+              {displayItems.length === 0 ? (
               <div style={{ 
                 background: 'white', 
                 borderRadius: '24px', 
@@ -2898,6 +2875,43 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
             />
           )}
         </div>
+        
+        {/* Evidence loading overlay */}
+        {evidenceLoading && (
+          <div style={{
+            position: 'fixed',
+            bottom: '32px',
+            right: '32px',
+            background: 'rgba(255, 255, 255, 0.95)',
+            borderRadius: '12px',
+            padding: '16px 20px',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+            border: '1px solid rgba(229, 231, 235, 0.8)',
+            zIndex: 1000,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px'
+          }}>
+            <div style={{
+              width: '20px',
+              height: '20px',
+              border: '2px solid #e5e7eb',
+              borderTop: '2px solid #3b82f6',
+              borderRadius: '50%',
+              animation: 'spin 1s linear infinite'
+            }}></div>
+            <div>
+              <div style={{ fontSize: '14px', fontWeight: '600', color: '#1f2937' }}>
+                Loading Evidence
+              </div>
+              <div style={{ fontSize: '12px', color: '#6b7280' }}>
+                {evidenceProgress}% complete
+              </div>
+            </div>
+          </div>
+        )}
+        
+        </ProgressiveLoader>
         </div>
       </div>
     )
@@ -2922,7 +2936,14 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
         
         {/* Desktop View */}
       
-      {evidenceLoaded ? (
+      <ProgressiveLoader
+        loading={!initialDataLoaded}
+        skeletonType="dashboard"
+        skeletonCount={6}
+        loadingMessage="Loading Dashboard..."
+        showProgress={evidenceLoading}
+        progress={evidenceProgress}
+      >
         <StakeholderDashboard 
           user={user} 
           items={allItems} 
@@ -2933,25 +2954,42 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
           evidenceCache={evidenceCache}
           evidenceLoaded={evidenceLoaded}
         />
-      ) : (
-        <div style={{ textAlign: 'center', padding: '100px 20px' }}>
+        
+        {/* Evidence loading overlay */}
+        {evidenceLoading && (
           <div style={{
-            width: '64px',
-            height: '64px',
-            border: '4px solid #e5e7eb',
-            borderTop: '4px solid #3b82f6',
-            borderRadius: '50%',
-            animation: 'spin 1s linear infinite',
-            margin: '0 auto 32px'
-          }}></div>
-          <h2 style={{ fontSize: '32px', fontWeight: '700', color: '#1f2937', marginBottom: '16px' }}>
-            Loading Evidence Data
-          </h2>
-          <p style={{ fontSize: '18px', color: '#6b7280' }}>
-            Preparing thumbnail images for {allItems.length} items...
-          </p>
-        </div>
-      )}
+            position: 'fixed',
+            bottom: '32px',
+            right: '32px',
+            background: 'rgba(255, 255, 255, 0.95)',
+            borderRadius: '12px',
+            padding: '16px 20px',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+            border: '1px solid rgba(229, 231, 235, 0.8)',
+            zIndex: 1000,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px'
+          }}>
+            <div style={{
+              width: '20px',
+              height: '20px',
+              border: '2px solid #e5e7eb',
+              borderTop: '2px solid #3b82f6',
+              borderRadius: '50%',
+              animation: 'spin 1s linear infinite'
+            }}></div>
+            <div>
+              <div style={{ fontSize: '14px', fontWeight: '600', color: '#1f2937' }}>
+                Loading Evidence
+              </div>
+              <div style={{ fontSize: '12px', color: '#6b7280' }}>
+                {evidenceProgress}% complete
+              </div>
+            </div>
+          </div>
+        )}
+      </ProgressiveLoader>
     </div>
     </>
   )
