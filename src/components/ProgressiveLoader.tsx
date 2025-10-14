@@ -32,9 +32,10 @@ export function ProgressiveLoader({
     } else {
       // Start fade out animation
       setFadeOut(true)
-      // Hide skeleton after animation completes
+      // Hide skeleton and reset fade state after animation completes
       const timer = setTimeout(() => {
         setShowSkeleton(false)
+        setFadeOut(false) // Reset fade state so children are visible
       }, 300) // Match animation duration
       
       return () => clearTimeout(timer)
