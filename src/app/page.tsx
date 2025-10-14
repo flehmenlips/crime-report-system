@@ -916,11 +916,12 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
   }
 
   const userRole = user?.role
-  const evidenceCount = allItems.reduce((total, item) => 
-    total + item.evidence?.filter(e => e.type === 'photo')?.length + 
-    item.evidence?.filter(e => e.type === 'video')?.length + 
-    item.evidence?.filter(e => e.type === 'document')?.length, 0
-  ) ?? 0
+  
+  // Calculate evidence count from evidenceCache instead of item.evidence
+  // since evidence is now loaded progressively
+  const evidenceCount = Object.values(evidenceCache || {}).reduce((total, evidenceList) => 
+    total + evidenceList.length, 0
+  )
   
   // Stable sorting using useMemo - TEMPORARILY DISABLED FOR DEBUGGING
   // const sortedItems = useMemo(() => {
@@ -2285,7 +2286,7 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
                     </p>
 
                     {/* Additional Photos Indicator */}
-                    {item.evidence?.filter(e => e.type === 'photo')?.length > 1 && (
+                    {evidenceCache[item.id]?.filter(e => e.type === 'photo')?.length > 1 && (
                       <div style={{
                         background: '#f0f9ff',
                         border: '1px solid #bfdbfe',
@@ -2297,12 +2298,12 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
                         fontWeight: '600',
                         textAlign: 'center'
                       }}>
-                        📷 {item.evidence.filter(e => e.type === 'photo').length - 1} more photos available
+                        📷 {(evidenceCache[item.id]?.filter(e => e.type === 'photo').length || 0) - 1} more photos available
                       </div>
                     )}
 
                     <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
-                      {item.evidence?.filter(e => e.type === 'photo')?.length > 0 && (
+                      {evidenceCache[item.id]?.filter(e => e.type === 'photo')?.length > 0 && (
                         <div style={{
                           background: '#dbeafe',
                           color: '#1e40af',
@@ -2311,10 +2312,10 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
                           fontSize: '14px',
                           fontWeight: '600'
                         }}>
-                          📷 {item.evidence.filter(e => e.type === 'photo').length}
+                          📷 {evidenceCache[item.id].filter(e => e.type === 'photo').length}
                         </div>
                       )}
-                      {item.evidence?.filter(e => e.type === 'video')?.length > 0 && (
+                      {evidenceCache[item.id]?.filter(e => e.type === 'video')?.length > 0 && (
                         <div style={{
                           background: '#dcfce7',
                           color: '#166534',
@@ -2323,10 +2324,10 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
                           fontSize: '14px',
                           fontWeight: '600'
                         }}>
-                          🎥 {item.evidence.filter(e => e.type === 'video').length}
+                          🎥 {evidenceCache[item.id].filter(e => e.type === 'video').length}
                         </div>
                       )}
-                      {item.evidence?.filter(e => e.type === 'document')?.length > 0 && (
+                      {evidenceCache[item.id]?.filter(e => e.type === 'document')?.length > 0 && (
                         <div style={{
                           background: '#fef3c7',
                           color: '#92400e',
@@ -2335,7 +2336,7 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
                           fontSize: '14px',
                           fontWeight: '600'
                         }}>
-                          📄 {item.evidence.filter(e => e.type === 'document').length}
+                          📄 {evidenceCache[item.id].filter(e => e.type === 'document').length}
                         </div>
                       )}
                     </div>
@@ -2514,7 +2515,7 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
                         </td>
                         <td style={{ padding: '16px' }}>
                           <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
-                            {item.evidence?.filter(e => e.type === 'photo')?.length > 0 && (
+                            {evidenceCache[item.id]?.filter(e => e.type === 'photo')?.length > 0 && (
                               <span style={{
                                 background: '#dbeafe',
                                 color: '#1e40af',
@@ -2523,10 +2524,10 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
                                 fontSize: '11px',
                                 fontWeight: '600'
                               }}>
-                                📷 {item.evidence.filter(e => e.type === 'photo').length}
+                                📷 {evidenceCache[item.id].filter(e => e.type === 'photo').length}
                               </span>
                             )}
-                            {item.evidence?.filter(e => e.type === 'video')?.length > 0 && (
+                            {evidenceCache[item.id]?.filter(e => e.type === 'video')?.length > 0 && (
                               <span style={{
                                 background: '#dcfce7',
                                 color: '#166534',
@@ -2535,10 +2536,10 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
                                 fontSize: '11px',
                                 fontWeight: '600'
                               }}>
-                                🎥 {item.evidence.filter(e => e.type === 'video').length}
+                                🎥 {evidenceCache[item.id].filter(e => e.type === 'video').length}
                               </span>
                             )}
-                            {item.evidence?.filter(e => e.type === 'document')?.length > 0 && (
+                            {evidenceCache[item.id]?.filter(e => e.type === 'document')?.length > 0 && (
                               <span style={{
                                 background: '#fef3c7',
                                 color: '#92400e',
@@ -2547,7 +2548,7 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
                                 fontSize: '11px',
                                 fontWeight: '600'
                               }}>
-                                📄 {item.evidence.filter(e => e.type === 'document').length}
+                                📄 {evidenceCache[item.id].filter(e => e.type === 'document').length}
                               </span>
                             )}
                           </div>
