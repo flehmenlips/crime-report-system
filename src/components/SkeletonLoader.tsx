@@ -125,6 +125,132 @@ export function SkeletonLoader({ type = 'card', count = 1 }: SkeletonLoaderProps
           </div>
         )
 
+      case 'card':
+        return (
+          <div style={{
+            background: 'rgba(255, 255, 255, 0.95)',
+            borderRadius: '16px',
+            padding: '24px',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+            border: '1px solid rgba(229, 231, 235, 0.8)',
+            animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+          }}>
+            {/* Card header */}
+            <div style={{
+              width: '60%',
+              height: '24px',
+              background: 'linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%)',
+              backgroundSize: '200% 100%',
+              borderRadius: '6px',
+              marginBottom: '16px',
+              animation: 'shimmer 1.5s infinite'
+            }}></div>
+            
+            {/* Card content */}
+            <div style={{
+              width: '100%',
+              height: '16px',
+              background: 'linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%)',
+              backgroundSize: '200% 100%',
+              borderRadius: '4px',
+              marginBottom: '8px',
+              animation: 'shimmer 1.5s infinite'
+            }}></div>
+            <div style={{
+              width: '80%',
+              height: '16px',
+              background: 'linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%)',
+              backgroundSize: '200% 100%',
+              borderRadius: '4px',
+              marginBottom: '16px',
+              animation: 'shimmer 1.5s infinite'
+            }}></div>
+            
+            {/* Card footer */}
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}>
+              <div style={{
+                width: '100px',
+                height: '14px',
+                background: 'linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%)',
+                backgroundSize: '200% 100%',
+                borderRadius: '4px',
+                animation: 'shimmer 1.5s infinite'
+              }}></div>
+              <div style={{
+                width: '60px',
+                height: '14px',
+                background: 'linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%)',
+                backgroundSize: '200% 100%',
+                borderRadius: '4px',
+                animation: 'shimmer 1.5s infinite'
+              }}></div>
+            </div>
+          </div>
+        )
+
+      case 'list':
+        return (
+          <div style={{
+            background: 'rgba(255, 255, 255, 0.95)',
+            borderRadius: '12px',
+            padding: '16px 20px',
+            marginBottom: '12px',
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)',
+            border: '1px solid rgba(229, 231, 235, 0.8)',
+            animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '16px'
+          }}>
+            {/* List item icon */}
+            <div style={{
+              width: '40px',
+              height: '40px',
+              background: 'linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%)',
+              backgroundSize: '200% 100%',
+              borderRadius: '8px',
+              flexShrink: 0,
+              animation: 'shimmer 1.5s infinite'
+            }}></div>
+            
+            {/* List item content */}
+            <div style={{ flex: 1 }}>
+              <div style={{
+                width: '70%',
+                height: '18px',
+                background: 'linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%)',
+                backgroundSize: '200% 100%',
+                borderRadius: '4px',
+                marginBottom: '8px',
+                animation: 'shimmer 1.5s infinite'
+              }}></div>
+              <div style={{
+                width: '50%',
+                height: '14px',
+                background: 'linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%)',
+                backgroundSize: '200% 100%',
+                borderRadius: '4px',
+                animation: 'shimmer 1.5s infinite'
+              }}></div>
+            </div>
+            
+            {/* List item action */}
+            <div style={{
+              width: '80px',
+              height: '32px',
+              background: 'linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%)',
+              backgroundSize: '200% 100%',
+              borderRadius: '6px',
+              flexShrink: 0,
+              animation: 'shimmer 1.5s infinite'
+            }}></div>
+          </div>
+        )
+
       case 'dashboard':
         return (
           <div style={{
