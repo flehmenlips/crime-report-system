@@ -2912,7 +2912,6 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
         )}
         
         </ProgressiveLoader>
-        </div>
       </div>
     )
   }
