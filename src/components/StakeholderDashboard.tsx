@@ -35,6 +35,24 @@ interface StakeholderDashboardProps {
 }
 
 export function StakeholderDashboard({ user, items, onItemsUpdate, loading = false, error = null, onRefresh, evidenceCache, evidenceLoaded }: StakeholderDashboardProps) {
+  const [scrollY, setScrollY] = useState(0)
+  
+  // Add scroll listener for dynamic text color
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrollY(window.scrollY)
+    }
+
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  // Determine text color based on scroll position
+  // When scrolled past the header area (around 200px), switch to dark text
+  const isScrolled = scrollY > 200
+  const textColor = isScrolled ? '#1e293b' : 'white' // Dark blue when scrolled, white when at top
+  const textColorSecondary = isScrolled ? '#475569' : 'rgba(255, 255, 255, 0.8)'
+
   // Use user preferences for view and sort settings
   const { viewMode, sortField, sortOrder, setViewMode, setSortField, setSortOrder } = useViewPreferences()
   
@@ -362,20 +380,19 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
                   fontSize: '32px', 
                   fontWeight: '800', 
                   margin: 0,
-                  background: 'linear-gradient(135deg, #ffffff 0%, #e2e8f0 100%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent'
+                  color: textColor,
+                  transition: 'color 0.3s ease-in-out'
                 }}>
                   {roleConfig.title}
                 </h1>
-                <p style={{ color: 'rgba(255, 255, 255, 0.8)', margin: 0, fontWeight: '500' }}>
+                <p style={{ color: textColorSecondary, margin: 0, fontWeight: '500', transition: 'color 0.3s ease-in-out' }}>
                   {roleConfig.subtitle}
                 </p>
               </div>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-              <TenantInfo user={user} />
-              <UserProfile showDetails={true} />
+              <TenantInfo user={user} textColor={textColor} textColorSecondary={textColorSecondary} />
+              <UserProfile showDetails={true} textColor={textColor} textColorSecondary={textColorSecondary} />
             </div>
           </div>
         </div>
