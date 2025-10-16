@@ -295,7 +295,7 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
     setSortOrder(newSortOrder)
   }
 
-  const displayItems = isFiltered ? filteredItems : getSortedItems(items)
+  const displayItems = isFiltered ? getSortedItems(filteredItems) : getSortedItems(items)
   
   // Calculate evidence count from evidenceCache instead of item.evidence
   // since evidence is now loaded progressively
