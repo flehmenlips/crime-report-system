@@ -96,51 +96,25 @@ export function EvidenceTags({ user, items, onClose }: EvidenceTagsProps) {
         }
       })
 
-      // Auto-categorize items based on value, category, and name
+      // Use actual user-assigned categories instead of auto-categorization
       const categorizedItems = tagCategories.map(category => ({
         ...category,
         items: items.filter(item => {
+          const userCategory = (item.category || 'other').toLowerCase()
+          
           switch (category.id) {
             case 'high-value':
               return item.estimatedValue >= 5000
             case 'electronics':
-              const category = (item.category || 'other').toLowerCase()
-              return category.includes('electronic') ||
-                     category.includes('computer') ||
-                     category.includes('phone') ||
-                     item.name.toLowerCase().includes('laptop') ||
-                     item.name.toLowerCase().includes('phone') ||
-                     item.name.toLowerCase().includes('computer') ||
-                     item.name.toLowerCase().includes('tv') ||
-                     item.name.toLowerCase().includes('camera')
+              return userCategory === 'electronics' || userCategory === 'electronic'
             case 'tools':
-              const toolsCategory = (item.category || 'other').toLowerCase()
-              return toolsCategory.includes('tool') ||
-                     item.name.toLowerCase().includes('tool') ||
-                     item.name.toLowerCase().includes('equipment') ||
-                     item.name.toLowerCase().includes('saw') ||
-                     item.name.toLowerCase().includes('drill')
+              return userCategory === 'tools' || userCategory === 'tool' || userCategory === 'equipment'
             case 'vehicles':
-              const vehiclesCategory = (item.category || 'other').toLowerCase()
-              return vehiclesCategory.includes('vehicle') ||
-                     vehiclesCategory.includes('car') ||
-                     item.name.toLowerCase().includes('car') ||
-                     item.name.toLowerCase().includes('truck') ||
-                     item.name.toLowerCase().includes('vehicle') ||
-                     item.name.toLowerCase().includes('motorcycle')
+              return userCategory === 'vehicles' || userCategory === 'vehicle' || userCategory === 'transportation'
             case 'jewelry':
-              const jewelryCategory = (item.category || 'other').toLowerCase()
-              return jewelryCategory.includes('jewelry') ||
-                     item.name.toLowerCase().includes('ring') ||
-                     item.name.toLowerCase().includes('necklace') ||
-                     item.name.toLowerCase().includes('watch') ||
-                     item.name.toLowerCase().includes('jewelry')
+              return userCategory === 'jewelry' || userCategory === 'valuables'
             case 'documents':
-              const documentsCategory = (item.category || 'other').toLowerCase()
-              return documentsCategory.includes('document') ||
-                     item.name.toLowerCase().includes('document') ||
-                     item.name.toLowerCase().includes('certificate') ||
-                     item.name.toLowerCase().includes('title')
+              return userCategory === 'documents' || userCategory === 'document' || userCategory === 'papers'
             default:
               return false
           }
@@ -489,7 +463,7 @@ export function EvidenceTags({ user, items, onClose }: EvidenceTagsProps) {
           alignItems: 'center'
         }}>
           <div style={{ fontSize: '12px', color: '#6b7280' }}>
-            Total evidence files: {evidenceItems.length} • Auto-categorized items
+            Total evidence files: {evidenceItems.length} • User-assigned categories
           </div>
           <div style={{ display: 'flex', gap: '12px' }}>
             <button
