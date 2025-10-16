@@ -34,7 +34,7 @@ async function getAllItems(userTenantId?: string, userRole?: string): Promise<St
       locationLastSeen: item.locationLastSeen,
       estimatedValue: item.estimatedValue,
       category: item.category || 'other',
-      tags: Array.isArray(item.tags) ? item.tags : [],
+      tags: Array.isArray(item.tags) ? item.tags as string[] : [],
       notes: item.notes || undefined,
       createdAt: item.createdAt.toISOString(),
       updatedAt: item.updatedAt.toISOString(),
@@ -118,7 +118,7 @@ async function searchItems(filters: SearchFilters, userTenantId?: string, userRo
       locationLastSeen: item.locationLastSeen,
       estimatedValue: item.estimatedValue,
       category: item.category || 'other',
-      tags: Array.isArray(item.tags) ? item.tags : [],
+      tags: Array.isArray(item.tags) ? item.tags as string[] : [],
       notes: item.notes || undefined,
       createdAt: item.createdAt.toISOString(),
       updatedAt: item.updatedAt.toISOString(),
@@ -327,7 +327,7 @@ export async function POST(request: NextRequest) {
     // Convert to frontend format
     return NextResponse.json({
       ...newItem,
-      tags: Array.isArray(newItem.tags) ? newItem.tags : [],
+      tags: Array.isArray(newItem.tags) ? newItem.tags as string[] : [],
       evidence: (newItem as any).evidence ? (newItem as any).evidence.map((e: any) => ({ 
         ...e, 
         createdAt: e.createdAt.toISOString(),
@@ -406,7 +406,7 @@ export async function PUT(request: NextRequest) {
 
     return NextResponse.json({
       ...updatedItem,
-      tags: Array.isArray(updatedItem.tags) ? updatedItem.tags : [],
+      tags: Array.isArray(updatedItem.tags) ? updatedItem.tags as string[] : [],
       evidence: (updatedItem as any).evidence ? (updatedItem as any).evidence.map((e: any) => ({ 
         ...e, 
         createdAt: e.createdAt.toISOString(),
