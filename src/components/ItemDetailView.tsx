@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { StolenItem } from '@/types'
 import { formatCurrency, formatDate } from '@/lib/data'
 import { DynamicCategorySelector } from './DynamicCategorySelector'
+import { EnhancedTagDisplay } from './EnhancedTagDisplay'
 import { EvidenceCaption } from './EvidenceCaption'
 
 interface ItemDetailViewProps {
@@ -599,20 +600,11 @@ export function ItemDetailView({ item, onClose, onEdit, onDelete, onDuplicate, o
                 {item.tags && item.tags.length > 0 && (
                   <div style={{ background: '#fef7ff', padding: '20px', borderRadius: '16px', border: '2px solid #e9d5ff' }}>
                     <div style={{ fontSize: '14px', color: '#6b7280', marginBottom: '12px', fontWeight: '600' }}>🏷️ Tags</div>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                      {item.tags.map((tag, index) => (
-                        <span key={index} style={{
-                          background: '#ddd6fe',
-                          color: '#7c3aed',
-                          padding: '6px 16px',
-                          borderRadius: '20px',
-                          fontSize: '14px',
-                          fontWeight: '600'
-                        }}>
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
+                    <EnhancedTagDisplay 
+                      tags={item.tags} 
+                      maxDisplay={6}
+                      showAll={false}
+                    />
                   </div>
                 )}
 

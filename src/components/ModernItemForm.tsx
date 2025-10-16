@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { ItemFormData } from '@/types'
 import { DynamicCategorySelector } from './DynamicCategorySelector'
+import { EnhancedTagInput } from './EnhancedTagInput'
 
 interface ModernItemFormProps {
   onClose: () => void
@@ -657,23 +658,15 @@ export function ModernItemForm({ onClose, onSubmit, initialData, mode = 'create'
                   <label style={{ display: 'block', fontSize: '16px', fontWeight: '600', color: '#1f2937', marginBottom: '8px' }}>
                     Tags
                   </label>
-                  <input
-                    type="text"
-                    value={Array.isArray(formData.tags) ? formData.tags.join(', ') : ''}
-                    onChange={(e) => updateField('tags', e.target.value.split(',').map(tag => tag.trim()).filter(tag => tag))}
-                    placeholder="e.g., john deere, heavy equipment, valuable (separate with commas)"
-                    style={{
-                      width: '100%',
-                      padding: '16px',
-                      border: '2px solid #e5e7eb',
-                      borderRadius: '12px',
-                      fontSize: '16px',
-                      transition: 'border-color 0.2s ease',
-                      outline: 'none'
-                    }}
+                  <EnhancedTagInput
+                    tags={Array.isArray(formData.tags) ? formData.tags : []}
+                    onChange={(tags) => updateField('tags', tags)}
+                    placeholder="e.g., john deere, heavy equipment, valuable"
+                    maxTags={8}
+                    allowCustom={true}
                   />
                   <p style={{ fontSize: '12px', color: '#6b7280', marginTop: '4px' }}>
-                    Tags help organize and search your items
+                    Tags help organize and search your items. Use common terms for better organization.
                   </p>
                 </div>
 
