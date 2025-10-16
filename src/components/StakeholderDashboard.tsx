@@ -789,25 +789,68 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
             </div>
             
             {isFiltered && (
-              <button
-                onClick={() => {
-                  setIsFiltered(false)
-                  setFilteredItems([])
-                }}
-                style={{
-                  background: '#fef3c7',
-                  color: '#92400e',
-                  border: 'none',
-                  padding: '4px 8px',
-                  borderRadius: '6px',
-                  fontSize: '12px',
-                  fontWeight: '600',
-                  cursor: 'pointer',
-                  marginLeft: '12px'
-                }}
-              >
-                Clear Filter
-              </button>
+              <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginLeft: '12px' }}>
+                <button
+                  onClick={() => {
+                    setIsFiltered(false)
+                    setFilteredItems([])
+                  }}
+                  style={{
+                    background: 'rgba(59, 130, 246, 0.1)',
+                    border: '1px solid rgba(59, 130, 246, 0.3)',
+                    color: '#3b82f6',
+                    padding: '8px 16px',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = 'rgba(59, 130, 246, 0.2)'
+                    e.currentTarget.style.borderColor = 'rgba(59, 130, 246, 0.5)'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'rgba(59, 130, 246, 0.1)'
+                    e.currentTarget.style.borderColor = 'rgba(59, 130, 246, 0.3)'
+                  }}
+                >
+                  📋 Show All ({items.length} items)
+                </button>
+                <button
+                  onClick={() => {
+                    setIsFiltered(false)
+                    setFilteredItems([])
+                  }}
+                  style={{
+                    background: 'rgba(239, 68, 68, 0.1)',
+                    border: '1px solid rgba(239, 68, 68, 0.3)',
+                    color: '#ef4444',
+                    padding: '8px 16px',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = 'rgba(239, 68, 68, 0.2)'
+                    e.currentTarget.style.borderColor = 'rgba(239, 68, 68, 0.5)'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)'
+                    e.currentTarget.style.borderColor = 'rgba(239, 68, 68, 0.3)'
+                  }}
+                >
+                  🗑️ Clear Filter
+                </button>
+              </div>
             )}
           </div>
 
