@@ -34,7 +34,7 @@ async function getAllItems(userTenantId?: string, userRole?: string): Promise<St
       locationLastSeen: item.locationLastSeen,
       estimatedValue: item.estimatedValue,
       category: item.category || 'other',
-      tags: item.tags ? JSON.parse(item.tags) : [],
+      tags: Array.isArray(item.tags) ? item.tags : [],
       notes: item.notes || undefined,
       createdAt: item.createdAt.toISOString(),
       updatedAt: item.updatedAt.toISOString(),
@@ -118,7 +118,7 @@ async function searchItems(filters: SearchFilters, userTenantId?: string, userRo
       locationLastSeen: item.locationLastSeen,
       estimatedValue: item.estimatedValue,
       category: item.category || 'other',
-      tags: item.tags ? JSON.parse(item.tags) : [],
+      tags: Array.isArray(item.tags) ? item.tags : [],
       notes: item.notes || undefined,
       createdAt: item.createdAt.toISOString(),
       updatedAt: item.updatedAt.toISOString(),
@@ -313,7 +313,7 @@ export async function POST(request: NextRequest) {
         locationLastSeen: body.locationLastSeen ? sanitizeString(body.locationLastSeen) : 'Location not specified',
         estimatedValue: body.estimatedValue ? parseFloat(body.estimatedValue) : 0,
         category: body.category ? sanitizeString(body.category) : 'other',
-        tags: body.tags ? JSON.stringify(body.tags) : null,
+        tags: body.tags ? body.tags : null,
         notes: body.notes ? sanitizeString(body.notes) : null,
         ownerId: body.ownerId,
         tenantId: user.tenantId // CRITICAL: Set tenantId for proper data isolation
@@ -327,12 +327,12 @@ export async function POST(request: NextRequest) {
     // Convert to frontend format
     return NextResponse.json({
       ...newItem,
-      tags: newItem.tags ? JSON.parse(newItem.tags) : [],
-      evidence: newItem.evidence.map(e => ({ 
+      tags: Array.isArray(newItem.tags) ? newItem.tags : [],
+      evidence: (newItem as any).evidence ? (newItem as any).evidence.map((e: any) => ({ 
         ...e, 
         createdAt: e.createdAt.toISOString(),
         type: e.type as 'photo' | 'video' | 'document' 
-      }))
+      })) : []
     })
 
   } catch (error) {
@@ -395,7 +395,7 @@ export async function PUT(request: NextRequest) {
         locationLastSeen: body.locationLastSeen ? sanitizeString(body.locationLastSeen) : 'Location not specified',
         estimatedValue: body.estimatedValue ? parseFloat(body.estimatedValue) : 0,
         category: body.category ? sanitizeString(body.category) : 'other',
-        tags: body.tags ? JSON.stringify(body.tags) : null,
+        tags: body.tags ? body.tags : null,
         notes: body.notes ? sanitizeString(body.notes) : null,
         updatedAt: new Date()
       },
@@ -406,12 +406,12 @@ export async function PUT(request: NextRequest) {
 
     return NextResponse.json({
       ...updatedItem,
-      tags: updatedItem.tags ? JSON.parse(updatedItem.tags) : [],
-      evidence: updatedItem.evidence.map(e => ({ 
+      tags: Array.isArray(updatedItem.tags) ? updatedItem.tags : [],
+      evidence: (updatedItem as any).evidence ? (updatedItem as any).evidence.map((e: any) => ({ 
         ...e, 
         createdAt: e.createdAt.toISOString(),
         type: e.type as 'photo' | 'video' | 'document' 
-      }))
+      })) : []
     })
 
   } catch (error) {
