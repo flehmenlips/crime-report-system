@@ -1,7 +1,7 @@
 import { cookies } from 'next/headers'
 import { User, Role } from './auth'
 import { prisma } from './prisma'
-import { verifyPassword } from './password'
+import { verifyPassword, isLegacyPassword, migrateUserPassword } from './password'
 
 function getDefaultPermissions(role: Role): string[] {
   switch (role) {
@@ -82,6 +82,24 @@ export async function authenticateUser(username: string, password: string): Prom
         console.log('=== END AUTH DEBUG ===')
       }
       return null
+    }
+    
+    // MIGRATION: If user has legacy plain text password, migrate to hashed
+    if (isLegacyPassword(user.password)) {
+      try {
+        await migrateUserPassword(user.id, password, prisma)
+        // Refresh user data to get updated password hash
+        const updatedUser = await prisma.user.findUnique({
+          where: { id: user.id },
+          include: { tenant: true }
+        })
+        if (updatedUser) {
+          user.password = updatedUser.password
+        }
+      } catch (error) {
+        console.error('Failed to migrate user password:', error)
+        // Continue with login even if migration fails
+      }
     }
     
     if (isDev) {

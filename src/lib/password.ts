@@ -50,8 +50,18 @@ export async function verifyPassword(
   }
   
   try {
-    const isValid = await bcrypt.compare(password, hashedPassword)
-    return isValid
+    // Check if the stored password is already hashed (starts with $2b$12$)
+    const isHashed = hashedPassword.startsWith('$2b$12$')
+    
+    if (isHashed) {
+      // New format: use bcrypt to verify
+      const isValid = await bcrypt.compare(password, hashedPassword)
+      return isValid
+    } else {
+      // Legacy format: plain text comparison (TEMPORARY - for migration period)
+      console.warn('⚠️ Using legacy plain text password verification - user should reset password')
+      return password === hashedPassword
+    }
   } catch (error) {
     console.error('Error verifying password:', error)
     return false
@@ -138,5 +148,44 @@ export function isCommonPassword(password: string): boolean {
   return commonPasswords.some(common => 
     password.toLowerCase().includes(common.toLowerCase())
   )
+}
+
+/**
+ * Check if a password is stored in legacy plain text format
+ * 
+ * @param hashedPassword - Password from database
+ * @returns true if password is plain text (not hashed)
+ */
+export function isLegacyPassword(hashedPassword: string): boolean {
+  return !hashedPassword.startsWith('$2b$12$')
+}
+
+/**
+ * Migrate a user's password from plain text to hashed format
+ * This should be called when a user with a legacy password logs in
+ * 
+ * @param userId - User ID to update
+ * @param plainTextPassword - The plain text password to hash
+ * @param prisma - Prisma client instance
+ * @returns Promise resolving when migration is complete
+ */
+export async function migrateUserPassword(
+  userId: string,
+  plainTextPassword: string,
+  prisma: any
+): Promise<void> {
+  try {
+    const hashedPassword = await hashPassword(plainTextPassword)
+    
+    await prisma.user.update({
+      where: { id: userId },
+      data: { password: hashedPassword }
+    })
+    
+    console.log(`✅ Migrated password for user ${userId} to hashed format`)
+  } catch (error) {
+    console.error(`❌ Failed to migrate password for user ${userId}:`, error)
+    throw error
+  }
 }
 
