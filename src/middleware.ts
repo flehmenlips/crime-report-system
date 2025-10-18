@@ -1,6 +1,31 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getCurrentUser } from '@/lib/auth-server'
+import { cookies } from 'next/headers'
 import { canReadAll, canWriteAll, canManageUsers, canAccessAdmin, Role } from '@/lib/auth'
+
+// Middleware-safe user session checker (doesn't use bcrypt)
+async function getCurrentUserSafe(): Promise<any | null> {
+  try {
+    const cookieStore = await cookies()
+    const sessionCookie = cookieStore.get('session')
+    
+    if (!sessionCookie?.value) {
+      return null
+    }
+
+    // Parse session data (basic validation only - no password verification needed)
+    const sessionData = JSON.parse(sessionCookie.value)
+    
+    // Basic session validation
+    if (!sessionData?.user?.id || !sessionData?.user?.username) {
+      return null
+    }
+
+    return sessionData.user
+  } catch (error) {
+    console.error('Middleware auth error:', error)
+    return null
+  }
+}
 
 // Define route access rules
 const ROUTE_PERMISSIONS = {
@@ -37,7 +62,7 @@ export async function middleware(req: NextRequest) {
   }
   
   // Check for user session
-  const user = await getCurrentUser()
+  const user = await getCurrentUserSafe()
   
   // Only log for page routes, not API calls or static assets to reduce console noise
   if (!pathname.startsWith('/api/') && (!pathname.includes('.') || pathname.endsWith('.html'))) {
