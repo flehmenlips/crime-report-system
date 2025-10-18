@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getCurrentUser } from '@/lib/auth-server'
 import { prisma } from '@/lib/prisma'
 import { canSuperAdmin } from '@/lib/auth'
+import { hashPassword } from '@/lib/password'
 
 // GET /api/admin/users - Get all users (SuperAdmin only)
 export async function GET(request: NextRequest) {
@@ -92,13 +93,16 @@ export async function POST(request: NextRequest) {
       userTenantId = newTenant.id
     }
 
+    // Hash password before storing (SECURITY: Never store plain text passwords)
+    const hashedPassword = await hashPassword(password)
+
     // Create new user
     const newUser = await prisma.user.create({
       data: {
         username,
         email,
         name,
-        password, // In production, hash this password
+        password: hashedPassword,
         role,
         tenantId: userTenantId,
         isActive: true,

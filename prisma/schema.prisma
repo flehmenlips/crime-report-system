@@ -268,3 +268,27 @@ model Category {
   @@unique([tenantId, name]) // Ensure unique category names per tenant
   @@map("categories")
 }
+
+// AUDIT LOGGING - Critical for Law Enforcement Chain of Custody
+model AuditLog {
+  id          String   @id @default(cuid())
+  userId      String?  // Null for failed logins or anonymous actions
+  username    String?  // Denormalized for query performance
+  action      String   // 'login', 'logout', 'view_evidence', 'modify_case', etc.
+  resource    String?  // 'evidence:123', 'case:456', 'user:789', etc.
+  resourceType String? // 'evidence', 'case', 'user', 'item', etc.
+  details     Json?    // Additional context (before/after values, metadata)
+  ipAddress   String?  // Client IP address
+  userAgent   String?  // Browser/client information
+  timestamp   DateTime @default(now())
+  success     Boolean  @default(true) // false for failed attempts
+  severity    String   @default("info") // 'info', 'warning', 'error', 'critical'
+  
+  @@index([userId])
+  @@index([action])
+  @@index([timestamp])
+  @@index([resource])
+  @@index([resourceType])
+  @@index([success])
+  @@map("audit_logs")
+}

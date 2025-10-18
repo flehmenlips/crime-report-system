@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { authenticateUser, setUserSession } from '@/lib/auth-server'
+import { logAuthAttempt } from '@/lib/audit'
 
 export async function POST(request: NextRequest) {
   try {
@@ -19,12 +20,28 @@ export async function POST(request: NextRequest) {
     console.log('Authentication result:', user ? 'SUCCESS' : 'FAILED')
     
     if (!user) {
+      // AUDIT LOG: Failed login attempt (CRITICAL for security monitoring)
+      await logAuthAttempt({
+        username,
+        success: false,
+        reason: 'Invalid credentials',
+        request
+      })
+      
       console.log('=== END LOGIN API DEBUG ===')
       return NextResponse.json(
         { error: 'Invalid credentials' },
         { status: 401 }
       )
     }
+    
+    // AUDIT LOG: Successful login (CRITICAL for law enforcement chain of custody)
+    await logAuthAttempt({
+      username: user.username,
+      userId: user.id,
+      success: true,
+      request
+    })
     
     console.log('Setting user session for:', user.name, user.role)
     await setUserSession(user)

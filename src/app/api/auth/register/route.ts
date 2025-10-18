@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { Role, AccessLevel } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { EmailService } from '@/lib/email'
+import { hashPassword, validatePasswordStrength, isCommonPassword } from '@/lib/password'
 import crypto from 'crypto'
 
 function getDefaultPermissions(role: Role): string[] {
@@ -42,10 +43,22 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Validate password strength
-    if (password.length < 6) {
+    // Validate password strength (Law enforcement compliant)
+    const passwordValidation = validatePasswordStrength(password)
+    if (!passwordValidation.isValid) {
       return NextResponse.json(
-        { error: 'Password must be at least 6 characters long' },
+        { 
+          error: 'Password does not meet security requirements',
+          details: passwordValidation.errors
+        },
+        { status: 400 }
+      )
+    }
+
+    // Check for common passwords
+    if (isCommonPassword(password)) {
+      return NextResponse.json(
+        { error: 'Password is too common. Please choose a more unique password.' },
         { status: 400 }
       )
     }
@@ -102,13 +115,16 @@ export async function POST(request: NextRequest) {
         const verificationToken = crypto.randomBytes(32).toString('hex')
         const verificationExpires = new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours from now
 
+        // Hash password before storing (SECURITY: Never store plain text passwords)
+        const hashedPassword = await hashPassword(password)
+
         // Create user in database
         const newUser = await prisma.user.create({
           data: {
             username,
             email,
             name,
-            password, // In a real app, you'd hash this
+            password: hashedPassword,
             role: role as Role,
             accessLevel: (role === 'property_owner' ? 'owner' : 'stakeholder') as AccessLevel,
             // permissions: getDefaultPermissions(role as Role), // Role-specific permissions - not in DB schema

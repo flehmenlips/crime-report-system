@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { v2 as cloudinary } from 'cloudinary'
 import { prisma } from '@/lib/prisma'
 import { getCurrentUser } from '@/lib/auth-server'
+import { logEvidenceAccess } from '@/lib/audit'
 
 // Configure Cloudinary
 const cloudinaryConfig = {
@@ -156,6 +157,21 @@ export async function POST(request: NextRequest) {
         }
       })
       console.log('Database save success:', evidence)
+      
+      // AUDIT LOG: Evidence uploaded (CRITICAL for chain of custody)
+      await logEvidenceAccess({
+        userId: user.id,
+        username: user.username,
+        action: 'evidence_uploaded',
+        evidenceId: evidence.id,
+        itemId: parseInt(itemId),
+        details: {
+          type: evidenceType,
+          originalName: file.name,
+          fileSize: file.size
+        },
+        request
+      })
       
       return NextResponse.json({
         success: true,

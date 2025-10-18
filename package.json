@@ -26,6 +26,7 @@
     "@types/react-dom": "latest",
     "@types/sqlite3": "^5.1.0",
     "autoprefixer": "^10.4.21",
+    "bcrypt": "^6.0.0",
     "cloudinary": "^2.7.0",
     "critters": "^0.0.25",
     "eslint": "latest",
@@ -44,6 +45,7 @@
     "typescript": "latest"
   },
   "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
     "prisma": "^6.16.1",
     "sqlite3": "^5.1.7"
   }

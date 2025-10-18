@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { getCurrentUser } from '@/lib/auth-server'
+import { logEvidenceAccess } from '@/lib/audit'
 
 // GET - Fetch single evidence details
 export async function GET(
@@ -51,6 +52,20 @@ export async function GET(
         { status: 403 }
       )
     }
+
+    // AUDIT LOG: Evidence viewed (CRITICAL for chain of custody)
+    await logEvidenceAccess({
+      userId: user.id,
+      username: user.username,
+      action: 'evidence_viewed',
+      evidenceId: evidence.id,
+      itemId: evidence.itemId,
+      details: {
+        type: evidence.type,
+        originalName: evidence.originalName
+      },
+      request
+    })
 
     // Return evidence with properly serialized dates
     return NextResponse.json({
@@ -136,6 +151,21 @@ export async function PUT(
       id: updatedEvidence.id,
       itemId: updatedEvidence.itemId,
       hasDescription: !!updatedEvidence.description
+    })
+
+    // AUDIT LOG: Evidence modified (CRITICAL for chain of custody)
+    await logEvidenceAccess({
+      userId: user.id,
+      username: user.username,
+      action: 'evidence_modified',
+      evidenceId: updatedEvidence.id,
+      itemId: updatedEvidence.itemId,
+      details: {
+        field: 'description',
+        oldValue: existingEvidence.description,
+        newValue: updatedEvidence.description
+      },
+      request
     })
 
     return NextResponse.json({
