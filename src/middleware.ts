@@ -6,21 +6,21 @@ import { canReadAll, canWriteAll, canManageUsers, canAccessAdmin, Role } from '@
 async function getCurrentUserSafe(): Promise<any | null> {
   try {
     const cookieStore = await cookies()
-    const sessionCookie = cookieStore.get('session')
+    const userCookie = cookieStore.get('user')
     
-    if (!sessionCookie?.value) {
+    if (!userCookie?.value) {
       return null
     }
 
-    // Parse session data (basic validation only - no password verification needed)
-    const sessionData = JSON.parse(sessionCookie.value)
+    // Parse user data (basic validation only - no password verification needed)
+    const user = JSON.parse(userCookie.value)
     
-    // Basic session validation
-    if (!sessionData?.user?.id || !sessionData?.user?.username) {
+    // Basic user validation
+    if (!user?.id || !user?.username) {
       return null
     }
 
-    return sessionData.user
+    return user
   } catch (error) {
     console.error('Middleware auth error:', error)
     return null
