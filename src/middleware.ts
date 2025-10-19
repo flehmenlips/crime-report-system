@@ -46,6 +46,7 @@ export async function middleware(req: NextRequest) {
   // Allow access to auth pages, static assets, and login without authentication
   if (pathname.startsWith('/api/auth') || 
       pathname.startsWith('/login') ||
+      pathname.startsWith('/landing') || // Public marketing page
       pathname.startsWith('/unauthorized') ||
       pathname.startsWith('/_next') ||
       pathname.startsWith('/icons/') ||
