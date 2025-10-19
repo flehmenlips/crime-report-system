@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { getCurrentUser } from '@/lib/auth-server'
 import { hashPassword } from '@/lib/password'
+import { EmailService } from '@/lib/email'
 
 // GET - Fetch all users for a tenant
 export async function GET(request: NextRequest) {
@@ -150,8 +151,24 @@ export async function POST(request: NextRequest) {
 
     console.log(`✅ User "${currentUser.name}" invited "${newUser.name}" to tenant "${currentUser.tenantId}"`)
 
+    // Send invitation email
+    try {
+      const setupPasswordUrl = `${process.env.NEXTAUTH_URL || 'https://www.remise.farm'}/login-simple?invited=true&email=${encodeURIComponent(email)}`
+      await EmailService.sendInvitationEmail(
+        email,
+        newUser.name,
+        currentUser.name,
+        'Birkenfeld Farm', // tenant name
+        setupPasswordUrl
+      )
+      console.log(`📧 Invitation email sent to ${email}`)
+    } catch (emailError) {
+      console.error('❌ Failed to send invitation email:', emailError)
+      // Don't fail the user creation if email fails
+    }
+
     return NextResponse.json({
-      message: 'User created successfully',
+      message: 'User created successfully and invitation email sent',
       user: newUser
     })
 
