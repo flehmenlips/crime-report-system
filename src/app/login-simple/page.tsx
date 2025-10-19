@@ -71,15 +71,40 @@ export default function SimpleLoginPage() {
           </div>
 
           {/* Typography */}
-          <h1 style={{
-            fontSize: '32px',
-            fontWeight: 'bold',
-            color: 'white',
-            marginBottom: '12px',
-            margin: '0 0 12px 0'
+          <div style={{
+            marginBottom: '16px'
           }}>
-            REMISE Asset Barn
-          </h1>
+            <h1 style={{
+              fontSize: '48px',
+              fontWeight: 'bold',
+              color: 'white',
+              margin: '0',
+              lineHeight: '1.1',
+              letterSpacing: '0.02em'
+            }}>
+              REMISE
+            </h1>
+            <h2 style={{
+              fontSize: '28px',
+              fontWeight: '600',
+              color: 'rgba(255, 255, 255, 0.9)',
+              margin: '4px 0 0 0',
+              lineHeight: '1.2'
+            }}>
+              Asset Barn
+            </h2>
+          </div>
+          
+          <p style={{
+            color: 'rgba(255, 255, 255, 0.85)',
+            fontSize: '15px',
+            margin: '0 0 20px 0',
+            lineHeight: '1.6',
+            maxWidth: '400px'
+          }}>
+            A secure repository barn for tracking all of your valuable assets and belongings
+          </p>
+
           <div style={{
             display: 'inline-flex',
             alignItems: 'center',
@@ -97,24 +122,9 @@ export default function SimpleLoginPage() {
               marginRight: '12px'
             }}></div>
             <span style={{ color: '#bfdbfe', fontSize: '14px', fontWeight: '500' }}>
-              Asset Tracking and Crime Reporting System
+              Asset Tracking & Crime Reporting System
             </span>
           </div>
-          <h3 style={{
-            fontSize: '20px',
-            fontWeight: '600',
-            color: 'rgba(255, 255, 255, 0.9)',
-            margin: '0 0 8px 0'
-          }}>
-            Professional Security Portal
-          </h3>
-          <p style={{
-            color: 'rgba(255, 255, 255, 0.7)',
-            fontSize: '14px',
-            margin: '0'
-          }}>
-            Secure access for law enforcement, property owners, and stakeholders
-          </p>
         </div>
 
         <div style={{
