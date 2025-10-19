@@ -78,7 +78,7 @@ export default function SimpleLoginPage() {
             marginBottom: '12px',
             margin: '0 0 12px 0'
           }}>
-            Crime Report System
+            REMISE Asset Barn
           </h1>
           <div style={{
             display: 'inline-flex',
@@ -97,7 +97,7 @@ export default function SimpleLoginPage() {
               marginRight: '12px'
             }}></div>
             <span style={{ color: '#bfdbfe', fontSize: '14px', fontWeight: '500' }}>
-              Birkenfeld Farm Theft Case
+              Asset Tracking and Crime Reporting System
             </span>
           </div>
           <h3 style={{
