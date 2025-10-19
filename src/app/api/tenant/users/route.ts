@@ -152,7 +152,7 @@ export async function POST(request: NextRequest) {
         role,
         tenantId: currentUser.tenantId,
         isActive: true,
-        emailVerified: false, // User will need to verify email
+        emailVerified: true, // Invited users are pre-verified
         accessLevel: role === 'property_owner' ? 'owner' : 'stakeholder'
       },
       select: {
