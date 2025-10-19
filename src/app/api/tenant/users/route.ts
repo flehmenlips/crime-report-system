@@ -159,7 +159,9 @@ export async function POST(request: NextRequest) {
         newUser.name,
         currentUser.name,
         'Birkenfeld Farm', // tenant name
-        setupPasswordUrl
+        setupPasswordUrl,
+        username, // Add username
+        password  // Add temporary password
       )
       console.log(`📧 Invitation email sent to ${email}`)
     } catch (emailError) {

@@ -183,7 +183,7 @@ export const EMAIL_TEMPLATES = {
   // User invitation email
   invitation: {
     subject: 'You\'ve been invited to join Crime Report System',
-    template: (inviteeName: string, inviterName: string, tenantName: string, setupPasswordUrl: string) => ({
+    template: (inviteeName: string, inviterName: string, tenantName: string, setupPasswordUrl: string, username?: string, password?: string) => ({
       subject: 'You\'ve been invited to join Crime Report System',
       html: `
         <!DOCTYPE html>
@@ -223,9 +223,18 @@ export const EMAIL_TEMPLATES = {
               </ul>
             </div>
             
+            ${username && password ? `
+            <div class="highlight" style="background: #f0fdf4; border-color: #22c55e;">
+              <strong>🔑 Your Login Credentials:</strong><br>
+              <strong>Username:</strong> <code style="background: #f3f4f6; padding: 4px 8px; border-radius: 4px;">${username}</code><br>
+              <strong>Temporary Password:</strong> <code style="background: #f3f4f6; padding: 4px 8px; border-radius: 4px;">${password}</code><br>
+              <small style="color: #6b7280;">You can log in immediately with these credentials, or click below to set up a new password.</small>
+            </div>
+            ` : ''}
+            
             <div class="highlight">
               <strong>🚀 Ready to get started?</strong><br>
-              Your account has been created! Click the button below to set up your secure password and access the system.
+              Your account has been created! Click the button below to access the system.
             </div>
             
             <div style="text-align: center;">
@@ -392,9 +401,9 @@ export class EmailService {
   }
 
   // Send user invitation email
-  static async sendInvitationEmail(email: string, inviteeName: string, inviterName: string, tenantName: string, setupPasswordUrl: string) {
+  static async sendInvitationEmail(email: string, inviteeName: string, inviterName: string, tenantName: string, setupPasswordUrl: string, username?: string, password?: string) {
     try {
-      const template = EMAIL_TEMPLATES.invitation.template(inviteeName, inviterName, tenantName, setupPasswordUrl)
+      const template = EMAIL_TEMPLATES.invitation.template(inviteeName, inviterName, tenantName, setupPasswordUrl, username, password)
       
       const result = await resend.emails.send({
         from: EMAIL_CONFIG.from,
