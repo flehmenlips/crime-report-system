@@ -236,6 +236,10 @@ export const EMAIL_TEMPLATES = {
               <strong>🔒 Security Note:</strong> This link will expire in 24 hours for security reasons. If you didn't expect this invitation, please ignore this email.
             </div>
             
+            <div class="security-note" style="background: #f0f9ff; border-color: #0ea5e9;">
+              <strong>📧 Email Tips:</strong> To ensure you receive all REMISE notifications, please add <strong>noreply@accounts.remise.farm</strong> to your email contacts or safe sender list.
+            </div>
+            
             <p><strong>Need help?</strong> Contact ${inviterName} or our support team if you have any questions about getting started.</p>
           </div>
           <div class="footer">
