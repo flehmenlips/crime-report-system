@@ -39,14 +39,31 @@ export async function GET(request: NextRequest) {
         name: true,
         email: true,
         role: true,
-        accessLevel: true
+        accessLevel: true,
+        username: true,
+        _count: {
+          select: {
+            items: true
+          }
+        }
       },
       orderBy: { name: 'asc' }
     })
 
-    console.log(`✅ User "${currentUser.name}" fetched ${users.length} users for tenant ${tenantId}`)
+    // Transform users to include itemCount
+    const usersWithItemCount = users.map(user => ({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      accessLevel: user.accessLevel,
+      username: user.username,
+      itemCount: user._count.items
+    }))
 
-    return NextResponse.json({ users })
+    console.log(`✅ User "${currentUser.name}" fetched ${usersWithItemCount.length} users for tenant ${tenantId}`)
+
+    return NextResponse.json({ users: usersWithItemCount })
 
   } catch (error) {
     console.error('❌ Error fetching tenant users:', error)
