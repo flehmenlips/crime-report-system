@@ -3,6 +3,9 @@ import { prisma } from '@/lib/prisma'
 import { EmailService } from '@/lib/email'
 import crypto from 'crypto'
 
+// Force dynamic rendering since we use cookies
+export const dynamic = 'force-dynamic'
+
 export async function POST(request: NextRequest) {
   try {
     const { email } = await request.json()

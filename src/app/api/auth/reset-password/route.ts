@@ -4,6 +4,9 @@ import { EmailService } from '@/lib/email'
 import { hashPassword, validatePasswordStrength, isCommonPassword } from '@/lib/password'
 import crypto from 'crypto'
 
+// Force dynamic rendering since we use cookies
+export const dynamic = 'force-dynamic'
+
 export async function POST(request: NextRequest) {
   try {
     const { token, password } = await request.json()

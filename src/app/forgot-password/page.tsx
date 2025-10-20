@@ -59,21 +59,45 @@ export default function ForgotPasswordPage() {
         boxShadow: '0 20px 40px rgba(0, 0, 0, 0.1)',
         border: '1px solid rgba(255, 255, 255, 0.2)'
       }}>
-        <div style={{ textAlign: 'center', marginBottom: '30px' }}>
+        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+          <div style={{
+            width: '64px',
+            height: '64px',
+            background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+            borderRadius: '16px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            margin: '0 auto 24px',
+            boxShadow: '0 8px 25px rgba(239, 68, 68, 0.3)'
+          }}>
+            <span style={{ fontSize: '28px' }}>🔒</span>
+          </div>
           <h1 style={{
-            fontSize: '28px',
+            fontSize: '32px',
             fontWeight: 'bold',
             color: '#1f2937',
-            marginBottom: '8px'
+            margin: '0 0 8px 0'
           }}>
             Forgot Password?
           </h1>
           <p style={{
             color: '#6b7280',
-            fontSize: '16px'
+            fontSize: '16px',
+            margin: '0 0 16px 0'
           }}>
-            Enter your email address and we'll send you a link to reset your password.
+            Enter your email address and we'll send you a secure link to reset your password.
           </p>
+          <div style={{
+            padding: '12px 16px',
+            background: '#fef3c7',
+            border: '1px solid #f59e0b',
+            borderRadius: '8px',
+            fontSize: '14px',
+            color: '#92400e'
+          }}>
+            <strong>⏰ Security Note:</strong> Reset links expire in 1 hour for your security.
+          </div>
         </div>
 
         {message && (
@@ -181,7 +205,7 @@ export default function ForgotPasswordPage() {
 
         <div style={{ textAlign: 'center' }}>
           <button
-            onClick={() => router.push('/login')}
+            onClick={() => router.push('/login-simple')}
             style={{
               background: 'none',
               border: 'none',

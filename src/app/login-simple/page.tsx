@@ -364,6 +364,33 @@ export default function SimpleLoginPage() {
                 )}
               </button>
             </div>
+
+            {/* Forgot Password Link */}
+            <div style={{ marginTop: '16px', textAlign: 'center' }}>
+              <button
+                type="button"
+                onClick={() => router.push('/forgot-password')}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: 'rgba(255, 255, 255, 0.8)',
+                  fontSize: '14px',
+                  cursor: 'pointer',
+                  textDecoration: 'underline',
+                  transition: 'color 0.3s ease'
+                }}
+                onMouseEnter={(e) => {
+                  const target = e.target as HTMLButtonElement
+                  target.style.color = 'white'
+                }}
+                onMouseLeave={(e) => {
+                  const target = e.target as HTMLButtonElement
+                  target.style.color = 'rgba(255, 255, 255, 0.8)'
+                }}
+              >
+                Forgot your password?
+              </button>
+            </div>
           </form>
 
           {/* Email Instructions */}
