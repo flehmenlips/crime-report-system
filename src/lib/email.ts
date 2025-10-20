@@ -8,7 +8,7 @@ export const EMAIL_CONFIG = {
   from: process.env.EMAIL_FROM || 'Crime Report System <onboarding@resend.dev>', // Use environment variable or fallback to test domain
   replyTo: process.env.EMAIL_REPLY_TO || 'onboarding@resend.dev',
   companyName: 'Crime Report System',
-  websiteUrl: process.env.NEXTAUTH_URL || 'https://remise-rov8.onrender.com'
+  websiteUrl: process.env.NEXTAUTH_URL || 'https://www.remise.farm'
 }
 
 // Email templates

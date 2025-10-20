@@ -168,6 +168,12 @@ export async function POST(request: NextRequest) {
 
     console.log(`✅ User "${currentUser.name}" invited "${newUser.name}" to tenant "${currentUser.tenantId}"`)
 
+    // Get tenant name for email
+    const tenant = await prisma.tenant.findUnique({
+      where: { id: currentUser.tenantId },
+      select: { name: true }
+    })
+
     // Send invitation email
     try {
       const setupPasswordUrl = `${process.env.NEXTAUTH_URL || 'https://www.remise.farm'}/login-simple?invited=true&email=${encodeURIComponent(email)}`
@@ -175,7 +181,7 @@ export async function POST(request: NextRequest) {
         email,
         newUser.name,
         currentUser.name,
-        'Birkenfeld Farm', // tenant name
+        tenant?.name || 'Your Property', // Use actual tenant name
         setupPasswordUrl,
         username, // Add username
         password  // Add temporary password
@@ -183,6 +189,13 @@ export async function POST(request: NextRequest) {
       console.log(`📧 Invitation email sent to ${email}`)
     } catch (emailError) {
       console.error('❌ Failed to send invitation email:', emailError)
+      console.error('Email error details:', {
+        email,
+        inviteeName: newUser.name,
+        inviterName: currentUser.name,
+        tenantName: tenant?.name,
+        error: emailError
+      })
       // Don't fail the user creation if email fails
     }
 

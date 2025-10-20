@@ -1,64 +1,34 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { EmailService } from '@/lib/email'
 
-export async function GET(request: NextRequest) {
+export async function POST(request: NextRequest) {
   try {
-    console.log('=== EMAIL SYSTEM TEST ===')
+    const { email } = await request.json()
     
-    // Check environment variables
-    const hasResendKey = !!process.env.RESEND_API_KEY
-    const hasEmailFrom = !!process.env.EMAIL_FROM
-    const hasEmailReplyTo = !!process.env.EMAIL_REPLY_TO
-    
-    console.log('Environment check:', {
-      hasResendKey,
-      hasEmailFrom,
-      hasEmailReplyTo,
-      emailFrom: process.env.EMAIL_FROM,
-      emailReplyTo: process.env.EMAIL_REPLY_TO,
-      resendKeyPrefix: process.env.RESEND_API_KEY?.substring(0, 10) + '...'
-    })
-    
-    if (!hasResendKey) {
-      return NextResponse.json({
-        success: false,
-        error: 'RESEND_API_KEY not found in environment variables',
-        environment: {
-          hasResendKey,
-          hasEmailFrom,
-          hasEmailReplyTo
-        }
-      }, { status: 500 })
+    if (!email) {
+      return NextResponse.json({ error: 'Email is required' }, { status: 400 })
     }
-    
+
     // Test sending a simple notification email
-    const testResult = await EmailService.sendNotificationEmail(
-      'test@example.com', // This will fail, but we'll see the error
-      'Test Email System',
-      'This is a test email to verify the email system is working.',
-      'Test Button',
-      'https://example.com'
+    const result = await EmailService.sendNotificationEmail(
+      email,
+      'Test Email - REMISE System',
+      'This is a test email to verify the Resend integration is working properly.',
+      'Visit REMISE',
+      'https://www.remise.farm'
     )
-    
+
     return NextResponse.json({
-      success: true,
-      message: 'Email system test completed',
-      environment: {
-        hasResendKey,
-        hasEmailFrom,
-        hasEmailReplyTo,
-        emailFrom: process.env.EMAIL_FROM,
-        emailReplyTo: process.env.EMAIL_REPLY_TO
-      },
-      testResult
+      success: result.success,
+      message: result.success ? 'Test email sent successfully' : 'Failed to send test email',
+      error: result.error
     })
-    
+
   } catch (error) {
-    console.error('Email system test error:', error)
-    return NextResponse.json({
-      success: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
-      stack: error instanceof Error ? error.stack : undefined
+    console.error('Test email error:', error)
+    return NextResponse.json({ 
+      error: 'Internal server error',
+      details: error instanceof Error ? error.message : 'Unknown error'
     }, { status: 500 })
   }
 }
