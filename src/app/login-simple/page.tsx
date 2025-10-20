@@ -531,8 +531,8 @@ export default function SimpleLoginPage() {
         <RegistrationModal
           onClose={() => setShowRegistration(false)}
           onSuccess={() => {
-            // Optional: Show a success message or redirect
-            console.log('Registration successful!')
+            // Redirect to registration success page
+            window.location.href = '/registration-success'
           }}
         />
       )}

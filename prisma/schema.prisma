@@ -8,16 +8,19 @@ datasource db {
 }
 
 model Tenant {
-  id          String        @id @default(uuid())
-  name        String
-  description String?
-  isActive    Boolean       @default(true)
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-  items       StolenItem[]
-  users       User[]
-  caseDetails CaseDetails[]
-  categories  Category[]
+  id           String        @id @default(uuid())
+  name         String
+  description  String?
+  isActive     Boolean       @default(true)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  address      String?
+  contactEmail String?
+  contactPhone String?
+  caseDetails  CaseDetails[]
+  categories   Category[]
+  items        StolenItem[]
+  users        User[]
 
   @@map("tenants")
 }
@@ -58,26 +61,26 @@ model User {
 }
 
 model StolenItem {
-  id                  Int                   @id @default(autoincrement())
-  name                String
-  description         String
-  serialNumber        String?
-  purchaseDate        String
-  purchaseCost        Float
-  dateLastSeen        String
-  locationLastSeen    String
-  estimatedValue      Float
-  category            String                @default("other") // Required field with default value
-  tags                Json?                  // Store as JSON array for proper multi-tag support
-  notes               String?
-  createdAt           DateTime              @default(now())
-  updatedAt           DateTime              @updatedAt
-  ownerId             String
-  tenantId            String?               @default("tenant-1")
-  evidence            Evidence[]
-  investigationNotes  InvestigationNote[]
-  owner               User                  @relation(fields: [ownerId], references: [id])
-  tenant              Tenant?               @relation(fields: [tenantId], references: [id])
+  id                 Int                 @id @default(autoincrement())
+  name               String
+  description        String
+  serialNumber       String?
+  purchaseDate       String
+  purchaseCost       Float
+  dateLastSeen       String
+  locationLastSeen   String
+  estimatedValue     Float
+  category           String              @default("other")
+  notes              String?
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  ownerId            String
+  tenantId           String?             @default("tenant-1")
+  tags               Json?
+  evidence           Evidence[]
+  investigationNotes InvestigationNote[]
+  owner              User                @relation(fields: [ownerId], references: [id])
+  tenant             Tenant?             @relation(fields: [tenantId], references: [id])
 
   @@map("stolen_items")
 }
@@ -86,149 +89,186 @@ model Evidence {
   id             Int        @id @default(autoincrement())
   type           String
   cloudinaryId   String?
-  url            String?
   originalName   String?
   description    String?
+  createdAt      DateTime   @default(now())
+  itemId         Int
+  documentData   Bytes?
+  url            String?
   fileSize       Int?
   mimeType       String?
   uploadedBy     String?
   uploadedByName String?
   uploadedByRole String?
-  createdAt      DateTime   @default(now())
-  itemId         Int
-  documentData   Bytes?
   item           StolenItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
 
   @@map("evidence")
 }
 
 model InvestigationNote {
-  id              Int        @id @default(autoincrement())
-  itemId          Int
-  content         String     @db.Text
-  createdBy       String
-  createdByName   String
-  createdByRole   String
-  isConfidential  Boolean    @default(false)
-  createdAt       DateTime   @default(now())
-  updatedAt       DateTime   @updatedAt
-  item            StolenItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  id             Int        @id @default(autoincrement())
+  itemId         Int
+  content        String
+  createdBy      String
+  createdByName  String
+  createdByRole  String
+  isConfidential Boolean    @default(false)
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  item           StolenItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
 
   @@map("investigation_notes")
 }
 
 model CaseDetails {
-  id                String          @id @default(cuid())
-  tenantId          String
-  caseName          String
-  caseNumber        String?
-  dateReported      DateTime
-  dateOccurred      DateTime
-  location          String          @db.Text
-  status            String          @default("open") // open, investigating, closed
-  priority          String          @default("medium") // low, medium, high, critical
-  assignedOfficer   String?
-  description       String          @db.Text
-  createdBy         String
-  createdByName     String
-  createdByRole     String
-  createdAt         DateTime        @default(now())
-  updatedAt         DateTime        @updatedAt
-  
-  // Relations
-  tenant            Tenant          @relation(fields: [tenantId], references: [id])
-  timeline          CaseTimelineEvent[]
-  suspects          CaseSuspect[]
-  caseEvidence      CaseEvidence[]
-  updates           CaseUpdate[]
-  permissions       CasePermission[]
+  id              String              @id @default(cuid())
+  tenantId        String
+  caseName        String
+  caseNumber      String?
+  dateReported    DateTime
+  dateOccurred    DateTime
+  location        String
+  status          String              @default("open")
+  priority        String              @default("medium")
+  assignedOfficer String?
+  description     String
+  createdBy       String
+  createdByName   String
+  createdByRole   String
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+  tenant          Tenant              @relation(fields: [tenantId], references: [id])
+  caseEvidence    CaseEvidence[]
+  permissions     CasePermission[]
+  suspects        CaseSuspect[]
+  timeline        CaseTimelineEvent[]
+  updates         CaseUpdate[]
 
   @@map("case_details")
 }
 
 model CaseTimelineEvent {
-  id              String       @id @default(cuid())
-  caseId          String
-  date            DateTime
-  time            String
-  event           String
-  description     String       @db.Text
-  createdBy       String
-  createdByName   String
-  createdByRole   String
-  createdAt       DateTime     @default(now())
-  updatedAt       DateTime     @updatedAt
-  case            CaseDetails  @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  id            String      @id @default(cuid())
+  caseId        String
+  date          DateTime
+  time          String
+  event         String
+  description   String
+  createdBy     String
+  createdByName String
+  createdByRole String
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  case          CaseDetails @relation(fields: [caseId], references: [id], onDelete: Cascade)
 
   @@map("case_timeline_events")
 }
 
 model CaseSuspect {
-  id              String       @id @default(cuid())
-  caseId          String
-  name            String
-  description     String       @db.Text
-  address         String?
-  phone           String?
-  status          String       @default("active") // active, cleared, arrested
-  createdBy       String
-  createdByName   String
-  createdByRole   String
-  createdAt       DateTime     @default(now())
-  updatedAt       DateTime     @updatedAt
-  case            CaseDetails  @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  id            String      @id @default(cuid())
+  caseId        String
+  name          String
+  description   String
+  address       String?
+  phone         String?
+  status        String      @default("active")
+  createdBy     String
+  createdByName String
+  createdByRole String
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  case          CaseDetails @relation(fields: [caseId], references: [id], onDelete: Cascade)
 
   @@map("case_suspects")
 }
 
 model CaseEvidence {
-  id              String       @id @default(cuid())
-  caseId          String
-  type            String
-  description     String       @db.Text
-  location        String
-  collectedBy     String
-  dateCollected   DateTime
-  createdBy       String
-  createdByName   String
-  createdByRole   String
-  createdAt       DateTime     @default(now())
-  updatedAt       DateTime     @updatedAt
-  case            CaseDetails  @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  id            String      @id @default(cuid())
+  caseId        String
+  type          String
+  description   String
+  location      String
+  collectedBy   String
+  dateCollected DateTime
+  createdBy     String
+  createdByName String
+  createdByRole String
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  case          CaseDetails @relation(fields: [caseId], references: [id], onDelete: Cascade)
 
   @@map("case_evidence")
 }
 
 model CaseUpdate {
-  id              String       @id @default(cuid())
-  caseId          String
-  date            DateTime
-  update          String       @db.Text
-  createdBy       String
-  createdByName   String
-  createdByRole   String
-  createdAt       DateTime     @default(now())
-  updatedAt       DateTime     @updatedAt
-  case            CaseDetails  @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  id            String      @id @default(cuid())
+  caseId        String
+  date          DateTime
+  update        String
+  createdBy     String
+  createdByName String
+  createdByRole String
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  case          CaseDetails @relation(fields: [caseId], references: [id], onDelete: Cascade)
 
   @@map("case_updates")
 }
 
 model CasePermission {
-  id              String       @id @default(cuid())
-  caseId          String
-  userId          String
-  canView         Boolean      @default(true)
-  canEdit         Boolean      @default(false)
-  canDelete       Boolean      @default(false)
-  grantedBy       String
-  grantedByName   String
-  createdAt       DateTime     @default(now())
-  updatedAt       DateTime     @updatedAt
-  case            CaseDetails  @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  id            String      @id @default(cuid())
+  caseId        String
+  userId        String
+  canView       Boolean     @default(true)
+  canEdit       Boolean     @default(false)
+  canDelete     Boolean     @default(false)
+  grantedBy     String
+  grantedByName String
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  case          CaseDetails @relation(fields: [caseId], references: [id], onDelete: Cascade)
 
   @@unique([caseId, userId])
   @@map("case_permissions")
+}
+
+model Category {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  tenantId    String
+  isSystem    Boolean  @default(false)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdBy   String
+  tenant      Tenant   @relation(fields: [tenantId], references: [id])
+
+  @@unique([tenantId, name])
+  @@map("categories")
+}
+
+model AuditLog {
+  id           String   @id @default(cuid())
+  userId       String?
+  username     String?
+  action       String
+  resource     String?
+  resourceType String?
+  details      Json?
+  ipAddress    String?
+  userAgent    String?
+  timestamp    DateTime @default(now())
+  success      Boolean  @default(true)
+  severity     String   @default("info")
+
+  @@index([userId])
+  @@index([action])
+  @@index([timestamp])
+  @@index([resource])
+  @@index([resourceType])
+  @@index([success])
+  @@map("audit_logs")
 }
 
 enum Role {
@@ -250,45 +290,4 @@ enum AccessLevel {
   staff
   stakeholder
   view_only
-}
-
-model Category {
-  id          String   @id @default(uuid())
-  name        String
-  description String?
-  tenantId    String
-  isSystem    Boolean  @default(false) // System categories cannot be deleted
-  sortOrder   Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  createdBy   String
-  
-  tenant      Tenant   @relation(fields: [tenantId], references: [id])
-  
-  @@unique([tenantId, name]) // Ensure unique category names per tenant
-  @@map("categories")
-}
-
-// AUDIT LOGGING - Critical for Law Enforcement Chain of Custody
-model AuditLog {
-  id          String   @id @default(cuid())
-  userId      String?  // Null for failed logins or anonymous actions
-  username    String?  // Denormalized for query performance
-  action      String   // 'login', 'logout', 'view_evidence', 'modify_case', etc.
-  resource    String?  // 'evidence:123', 'case:456', 'user:789', etc.
-  resourceType String? // 'evidence', 'case', 'user', 'item', etc.
-  details     Json?    // Additional context (before/after values, metadata)
-  ipAddress   String?  // Client IP address
-  userAgent   String?  // Browser/client information
-  timestamp   DateTime @default(now())
-  success     Boolean  @default(true) // false for failed attempts
-  severity    String   @default("info") // 'info', 'warning', 'error', 'critical'
-  
-  @@index([userId])
-  @@index([action])
-  @@index([timestamp])
-  @@index([resource])
-  @@index([resourceType])
-  @@index([success])
-  @@map("audit_logs")
 }

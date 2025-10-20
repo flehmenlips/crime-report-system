@@ -30,6 +30,7 @@ async function getCurrentUserSafe(): Promise<any | null> {
 // Define route access rules
 const ROUTE_PERMISSIONS = {
   '/admin': ['admin:system'],
+  '/tenant-management': ['super_admin'], // Only super_admin can manage tenants
   '/law-enforcement': ['law_enforcement'],
   '/insurance': ['insurance_agent'],
   '/broker': ['broker'],
@@ -47,6 +48,7 @@ export async function middleware(req: NextRequest) {
   if (pathname.startsWith('/api/auth') || 
       pathname.startsWith('/login') ||
       pathname.startsWith('/landing') || // Public marketing page
+      pathname.startsWith('/registration-success') || // Registration success page
       pathname.startsWith('/unauthorized') ||
       pathname.startsWith('/_next') ||
       pathname.startsWith('/icons/') ||
