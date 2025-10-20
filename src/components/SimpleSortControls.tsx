@@ -14,7 +14,7 @@ interface SimpleSortControlsProps {
 
 export function SimpleSortControls({ 
   onSortChange, 
-  currentField = 'date', 
+  currentField = 'value', 
   currentOrder = 'desc', 
   showLabel = true 
 }: SimpleSortControlsProps) {

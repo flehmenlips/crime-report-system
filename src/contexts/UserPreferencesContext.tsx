@@ -33,7 +33,7 @@ interface UserPreferencesContextType {
 
 const defaultPreferences: UserPreferences = {
   viewMode: 'cards',
-  sortField: 'date',
+  sortField: 'value',
   sortOrder: 'desc',
   dashboardLayout: 'spacious',
   showAdvancedSearch: true,

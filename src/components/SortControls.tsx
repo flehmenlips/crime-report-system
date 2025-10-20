@@ -13,7 +13,7 @@ interface SortControlsProps {
 }
 
 export function SortControls({ items, onSortChange, className = '', showLabel = true }: SortControlsProps) {
-  const [sortField, setSortField] = useState<SortField>('date')
+  const [sortField, setSortField] = useState<SortField>('value')
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc')
 
   // Safety check - don't render if onSortChange is not a function

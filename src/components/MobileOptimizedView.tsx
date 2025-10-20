@@ -35,7 +35,7 @@ export function MobileOptimizedView({
 }: MobileOptimizedViewProps) {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('all')
-  const [sortBy, setSortBy] = useState<'name' | 'value' | 'date'>('date')
+  const [sortBy, setSortBy] = useState<'name' | 'value' | 'date'>('value')
   const [showFilters, setShowFilters] = useState(false)
 
   // Filter and sort items
