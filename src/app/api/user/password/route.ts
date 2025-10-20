@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getCurrentUser } from '@/lib/auth-server'
 import { prisma } from '@/lib/prisma'
+import { hashPassword, verifyPassword } from '@/lib/password'
 
 export async function PUT(request: NextRequest) {
   try {
@@ -28,8 +29,9 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 })
     }
 
-    // Verify current password (in a real app, you'd hash this)
-    if (dbUser.password !== currentPassword) {
+    // Verify current password using proper hashing
+    const isCurrentPasswordValid = await verifyPassword(currentPassword, dbUser.password)
+    if (!isCurrentPasswordValid) {
       return NextResponse.json(
         { error: 'Current password is incorrect' },
         { status: 400 }
@@ -37,18 +39,21 @@ export async function PUT(request: NextRequest) {
     }
 
     // Validate new password strength
-    if (newPassword.length < 6) {
+    if (newPassword.length < 8) {
       return NextResponse.json(
-        { error: 'New password must be at least 6 characters long' },
+        { error: 'New password must be at least 8 characters long' },
         { status: 400 }
       )
     }
+
+    // Hash the new password before storing
+    const hashedNewPassword = await hashPassword(newPassword)
 
     // Update password in database
     await prisma.user.update({
       where: { id: user.id },
       data: {
-        password: newPassword,
+        password: hashedNewPassword,
         updatedAt: new Date()
       }
     })

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { EmailService } from '@/lib/email'
+import { hashPassword } from '@/lib/password'
 import crypto from 'crypto'
 
 export async function POST(request: NextRequest) {
@@ -15,9 +16,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate password strength
-    if (password.length < 6) {
+    if (password.length < 8) {
       return NextResponse.json(
-        { error: 'Password must be at least 6 characters long' },
+        { error: 'Password must be at least 8 characters long' },
         { status: 400 }
       )
     }
@@ -39,11 +40,14 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Hash the new password before storing
+    const hashedPassword = await hashPassword(password)
+
     // Update user with new password and clear reset tokens
     const updatedUser = await prisma.user.update({
       where: { id: user.id },
       data: {
-        password: password, // In a real app, you'd hash this
+        password: hashedPassword,
         passwordResetToken: null,
         passwordResetExpires: null,
         isActive: true // Activate account after password is set
