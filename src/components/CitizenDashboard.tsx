@@ -98,7 +98,7 @@ export function CitizenDashboard() {
       {/* Property Owner Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">My Stolen Property</h1>
-        <p className="text-gray-600 text-lg">Birkenfeld Farm Theft • Manage your stolen items and evidence</p>
+        <p className="text-gray-600 text-lg">Manage your stolen items and evidence</p>
       </div>
 
       {/* Quick Stats */}

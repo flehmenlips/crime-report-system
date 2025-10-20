@@ -29,8 +29,8 @@ export function GenerateReport({ items, onClose }: GenerateReportProps) {
     includeValueBreakdown: true,
     includeTimeline: true,
     includeContactInfo: true,
-    reportTitle: 'Stolen Property Report - Birkenfeld Farm Theft',
-    caseNumber: 'Case #2023-12020',
+    reportTitle: 'Stolen Property Report',
+    caseNumber: '',
     officerName: '',
     department: 'Columbia County Sheriff\'s Office',
     reportDate: new Date().toISOString().split('T')[0]

@@ -220,6 +220,41 @@ export function TenantInfo({ user, className = '', textColor = 'white', textColo
           )}
         </div>
       </div>
+
+      {/* Property Management Button for Property Owners */}
+      {isPropertyOwner(user) && (
+        <div style={{ marginTop: '12px', paddingTop: '12px', borderTop: '1px solid rgba(255, 255, 255, 0.2)' }}>
+          <button
+            onClick={() => window.location.href = '/my-property'}
+            style={{
+              width: '100%',
+              padding: '8px 12px',
+              background: 'linear-gradient(135deg, #3b82f6 0%, #6366f1 100%)',
+              color: 'white',
+              border: 'none',
+              borderRadius: '8px',
+              fontSize: '12px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '6px'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-1px)'
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(59, 130, 246, 0.3)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)'
+              e.currentTarget.style.boxShadow = 'none'
+            }}
+          >
+            🏢 Manage Property
+          </button>
+        </div>
+      )}
     </div>
   )
 }

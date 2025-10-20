@@ -562,7 +562,7 @@ export function CaseDetailsForm({ user, caseId, onClose, onSave }: CaseDetailsFo
                     type="text"
                     value={formData.caseName}
                     onChange={(e) => setFormData({ ...formData, caseName: e.target.value })}
-                    placeholder="e.g., Birkenfeld Farm Theft Investigation"
+                    placeholder="e.g., Property Theft Investigation"
                     style={{
                       width: '100%',
                       padding: '12px',

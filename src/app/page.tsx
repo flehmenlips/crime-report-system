@@ -1106,7 +1106,7 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
                     {getDashboardTitle(user)}
                   </h1>
                   <p style={{ color: textColorSecondary, margin: 0, fontWeight: '500', transition: 'color 0.3s ease-in-out' }}>
-                    Birkenfeld Farm Theft • Case #2023-12020
+                    {user.tenant?.name || 'Property Management'}
                   </p>
                 </div>
               </div>
@@ -2919,24 +2919,108 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
         
         {/* Desktop View */}
       
-      <ProgressiveLoader
-        loading={!initialDataLoaded}
-        skeletonType="dashboard"
-        skeletonCount={6}
-        loadingMessage="Loading Dashboard..."
-        showProgress={evidenceLoading}
-        progress={evidenceProgress}
-      >
-        <StakeholderDashboard 
-          user={user} 
-          items={allItems} 
-          onItemsUpdate={(updatedItems) => setAllItems(updatedItems)}
-          loading={loading}
-          error={error}
-          onRefresh={handleRefresh}
-          evidenceCache={evidenceCache}
-          evidenceLoaded={evidenceLoaded}
-        />
+      {/* Property Onboarding Check for Property Owners */}
+      {user && user.role === 'property_owner' && !user.tenantId && (
+        <div style={{
+          maxWidth: '800px',
+          margin: '40px auto',
+          padding: '24px',
+          textAlign: 'center'
+        }}>
+          <div style={{
+            background: 'white',
+            borderRadius: '16px',
+            padding: '48px',
+            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+            border: '1px solid #e5e7eb'
+          }}>
+            <div style={{
+              width: '80px',
+              height: '80px',
+              background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 24px auto',
+              fontSize: '40px'
+            }}>
+              🏢
+            </div>
+            <h2 style={{
+              fontSize: '24px',
+              fontWeight: '600',
+              color: '#1f2937',
+              marginBottom: '16px'
+            }}>
+              Welcome to REMISE Asset Barn!
+            </h2>
+            <p style={{
+              fontSize: '16px',
+              color: '#6b7280',
+              marginBottom: '32px',
+              lineHeight: '1.6'
+            }}>
+              You haven't set up your property details yet. This helps us customize your experience and provides important information for stakeholders.
+            </p>
+            <button
+              onClick={() => window.location.href = '/property-onboarding'}
+              style={{
+                padding: '16px 32px',
+                background: 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)',
+                color: 'white',
+                borderRadius: '12px',
+                fontSize: '16px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                border: 'none',
+                boxShadow: '0 4px 12px rgba(37, 99, 235, 0.3)',
+                marginRight: '12px'
+              }}
+            >
+              Set Up My Property
+            </button>
+            <button
+              onClick={() => window.location.reload()}
+              style={{
+                padding: '16px 32px',
+                background: 'none',
+                color: '#6b7280',
+                borderRadius: '12px',
+                fontSize: '16px',
+                fontWeight: '500',
+                cursor: 'pointer',
+                border: '1px solid #d1d5db'
+              }}
+            >
+              Skip for Now
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Main Dashboard Content - Only show if property is set up or user is not a property owner */}
+      {!(user && user.role === 'property_owner' && !user.tenantId) && (
+        <ProgressiveLoader
+          loading={!initialDataLoaded}
+          skeletonType="dashboard"
+          skeletonCount={6}
+          loadingMessage="Loading Dashboard..."
+          showProgress={evidenceLoading}
+          progress={evidenceProgress}
+        >
+          <StakeholderDashboard 
+            user={user} 
+            items={allItems} 
+            onItemsUpdate={(updatedItems) => setAllItems(updatedItems)}
+            loading={loading}
+            error={error}
+            onRefresh={handleRefresh}
+            evidenceCache={evidenceCache}
+            evidenceLoaded={evidenceLoaded}
+          />
+        </ProgressiveLoader>
+      )}
         
         {/* Evidence loading overlay */}
         {evidenceLoading && (
@@ -2972,7 +3056,6 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
             </div>
           </div>
         )}
-      </ProgressiveLoader>
     </div>
     </>
   )
