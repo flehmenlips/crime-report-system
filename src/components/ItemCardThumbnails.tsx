@@ -32,8 +32,8 @@ export function ItemCardThumbnails({ item, onImageClick, compact = false, eviden
       console.log('✅ Using provided evidence data for item:', item.id, 'Evidence count:', propEvidence.length)
       setEvidence(propEvidence)
       setLoading(false)
-    } else if (!loading) {
-      // Only make API call if we haven't already loaded evidence
+    } else {
+      // Fallback to API call if no evidence provided
       console.log('⚠️ No evidence prop provided for item:', item.id, 'Making API call')
       loadEvidence()
     }
