@@ -29,14 +29,17 @@ export function SuperAdminDashboard({ currentUser, onClose }: SuperAdminDashboar
 
   const loadPlatformStats = async () => {
     try {
+      console.log('SuperAdminDashboard: Starting to load platform stats...')
       setLoading(true)
       const response = await fetch('/api/admin/platform-stats')
+      console.log('SuperAdminDashboard: API response status:', response.status)
       if (response.ok) {
         const data = await response.json()
+        console.log('SuperAdminDashboard: Loaded platform stats:', data.stats)
         setStats(data.stats)
       } else {
         // Don't show error for authentication issues - just show default stats
-        console.log('Platform stats API not accessible, using default values')
+        console.log('SuperAdminDashboard: Platform stats API not accessible, using default values')
         setStats({
           totalUsers: 0,
           totalTenants: 0,
@@ -48,7 +51,7 @@ export function SuperAdminDashboard({ currentUser, onClose }: SuperAdminDashboar
       }
     } catch (error) {
       // Don't show error for network issues - just show default stats
-      console.log('Platform stats API not accessible, using default values')
+      console.log('SuperAdminDashboard: Platform stats API not accessible, using default values')
       setStats({
         totalUsers: 0,
         totalTenants: 0,
@@ -58,6 +61,7 @@ export function SuperAdminDashboard({ currentUser, onClose }: SuperAdminDashboar
         totalEvidence: 0
       })
     } finally {
+      console.log('SuperAdminDashboard: Setting loading to false')
       setLoading(false)
     }
   }

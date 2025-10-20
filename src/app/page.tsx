@@ -843,7 +843,8 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
   }
 
   // Show loading state while authenticating or loading data
-  if (!user || loading) {
+  // Skip loading screen for SuperAdmin users since they don't load tenant data
+  if (!user || (loading && !(user?.role === 'super_admin'))) {
     return (
       <div style={{
         minHeight: '100vh',
@@ -3009,6 +3010,7 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
           margin: '0 auto',
           padding: '24px'
         }}>
+          {console.log('Rendering SuperAdminDashboard for user:', user.name, 'role:', user.role)}
           <SuperAdminDashboard 
             currentUser={user}
             // No onClose prop for main dashboard - this makes it non-modal
