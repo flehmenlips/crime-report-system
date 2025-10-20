@@ -1,9 +1,9 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 
-export default function RegistrationSuccessPage() {
+function RegistrationSuccessContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [accountInfo, setAccountInfo] = useState<{
@@ -347,5 +347,41 @@ export default function RegistrationSuccessPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function RegistrationSuccessPage() {
+  return (
+    <Suspense fallback={
+      <div style={{
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #1e3a8a 0%, #3730a3 50%, #581c87 100%)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '20px'
+      }}>
+        <div style={{
+          maxWidth: '600px',
+          width: '100%',
+          background: 'rgba(255, 255, 255, 0.95)',
+          backdropFilter: 'blur(20px)',
+          borderRadius: '24px',
+          padding: '48px',
+          boxShadow: '0 25px 50px rgba(0, 0, 0, 0.25)',
+          textAlign: 'center'
+        }}>
+          <div style={{
+            fontSize: '24px',
+            color: '#6b7280',
+            marginBottom: '16px'
+          }}>
+            Loading...
+          </div>
+        </div>
+      </div>
+    }>
+      <RegistrationSuccessContent />
+    </Suspense>
   )
 }
