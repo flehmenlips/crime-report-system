@@ -1075,33 +1075,39 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
         <div style={{
           background: 'rgba(255, 255, 255, 0.1)',
           backdropFilter: 'blur(20px)',
-          margin: '24px',
+          margin: isMobile ? '12px' : '24px',
           borderRadius: '20px',
           border: '1px solid rgba(255, 255, 255, 0.2)',
           boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)',
           position: 'sticky',
-          top: '24px',
+          top: isMobile ? '12px' : '24px',
           zIndex: 50
         }}>
-          <div style={{ padding: '24px 32px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <div style={{ padding: isMobile ? '16px 20px' : '24px 32px' }}>
+            <div style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'space-between',
+              flexDirection: isMobile ? 'column' : 'row',
+              gap: isMobile ? '16px' : '0'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '12px' : '16px' }}>
                 <div style={{
-                  width: '56px',
-                  height: '56px',
+                  width: isMobile ? '48px' : '56px',
+                  height: isMobile ? '48px' : '56px',
                   background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
                   borderRadius: '16px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   boxShadow: '0 10px 25px rgba(59, 130, 246, 0.3)',
-                  fontSize: '24px'
+                  fontSize: isMobile ? '20px' : '24px'
                 }}>
                   🏠
                 </div>
                 <div>
                   <h1 style={{ 
-                    fontSize: '32px', 
+                    fontSize: isMobile ? '24px' : '32px', 
                     fontWeight: '800', 
                     margin: 0,
                     color: textColor,
@@ -1109,14 +1115,31 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
                   }}>
                     {getDashboardTitle(user)}
                   </h1>
-                  <p style={{ color: textColorSecondary, margin: 0, fontWeight: '500', transition: 'color 0.3s ease-in-out' }}>
+                  <p style={{ 
+                    color: textColorSecondary, 
+                    margin: 0, 
+                    fontWeight: '500', 
+                    transition: 'color 0.3s ease-in-out',
+                    fontSize: isMobile ? '14px' : '16px'
+                  }}>
                     {user.tenant?.name || 'Property Management'}
                   </p>
                 </div>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+              <div style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '16px',
+                flexDirection: isMobile ? 'column' : 'row',
+                width: isMobile ? '100%' : 'auto'
+              }}>
                 {/* <NotificationBell /> */}
-              <TenantInfo user={user} textColor={textColor} textColorSecondary={textColorSecondary} />
+              <TenantInfo 
+                user={user} 
+                textColor={textColor} 
+                textColorSecondary={textColorSecondary}
+                isMobile={isMobile}
+              />
               <UserProfile 
                 showDetails={true} 
                 onProfileUpdate={(updatedUser) => {
@@ -1124,6 +1147,7 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
                 }}
                 textColor={textColor}
                 textColorSecondary={textColorSecondary}
+                isMobile={isMobile}
               />
               </div>
             </div>

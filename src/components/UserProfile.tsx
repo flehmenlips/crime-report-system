@@ -10,9 +10,10 @@ interface UserProfileProps {
   onProfileUpdate?: (updatedUser: User) => void
   textColor?: string
   textColorSecondary?: string
+  isMobile?: boolean
 }
 
-export function UserProfile({ className = '', showDetails = true, onProfileUpdate, textColor = 'white', textColorSecondary = 'rgba(255, 255, 255, 0.8)' }: UserProfileProps) {
+export function UserProfile({ className = '', showDetails = true, onProfileUpdate, textColor = 'white', textColorSecondary = 'rgba(255, 255, 255, 0.8)', isMobile = false }: UserProfileProps) {
   const [user, setUser] = useState<User | null>(null)
   const [isExpanded, setIsExpanded] = useState(false)
   const [showProfileManagement, setShowProfileManagement] = useState(false)
@@ -77,12 +78,13 @@ export function UserProfile({ className = '', showDetails = true, onProfileUpdat
         style={{
           display: 'flex',
           alignItems: 'center',
-          gap: '12px',
+          gap: isMobile ? '8px' : '12px',
           cursor: 'pointer',
-          padding: '8px',
+          padding: isMobile ? '6px' : '8px',
           borderRadius: '12px',
           transition: 'all 0.2s ease',
-          opacity: isExpanded ? 0.7 : 1
+          opacity: isExpanded ? 0.7 : 1,
+          width: isMobile ? '100%' : 'auto'
         }}
         onClick={() => setIsExpanded(!isExpanded)}
         onMouseEnter={(e) => {
@@ -97,8 +99,8 @@ export function UserProfile({ className = '', showDetails = true, onProfileUpdat
         }}
       >
         <div style={{
-          width: '40px',
-          height: '40px',
+          width: isMobile ? '36px' : '40px',
+          height: isMobile ? '36px' : '40px',
           background: user.role === 'property_owner' 
             ? 'linear-gradient(135deg, #3b82f6 0%, #6366f1 100%)'
             : user.role === 'law_enforcement'
@@ -112,7 +114,7 @@ export function UserProfile({ className = '', showDetails = true, onProfileUpdat
         }}>
           <span style={{
             color: textColor,
-            fontSize: '18px',
+            fontSize: isMobile ? '16px' : '18px',
             fontWeight: 'bold',
             transition: 'color 0.3s ease-in-out'
           }}>

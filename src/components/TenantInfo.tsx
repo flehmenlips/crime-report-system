@@ -9,9 +9,10 @@ interface TenantInfoProps {
   className?: string
   textColor?: string
   textColorSecondary?: string
+  isMobile?: boolean
 }
 
-export function TenantInfo({ user, className = '', textColor = 'white', textColorSecondary = 'rgba(255, 255, 255, 0.8)' }: TenantInfoProps) {
+export function TenantInfo({ user, className = '', textColor = 'white', textColorSecondary = 'rgba(255, 255, 255, 0.8)', isMobile = false }: TenantInfoProps) {
   const [tenantData, setTenantData] = useState<Tenant | null>(null)
   const [loading, setLoading] = useState(true)
 
@@ -73,7 +74,9 @@ export function TenantInfo({ user, className = '', textColor = 'white', textColo
       backdropFilter: 'blur(12px)',
       borderRadius: '12px',
       border: '1px solid rgba(255, 255, 255, 0.2)',
-      padding: '16px',
+      padding: isMobile ? '12px' : '16px',
+      width: isMobile ? '100%' : 'auto',
+      minWidth: isMobile ? '0' : '280px',
       ...(className ? { className } : {})
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
@@ -100,7 +103,7 @@ export function TenantInfo({ user, className = '', textColor = 'white', textColo
           <h3 style={{
             color: textColor,
             fontWeight: '600',
-            fontSize: '14px',
+            fontSize: isMobile ? '13px' : '14px',
             margin: '0 0 2px 0',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
@@ -111,7 +114,7 @@ export function TenantInfo({ user, className = '', textColor = 'white', textColo
           </h3>
           <p style={{
             color: textColorSecondary,
-            fontSize: '12px',
+            fontSize: isMobile ? '11px' : '12px',
             margin: '0',
             transition: 'color 0.3s ease-in-out'
           }}>
