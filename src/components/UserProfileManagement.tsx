@@ -38,6 +38,10 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
     confirmPassword: ''
   })
 
+  // Password visibility state (only for new password fields for security)
+  const [showNewPassword, setShowNewPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+
   // Registration form state (for new users)
   const [registrationData, setRegistrationData] = useState<UserRegistration>({
     username: '',
@@ -1120,35 +1124,59 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
                   }}>
                     New Password *
                   </label>
-                  <input
-                    type="password"
-                    required
-                    value={passwordData.newPassword}
-                    onChange={(e) => setPasswordData({...passwordData, newPassword: e.target.value})}
-                    style={{
-                      width: '100%',
-                      padding: '16px',
-                      background: '#f9fafb',
-                      border: '1px solid #e5e7eb',
-                      borderRadius: '16px',
-                      fontSize: '16px',
-                      color: '#1f2937',
-                      outline: 'none',
-                      transition: 'all 0.3s ease',
-                      boxSizing: 'border-box',
-                      boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.06)'
-                    }}
-                    onFocus={(e) => {
-                      e.target.style.borderColor = '#3b82f6'
-                      e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1), inset 0 1px 3px rgba(0,0,0,0.06)'
-                      e.target.style.background = 'white'
-                    }}
-                    onBlur={(e) => {
-                      e.target.style.borderColor = '#e5e7eb'
-                      e.target.style.boxShadow = 'inset 0 1px 3px rgba(0,0,0,0.06)'
-                      e.target.style.background = '#f9fafb'
-                    }}
-                  />
+                  <div style={{ position: 'relative' }}>
+                    <input
+                      type={showNewPassword ? 'text' : 'password'}
+                      required
+                      value={passwordData.newPassword}
+                      onChange={(e) => setPasswordData({...passwordData, newPassword: e.target.value})}
+                      style={{
+                        width: '100%',
+                        padding: '16px 52px 16px 16px',
+                        background: '#f9fafb',
+                        border: '1px solid #e5e7eb',
+                        borderRadius: '16px',
+                        fontSize: '16px',
+                        color: '#1f2937',
+                        outline: 'none',
+                        transition: 'all 0.3s ease',
+                        boxSizing: 'border-box',
+                        boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.06)'
+                      }}
+                      onFocus={(e) => {
+                        e.target.style.borderColor = '#3b82f6'
+                        e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1), inset 0 1px 3px rgba(0,0,0,0.06)'
+                        e.target.style.background = 'white'
+                      }}
+                      onBlur={(e) => {
+                        e.target.style.borderColor = '#e5e7eb'
+                        e.target.style.boxShadow = 'inset 0 1px 3px rgba(0,0,0,0.06)'
+                        e.target.style.background = '#f9fafb'
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowNewPassword(!showNewPassword)}
+                      style={{
+                        position: 'absolute',
+                        right: '12px',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        background: 'none',
+                        border: 'none',
+                        cursor: 'pointer',
+                        padding: '8px',
+                        color: '#6b7280',
+                        fontSize: '18px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}
+                      title={showNewPassword ? 'Hide password' : 'Show password'}
+                    >
+                      {showNewPassword ? '👁️‍🗨️' : '👁️'}
+                    </button>
+                  </div>
                 </div>
                 <div>
                   <label style={{
@@ -1160,35 +1188,59 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
                   }}>
                     Confirm New Password *
                   </label>
-                  <input
-                    type="password"
-                    required
-                    value={passwordData.confirmPassword}
-                    onChange={(e) => setPasswordData({...passwordData, confirmPassword: e.target.value})}
-                    style={{
-                      width: '100%',
-                      padding: '16px',
-                      background: '#f9fafb',
-                      border: '1px solid #e5e7eb',
-                      borderRadius: '16px',
-                      fontSize: '16px',
-                      color: '#1f2937',
-                      outline: 'none',
-                      transition: 'all 0.3s ease',
-                      boxSizing: 'border-box',
-                      boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.06)'
-                    }}
-                    onFocus={(e) => {
-                      e.target.style.borderColor = '#3b82f6'
-                      e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1), inset 0 1px 3px rgba(0,0,0,0.06)'
-                      e.target.style.background = 'white'
-                    }}
-                    onBlur={(e) => {
-                      e.target.style.borderColor = '#e5e7eb'
-                      e.target.style.boxShadow = 'inset 0 1px 3px rgba(0,0,0,0.06)'
-                      e.target.style.background = '#f9fafb'
-                    }}
-                  />
+                  <div style={{ position: 'relative' }}>
+                    <input
+                      type={showConfirmPassword ? 'text' : 'password'}
+                      required
+                      value={passwordData.confirmPassword}
+                      onChange={(e) => setPasswordData({...passwordData, confirmPassword: e.target.value})}
+                      style={{
+                        width: '100%',
+                        padding: '16px 52px 16px 16px',
+                        background: '#f9fafb',
+                        border: '1px solid #e5e7eb',
+                        borderRadius: '16px',
+                        fontSize: '16px',
+                        color: '#1f2937',
+                        outline: 'none',
+                        transition: 'all 0.3s ease',
+                        boxSizing: 'border-box',
+                        boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.06)'
+                      }}
+                      onFocus={(e) => {
+                        e.target.style.borderColor = '#3b82f6'
+                        e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1), inset 0 1px 3px rgba(0,0,0,0.06)'
+                        e.target.style.background = 'white'
+                      }}
+                      onBlur={(e) => {
+                        e.target.style.borderColor = '#e5e7eb'
+                        e.target.style.boxShadow = 'inset 0 1px 3px rgba(0,0,0,0.06)'
+                        e.target.style.background = '#f9fafb'
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      style={{
+                        position: 'absolute',
+                        right: '12px',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        background: 'none',
+                        border: 'none',
+                        cursor: 'pointer',
+                        padding: '8px',
+                        color: '#6b7280',
+                        fontSize: '18px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}
+                      title={showConfirmPassword ? 'Hide password' : 'Show password'}
+                    >
+                      {showConfirmPassword ? '👁️‍🗨️' : '👁️'}
+                    </button>
+                  </div>
                 </div>
               </div>
 

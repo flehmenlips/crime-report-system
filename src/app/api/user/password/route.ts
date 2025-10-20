@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getCurrentUser } from '@/lib/auth-server'
 import { prisma } from '@/lib/prisma'
-import { hashPassword, verifyPassword } from '@/lib/password'
+import { hashPassword, verifyPassword, validatePasswordStrength, isCommonPassword } from '@/lib/password'
 
 export async function PUT(request: NextRequest) {
   try {
@@ -38,10 +38,25 @@ export async function PUT(request: NextRequest) {
       )
     }
 
-    // Validate new password strength
-    if (newPassword.length < 8) {
+    // Validate new password strength (Law enforcement compliant)
+    const passwordValidation = validatePasswordStrength(newPassword)
+    if (!passwordValidation.isValid) {
       return NextResponse.json(
-        { error: 'New password must be at least 8 characters long' },
+        { 
+          error: 'Password does not meet security requirements',
+          details: passwordValidation.errors
+        },
+        { status: 400 }
+      )
+    }
+
+    // Check for common passwords
+    if (isCommonPassword(newPassword)) {
+      return NextResponse.json(
+        { 
+          error: 'Password is too common. Please choose a more unique password.',
+          details: ['Password appears in common password lists']
+        },
         { status: 400 }
       )
     }
