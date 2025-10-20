@@ -70,7 +70,7 @@ export function MobileHeader({
             margin: 0,
             color: '#1f2937'
           }}>
-            REMISE Asset Barn
+            REMISE Asset Barn v2.0
           </h1>
           <p style={{
             fontSize: '12px',
