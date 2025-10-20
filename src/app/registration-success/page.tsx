@@ -178,7 +178,7 @@ export default function RegistrationSuccessPage() {
 
         {/* Continue Button */}
         <button
-          onClick={handleLoginRedirect}
+          onClick={() => window.location.href = '/property-onboarding'}
           style={{
             width: '100%',
             padding: '16px 24px',
@@ -201,7 +201,7 @@ export default function RegistrationSuccessPage() {
             e.currentTarget.style.boxShadow = '0 10px 25px rgba(37, 99, 235, 0.3)'
           }}
         >
-          Continue to Login
+          Set Up My Property
         </button>
 
         {/* Help Text */}
@@ -223,6 +223,27 @@ export default function RegistrationSuccessPage() {
             support@remise.farm
           </a>
         </p>
+
+        {/* Skip Option */}
+        <div style={{
+          textAlign: 'center',
+          marginTop: '16px'
+        }}>
+          <button
+            type="button"
+            onClick={() => window.location.href = '/login-simple'}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: '#6b7280',
+              fontSize: '14px',
+              cursor: 'pointer',
+              textDecoration: 'underline'
+            }}
+          >
+            Skip property setup for now
+          </button>
+        </div>
       </div>
     </div>
   )

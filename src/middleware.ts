@@ -31,6 +31,7 @@ async function getCurrentUserSafe(): Promise<any | null> {
 const ROUTE_PERMISSIONS = {
   '/admin': ['admin:system'],
   '/tenant-management': ['super_admin'], // Only super_admin can manage tenants
+  '/my-property': ['property_owner'], // Only property owners can manage their own property
   '/law-enforcement': ['law_enforcement'],
   '/insurance': ['insurance_agent'],
   '/broker': ['broker'],
@@ -49,6 +50,7 @@ export async function middleware(req: NextRequest) {
       pathname.startsWith('/login') ||
       pathname.startsWith('/landing') || // Public marketing page
       pathname.startsWith('/registration-success') || // Registration success page
+      pathname.startsWith('/property-onboarding') || // Property onboarding page
       pathname.startsWith('/unauthorized') ||
       pathname.startsWith('/_next') ||
       pathname.startsWith('/icons/') ||
