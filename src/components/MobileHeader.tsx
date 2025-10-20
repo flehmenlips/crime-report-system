@@ -2,16 +2,33 @@
 
 import { useState } from 'react'
 import { User } from '@/types'
+import { UserProfileManagement } from '@/components/UserProfileManagement'
 
 interface MobileHeaderProps {
   user: User
   textColor: string
   textColorSecondary: string
   onProfileUpdate: (updatedUser: User) => void
+  onAnalyticsClick?: () => void
+  onReportClick?: () => void
+  onPropertyClick?: () => void
+  onViewModeChange?: (mode: 'cards' | 'list') => void
+  currentViewMode?: 'cards' | 'list'
 }
 
-export function MobileHeader({ user, textColor, textColorSecondary, onProfileUpdate }: MobileHeaderProps) {
+export function MobileHeader({ 
+  user, 
+  textColor, 
+  textColorSecondary, 
+  onProfileUpdate,
+  onAnalyticsClick,
+  onReportClick,
+  onPropertyClick,
+  onViewModeChange,
+  currentViewMode = 'cards'
+}: MobileHeaderProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [showProfileEdit, setShowProfileEdit] = useState(false)
 
   return (
     <div style={{
@@ -119,18 +136,19 @@ export function MobileHeader({ user, textColor, textColorSecondary, onProfileUpd
             onClick={() => setIsMenuOpen(false)}
           />
           
-          {/* Menu Panel */}
+          {/* Menu Panel - Full Width */}
           <div style={{
             position: 'fixed',
             top: '0',
+            left: '0',
             right: '0',
-            width: '280px',
-            height: '100vh',
+            bottom: '0',
             background: 'white',
-            boxShadow: '-4px 0 20px rgba(0, 0, 0, 0.15)',
             zIndex: 1002,
             padding: '20px',
-            overflowY: 'auto'
+            overflowY: 'auto',
+            display: 'flex',
+            flexDirection: 'column'
           }}>
             {/* Close Button */}
             <div style={{
@@ -192,7 +210,7 @@ export function MobileHeader({ user, textColor, textColorSecondary, onProfileUpd
                 }}>
                   {user.name.charAt(0).toUpperCase()}
                 </div>
-                <div>
+                <div style={{ flex: 1 }}>
                   <h3 style={{
                     fontSize: '16px',
                     fontWeight: '600',
@@ -211,7 +229,29 @@ export function MobileHeader({ user, textColor, textColorSecondary, onProfileUpd
                      user.role === 'insurance_agent' ? 'Insurance Agent' : 
                      user.role === 'banker' ? 'Banker' : 'User'}
                   </p>
+                  <p style={{
+                    fontSize: '12px',
+                    color: '#9ca3af',
+                    margin: '4px 0 0 0'
+                  }}>
+                    Last Login: {user.lastLoginAt ? new Date(user.lastLoginAt).toLocaleDateString() : 'Never'}
+                  </p>
                 </div>
+                <button
+                  onClick={() => setShowProfileEdit(true)}
+                  style={{
+                    background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+                    color: 'white',
+                    border: 'none',
+                    padding: '8px 12px',
+                    borderRadius: '8px',
+                    fontSize: '12px',
+                    fontWeight: '600',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Edit Profile
+                </button>
               </div>
               
               {user.tenant && (
@@ -239,12 +279,90 @@ export function MobileHeader({ user, textColor, textColorSecondary, onProfileUpd
                   <p style={{
                     fontSize: '13px',
                     color: '#6b7280',
+                    margin: '0 0 4px 0'
+                  }}>
+                    <strong>Address:</strong> {(user.tenant as any).address || 'Not specified'}
+                  </p>
+                  <p style={{
+                    fontSize: '13px',
+                    color: '#6b7280',
                     margin: 0
                   }}>
                     <strong>Status:</strong> <span style={{ color: '#10b981' }}>● Active</span>
                   </p>
                 </div>
               )}
+            </div>
+
+            {/* View Mode Toggle */}
+            <div style={{ marginBottom: '24px' }}>
+              <h3 style={{
+                fontSize: '16px',
+                fontWeight: '600',
+                color: '#374151',
+                margin: '0 0 12px 0'
+              }}>
+                View Mode
+              </h3>
+              <div style={{ 
+                display: 'flex', 
+                background: '#f3f4f6', 
+                borderRadius: '12px', 
+                padding: '4px'
+              }}>
+                <button
+                  onClick={() => {
+                    onViewModeChange?.('cards')
+                    setIsMenuOpen(false)
+                  }}
+                  style={{
+                    background: currentViewMode === 'cards' ? '#3b82f6' : 'transparent',
+                    color: currentViewMode === 'cards' ? 'white' : '#6b7280',
+                    border: 'none',
+                    padding: '12px 16px',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    flex: 1,
+                    justifyContent: 'center'
+                  }}
+                >
+                  <svg style={{ width: '16px', height: '16px' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                  </svg>
+                  Cards
+                </button>
+                <button
+                  onClick={() => {
+                    onViewModeChange?.('list')
+                    setIsMenuOpen(false)
+                  }}
+                  style={{
+                    background: currentViewMode === 'list' ? '#3b82f6' : 'transparent',
+                    color: currentViewMode === 'list' ? 'white' : '#6b7280',
+                    border: 'none',
+                    padding: '12px 16px',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    flex: 1,
+                    justifyContent: 'center'
+                  }}
+                >
+                  <svg style={{ width: '16px', height: '16px' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                  </svg>
+                  List
+                </button>
+              </div>
             </div>
 
             {/* Quick Actions */}
@@ -268,9 +386,15 @@ export function MobileHeader({ user, textColor, textColorSecondary, onProfileUpd
                     fontSize: '14px',
                     fontWeight: '600',
                     cursor: 'pointer',
-                    textAlign: 'left'
+                    textAlign: 'left',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px'
                   }}
-                  onClick={() => setIsMenuOpen(false)}
+                  onClick={() => {
+                    onAnalyticsClick?.()
+                    setIsMenuOpen(false)
+                  }}
                 >
                   📊 View Analytics
                 </button>
@@ -284,9 +408,15 @@ export function MobileHeader({ user, textColor, textColorSecondary, onProfileUpd
                     fontSize: '14px',
                     fontWeight: '600',
                     cursor: 'pointer',
-                    textAlign: 'left'
+                    textAlign: 'left',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px'
                   }}
-                  onClick={() => setIsMenuOpen(false)}
+                  onClick={() => {
+                    onReportClick?.()
+                    setIsMenuOpen(false)
+                  }}
                 >
                   📄 Generate Report
                 </button>
@@ -301,9 +431,15 @@ export function MobileHeader({ user, textColor, textColorSecondary, onProfileUpd
                       fontSize: '14px',
                       fontWeight: '600',
                       cursor: 'pointer',
-                      textAlign: 'left'
+                      textAlign: 'left',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px'
                     }}
-                    onClick={() => setIsMenuOpen(false)}
+                    onClick={() => {
+                      onPropertyClick?.()
+                      setIsMenuOpen(false)
+                    }}
                   >
                     🏢 Manage Property
                   </button>
@@ -337,6 +473,69 @@ export function MobileHeader({ user, textColor, textColorSecondary, onProfileUpd
             </button>
           </div>
         </>
+      )}
+
+      {/* Profile Edit Modal */}
+      {showProfileEdit && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0, 0, 0, 0.5)',
+          zIndex: 1003,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '20px'
+        }}>
+          <div style={{
+            background: 'white',
+            borderRadius: '16px',
+            padding: '24px',
+            width: '100%',
+            maxWidth: '400px',
+            maxHeight: '80vh',
+            overflowY: 'auto'
+          }}>
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: '20px'
+            }}>
+              <h2 style={{
+                fontSize: '20px',
+                fontWeight: '700',
+                color: '#1f2937',
+                margin: 0
+              }}>
+                Edit Profile
+              </h2>
+              <button
+                onClick={() => setShowProfileEdit(false)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  fontSize: '24px',
+                  cursor: 'pointer',
+                  color: '#6b7280'
+                }}
+              >
+                ×
+              </button>
+            </div>
+            <UserProfileManagement
+              user={user}
+              onProfileUpdate={(updatedUser) => {
+                onProfileUpdate(updatedUser)
+                setShowProfileEdit(false)
+              }}
+              onClose={() => setShowProfileEdit(false)}
+            />
+          </div>
+        </div>
       )}
     </div>
   )

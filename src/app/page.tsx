@@ -1083,6 +1083,11 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
             onProfileUpdate={(updatedUser) => {
               setUser(updatedUser)
             }}
+            onAnalyticsClick={() => setShowAnalytics(true)}
+            onReportClick={() => setShowGenerateReport(true)}
+            onPropertyClick={() => window.location.href = '/my-property'}
+            onViewModeChange={setViewMode}
+            currentViewMode={viewMode}
           />
         ) : (
           /* Desktop Header */
@@ -1168,7 +1173,7 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
         <div style={{ 
           maxWidth: '1200px', 
           margin: '0 auto', 
-          padding: isMobile ? '80px 4px 48px' : '0 24px 48px',
+          padding: isMobile ? '80px 2px 48px' : '0 24px 48px',
           width: '100%',
           overflow: 'hidden',
           boxSizing: 'border-box',
@@ -2148,7 +2153,7 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
                   <div key={item.id} style={{
                     background: 'white',
                     borderRadius: '20px',
-                    padding: isMobile ? '16px' : '32px',
+                    padding: isMobile ? '12px' : '32px',
                     boxShadow: selectedItems.has(item.id) ? '0 32px 64px rgba(59, 130, 246, 0.2)' : '0 20px 40px rgba(0, 0, 0, 0.08)',
                     border: selectedItems.has(item.id) ? '2px solid #3b82f6' : '1px solid rgba(0, 0, 0, 0.05)',
                     transition: 'all 0.4s ease',
