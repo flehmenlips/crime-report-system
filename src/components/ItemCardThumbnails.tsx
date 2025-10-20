@@ -21,7 +21,6 @@ interface Evidence {
 export function ItemCardThumbnails({ item, onImageClick, compact = false, evidence: propEvidence }: ItemCardThumbnailsProps) {
   const [evidence, setEvidence] = useState<Evidence[]>([])
   const [loading, setLoading] = useState(!propEvidence) // Only show loading if no evidence provided
-  const [imageLoading, setImageLoading] = useState<Set<number>>(new Set()) // Track individual image loading states
 
   // Debug logging
   console.log('ItemCardThumbnails rendered for item:', item.name, 'ID:', item.id, 'Has evidence prop:', !!propEvidence, 'Evidence count:', propEvidence?.length || 0)
@@ -210,21 +209,6 @@ export function ItemCardThumbnails({ item, onImageClick, compact = false, eviden
             height: '100%',
             objectFit: 'cover'
           }}
-          onLoad={() => {
-            setImageLoading(prev => {
-              const newSet = new Set(prev)
-              newSet.delete(photos[0].id)
-              return newSet
-            })
-          }}
-          onError={() => {
-            console.log('Image failed to load for', photos[0].originalName)
-            setImageLoading(prev => {
-              const newSet = new Set(prev)
-              newSet.delete(photos[0].id)
-              return newSet
-            })
-          }}
         />
       </div>
     )
@@ -265,21 +249,6 @@ export function ItemCardThumbnails({ item, onImageClick, compact = false, eviden
                     width: '100%',
                     height: '100%',
                     objectFit: 'cover'
-                  }}
-                  onLoad={() => {
-                    setImageLoading(prev => {
-                      const newSet = new Set(prev)
-                      newSet.delete(photo.id)
-                      return newSet
-                    })
-                  }}
-                  onError={() => {
-                    console.log('Image failed to load for', photo.originalName)
-                    setImageLoading(prev => {
-                      const newSet = new Set(prev)
-                      newSet.delete(photo.id)
-                      return newSet
-                    })
                   }}
                 />
                 {index === 3 && photos.length > 4 && (
