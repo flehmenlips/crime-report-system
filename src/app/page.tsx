@@ -272,7 +272,10 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
     console.log('Main page hydrated with user:', initialUser?.name)
     
     // User is passed as prop, no need to load again
-    loadData()
+    // Skip data loading for SuperAdmin users with no tenantId
+    if (!(initialUser?.role === 'super_admin' && !initialUser?.tenantId)) {
+      loadData()
+    }
   }, [])
 
   // Add scroll listener for dynamic text color
