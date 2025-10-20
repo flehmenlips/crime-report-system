@@ -86,6 +86,8 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
   const [evidenceProgress, setEvidenceProgress] = useState(0)
   const [initialDataLoaded, setInitialDataLoaded] = useState(false)
   const [scrollY, setScrollY] = useState(0)
+  const [headerVisible, setHeaderVisible] = useState(true)
+  const [lastScrollY, setLastScrollY] = useState(0)
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false)
   const [showGenerateReport, setShowGenerateReport] = useState(false)
   const [showAnalytics, setShowAnalytics] = useState(false)
@@ -278,15 +280,35 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
     }
   }, [])
 
-  // Add scroll listener for dynamic text color
+  // Add scroll listener for dynamic text color and collapsible header
   useEffect(() => {
     const handleScroll = () => {
-      setScrollY(window.scrollY)
+      const currentScrollY = window.scrollY
+      setScrollY(currentScrollY)
+      
+      // Collapsible header logic for mobile
+      if (isMobile) {
+        const scrollThreshold = 100
+        const scrollDifference = Math.abs(currentScrollY - lastScrollY)
+        
+        // Only update header visibility if scroll difference is significant
+        if (scrollDifference > 5) {
+          if (currentScrollY > lastScrollY && currentScrollY > scrollThreshold) {
+            // Scrolling down - hide header
+            setHeaderVisible(false)
+          } else if (currentScrollY < lastScrollY) {
+            // Scrolling up - show header
+            setHeaderVisible(true)
+          }
+          
+          setLastScrollY(currentScrollY)
+        }
+      }
     }
 
-    window.addEventListener('scroll', handleScroll)
+    window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
+  }, [isMobile, lastScrollY])
 
   // Determine text color based on scroll position
   // When scrolled past the header area (around 200px), switch to dark text
@@ -1081,7 +1103,10 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
           boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)',
           position: 'sticky',
           top: isMobile ? '12px' : '24px',
-          zIndex: 50
+          zIndex: 50,
+          transform: isMobile && !headerVisible ? 'translateY(-100%)' : 'translateY(0)',
+          transition: 'transform 0.3s ease-in-out',
+          opacity: isMobile && !headerVisible ? 0 : 1
         }}>
           <div style={{ padding: isMobile ? '16px 20px' : '24px 32px' }}>
             <div style={{ 
@@ -1154,7 +1179,13 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
           </div>
         </div>
 
-        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px 48px' }}>
+        <div style={{ 
+          maxWidth: '1200px', 
+          margin: '0 auto', 
+          padding: isMobile ? '0 12px 48px' : '0 24px 48px',
+          width: '100%',
+          overflow: 'hidden'
+        }}>
           {/* Refresh Button */}
           <div style={{ 
             display: 'flex', 

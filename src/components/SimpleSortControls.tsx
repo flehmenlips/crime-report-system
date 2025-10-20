@@ -58,7 +58,8 @@ export function SimpleSortControls({
           fontSize: '14px',
           backgroundColor: 'white',
           cursor: 'pointer',
-          minWidth: '140px'
+          minWidth: '120px',
+          maxWidth: '160px'
         }}
       >
         <option value="name">Name</option>

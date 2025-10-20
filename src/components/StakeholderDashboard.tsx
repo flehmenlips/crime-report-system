@@ -729,7 +729,13 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
               </div>
               
               {/* Controls Row */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+              <div style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '16px',
+                flexWrap: 'wrap',
+                justifyContent: 'space-between'
+              }}>
                 {/* Sort Controls */}
                 <SimpleSortControls 
                   onSortChange={handleSortChange}
@@ -746,7 +752,7 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
                     background: viewMode === 'cards' ? '#3b82f6' : 'transparent',
                     color: viewMode === 'cards' ? 'white' : '#6b7280',
                     border: 'none',
-                    padding: '8px 16px',
+                    padding: '8px 12px',
                     borderRadius: '8px',
                     fontSize: '14px',
                     fontWeight: '600',
@@ -754,7 +760,8 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
                     transition: 'all 0.2s ease',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '6px'
+                    gap: '4px',
+                    minWidth: 'auto'
                   }}
                 >
                   <svg style={{ width: '16px', height: '16px' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -768,7 +775,7 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
                     background: viewMode === 'list' ? '#3b82f6' : 'transparent',
                     color: viewMode === 'list' ? 'white' : '#6b7280',
                     border: 'none',
-                    padding: '8px 16px',
+                    padding: '8px 12px',
                     borderRadius: '8px',
                     fontSize: '14px',
                     fontWeight: '600',
@@ -776,7 +783,8 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
                     transition: 'all 0.2s ease',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '6px'
+                    gap: '4px',
+                    minWidth: 'auto'
                   }}
                 >
                   <svg style={{ width: '16px', height: '16px' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
