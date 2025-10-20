@@ -150,6 +150,22 @@ export default function TenantManagement() {
         marginBottom: '32px'
       }}>
         <div>
+          <button
+            onClick={() => window.history.back()}
+            style={{
+              padding: '8px 16px',
+              background: '#6b7280',
+              color: 'white',
+              border: 'none',
+              borderRadius: '8px',
+              fontSize: '14px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              marginBottom: '8px'
+            }}
+          >
+            ← Back to Dashboard
+          </button>
           <h1 style={{
             fontSize: '32px',
             fontWeight: '700',

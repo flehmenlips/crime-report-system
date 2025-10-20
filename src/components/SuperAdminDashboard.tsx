@@ -5,7 +5,7 @@ import { User, Tenant } from '@/types'
 
 interface SuperAdminDashboardProps {
   currentUser: User | null
-  onClose: () => void
+  onClose?: () => void
 }
 
 interface PlatformStats {
@@ -181,7 +181,7 @@ export function SuperAdminDashboard({ currentUser, onClose }: SuperAdminDashboar
             >
               🚪 Logout
             </button>
-            {isModal && (
+            {isModal && onClose && (
               <button
                 onClick={onClose}
                 style={{

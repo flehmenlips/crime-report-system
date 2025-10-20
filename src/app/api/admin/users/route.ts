@@ -1,10 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getCurrentUser } from '@/lib/auth-server'
 import { prisma } from '@/lib/prisma'
-import { canSuperAdmin } from '@/lib/auth'
-import { hashPassword } from '@/lib/password'
+import { getCurrentUser } from '@/lib/auth-server'
 
-// GET /api/admin/users - Get all users (SuperAdmin only)
+// GET - Fetch all platform users (SuperAdmin only)
 export async function GET(request: NextRequest) {
   try {
     const currentUser = await getCurrentUser()
@@ -12,39 +10,42 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
     }
 
-    if (!canSuperAdmin(currentUser)) {
-      return NextResponse.json({ error: 'SuperAdmin access required' }, { status: 403 })
+    // Only super_admin can view all users
+    if (currentUser.role !== 'super_admin') {
+      return NextResponse.json(
+        { error: 'Only super administrators can view all users' },
+        { status: 403 }
+      )
     }
 
+    // Fetch all users with their tenant information
     const users = await prisma.user.findMany({
       include: {
-        tenant: true,
-        _count: {
-          select: {
-            items: true
-          }
-        }
+        tenant: true
       },
       orderBy: {
         createdAt: 'desc'
       }
     })
 
-    // Format users with tenant information
-    const usersWithTenants = users.map(user => ({
-      ...user,
-      itemCount: user._count.items,
-      lastLogin: user.lastLoginAt?.toISOString() || null
-    }))
+    console.log(`✅ SuperAdmin "${currentUser.name}" fetched all platform users (${users.length} users)`)
 
-    return NextResponse.json({ users: usersWithTenants })
+    return NextResponse.json({ users })
+
   } catch (error) {
-    console.error('Error fetching users:', error)
-    return NextResponse.json({ error: 'Failed to fetch users' }, { status: 500 })
+    console.error('❌ Error fetching platform users:', error)
+    
+    return NextResponse.json(
+      { 
+        error: 'Failed to fetch platform users',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      },
+      { status: 500 }
+    )
   }
 }
 
-// POST /api/admin/users - Create new user (SuperAdmin only)
+// POST - Create new user (SuperAdmin only)
 export async function POST(request: NextRequest) {
   try {
     const currentUser = await getCurrentUser()
@@ -52,81 +53,80 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
     }
 
-    if (!canSuperAdmin(currentUser)) {
-      return NextResponse.json({ error: 'SuperAdmin access required' }, { status: 403 })
+    // Only super_admin can create users
+    if (currentUser.role !== 'super_admin') {
+      return NextResponse.json(
+        { error: 'Only super administrators can create users' },
+        { status: 403 }
+      )
     }
 
     const body = await request.json()
-    const { username, email, name, password, role = 'property_owner', tenantId } = body
+    const { name, email, username, password, role, tenantId } = body
 
     // Validate required fields
-    if (!username || !email || !name || !password) {
-      return NextResponse.json({ error: 'Username, email, name, and password are required' }, { status: 400 })
+    if (!name || !email || !username || !password || !role) {
+      return NextResponse.json(
+        { error: 'Missing required fields: name, email, username, password, role' },
+        { status: 400 }
+      )
     }
 
-    // Check if username already exists
-    const existingUsername = await prisma.user.findUnique({
-      where: { username }
+    // Check if user already exists
+    const existingUser = await prisma.user.findFirst({
+      where: {
+        OR: [
+          { email: email },
+          { username: username }
+        ]
+      }
     })
-    if (existingUsername) {
-      return NextResponse.json({ error: 'Username already exists' }, { status: 400 })
+
+    if (existingUser) {
+      return NextResponse.json(
+        { error: 'User with this email or username already exists' },
+        { status: 409 }
+      )
     }
 
-    // Check if email already exists
-    const existingEmail = await prisma.user.findUnique({
-      where: { email }
-    })
-    if (existingEmail) {
-      return NextResponse.json({ error: 'Email already exists' }, { status: 400 })
-    }
+    // Hash password
+    const bcrypt = require('bcrypt')
+    const hashedPassword = await bcrypt.hash(password, 12)
 
-    // Create new tenant if not provided
-    let userTenantId = tenantId
-    if (!userTenantId) {
-      const newTenant = await prisma.tenant.create({
-        data: {
-          name: role === 'property_owner' ? `${name}'s Property` : `${name}'s Account`,
-          description: role === 'property_owner' ? `Property managed by ${name}` : `Account for ${name} (${role})`,
-          isActive: true
-        }
-      })
-      userTenantId = newTenant.id
-    }
-
-    // Hash password before storing (SECURITY: Never store plain text passwords)
-    const hashedPassword = await hashPassword(password)
-
-    // Create new user
+    // Create user
     const newUser = await prisma.user.create({
       data: {
-        username,
-        email,
         name,
+        email,
+        username,
         password: hashedPassword,
         role,
-        tenantId: userTenantId,
+        tenantId: tenantId || null,
         isActive: true,
-        accessLevel: role === 'property_owner' ? 'owner' : 'stakeholder'
+        emailVerified: role === 'super_admin' ? true : false,
+        accessLevel: role === 'super_admin' ? 'owner' : 'stakeholder'
       },
       include: {
-        tenant: true,
-        _count: {
-          select: {
-            items: true
-          }
-        }
+        tenant: true
       }
     })
 
-    return NextResponse.json({
-      user: {
-        ...newUser,
-        itemCount: newUser._count.items,
-        lastLogin: newUser.lastLoginAt?.toISOString() || null
-      }
+    console.log(`✅ SuperAdmin "${currentUser.name}" created new user: ${newUser.name} (${newUser.email})`)
+
+    return NextResponse.json({ 
+      message: 'User created successfully',
+      user: newUser
     })
+
   } catch (error) {
-    console.error('Error creating user:', error)
-    return NextResponse.json({ error: 'Failed to create user' }, { status: 500 })
+    console.error('❌ Error creating user:', error)
+    
+    return NextResponse.json(
+      { 
+        error: 'Failed to create user',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      },
+      { status: 500 }
+    )
   }
 }
