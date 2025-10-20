@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import { StolenItem } from '@/types'
 
 interface ItemCardThumbnailsProps {
@@ -20,7 +20,8 @@ interface Evidence {
 
 export function ItemCardThumbnails({ item, onImageClick, compact = false, evidence: propEvidence }: ItemCardThumbnailsProps) {
   const [evidence, setEvidence] = useState<Evidence[]>([])
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(!propEvidence) // Only show loading if no evidence provided
+  const [imageLoading, setImageLoading] = useState<Set<number>>(new Set()) // Track individual image loading states
 
   // Debug logging
   console.log('ItemCardThumbnails rendered for item:', item.name, 'ID:', item.id, 'Has evidence prop:', !!propEvidence, 'Evidence count:', propEvidence?.length || 0)
@@ -31,8 +32,8 @@ export function ItemCardThumbnails({ item, onImageClick, compact = false, eviden
       console.log('✅ Using provided evidence data for item:', item.id, 'Evidence count:', propEvidence.length)
       setEvidence(propEvidence)
       setLoading(false)
-    } else {
-      // Fallback to API call if no evidence provided
+    } else if (!loading) {
+      // Only make API call if we haven't already loaded evidence
       console.log('⚠️ No evidence prop provided for item:', item.id, 'Making API call')
       loadEvidence()
     }
@@ -58,7 +59,7 @@ export function ItemCardThumbnails({ item, onImageClick, compact = false, eviden
     }
   }
 
-  const getCloudinaryThumbnailUrl = (cloudinaryId: string, url?: string | null) => {
+  const getCloudinaryThumbnailUrl = useCallback((cloudinaryId: string, url?: string | null) => {
     const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'dhaacekdd'
     
     console.log('ItemCardThumbnails getCloudinaryThumbnailUrl - cloudinaryId:', cloudinaryId, 'url:', url)
@@ -100,44 +101,33 @@ export function ItemCardThumbnails({ item, onImageClick, compact = false, eviden
     const constructedUrl = `https://res.cloudinary.com/${cloudName}/image/upload/w_120,h_80,c_fill,f_auto,q_auto/${cloudinaryId}`
     console.log('ItemCardThumbnails constructed URL from public_id:', constructedUrl)
     return constructedUrl
-  }
+  }, [])
 
-  const photos = evidence.filter(e => e.type === 'photo')
-  const videos = evidence.filter(e => e.type === 'video')
-  const documents = evidence.filter(e => e.type === 'document')
+  const photos = useMemo(() => evidence.filter(e => e.type === 'photo'), [evidence])
+  const videos = useMemo(() => evidence.filter(e => e.type === 'video'), [evidence])
+  const documents = useMemo(() => evidence.filter(e => e.type === 'document'), [evidence])
 
   if (loading) {
     return (
       <div style={{
-        height: '80px',
-        background: '#f3f4f6',
-        borderRadius: '12px',
+        height: compact ? '48px' : '80px',
+        width: compact ? '48px' : '100%',
+        background: '#f9fafb',
+        borderRadius: compact ? '8px' : '12px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        marginBottom: '16px',
-        position: 'relative'
+        marginBottom: compact ? '0' : '16px',
+        border: '1px solid #e5e7eb'
       }}>
         <div style={{
-          width: '16px',
-          height: '16px',
-          border: '2px solid #d1d5db',
-          borderTop: '2px solid #3b82f6',
+          width: '12px',
+          height: '12px',
+          border: '2px solid #e5e7eb',
+          borderTop: '2px solid #6b7280',
           borderRadius: '50%',
           animation: 'spin 1s linear infinite'
         }}></div>
-        <div style={{
-          position: 'absolute',
-          top: '4px',
-          right: '4px',
-          background: '#059669',
-          color: 'white',
-          fontSize: '8px',
-          padding: '2px 4px',
-          borderRadius: '4px'
-        }}>
-          LOADING
-        </div>
       </div>
     )
   }
@@ -220,6 +210,21 @@ export function ItemCardThumbnails({ item, onImageClick, compact = false, eviden
             height: '100%',
             objectFit: 'cover'
           }}
+          onLoad={() => {
+            setImageLoading(prev => {
+              const newSet = new Set(prev)
+              newSet.delete(photos[0].id)
+              return newSet
+            })
+          }}
+          onError={() => {
+            console.log('Image failed to load for', photos[0].originalName)
+            setImageLoading(prev => {
+              const newSet = new Set(prev)
+              newSet.delete(photos[0].id)
+              return newSet
+            })
+          }}
         />
       </div>
     )
@@ -260,6 +265,21 @@ export function ItemCardThumbnails({ item, onImageClick, compact = false, eviden
                     width: '100%',
                     height: '100%',
                     objectFit: 'cover'
+                  }}
+                  onLoad={() => {
+                    setImageLoading(prev => {
+                      const newSet = new Set(prev)
+                      newSet.delete(photo.id)
+                      return newSet
+                    })
+                  }}
+                  onError={() => {
+                    console.log('Image failed to load for', photo.originalName)
+                    setImageLoading(prev => {
+                      const newSet = new Set(prev)
+                      newSet.delete(photo.id)
+                      return newSet
+                    })
                   }}
                 />
                 {index === 3 && photos.length > 4 && (

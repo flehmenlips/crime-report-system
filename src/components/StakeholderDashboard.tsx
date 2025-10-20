@@ -1071,7 +1071,7 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
                             flexShrink: 0
                           }}>
                             <ItemCardThumbnails 
-                              key={`thumb-list-${item.id}-${Date.now()}`}
+                              key={`thumb-list-${item.id}`}
                               item={item} 
                               compact={true}
                               evidence={evidenceCache?.[item.id]}
