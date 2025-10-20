@@ -176,13 +176,13 @@ export async function POST(request: NextRequest) {
 
     // Send invitation email
     try {
-      const setupPasswordUrl = `${process.env.NEXTAUTH_URL || 'https://www.remise.farm'}/login-simple?invited=true&email=${encodeURIComponent(email)}`
+      const loginUrl = `${process.env.NEXTAUTH_URL || 'https://www.remise.farm'}/login-simple`
       await EmailService.sendInvitationEmail(
         email,
         newUser.name,
         currentUser.name,
         tenant?.name || 'Your Property', // Use actual tenant name
-        setupPasswordUrl,
+        loginUrl,
         username, // Add username
         password  // Add temporary password
       )

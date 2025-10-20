@@ -228,17 +228,26 @@ export const EMAIL_TEMPLATES = {
               <strong>🔑 Your Login Credentials:</strong><br>
               <strong>Username:</strong> <code style="background: #f3f4f6; padding: 4px 8px; border-radius: 4px;">${username}</code><br>
               <strong>Temporary Password:</strong> <code style="background: #f3f4f6; padding: 4px 8px; border-radius: 4px;">${password}</code><br>
-              <small style="color: #6b7280;">You can log in immediately with these credentials, or click below to set up a new password.</small>
+              <small style="color: #6b7280;">Use these credentials to log in to your account.</small>
             </div>
             ` : ''}
             
             <div class="highlight">
               <strong>🚀 Ready to get started?</strong><br>
-              Your account has been created! Click the button below to access the system.
+              Your account has been created! Follow these steps to get started:
+            </div>
+            
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; margin: 20px 0;">
+              <h4 style="margin: 0 0 12px 0; color: #1f2937;">📋 Next Steps:</h4>
+              <ol style="margin: 0; padding-left: 20px; color: #374151;">
+                <li><strong>Log in</strong> using the credentials above</li>
+                <li><strong>Set up your password</strong> in your profile settings (recommended for security)</li>
+                <li><strong>Explore the system</strong> and start managing your property</li>
+              </ol>
             </div>
             
             <div style="text-align: center;">
-              <a href="${setupPasswordUrl}" class="button">Set Up Your Password</a>
+              <a href="${EMAIL_CONFIG.websiteUrl}/login-simple" class="button">Log In to Your Account</a>
             </div>
             
             <div class="security-note">
