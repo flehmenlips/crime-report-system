@@ -393,58 +393,6 @@ export default function SimpleLoginPage() {
             </div>
           </form>
 
-          {/* Email Instructions */}
-          <div style={{
-            marginTop: '24px',
-            padding: '16px',
-            background: 'rgba(59, 130, 246, 0.1)',
-            border: '1px solid rgba(59, 130, 246, 0.2)',
-            borderRadius: '12px'
-          }}>
-            <div style={{
-              display: 'flex',
-              alignItems: 'flex-start',
-              gap: '12px'
-            }}>
-              <div style={{
-                color: '#60a5fa',
-                marginTop: '2px',
-                flexShrink: 0
-              }}>
-                <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                </svg>
-              </div>
-              <div>
-                <h4 style={{
-                  color: '#bfdbfe',
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  margin: '0 0 8px 0'
-                }}>
-                  📧 Email Notifications
-                </h4>
-                <p style={{
-                  color: 'rgba(255, 255, 255, 0.8)',
-                  fontSize: '13px',
-                  margin: '0 0 8px 0',
-                  lineHeight: '1.5'
-                }}>
-                  If you don't receive invitation emails, please check your spam/junk folder and:
-                </p>
-                <ul style={{
-                  color: 'rgba(255, 255, 255, 0.8)',
-                  fontSize: '13px',
-                  margin: '0',
-                  paddingLeft: '16px',
-                  lineHeight: '1.5'
-                }}>
-                  <li>Add <strong style={{color: '#93c5fd'}}>noreply@accounts.remise.farm</strong> to your contacts</li>
-                  <li>Mark our emails as "Not Spam" if they land in spam</li>
-                </ul>
-              </div>
-            </div>
-          </div>
 
           {/* Divider */}
           <div style={{ marginTop: '32px', position: 'relative' }}>
