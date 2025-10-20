@@ -1173,7 +1173,7 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
         <div style={{ 
           maxWidth: '1200px', 
           margin: '0 auto', 
-          padding: isMobile ? '80px 0 48px' : '0 24px 48px',
+          padding: isMobile ? '80px 8px 48px' : '0 24px 48px',
           width: '100%',
           overflow: 'hidden',
           boxSizing: 'border-box',
@@ -2144,7 +2144,7 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
               <div key={refreshKey} style={{ 
                 display: 'grid', 
                 gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(400px, 1fr))', 
-                gap: isMobile ? '8px' : '32px',
+                gap: isMobile ? '12px' : '32px',
                 width: '100%',
                 boxSizing: 'border-box',
                 maxWidth: '100%'
