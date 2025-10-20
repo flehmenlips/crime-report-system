@@ -272,8 +272,8 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
     console.log('Main page hydrated with user:', initialUser?.name)
     
     // User is passed as prop, no need to load again
-    // Skip data loading for SuperAdmin users with no tenantId
-    if (!(initialUser?.role === 'super_admin' && !initialUser?.tenantId)) {
+    // Skip data loading for SuperAdmin users with SuperAdmin tenant or no tenantId
+    if (!(initialUser?.role === 'super_admin' && (initialUser?.tenantId === 'superadmin-tenant' || !initialUser?.tenantId))) {
       loadData()
     }
   }, [])

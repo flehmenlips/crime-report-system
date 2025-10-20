@@ -113,7 +113,26 @@ export async function POST(request: NextRequest) {
 
       console.log('Tenant created with ID:', newTenant.id)
     } else {
-      console.log('Skipping tenant creation for SuperAdmin user')
+      console.log('Assigning SuperAdmin user to SuperAdmin tenant')
+      // Find the special SuperAdmin tenant
+      newTenant = await prisma.tenant.findUnique({
+        where: { id: 'superadmin-tenant' }
+      })
+      
+      if (!newTenant) {
+        // Create SuperAdmin tenant if it doesn't exist
+        newTenant = await prisma.tenant.create({
+          data: {
+            id: 'superadmin-tenant',
+            name: 'SuperAdmin Platform',
+            description: 'Special tenant for platform administration - no data loading',
+            isActive: true
+          }
+        })
+        console.log('SuperAdmin tenant created with ID:', newTenant.id)
+      } else {
+        console.log('Using existing SuperAdmin tenant:', newTenant.id)
+      }
     }
 
         // Generate verification token
