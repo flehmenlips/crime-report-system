@@ -403,21 +403,13 @@ export class EmailService {
   // Send user invitation email
   static async sendInvitationEmail(email: string, inviteeName: string, inviterName: string, tenantName: string, setupPasswordUrl: string, username?: string, password?: string) {
     try {
-      // Use minimal HTML to avoid template issues
-      const minimalHtml = `
-        <h1>You're Invited!</h1>
-        <p>Hello ${inviteeName}!</p>
-        <p>${inviterName} has invited you to join ${tenantName} on the Crime Report System.</p>
-        ${username && password ? `<p>Username: ${username}<br>Password: ${password}</p>` : ''}
-        <p><a href="${setupPasswordUrl}">Click here to get started</a></p>
-        <p>Best regards,<br>Crime Report System</p>
-      `
+      const template = EMAIL_TEMPLATES.invitation.template(inviteeName, inviterName, tenantName, setupPasswordUrl, username, password)
       
       const result = await resend.emails.send({
         from: EMAIL_CONFIG.from,
         to: [email],
-        subject: 'You\'ve been invited to join Crime Report System',
-        html: minimalHtml,
+        subject: template.subject,
+        html: template.html,
       })
       
       console.log('Invitation email sent:', result)
