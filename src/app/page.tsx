@@ -3014,7 +3014,7 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
       )}
 
       {/* Main Dashboard Content - Only show if property is set up or user is not a property owner, and not super_admin */}
-      {!(user && user.role === 'property_owner' && !user.tenantId) && !(user && user.role === 'super_admin') && (
+      {!(user && user.role === 'property_owner' && !user.tenantId) && user && user.role !== 'super_admin' && (
         <ProgressiveLoader
           loading={!initialDataLoaded}
           skeletonType="dashboard"
