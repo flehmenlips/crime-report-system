@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { v2 as cloudinary } from 'cloudinary'
 
+// Force dynamic rendering since we use request.url
+export const dynamic = 'force-dynamic'
+
 // Configure Cloudinary with admin access
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,

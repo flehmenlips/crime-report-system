@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { getCurrentUser } from '@/lib/auth-server'
 
+// Force dynamic rendering since we use cookies
+export const dynamic = 'force-dynamic'
+
 // GET - Fetch platform analytics (SuperAdmin only)
 export async function GET(request: NextRequest) {
   try {
