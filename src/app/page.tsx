@@ -1182,9 +1182,10 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
         <div style={{ 
           maxWidth: '1200px', 
           margin: '0 auto', 
-          padding: isMobile ? '0 12px 48px' : '0 24px 48px',
+          padding: isMobile ? '0 8px 48px' : '0 24px 48px',
           width: '100%',
-          overflow: 'hidden'
+          overflow: 'hidden',
+          boxSizing: 'border-box'
         }}>
           {/* Refresh Button */}
           <div style={{ 
@@ -1773,7 +1774,6 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
                   <div>
                     <h2 style={{ fontSize: '48px', fontWeight: '800', color: '#1f2937', marginBottom: '16px' }}>
                       Your Stolen Items
-                      <span style={{ fontSize: '16px', color: '#3b82f6', marginLeft: '16px' }}>📊 SORT v6.0</span>
                     </h2>
                     <p style={{ fontSize: '20px', color: '#6b7280' }}>
                       {displayItems.length} items {isFiltered ? 'found' : 'documented'} • {formatCurrency(displayTotalValue)} {isFiltered ? 'filtered' : 'total'} value
@@ -2143,18 +2143,23 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
             ) : viewMode === 'cards' ? (
               <div key={refreshKey} style={{ 
                 display: 'grid', 
-                gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', 
-                gap: '32px' 
+                gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(400px, 1fr))', 
+                gap: isMobile ? '16px' : '32px',
+                width: '100%',
+                boxSizing: 'border-box'
               }}>
                 {displayItems.map((item) => (
                   <div key={item.id} style={{
                     background: 'white',
                     borderRadius: '20px',
-                    padding: '32px',
+                    padding: isMobile ? '20px' : '32px',
                     boxShadow: selectedItems.has(item.id) ? '0 32px 64px rgba(59, 130, 246, 0.2)' : '0 20px 40px rgba(0, 0, 0, 0.08)',
                     border: selectedItems.has(item.id) ? '2px solid #3b82f6' : '1px solid rgba(0, 0, 0, 0.05)',
                     transition: 'all 0.4s ease',
-                    position: 'relative'
+                    position: 'relative',
+                    width: '100%',
+                    boxSizing: 'border-box',
+                    maxWidth: '100%'
                   }}
                   onMouseOver={(e) => {
                     e.currentTarget.style.transform = 'translateY(-8px)'

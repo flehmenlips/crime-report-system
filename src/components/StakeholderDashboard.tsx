@@ -734,7 +734,9 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
                 alignItems: 'center', 
                 gap: '16px',
                 flexWrap: 'wrap',
-                justifyContent: 'space-between'
+                justifyContent: 'space-between',
+                width: '100%',
+                overflow: 'visible'
               }}>
                 {/* Sort Controls */}
                 <SimpleSortControls 
@@ -897,18 +899,23 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
             // Card View
             <div style={{ 
               display: 'grid', 
-              gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))',
-              gap: '24px'
+              gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+              gap: '16px',
+              width: '100%',
+              boxSizing: 'border-box'
             }}>
               {displayItems.map((item) => (
                 <div key={item.id} style={{
                   background: 'white',
                   borderRadius: '16px',
-                  padding: '24px',
+                  padding: '20px',
                   boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
                   border: '1px solid #e5e7eb',
                   transition: 'all 0.2s ease',
-                  cursor: 'pointer'
+                  cursor: 'pointer',
+                  width: '100%',
+                  boxSizing: 'border-box',
+                  maxWidth: '100%'
                 }}
                 onMouseOver={(e) => {
                   e.currentTarget.style.transform = 'translateY(-2px)'
