@@ -87,29 +87,34 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Create new tenant for ALL users to ensure proper isolation
-    const tenantName = role === 'property_owner' && propertyName 
-      ? propertyName 
-      : role === 'property_owner' 
-        ? `${name}'s Property` 
-        : `${name}'s Account`
-    
-    const tenantDescription = role === 'property_owner' 
-      ? `Property managed by ${name}` 
-      : `Account for ${name} (${role})`
+    // Create new tenant for non-SuperAdmin users to ensure proper isolation
+    let newTenant = null
+    if (role !== 'super_admin') {
+      const tenantName = role === 'property_owner' && propertyName 
+        ? propertyName 
+        : role === 'property_owner' 
+          ? `${name}'s Property` 
+          : `${name}'s Account`
+      
+      const tenantDescription = role === 'property_owner' 
+        ? `Property managed by ${name}` 
+        : `Account for ${name} (${role})`
 
-        console.log('Creating tenant:', { name: tenantName, description: tenantDescription })
+      console.log('Creating tenant:', { name: tenantName, description: tenantDescription })
 
-        // Create tenant in database
-        const newTenant = await prisma.tenant.create({
-          data: {
-            name: tenantName,
-            description: tenantDescription,
-            isActive: true,
-          }
-        })
+      // Create tenant in database
+      newTenant = await prisma.tenant.create({
+        data: {
+          name: tenantName,
+          description: tenantDescription,
+          isActive: true,
+        }
+      })
 
-        console.log('Tenant created with ID:', newTenant.id)
+      console.log('Tenant created with ID:', newTenant.id)
+    } else {
+      console.log('Skipping tenant creation for SuperAdmin user')
+    }
 
         // Generate verification token
         const verificationToken = crypto.randomBytes(32).toString('hex')
@@ -141,7 +146,7 @@ export async function POST(request: NextRequest) {
             emailVerified: false,
             isActive: false, // Don't activate until email is verified
             preferences: '',
-            tenantId: newTenant.id,
+            tenantId: newTenant?.id || null,
             verificationToken,
             verificationExpires,
           },

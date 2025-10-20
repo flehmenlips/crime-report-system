@@ -3011,7 +3011,7 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
         }}>
           <SuperAdminDashboard 
             currentUser={user}
-            onClose={() => {}} // No close button for main dashboard
+            // No onClose prop for main dashboard - this makes it non-modal
           />
         </div>
       )}
