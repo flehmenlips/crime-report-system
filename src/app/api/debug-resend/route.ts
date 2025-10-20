@@ -9,10 +9,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Check if user is SuperAdmin
-    if (currentUser.role !== 'super_admin') {
-      return NextResponse.json({ error: 'Forbidden - SuperAdmin access required' }, { status: 403 })
-    }
+    // Any authenticated user can check email configuration
 
     // Return environment info (without exposing sensitive data)
     return NextResponse.json({
