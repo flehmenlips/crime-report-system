@@ -24,6 +24,7 @@ export function RegistrationModal({ onClose, onSuccess }: RegistrationModalProps
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [passwordErrors, setPasswordErrors] = useState<string[]>([])
   const [passwordStrength, setPasswordStrength] = useState<'weak' | 'medium' | 'strong'>('weak')
+  const [passwordsMatch, setPasswordsMatch] = useState<boolean | null>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -56,12 +57,16 @@ export function RegistrationModal({ onClose, onSuccess }: RegistrationModalProps
       const data = await response.json()
 
       if (response.ok) {
+        // Store account info for success page
+        localStorage.setItem('newAccountEmail', formData.email)
+        localStorage.setItem('newAccountName', formData.name)
+        localStorage.setItem('newAccountRole', formData.role)
+        
         setSuccess(true)
-        // Close modal after a longer delay since user needs to check email
+        // Redirect to success page after a short delay
         setTimeout(() => {
-          onClose()
-          if (onSuccess) onSuccess()
-        }, 5000)
+          window.location.href = '/registration-success'
+        }, 2000)
       } else {
         setError(data.error || 'Registration failed')
       }
@@ -108,6 +113,18 @@ export function RegistrationModal({ onClose, onSuccess }: RegistrationModalProps
       const validation = validatePassword(value)
       setPasswordErrors(validation.errors)
       setPasswordStrength(validation.strength)
+    }
+    
+    // Check password match in real-time
+    if (field === 'confirmPassword' || field === 'password') {
+      const newPassword = field === 'password' ? value : formData.password
+      const newConfirmPassword = field === 'confirmPassword' ? value : formData.confirmPassword
+      
+      if (newPassword && newConfirmPassword) {
+        setPasswordsMatch(newPassword === newConfirmPassword)
+      } else {
+        setPasswordsMatch(null)
+      }
     }
   }
 
@@ -632,6 +649,34 @@ export function RegistrationModal({ onClose, onSuccess }: RegistrationModalProps
                 )}
               </button>
             </div>
+            
+            {/* Password Match Indicator */}
+            {formData.confirmPassword && passwordsMatch !== null && (
+              <div style={{
+                marginTop: '8px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                fontSize: '12px',
+                color: passwordsMatch ? '#10b981' : '#ef4444'
+              }}>
+                {passwordsMatch ? (
+                  <>
+                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    Passwords match
+                  </>
+                ) : (
+                  <>
+                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                    Passwords do not match
+                  </>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Role Selection */}
