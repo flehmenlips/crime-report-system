@@ -1173,7 +1173,7 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
         <div style={{ 
           maxWidth: '1200px', 
           margin: '0 auto', 
-          padding: isMobile ? '80px 2px 48px' : '0 24px 48px',
+          padding: isMobile ? '80px 0 48px' : '0 24px 48px',
           width: '100%',
           overflow: 'hidden',
           boxSizing: 'border-box',
@@ -1808,7 +1808,7 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
                       background: '#f3f4f6', 
                       borderRadius: '12px', 
                       padding: '4px',
-                      minWidth: isMobile ? '140px' : 'auto'
+                      minWidth: isMobile ? '140px' : 'auto',
                     }}>
                       <button
                         onClick={() => setViewMode('cards')}
@@ -2144,7 +2144,7 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
               <div key={refreshKey} style={{ 
                 display: 'grid', 
                 gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(400px, 1fr))', 
-                gap: isMobile ? '12px' : '32px',
+                gap: isMobile ? '8px' : '32px',
                 width: '100%',
                 boxSizing: 'border-box',
                 maxWidth: '100%'
@@ -2153,7 +2153,7 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
                   <div key={item.id} style={{
                     background: 'white',
                     borderRadius: '20px',
-                    padding: isMobile ? '12px' : '32px',
+                    padding: isMobile ? '8px' : '32px',
                     boxShadow: selectedItems.has(item.id) ? '0 32px 64px rgba(59, 130, 246, 0.2)' : '0 20px 40px rgba(0, 0, 0, 0.08)',
                     border: selectedItems.has(item.id) ? '2px solid #3b82f6' : '1px solid rgba(0, 0, 0, 0.05)',
                     transition: 'all 0.4s ease',

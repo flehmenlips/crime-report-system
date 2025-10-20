@@ -36,7 +36,7 @@ export function MobileHeader({
       top: '0',
       left: '0',
       right: '0',
-      zIndex: 1000,
+      zIndex: 9999,
       background: 'rgba(255, 255, 255, 0.95)',
       backdropFilter: 'blur(20px)',
       borderBottom: '1px solid rgba(0, 0, 0, 0.1)',
@@ -131,7 +131,7 @@ export function MobileHeader({
               right: 0,
               bottom: 0,
               background: 'rgba(0, 0, 0, 0.5)',
-              zIndex: 1001
+              zIndex: 9998
             }}
             onClick={() => setIsMenuOpen(false)}
           />
@@ -144,7 +144,7 @@ export function MobileHeader({
             right: '0',
             bottom: '0',
             background: 'white',
-            zIndex: 1002,
+            zIndex: 9999,
             padding: '20px',
             overflowY: 'auto',
             display: 'flex',
@@ -484,7 +484,7 @@ export function MobileHeader({
           right: 0,
           bottom: 0,
           background: 'rgba(0, 0, 0, 0.5)',
-          zIndex: 1003,
+          zIndex: 10000,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
