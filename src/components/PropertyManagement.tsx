@@ -183,6 +183,56 @@ export default function PropertyManagement() {
       margin: '0 auto',
       padding: '24px'
     }}>
+      {/* Navigation Header */}
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: '16px',
+        marginBottom: '24px'
+      }}>
+        <button
+          onClick={() => window.location.href = '/'}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            padding: '8px 16px',
+            background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
+            color: '#475569',
+            border: '1px solid #cbd5e1',
+            borderRadius: '8px',
+            fontSize: '14px',
+            fontWeight: '500',
+            cursor: 'pointer',
+            transition: 'all 0.2s ease'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = 'linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%)'
+            e.currentTarget.style.transform = 'translateY(-1px)'
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)'
+            e.currentTarget.style.transform = 'translateY(0)'
+          }}
+        >
+          ← Back to Dashboard
+        </button>
+        <div style={{
+          height: '20px',
+          width: '1px',
+          background: '#cbd5e1'
+        }}></div>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          color: '#64748b',
+          fontSize: '14px'
+        }}>
+          🏠 <span>REMISE Asset Barn</span>
+        </div>
+      </div>
+
       {/* Header */}
       <div style={{
         display: 'flex',

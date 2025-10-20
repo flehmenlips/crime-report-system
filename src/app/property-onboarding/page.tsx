@@ -481,6 +481,27 @@ export default function PropertyOnboardingPage() {
             Skip for now (can set up later)
           </button>
         </div>
+
+        {/* Navigation */}
+        <div style={{
+          textAlign: 'center',
+          marginTop: '16px'
+        }}>
+          <button
+            type="button"
+            onClick={() => router.push('/')}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: '#6b7280',
+              fontSize: '14px',
+              cursor: 'pointer',
+              textDecoration: 'underline'
+            }}
+          >
+            ← Back to Dashboard
+          </button>
+        </div>
       </div>
     </div>
   )
