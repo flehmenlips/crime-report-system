@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect } from 'react'
 import { User, Tenant } from '@/types'
+import { SuperAdminProfileEditModal } from './SuperAdminProfileEditModal'
+import { SuperAdminAuditLog } from './SuperAdminAuditLog'
 
 interface SuperAdminDashboardProps {
   currentUser: User | null
@@ -22,6 +24,8 @@ export function SuperAdminDashboard({ currentUser, onClose }: SuperAdminDashboar
   const [stats, setStats] = useState<PlatformStats | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [showProfileEditModal, setShowProfileEditModal] = useState(false)
+  const [activeTab, setActiveTab] = useState<'overview' | 'audit-log'>('overview')
 
   useEffect(() => {
     loadPlatformStats()
@@ -76,6 +80,14 @@ export function SuperAdminDashboard({ currentUser, onClose }: SuperAdminDashboar
 
   const handleViewAnalytics = () => {
     window.location.href = '/admin/analytics'
+  }
+
+  const handleProfileSave = (updatedUser: Partial<User>) => {
+    // Update the current user data
+    if (currentUser) {
+      Object.assign(currentUser, updatedUser)
+    }
+    setShowProfileEditModal(false)
   }
 
   if (loading) {
@@ -152,7 +164,7 @@ export function SuperAdminDashboard({ currentUser, onClose }: SuperAdminDashboar
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          marginBottom: '32px',
+          marginBottom: '24px',
           paddingBottom: '20px',
           borderBottom: '1px solid #e5e7eb'
         }}>
@@ -222,6 +234,51 @@ export function SuperAdminDashboard({ currentUser, onClose }: SuperAdminDashboar
           </div>
         </div>
 
+        {/* Tab Navigation */}
+        <div style={{
+          display: 'flex',
+          gap: '4px',
+          marginBottom: '32px',
+          background: '#f3f4f6',
+          borderRadius: '12px',
+          padding: '4px'
+        }}>
+          <button
+            onClick={() => setActiveTab('overview')}
+            style={{
+              flex: 1,
+              padding: '12px 20px',
+              background: activeTab === 'overview' ? 'white' : 'transparent',
+              color: activeTab === 'overview' ? '#1f2937' : '#6b7280',
+              border: 'none',
+              borderRadius: '8px',
+              fontSize: '14px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              boxShadow: activeTab === 'overview' ? '0 2px 4px rgba(0, 0, 0, 0.1)' : 'none'
+            }}
+          >
+            📊 Overview
+          </button>
+          <button
+            onClick={() => setActiveTab('audit-log')}
+            style={{
+              flex: 1,
+              padding: '12px 20px',
+              background: activeTab === 'audit-log' ? 'white' : 'transparent',
+              color: activeTab === 'audit-log' ? '#1f2937' : '#6b7280',
+              border: 'none',
+              borderRadius: '8px',
+              fontSize: '14px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              boxShadow: activeTab === 'audit-log' ? '0 2px 4px rgba(0, 0, 0, 0.1)' : 'none'
+            }}
+          >
+            📋 Audit Log
+          </button>
+        </div>
+
         {/* Error Message */}
         {error && (
           <div style={{
@@ -237,7 +294,10 @@ export function SuperAdminDashboard({ currentUser, onClose }: SuperAdminDashboar
           </div>
         )}
 
-        {/* SuperAdmin Profile Section */}
+        {/* Tab Content */}
+        {activeTab === 'overview' ? (
+          <>
+            {/* SuperAdmin Profile Section */}
         <div style={{
           background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
           border: '1px solid #e2e8f0',
@@ -272,10 +332,7 @@ export function SuperAdminDashboard({ currentUser, onClose }: SuperAdminDashboar
               </p>
             </div>
             <button
-              onClick={() => {
-                // TODO: Implement profile edit modal
-                alert('Profile editing functionality coming soon!')
-              }}
+              onClick={() => setShowProfileEditModal(true)}
               style={{
                 padding: '8px 16px',
                 background: '#3b82f6',
@@ -1008,7 +1065,19 @@ export function SuperAdminDashboard({ currentUser, onClose }: SuperAdminDashboar
             You have full platform administration access. All actions are logged for audit purposes. 
             Use this access responsibly and in accordance with platform policies.
           </p>
-        </div>
+          </div>
+          </>
+        ) : (
+          <SuperAdminAuditLog currentUser={currentUser} />
+        )}
+
+        {/* Profile Edit Modal */}
+        <SuperAdminProfileEditModal
+          currentUser={currentUser}
+          isOpen={showProfileEditModal}
+          onClose={() => setShowProfileEditModal(false)}
+          onSave={handleProfileSave}
+        />
       </div>
     </div>
   )
