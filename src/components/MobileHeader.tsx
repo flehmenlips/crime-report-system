@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { User } from '@/types'
 import { UserProfileManagement } from '@/components/UserProfileManagement'
+import { useRouter } from 'next/navigation'
 
 interface MobileHeaderProps {
   user: User
@@ -84,7 +85,10 @@ export function MobileHeader({
 
       {/* Right side - Hamburger Menu */}
       <button
-        onClick={() => setIsMenuOpen(!isMenuOpen)}
+        onClick={() => {
+          console.log('Menu clicked, current state:', isMenuOpen)
+          setIsMenuOpen(!isMenuOpen)
+        }}
         style={{
           background: 'none',
           border: 'none',
@@ -119,6 +123,22 @@ export function MobileHeader({
         }} />
       </button>
 
+      {/* Debug: Menu State */}
+      {isMenuOpen && (
+        <div style={{
+          position: 'fixed',
+          top: '50px',
+          left: '10px',
+          background: 'red',
+          color: 'white',
+          padding: '5px',
+          zIndex: 10000,
+          fontSize: '12px'
+        }}>
+          Menu is OPEN - isMenuOpen: {isMenuOpen.toString()}
+        </div>
+      )}
+
       {/* Mobile Menu Overlay */}
       {isMenuOpen && (
         <>
@@ -148,7 +168,9 @@ export function MobileHeader({
             padding: '20px',
             overflowY: 'auto',
             display: 'flex',
-            flexDirection: 'column'
+            flexDirection: 'column',
+            minHeight: '100vh',
+            width: '100vw'
           }}>
             {/* Close Button */}
             <div style={{
@@ -177,6 +199,17 @@ export function MobileHeader({
               >
                 ×
               </button>
+            </div>
+
+            {/* Debug Test Content */}
+            <div style={{
+              background: 'red',
+              color: 'white',
+              padding: '10px',
+              marginBottom: '10px',
+              borderRadius: '5px'
+            }}>
+              DEBUG: Menu content is rendering!
             </div>
 
             {/* User Profile Section */}
