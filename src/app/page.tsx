@@ -308,7 +308,7 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
 
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
-  }, [isMobile, lastScrollY])
+  }, [isMobile])
 
   // Determine text color based on scroll position
   // When scrolled past the header area (around 200px), switch to dark text
