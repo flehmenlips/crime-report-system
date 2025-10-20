@@ -181,7 +181,7 @@ export function SuperAdminDashboard({ currentUser, onClose }: SuperAdminDashboar
             >
               🚪 Logout
             </button>
-            {isModal && onClose && (
+            {isModal && onClose ? (
               <button
                 onClick={onClose}
                 style={{
@@ -197,7 +197,23 @@ export function SuperAdminDashboard({ currentUser, onClose }: SuperAdminDashboar
               >
                 ✕ Close
               </button>
-            )}
+            ) : !isModal ? (
+              <button
+                onClick={() => window.location.href = '/login-simple'}
+                style={{
+                  padding: '8px 16px',
+                  background: '#6b7280',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  cursor: 'pointer'
+                }}
+              >
+                🏠 Home
+              </button>
+            ) : null}
           </div>
         </div>
 
