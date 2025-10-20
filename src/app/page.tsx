@@ -2,7 +2,7 @@
 
 // import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import { useEffect, useState, useCallback, useMemo } from 'react'
+import { useEffect, useState, useCallback, useMemo, useRef } from 'react'
 import { EnhancedEvidenceUpload } from '@/components/EnhancedEvidenceUpload'
 import { EnhancedEvidenceManager } from '@/components/EnhancedEvidenceManager'
 import { PWAServiceWorker } from '@/components/PWAServiceWorker'
@@ -87,7 +87,7 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
   const [initialDataLoaded, setInitialDataLoaded] = useState(false)
   const [scrollY, setScrollY] = useState(0)
   const [headerVisible, setHeaderVisible] = useState(true)
-  const [lastScrollY, setLastScrollY] = useState(0)
+  const lastScrollY = useRef(0)
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false)
   const [showGenerateReport, setShowGenerateReport] = useState(false)
   const [showAnalytics, setShowAnalytics] = useState(false)
@@ -289,19 +289,19 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
       // Collapsible header logic for mobile
       if (isMobile) {
         const scrollThreshold = 100
-        const scrollDifference = Math.abs(currentScrollY - lastScrollY)
+        const scrollDifference = Math.abs(currentScrollY - lastScrollY.current)
         
         // Only update header visibility if scroll difference is significant
         if (scrollDifference > 5) {
-          if (currentScrollY > lastScrollY && currentScrollY > scrollThreshold) {
+          if (currentScrollY > lastScrollY.current && currentScrollY > scrollThreshold) {
             // Scrolling down - hide header
             setHeaderVisible(false)
-          } else if (currentScrollY < lastScrollY) {
+          } else if (currentScrollY < lastScrollY.current) {
             // Scrolling up - show header
             setHeaderVisible(true)
           }
           
-          setLastScrollY(currentScrollY)
+          lastScrollY.current = currentScrollY
         }
       }
     }
