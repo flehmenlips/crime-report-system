@@ -21,6 +21,7 @@ export default function PropertyManagement() {
   const [loading, setLoading] = useState(true)
   const [showEditForm, setShowEditForm] = useState(false)
   const [error, setError] = useState('')
+  const [isMobile, setIsMobile] = useState(false)
 
   // Form state
   const [formData, setFormData] = useState({
@@ -33,6 +34,15 @@ export default function PropertyManagement() {
 
   useEffect(() => {
     loadProperty()
+    
+    // Mobile detection
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+    
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
   }, [])
 
   const loadProperty = async () => {
@@ -179,9 +189,11 @@ export default function PropertyManagement() {
 
   return (
     <div style={{
-      maxWidth: '1000px',
+      maxWidth: isMobile ? '100%' : '1000px',
       margin: '0 auto',
-      padding: '24px'
+      padding: isMobile ? '8px' : '24px',
+      width: '100%',
+      boxSizing: 'border-box'
     }}>
       {/* Navigation Header */}
       <div style={{
@@ -294,22 +306,66 @@ export default function PropertyManagement() {
 
       {/* Edit Form */}
       {showEditForm && (
-        <div style={{
-          background: 'white',
-          borderRadius: '16px',
-          padding: '32px',
-          marginBottom: '32px',
-          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-          border: '1px solid #e5e7eb'
-        }}>
-          <h2 style={{
-            fontSize: '24px',
-            fontWeight: '600',
-            color: '#1f2937',
-            marginBottom: '24px'
+        <>
+          {/* Modal Backdrop */}
+          <div style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0, 0, 0, 0.5)',
+            zIndex: 1000,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: isMobile ? '16px' : '32px'
           }}>
-            ✏️ Edit Property Details
-          </h2>
+            <div style={{
+              background: 'white',
+              borderRadius: isMobile ? '12px' : '16px',
+              padding: isMobile ? '20px' : '32px',
+              boxShadow: '0 20px 40px rgba(0, 0, 0, 0.2)',
+              border: '1px solid #e5e7eb',
+              width: '100%',
+              maxWidth: isMobile ? '100%' : '600px',
+              maxHeight: '90vh',
+              overflowY: 'auto',
+              position: 'relative'
+            }}>
+              {/* Close Button */}
+              <button
+                onClick={resetForm}
+                style={{
+                  position: 'absolute',
+                  top: '16px',
+                  right: '16px',
+                  background: 'none',
+                  border: 'none',
+                  fontSize: '24px',
+                  cursor: 'pointer',
+                  color: '#6b7280',
+                  width: '32px',
+                  height: '32px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderRadius: '50%',
+                  background: '#f3f4f6'
+                }}
+              >
+                ×
+              </button>
+
+              <h2 style={{
+                fontSize: isMobile ? '20px' : '24px',
+                fontWeight: '600',
+                color: '#1f2937',
+                marginBottom: '24px',
+                paddingRight: '40px'
+              }}>
+                ✏️ Edit Property Details
+              </h2>
 
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             <div>
@@ -389,7 +445,11 @@ export default function PropertyManagement() {
               />
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+            <div style={{ 
+              display: 'grid', 
+              gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', 
+              gap: '20px' 
+            }}>
               <div>
                 <label style={{
                   display: 'block',
@@ -441,50 +501,61 @@ export default function PropertyManagement() {
               </div>
             </div>
 
-            <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
-              <button
-                type="button"
-                onClick={resetForm}
-                style={{
-                  padding: '12px 24px',
-                  border: '1px solid #d1d5db',
-                  borderRadius: '8px',
-                  fontSize: '16px',
-                  fontWeight: '500',
-                  cursor: 'pointer',
-                  background: 'white',
-                  color: '#374151'
-                }}
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                style={{
-                  padding: '12px 24px',
-                  background: 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)',
-                  color: 'white',
-                  borderRadius: '8px',
-                  fontSize: '16px',
-                  fontWeight: '600',
-                  cursor: 'pointer',
-                  border: 'none'
-                }}
-              >
-                Update Property
-              </button>
+              <div style={{ 
+                display: 'flex', 
+                gap: '12px', 
+                justifyContent: isMobile ? 'stretch' : 'flex-end',
+                flexDirection: isMobile ? 'column' : 'row'
+              }}>
+                <button
+                  type="button"
+                  onClick={resetForm}
+                  style={{
+                    padding: '12px 24px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    fontSize: '16px',
+                    fontWeight: '500',
+                    cursor: 'pointer',
+                    background: 'white',
+                    color: '#374151',
+                    width: isMobile ? '100%' : 'auto'
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  style={{
+                    padding: '12px 24px',
+                    background: 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)',
+                    color: 'white',
+                    borderRadius: '8px',
+                    fontSize: '16px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    border: 'none',
+                    width: isMobile ? '100%' : 'auto'
+                  }}
+                >
+                  Update Property
+                </button>
+              </div>
+            </form>
             </div>
-          </form>
-        </div>
+          </div>
+        </>
       )}
 
       {/* Property Details */}
       <div style={{
         background: 'white',
-        borderRadius: '16px',
-        padding: '32px',
+        borderRadius: isMobile ? '12px' : '16px',
+        padding: isMobile ? '20px' : '32px',
         boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-        border: '1px solid #e5e7eb'
+        border: '1px solid #e5e7eb',
+        width: '100%',
+        boxSizing: 'border-box'
       }}>
         <h2 style={{
           fontSize: '20px',
@@ -497,8 +568,8 @@ export default function PropertyManagement() {
 
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-          gap: '24px'
+          gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(300px, 1fr))',
+          gap: isMobile ? '16px' : '24px'
         }}>
           <div>
             <h3 style={{
@@ -593,7 +664,7 @@ export default function PropertyManagement() {
             </h3>
             <div style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+              gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(250px, 1fr))',
               gap: '16px'
             }}>
               {property.address && (

@@ -14,6 +14,7 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
+  const [isMobile, setIsMobile] = useState(false)
 
   // Profile form state
   const [profileData, setProfileData] = useState<UserProfile>({
@@ -69,6 +70,15 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
         avatar: user.avatar || ''
       })
     }
+
+    // Mobile detection
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+    
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
   }, [user])
 
   const handleProfileUpdate = async (e: React.FormEvent) => {
@@ -344,17 +354,17 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
       alignItems: 'center',
       justifyContent: 'center',
       zIndex: 1000,
-      padding: '24px',
+      padding: isMobile ? '8px' : '24px',
       fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif'
     }}>
       <div style={{
         background: 'rgba(255, 255, 255, 0.95)',
         backdropFilter: 'blur(20px)',
-        borderRadius: '24px',
-        padding: '32px',
-        maxWidth: '1000px',
+        borderRadius: isMobile ? '16px' : '24px',
+        padding: isMobile ? '20px' : '32px',
+        maxWidth: isMobile ? '100%' : '1000px',
         width: '100%',
-        maxHeight: '90vh',
+        maxHeight: isMobile ? '95vh' : '90vh',
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',

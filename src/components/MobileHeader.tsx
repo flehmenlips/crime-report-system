@@ -310,61 +310,6 @@ export function MobileHeader({
               )}
             </div>
 
-            {/* View Mode Toggle - Cards Only for Mobile */}
-            <div style={{ marginBottom: '24px' }}>
-              <h3 style={{
-                fontSize: '16px',
-                fontWeight: '600',
-                color: '#374151',
-                margin: '0 0 12px 0'
-              }}>
-                View Mode
-              </h3>
-              <div style={{
-                display: 'flex',
-                background: '#f3f4f6',
-                borderRadius: '12px',
-                padding: '4px'
-              }}>
-                <button
-                  onClick={() => {
-                    onViewModeChange?.('cards')
-                    setIsMenuOpen(false)
-                  }}
-                  style={{
-                    background: '#3b82f6',
-                    color: 'white',
-                    border: 'none',
-                    padding: '12px 16px',
-                    borderRadius: '8px',
-                    fontSize: '14px',
-                    fontWeight: '600',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    flex: 1,
-                    justifyContent: 'center'
-                  }}
-                >
-                  <svg style={{ width: '16px', height: '16px' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-                  </svg>
-                  Cards (Mobile Optimized)
-                </button>
-              </div>
-              <div style={{
-                marginTop: '8px',
-                padding: '8px 12px',
-                background: '#fef3c7',
-                border: '1px solid #f59e0b',
-                borderRadius: '6px',
-                fontSize: '12px',
-                color: '#92400e'
-              }}>
-                📱 List view disabled on mobile for better experience
-              </div>
-            </div>
 
             {/* Quick Actions */}
             <div style={{ marginBottom: '24px' }}>
@@ -461,8 +406,12 @@ export function MobileHeader({
                 fontSize: '16px',
                 fontWeight: '600',
                 cursor: 'pointer',
-                width: '100%',
-                margin: '20px'
+                width: 'calc(100% - 40px)',
+                margin: '20px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px'
               }}
               onClick={async () => {
                 try {
