@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { authenticateUser, setUserSession } from '@/lib/auth-server'
 import { logAuthAttempt } from '@/lib/audit'
+import { prisma } from '@/lib/prisma'
 
 export async function POST(request: NextRequest) {
   try {
@@ -43,8 +44,20 @@ export async function POST(request: NextRequest) {
       request
     })
     
+    // Update last login timestamp
+    const updatedUser = await prisma.user.update({
+      where: { id: user.id },
+      data: { lastLoginAt: new Date() }
+    })
+    
+    // Update the user object with the new lastLoginAt
+    const userWithUpdatedLogin = {
+      ...user,
+      lastLoginAt: updatedUser.lastLoginAt?.toISOString() || ''
+    }
+    
     console.log('Setting user session for:', user.name, user.role)
-    await setUserSession(user)
+    await setUserSession(userWithUpdatedLogin)
     console.log('Session set successfully')
     
     return NextResponse.json({ 
