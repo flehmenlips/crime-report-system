@@ -152,12 +152,25 @@ export function SuperAdminDashboard({ currentUser, onClose }: SuperAdminDashboar
               Manage platform users, tenants, and system analytics
             </p>
           </div>
-          {isModal && (
+          <div style={{ display: 'flex', gap: '8px' }}>
             <button
-              onClick={onClose}
+              onClick={async () => {
+                try {
+                  const response = await fetch('/api/auth/logout', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                  });
+                  if (response.ok) {
+                    window.location.href = '/login-simple';
+                  }
+                } catch (error) {
+                  console.error('Logout error:', error);
+                  window.location.href = '/login-simple';
+                }
+              }}
               style={{
                 padding: '8px 16px',
-                background: '#ef4444',
+                background: '#6b7280',
                 color: 'white',
                 border: 'none',
                 borderRadius: '8px',
@@ -166,9 +179,26 @@ export function SuperAdminDashboard({ currentUser, onClose }: SuperAdminDashboar
                 cursor: 'pointer'
               }}
             >
-              ✕ Close
+              🚪 Logout
             </button>
-          )}
+            {isModal && (
+              <button
+                onClick={onClose}
+                style={{
+                  padding: '8px 16px',
+                  background: '#ef4444',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  cursor: 'pointer'
+                }}
+              >
+                ✕ Close
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Error Message */}
