@@ -147,19 +147,21 @@ export function MobileHeader({
             bottom: '0',
             background: 'white',
             zIndex: 9999,
-            padding: '20px',
+            padding: '0',
             overflowY: 'auto',
             display: 'flex',
             flexDirection: 'column',
             minHeight: '100vh',
             width: '100vw'
           }}>
-            {/* Close Button */}
+            {/* Header with Close Button */}
             <div style={{
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
-              marginBottom: '24px'
+              padding: '20px',
+              borderBottom: '1px solid #e5e7eb',
+              background: '#f8fafc'
             }}>
               <h2 style={{
                 fontSize: '20px',
@@ -172,11 +174,18 @@ export function MobileHeader({
               <button
                 onClick={() => setIsMenuOpen(false)}
                 style={{
-                  background: 'none',
+                  background: '#ef4444',
                   border: 'none',
-                  fontSize: '24px',
+                  fontSize: '18px',
                   cursor: 'pointer',
-                  color: '#6b7280'
+                  color: 'white',
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontWeight: 'bold'
                 }}
               >
                 ×
@@ -184,13 +193,15 @@ export function MobileHeader({
             </div>
 
 
-            {/* User Profile Section */}
-            <div style={{
-              background: '#f8fafc',
-              borderRadius: '12px',
-              padding: '16px',
-              marginBottom: '24px'
-            }}>
+            {/* Content Area */}
+            <div style={{ padding: '20px', flex: 1 }}>
+              {/* User Profile Section */}
+              <div style={{
+                background: '#f8fafc',
+                borderRadius: '12px',
+                padding: '16px',
+                marginBottom: '24px'
+              }}>
               <div style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -299,7 +310,7 @@ export function MobileHeader({
               )}
             </div>
 
-            {/* View Mode Toggle */}
+            {/* View Mode Toggle - Cards Only for Mobile */}
             <div style={{ marginBottom: '24px' }}>
               <h3 style={{
                 fontSize: '16px',
@@ -309,10 +320,10 @@ export function MobileHeader({
               }}>
                 View Mode
               </h3>
-              <div style={{ 
-                display: 'flex', 
-                background: '#f3f4f6', 
-                borderRadius: '12px', 
+              <div style={{
+                display: 'flex',
+                background: '#f3f4f6',
+                borderRadius: '12px',
                 padding: '4px'
               }}>
                 <button
@@ -321,8 +332,8 @@ export function MobileHeader({
                     setIsMenuOpen(false)
                   }}
                   style={{
-                    background: currentViewMode === 'cards' ? '#3b82f6' : 'transparent',
-                    color: currentViewMode === 'cards' ? 'white' : '#6b7280',
+                    background: '#3b82f6',
+                    color: 'white',
                     border: 'none',
                     padding: '12px 16px',
                     borderRadius: '8px',
@@ -339,34 +350,19 @@ export function MobileHeader({
                   <svg style={{ width: '16px', height: '16px' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
                   </svg>
-                  Cards
+                  Cards (Mobile Optimized)
                 </button>
-                <button
-                  onClick={() => {
-                    onViewModeChange?.('list')
-                    setIsMenuOpen(false)
-                  }}
-                  style={{
-                    background: currentViewMode === 'list' ? '#3b82f6' : 'transparent',
-                    color: currentViewMode === 'list' ? 'white' : '#6b7280',
-                    border: 'none',
-                    padding: '12px 16px',
-                    borderRadius: '8px',
-                    fontSize: '14px',
-                    fontWeight: '600',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    flex: 1,
-                    justifyContent: 'center'
-                  }}
-                >
-                  <svg style={{ width: '16px', height: '16px' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
-                  </svg>
-                  List
-                </button>
+              </div>
+              <div style={{
+                marginTop: '8px',
+                padding: '8px 12px',
+                background: '#fef3c7',
+                border: '1px solid #f59e0b',
+                borderRadius: '6px',
+                fontSize: '12px',
+                color: '#92400e'
+              }}>
+                📱 List view disabled on mobile for better experience
               </div>
             </div>
 
@@ -452,18 +448,21 @@ export function MobileHeader({
               </div>
             </div>
 
+            </div>
+            
             {/* Logout */}
             <button
               style={{
                 background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
                 color: 'white',
                 border: 'none',
-                padding: '12px 16px',
+                padding: '16px 20px',
                 borderRadius: '8px',
-                fontSize: '14px',
+                fontSize: '16px',
                 fontWeight: '600',
                 cursor: 'pointer',
-                width: '100%'
+                width: '100%',
+                margin: '20px'
               }}
               onClick={async () => {
                 try {

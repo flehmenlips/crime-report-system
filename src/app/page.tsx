@@ -318,13 +318,19 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
     if (typeof window === 'undefined') return
     
     const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768)
+      const mobile = window.innerWidth < 768
+      setIsMobile(mobile)
+      
+      // Force cards view on mobile
+      if (mobile && viewMode === 'list') {
+        setViewMode('cards')
+      }
     }
 
     checkMobile()
     window.addEventListener('resize', checkMobile)
     return () => window.removeEventListener('resize', checkMobile)
-  }, [])
+  }, [viewMode])
 
   const handleAddItem = async () => {
     const itemName = prompt('Enter item name:')
