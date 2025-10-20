@@ -320,17 +320,19 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
     const checkMobile = () => {
       const mobile = window.innerWidth < 768
       setIsMobile(mobile)
-      
-      // Force cards view on mobile
-      if (mobile && viewMode === 'list') {
-        setViewMode('cards')
-      }
     }
 
     checkMobile()
     window.addEventListener('resize', checkMobile)
     return () => window.removeEventListener('resize', checkMobile)
-  }, [viewMode])
+  }, [])
+
+  // Force cards view on mobile - separate effect to avoid dependency issues
+  useEffect(() => {
+    if (isMobile && viewMode === 'list') {
+      setViewMode('cards')
+    }
+  }, [isMobile, viewMode])
 
   const handleAddItem = async () => {
     const itemName = prompt('Enter item name:')
