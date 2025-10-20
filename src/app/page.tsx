@@ -3004,19 +3004,21 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
       )}
 
       {/* SuperAdmin Dashboard */}
-      {user && user.role === 'super_admin' && (
-        <div style={{
-          maxWidth: '1200px',
-          margin: '0 auto',
-          padding: '24px'
-        }}>
-          {console.log('Rendering SuperAdminDashboard for user:', user.name, 'role:', user.role)}
-          <SuperAdminDashboard 
-            currentUser={user}
-            // No onClose prop for main dashboard - this makes it non-modal
-          />
-        </div>
-      )}
+      {user && user.role === 'super_admin' && (() => {
+        console.log('Rendering SuperAdminDashboard for user:', user.name, 'role:', user.role);
+        return (
+          <div style={{
+            maxWidth: '1200px',
+            margin: '0 auto',
+            padding: '24px'
+          }}>
+            <SuperAdminDashboard 
+              currentUser={user}
+              // No onClose prop for main dashboard - this makes it non-modal
+            />
+          </div>
+        );
+      })()}
 
       {/* Main Dashboard Content - Only show if user is not super_admin and (property is set up or user is not a property owner) */}
       {user && user.role !== 'super_admin' && !(user && user.role === 'property_owner' && !user.tenantId) && (
