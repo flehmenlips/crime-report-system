@@ -11,7 +11,6 @@ interface InviteUserModalProps {
 
 export function InviteUserModal({ tenantId, tenantName, onClose, onSuccess }: InviteUserModalProps) {
   const [formData, setFormData] = useState({
-    username: '',
     email: '',
     name: '',
     password: '',
@@ -33,7 +32,10 @@ export function InviteUserModal({ tenantId, tenantName, onClose, onSuccess }: In
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          username: formData.email // Use email as username
+        }),
       })
 
       const inviteResult = await inviteResponse.json()
@@ -187,32 +189,6 @@ export function InviteUserModal({ tenantId, tenantName, onClose, onSuccess }: In
             />
           </div>
 
-          <div style={{ marginBottom: '16px' }}>
-            <label style={{
-              display: 'block',
-              fontSize: '14px',
-              fontWeight: '600',
-              color: '#374151',
-              marginBottom: '8px'
-            }}>
-              Username *
-            </label>
-            <input
-              type="text"
-              value={formData.username}
-              onChange={(e) => handleInputChange('username', e.target.value)}
-              placeholder="e.g., jsmith"
-              required
-              style={{
-                width: '100%',
-                padding: '12px 16px',
-                border: '1px solid #d1d5db',
-                borderRadius: '8px',
-                fontSize: '16px',
-                backgroundColor: '#f9fafb'
-              }}
-            />
-          </div>
 
           <div style={{ marginBottom: '16px' }}>
             <label style={{
@@ -315,7 +291,7 @@ export function InviteUserModal({ tenantId, tenantName, onClose, onSuccess }: In
             </button>
             <button
               type="submit"
-              disabled={loading || !formData.name.trim() || !formData.email.trim() || !formData.username.trim() || !formData.password.trim()}
+              disabled={loading || !formData.name.trim() || !formData.email.trim() || !formData.password.trim()}
               style={{
                 background: loading 
                   ? '#d1d5db' 

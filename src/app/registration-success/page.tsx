@@ -1,10 +1,27 @@
 'use client'
 
-import React from 'react'
-import { useRouter } from 'next/navigation'
+import React, { useState, useEffect, Suspense } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 
-export default function RegistrationSuccessPage() {
+function RegistrationSuccessContent() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const [accountInfo, setAccountInfo] = useState<{
+    email: string
+    name: string
+    role: string
+  } | null>(null)
+
+  useEffect(() => {
+    // Get account info from URL params or localStorage
+    const email = searchParams.get('email') || localStorage.getItem('newAccountEmail')
+    const name = searchParams.get('name') || localStorage.getItem('newAccountName')
+    const role = searchParams.get('role') || localStorage.getItem('newAccountRole')
+    
+    if (email && name && role) {
+      setAccountInfo({ email, name, role })
+    }
+  }, [searchParams])
 
   const handleLoginRedirect = () => {
     router.push('/login-simple')
@@ -58,11 +75,54 @@ export default function RegistrationSuccessPage() {
         <p style={{
           fontSize: '18px',
           color: '#6b7280',
-          marginBottom: '32px',
+          marginBottom: '24px',
           lineHeight: '1.6'
         }}>
           Your REMISE Asset Barn account has been created and is ready to use.
         </p>
+
+        {/* Account Information */}
+        {accountInfo && (
+          <div style={{
+            background: '#f0fdf4',
+            border: '1px solid #22c55e',
+            borderRadius: '12px',
+            padding: '20px',
+            marginBottom: '24px',
+            textAlign: 'left'
+          }}>
+            <h3 style={{
+              fontSize: '16px',
+              fontWeight: '600',
+              color: '#15803d',
+              marginBottom: '12px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}>
+              📋 Account Details
+            </h3>
+            
+            <div style={{
+              fontSize: '14px',
+              color: '#166534',
+              lineHeight: '1.6'
+            }}>
+              <div style={{ marginBottom: '8px' }}>
+                <strong>Name:</strong> {accountInfo.name}
+              </div>
+              <div style={{ marginBottom: '8px' }}>
+                <strong>Email:</strong> {accountInfo.email}
+              </div>
+              <div style={{ marginBottom: '8px' }}>
+                <strong>Username:</strong> {accountInfo.email}
+              </div>
+              <div>
+                <strong>Role:</strong> {accountInfo.role.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Email Verification Notice */}
         <div style={{
@@ -176,33 +236,74 @@ export default function RegistrationSuccessPage() {
           </p>
         </div>
 
-        {/* Continue Button */}
-        <button
-          onClick={() => window.location.href = '/property-onboarding'}
-          style={{
-            width: '100%',
-            padding: '16px 24px',
-            background: 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)',
-            color: 'white',
-            fontSize: '18px',
-            fontWeight: '600',
-            borderRadius: '16px',
-            border: 'none',
-            cursor: 'pointer',
-            transition: 'all 0.3s ease',
-            boxShadow: '0 10px 25px rgba(37, 99, 235, 0.3)'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.transform = 'translateY(-2px)'
-            e.currentTarget.style.boxShadow = '0 15px 35px rgba(37, 99, 235, 0.4)'
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.transform = 'translateY(0)'
-            e.currentTarget.style.boxShadow = '0 10px 25px rgba(37, 99, 235, 0.3)'
-          }}
-        >
-          Set Up My Property
-        </button>
+        {/* Action Buttons */}
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '12px'
+        }}>
+          {/* Continue to Login Button */}
+          <button
+            onClick={handleLoginRedirect}
+            style={{
+              width: '100%',
+              padding: '16px 24px',
+              background: 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)',
+              color: 'white',
+              fontSize: '18px',
+              fontWeight: '600',
+              borderRadius: '16px',
+              border: 'none',
+              cursor: 'pointer',
+              transition: 'all 0.3s ease',
+              boxShadow: '0 10px 25px rgba(37, 99, 235, 0.3)'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-2px)'
+              e.currentTarget.style.boxShadow = '0 15px 35px rgba(37, 99, 235, 0.4)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)'
+              e.currentTarget.style.boxShadow = '0 10px 25px rgba(37, 99, 235, 0.3)'
+            }}
+          >
+            Continue to Login
+          </button>
+
+          {/* Property Setup Button - Disabled until verified */}
+          <button
+            onClick={() => window.location.href = '/property-onboarding'}
+            disabled={true}
+            style={{
+              width: '100%',
+              padding: '16px 24px',
+              background: '#e5e7eb',
+              color: '#9ca3af',
+              fontSize: '18px',
+              fontWeight: '600',
+              borderRadius: '16px',
+              border: 'none',
+              cursor: 'not-allowed',
+              transition: 'all 0.3s ease',
+              position: 'relative'
+            }}
+            title="Complete email verification first"
+          >
+            Set Up My Property
+            <div style={{
+              position: 'absolute',
+              top: '8px',
+              right: '12px',
+              fontSize: '12px',
+              background: '#f59e0b',
+              color: 'white',
+              padding: '2px 6px',
+              borderRadius: '4px'
+            }}>
+              Verify Email First
+            </div>
+          </button>
+        </div>
 
         {/* Help Text */}
         <p style={{
@@ -246,5 +347,41 @@ export default function RegistrationSuccessPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function RegistrationSuccessPage() {
+  return (
+    <Suspense fallback={
+      <div style={{
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #1e3a8a 0%, #3730a3 50%, #581c87 100%)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '20px'
+      }}>
+        <div style={{
+          maxWidth: '600px',
+          width: '100%',
+          background: 'rgba(255, 255, 255, 0.95)',
+          backdropFilter: 'blur(20px)',
+          borderRadius: '24px',
+          padding: '48px',
+          boxShadow: '0 25px 50px rgba(0, 0, 0, 0.25)',
+          textAlign: 'center'
+        }}>
+          <div style={{
+            fontSize: '24px',
+            color: '#6b7280',
+            marginBottom: '16px'
+          }}>
+            Loading...
+          </div>
+        </div>
+      </div>
+    }>
+      <RegistrationSuccessContent />
+    </Suspense>
   )
 }

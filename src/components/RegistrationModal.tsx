@@ -10,7 +10,6 @@ interface RegistrationModalProps {
 
 export function RegistrationModal({ onClose, onSuccess }: RegistrationModalProps) {
   const [formData, setFormData] = useState({
-    username: '',
     email: '',
     name: '',
     password: '',
@@ -23,6 +22,9 @@ export function RegistrationModal({ onClose, onSuccess }: RegistrationModalProps
   const [success, setSuccess] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [passwordErrors, setPasswordErrors] = useState<string[]>([])
+  const [passwordStrength, setPasswordStrength] = useState<'weak' | 'medium' | 'strong'>('weak')
+  const [passwordsMatch, setPasswordsMatch] = useState<boolean | null>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -43,7 +45,7 @@ export function RegistrationModal({ onClose, onSuccess }: RegistrationModalProps
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          username: formData.username,
+          username: formData.email, // Use email as username
           email: formData.email,
           name: formData.name,
           password: formData.password,
@@ -55,12 +57,16 @@ export function RegistrationModal({ onClose, onSuccess }: RegistrationModalProps
       const data = await response.json()
 
       if (response.ok) {
+        // Store account info for success page
+        localStorage.setItem('newAccountEmail', formData.email)
+        localStorage.setItem('newAccountName', formData.name)
+        localStorage.setItem('newAccountRole', formData.role)
+        
         setSuccess(true)
-        // Close modal after a longer delay since user needs to check email
+        // Redirect to success page after a short delay
         setTimeout(() => {
-          onClose()
-          if (onSuccess) onSuccess()
-        }, 5000)
+          window.location.href = '/registration-success'
+        }, 2000)
       } else {
         setError(data.error || 'Registration failed')
       }
@@ -72,8 +78,54 @@ export function RegistrationModal({ onClose, onSuccess }: RegistrationModalProps
     }
   }
 
+  const validatePassword = (password: string) => {
+    const errors: string[] = []
+    
+    if (password.length < 12) {
+      errors.push('At least 12 characters')
+    }
+    if (!/[A-Z]/.test(password)) {
+      errors.push('One uppercase letter (A-Z)')
+    }
+    if (!/[a-z]/.test(password)) {
+      errors.push('One lowercase letter (a-z)')
+    }
+    if (!/[0-9]/.test(password)) {
+      errors.push('One number (0-9)')
+    }
+    if (!/[^A-Za-z0-9]/.test(password)) {
+      errors.push('One special character (!@#$%^&*, etc.)')
+    }
+    
+    let strength: 'weak' | 'medium' | 'strong' = 'weak'
+    if (errors.length === 0) {
+      strength = password.length >= 16 ? 'strong' : 'medium'
+    }
+    
+    return { errors, strength }
+  }
+
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }))
+    
+    // Validate password in real-time
+    if (field === 'password') {
+      const validation = validatePassword(value)
+      setPasswordErrors(validation.errors)
+      setPasswordStrength(validation.strength)
+    }
+    
+    // Check password match in real-time
+    if (field === 'confirmPassword' || field === 'password') {
+      const newPassword = field === 'password' ? value : formData.password
+      const newConfirmPassword = field === 'confirmPassword' ? value : formData.confirmPassword
+      
+      if (newPassword && newConfirmPassword) {
+        setPasswordsMatch(newPassword === newConfirmPassword)
+      } else {
+        setPasswordsMatch(null)
+      }
+    }
   }
 
   if (success) {
@@ -206,66 +258,6 @@ export function RegistrationModal({ onClose, onSuccess }: RegistrationModalProps
         </div>
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          {/* Username */}
-          <div>
-            <label style={{
-              display: 'block',
-              fontSize: '14px',
-              fontWeight: '600',
-              color: 'rgba(255, 255, 255, 0.9)',
-              marginBottom: '8px'
-            }}>
-              Username *
-            </label>
-            <div style={{ position: 'relative' }}>
-              <input
-                type="text"
-                required
-                value={formData.username}
-                onChange={(e) => handleInputChange('username', e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '16px 16px 16px 52px',
-                  background: 'rgba(255, 255, 255, 0.15)',
-                  backdropFilter: 'blur(20px)',
-                  border: '1px solid rgba(255, 255, 255, 0.25)',
-                  borderRadius: '16px',
-                  fontSize: '16px',
-                  color: 'white',
-                  outline: 'none',
-                  transition: 'all 0.3s ease',
-                  boxSizing: 'border-box',
-                  boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 8px 32px rgba(0, 0, 0, 0.1)'
-                }}
-                placeholder="Enter your username"
-                onFocus={(e) => {
-                  e.target.style.borderColor = 'rgba(59, 130, 246, 0.8)'
-                  e.target.style.boxShadow = '0 0 0 4px rgba(59, 130, 246, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.3), 0 8px 32px rgba(0, 0, 0, 0.2)'
-                  e.target.style.background = 'rgba(255, 255, 255, 0.25)'
-                }}
-                onBlur={(e) => {
-                  e.target.style.borderColor = 'rgba(255, 255, 255, 0.25)'
-                  e.target.style.boxShadow = 'inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 8px 32px rgba(0, 0, 0, 0.1)'
-                  e.target.style.background = 'rgba(255, 255, 255, 0.15)'
-                }}
-              />
-              <div style={{
-                position: 'absolute',
-                left: '18px',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                color: 'rgba(255, 255, 255, 0.4)',
-                pointerEvents: 'none',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}>
-                <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-              </div>
-            </div>
-          </div>
 
           {/* Email */}
           <div>
@@ -486,6 +478,78 @@ export function RegistrationModal({ onClose, onSuccess }: RegistrationModalProps
                 )}
               </button>
             </div>
+            
+            {/* Password Requirements Feedback */}
+            {formData.password && (
+              <div style={{
+                marginTop: '12px',
+                padding: '12px',
+                background: 'rgba(255, 255, 255, 0.1)',
+                borderRadius: '8px',
+                border: '1px solid rgba(255, 255, 255, 0.2)'
+              }}>
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  marginBottom: '8px'
+                }}>
+                  <span style={{
+                    fontSize: '12px',
+                    fontWeight: '600',
+                    color: 'rgba(255, 255, 255, 0.8)'
+                  }}>
+                    Password Strength:
+                  </span>
+                  <span style={{
+                    fontSize: '12px',
+                    fontWeight: '600',
+                    color: passwordStrength === 'strong' ? '#10b981' : 
+                           passwordStrength === 'medium' ? '#f59e0b' : '#ef4444'
+                  }}>
+                    {passwordStrength.toUpperCase()}
+                  </span>
+                </div>
+                
+                {passwordErrors.length > 0 && (
+                  <div>
+                    <div style={{
+                      fontSize: '12px',
+                      fontWeight: '600',
+                      color: 'rgba(255, 255, 255, 0.8)',
+                      marginBottom: '6px'
+                    }}>
+                      Requirements missing:
+                    </div>
+                    <ul style={{
+                      margin: '0',
+                      paddingLeft: '16px',
+                      fontSize: '11px',
+                      color: 'rgba(255, 255, 255, 0.7)',
+                      lineHeight: '1.4'
+                    }}>
+                      {passwordErrors.map((error, index) => (
+                        <li key={index} style={{ marginBottom: '2px' }}>
+                          • {error}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                
+                {passwordErrors.length === 0 && (
+                  <div style={{
+                    fontSize: '11px',
+                    color: '#10b981',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px'
+                  }}>
+                    ✅ All requirements met
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Confirm Password */}
@@ -585,6 +649,34 @@ export function RegistrationModal({ onClose, onSuccess }: RegistrationModalProps
                 )}
               </button>
             </div>
+            
+            {/* Password Match Indicator */}
+            {formData.confirmPassword && passwordsMatch !== null && (
+              <div style={{
+                marginTop: '8px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                fontSize: '12px',
+                color: passwordsMatch ? '#10b981' : '#ef4444'
+              }}>
+                {passwordsMatch ? (
+                  <>
+                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    Passwords match
+                  </>
+                ) : (
+                  <>
+                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                    Passwords do not match
+                  </>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Role Selection */}
