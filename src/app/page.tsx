@@ -1051,7 +1051,7 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
   const displayItems = isFiltered ? filteredItems : getSortedItems(allItems)
   const displayTotalValue = displayItems.reduce((sum, item) => sum + item.estimatedValue, 0)
 
-  if (userRole === 'property_owner' || userRole === 'super_admin') {
+  if (userRole === 'property_owner') {
     return (
       <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)' }}>
         {/* PWA Service Worker - DISABLED FOR DEBUGGING */}
@@ -3013,8 +3013,8 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
         </div>
       )}
 
-      {/* Main Dashboard Content - Only show if property is set up or user is not a property owner, and not super_admin */}
-      {!(user && user.role === 'property_owner' && !user.tenantId) && user && user.role !== 'super_admin' && (
+      {/* Main Dashboard Content - Only show if user is not super_admin and (property is set up or user is not a property owner) */}
+      {user && user.role !== 'super_admin' && !(user && user.role === 'property_owner' && !user.tenantId) && (
         <ProgressiveLoader
           loading={!initialDataLoaded}
           skeletonType="dashboard"
