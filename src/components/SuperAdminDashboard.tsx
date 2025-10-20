@@ -237,6 +237,469 @@ export function SuperAdminDashboard({ currentUser, onClose }: SuperAdminDashboar
           </div>
         )}
 
+        {/* SuperAdmin Profile Section */}
+        <div style={{
+          background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
+          border: '1px solid #e2e8f0',
+          borderRadius: '16px',
+          padding: '24px',
+          marginBottom: '32px'
+        }}>
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'flex-start',
+            marginBottom: '20px'
+          }}>
+            <div>
+              <h2 style={{
+                fontSize: '24px',
+                fontWeight: '700',
+                color: '#1e293b',
+                marginBottom: '8px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}>
+                👤 SuperAdmin Profile
+              </h2>
+              <p style={{
+                color: '#64748b',
+                fontSize: '14px',
+                margin: 0
+              }}>
+                Manage your platform administrator account and credentials
+              </p>
+            </div>
+            <button
+              onClick={() => {
+                // TODO: Implement profile edit modal
+                alert('Profile editing functionality coming soon!')
+              }}
+              style={{
+                padding: '8px 16px',
+                background: '#3b82f6',
+                color: 'white',
+                border: 'none',
+                borderRadius: '8px',
+                fontSize: '14px',
+                fontWeight: '600',
+                cursor: 'pointer'
+              }}
+            >
+              ✏️ Edit Profile
+            </button>
+          </div>
+
+          {/* Profile Information Grid */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+            gap: '20px'
+          }}>
+            {/* Account Information */}
+            <div style={{
+              background: 'white',
+              border: '1px solid #e2e8f0',
+              borderRadius: '12px',
+              padding: '20px'
+            }}>
+              <h3 style={{
+                fontSize: '16px',
+                fontWeight: '600',
+                color: '#1e293b',
+                marginBottom: '16px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}>
+                🔐 Account Information
+              </h3>
+              
+              <div style={{ marginBottom: '12px' }}>
+                <label style={{
+                  display: 'block',
+                  fontSize: '12px',
+                  fontWeight: '500',
+                  color: '#64748b',
+                  marginBottom: '4px',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px'
+                }}>
+                  Full Name
+                </label>
+                <div style={{
+                  fontSize: '16px',
+                  fontWeight: '600',
+                  color: '#1e293b',
+                  padding: '8px 12px',
+                  background: '#f8fafc',
+                  borderRadius: '8px',
+                  border: '1px solid #e2e8f0'
+                }}>
+                  {currentUser?.name || 'Not specified'}
+                </div>
+              </div>
+
+              <div style={{ marginBottom: '12px' }}>
+                <label style={{
+                  display: 'block',
+                  fontSize: '12px',
+                  fontWeight: '500',
+                  color: '#64748b',
+                  marginBottom: '4px',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px'
+                }}>
+                  Username
+                </label>
+                <div style={{
+                  fontSize: '16px',
+                  fontWeight: '600',
+                  color: '#1e293b',
+                  padding: '8px 12px',
+                  background: '#f8fafc',
+                  borderRadius: '8px',
+                  border: '1px solid #e2e8f0'
+                }}>
+                  {currentUser?.username || 'Not specified'}
+                </div>
+              </div>
+
+              <div style={{ marginBottom: '12px' }}>
+                <label style={{
+                  display: 'block',
+                  fontSize: '12px',
+                  fontWeight: '500',
+                  color: '#64748b',
+                  marginBottom: '4px',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px'
+                }}>
+                  Email Address
+                </label>
+                <div style={{
+                  fontSize: '16px',
+                  fontWeight: '600',
+                  color: '#1e293b',
+                  padding: '8px 12px',
+                  background: '#f8fafc',
+                  borderRadius: '8px',
+                  border: '1px solid #e2e8f0'
+                }}>
+                  {currentUser?.email || 'Not specified'}
+                </div>
+              </div>
+
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '12px',
+                  fontWeight: '500',
+                  color: '#64748b',
+                  marginBottom: '4px',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px'
+                }}>
+                  Account Status
+                </label>
+                <div style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  color: currentUser?.isActive ? '#059669' : '#dc2626',
+                  padding: '6px 12px',
+                  background: currentUser?.isActive ? '#d1fae5' : '#fee2e2',
+                  borderRadius: '20px',
+                  border: `1px solid ${currentUser?.isActive ? '#a7f3d0' : '#fecaca'}`
+                }}>
+                  <div style={{
+                    width: '8px',
+                    height: '8px',
+                    borderRadius: '50%',
+                    background: currentUser?.isActive ? '#059669' : '#dc2626'
+                  }}></div>
+                  {currentUser?.isActive ? 'Active' : 'Inactive'}
+                </div>
+              </div>
+            </div>
+
+            {/* Role & Privileges */}
+            <div style={{
+              background: 'white',
+              border: '1px solid #e2e8f0',
+              borderRadius: '12px',
+              padding: '20px'
+            }}>
+              <h3 style={{
+                fontSize: '16px',
+                fontWeight: '600',
+                color: '#1e293b',
+                marginBottom: '16px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}>
+                🛡️ Role & Privileges
+              </h3>
+              
+              <div style={{ marginBottom: '12px' }}>
+                <label style={{
+                  display: 'block',
+                  fontSize: '12px',
+                  fontWeight: '500',
+                  color: '#64748b',
+                  marginBottom: '4px',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px'
+                }}>
+                  Role
+                </label>
+                <div style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  color: '#dc2626',
+                  padding: '8px 16px',
+                  background: '#fef2f2',
+                  borderRadius: '20px',
+                  border: '1px solid #fecaca'
+                }}>
+                  <span style={{ fontSize: '16px' }}>👑</span>
+                  Super Administrator
+                </div>
+              </div>
+
+              <div style={{ marginBottom: '12px' }}>
+                <label style={{
+                  display: 'block',
+                  fontSize: '12px',
+                  fontWeight: '500',
+                  color: '#64748b',
+                  marginBottom: '8px',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px'
+                }}>
+                  Platform Access Level
+                </label>
+                <div style={{
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  color: '#1e293b',
+                  padding: '8px 12px',
+                  background: '#fef3c7',
+                  borderRadius: '8px',
+                  border: '1px solid #fed7aa'
+                }}>
+                  Full Platform Access
+                </div>
+              </div>
+
+              <div style={{ marginBottom: '12px' }}>
+                <label style={{
+                  display: 'block',
+                  fontSize: '12px',
+                  fontWeight: '500',
+                  color: '#64748b',
+                  marginBottom: '8px',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px'
+                }}>
+                  Administrative Privileges
+                </label>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                  {['User Management', 'Tenant Management', 'Platform Analytics', 'System Configuration'].map((privilege) => (
+                    <div
+                      key={privilege}
+                      style={{
+                        fontSize: '12px',
+                        fontWeight: '500',
+                        color: '#059669',
+                        padding: '4px 8px',
+                        background: '#d1fae5',
+                        borderRadius: '12px',
+                        border: '1px solid #a7f3d0'
+                      }}
+                    >
+                      ✅ {privilege}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '12px',
+                  fontWeight: '500',
+                  color: '#64748b',
+                  marginBottom: '8px',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px'
+                }}>
+                  Security Level
+                </label>
+                <div style={{
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  color: '#1e293b',
+                  padding: '8px 12px',
+                  background: '#f3e8ff',
+                  borderRadius: '8px',
+                  border: '1px solid #e9d5ff'
+                }}>
+                  🔒 CJIS Compliant
+                </div>
+              </div>
+            </div>
+
+            {/* Account Details */}
+            <div style={{
+              background: 'white',
+              border: '1px solid #e2e8f0',
+              borderRadius: '12px',
+              padding: '20px'
+            }}>
+              <h3 style={{
+                fontSize: '16px',
+                fontWeight: '600',
+                color: '#1e293b',
+                marginBottom: '16px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}>
+                📋 Account Details
+              </h3>
+              
+              <div style={{ marginBottom: '12px' }}>
+                <label style={{
+                  display: 'block',
+                  fontSize: '12px',
+                  fontWeight: '500',
+                  color: '#64748b',
+                  marginBottom: '4px',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px'
+                }}>
+                  Account Created
+                </label>
+                <div style={{
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#1e293b',
+                  padding: '8px 12px',
+                  background: '#f8fafc',
+                  borderRadius: '8px',
+                  border: '1px solid #e2e8f0'
+                }}>
+                  {currentUser?.createdAt ? new Date(currentUser.createdAt).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  }) : 'Not available'}
+                </div>
+              </div>
+
+              <div style={{ marginBottom: '12px' }}>
+                <label style={{
+                  display: 'block',
+                  fontSize: '12px',
+                  fontWeight: '500',
+                  color: '#64748b',
+                  marginBottom: '4px',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px'
+                }}>
+                  Last Updated
+                </label>
+                <div style={{
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#1e293b',
+                  padding: '8px 12px',
+                  background: '#f8fafc',
+                  borderRadius: '8px',
+                  border: '1px solid #e2e8f0'
+                }}>
+                  {currentUser?.updatedAt ? new Date(currentUser.updatedAt).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  }) : 'Not available'}
+                </div>
+              </div>
+
+              <div style={{ marginBottom: '12px' }}>
+                <label style={{
+                  display: 'block',
+                  fontSize: '12px',
+                  fontWeight: '500',
+                  color: '#64748b',
+                  marginBottom: '4px',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px'
+                }}>
+                  Email Verification
+                </label>
+                <div style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  color: currentUser?.emailVerified ? '#059669' : '#dc2626',
+                  padding: '6px 12px',
+                  background: currentUser?.emailVerified ? '#d1fae5' : '#fee2e2',
+                  borderRadius: '20px',
+                  border: `1px solid ${currentUser?.emailVerified ? '#a7f3d0' : '#fecaca'}`
+                }}>
+                  <div style={{
+                    width: '8px',
+                    height: '8px',
+                    borderRadius: '50%',
+                    background: currentUser?.emailVerified ? '#059669' : '#dc2626'
+                  }}></div>
+                  {currentUser?.emailVerified ? 'Verified' : 'Not Verified'}
+                </div>
+              </div>
+
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '12px',
+                  fontWeight: '500',
+                  color: '#64748b',
+                  marginBottom: '4px',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px'
+                }}>
+                  Tenant Assignment
+                </label>
+                <div style={{
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#1e293b',
+                  padding: '8px 12px',
+                  background: '#f8fafc',
+                  borderRadius: '8px',
+                  border: '1px solid #e2e8f0'
+                }}>
+                  SuperAdmin Platform
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Platform Statistics */}
         {stats && (
           <div style={{
