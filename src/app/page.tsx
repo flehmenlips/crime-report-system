@@ -40,6 +40,7 @@ import { EdgeCaseStressTest } from '@/components/EdgeCaseStressTest'
 import { SuperAdminDashboard } from '@/components/SuperAdminDashboard'
 import { TenantUserManagement } from '@/components/TenantUserManagement'
 import { SimpleSortControls } from '@/components/SimpleSortControls'
+import { MobileHeader } from '@/components/MobileHeader'
 import { UserPreferencesProvider, useUserPreferences, useViewPreferences } from '@/contexts/UserPreferencesContext'
 import { CaseDetailsView } from '@/components/CaseDetailsView'
 import { CaseDetailsForm } from '@/components/CaseDetailsForm'
@@ -86,8 +87,6 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
   const [evidenceProgress, setEvidenceProgress] = useState(0)
   const [initialDataLoaded, setInitialDataLoaded] = useState(false)
   const [scrollY, setScrollY] = useState(0)
-  const [headerVisible, setHeaderVisible] = useState(true)
-  const lastScrollY = useRef(0)
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false)
   const [showGenerateReport, setShowGenerateReport] = useState(false)
   const [showAnalytics, setShowAnalytics] = useState(false)
@@ -280,34 +279,16 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
     }
   }, [])
 
-  // Add scroll listener for dynamic text color and collapsible header
+  // Add scroll listener for dynamic text color (desktop only)
   useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY
-      setScrollY(currentScrollY)
-      
-      // Collapsible header logic for mobile
-      if (isMobile) {
-        const scrollThreshold = 100
-        const scrollDifference = Math.abs(currentScrollY - lastScrollY.current)
-        
-        // Only update header visibility if scroll difference is significant
-        if (scrollDifference > 5) {
-          if (currentScrollY > lastScrollY.current && currentScrollY > scrollThreshold) {
-            // Scrolling down - hide header
-            setHeaderVisible(false)
-          } else if (currentScrollY < lastScrollY.current) {
-            // Scrolling up - show header
-            setHeaderVisible(true)
-          }
-          
-          lastScrollY.current = currentScrollY
-        }
+    if (!isMobile) {
+      const handleScroll = () => {
+        setScrollY(window.scrollY)
       }
-    }
 
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    return () => window.removeEventListener('scroll', handleScroll)
+      window.addEventListener('scroll', handleScroll, { passive: true })
+      return () => window.removeEventListener('scroll', handleScroll)
+    }
   }, [isMobile])
 
   // Determine text color based on scroll position
@@ -1093,99 +1074,105 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
             fontFamily: 'Inter, -apple-system, sans-serif',
             color: 'white'
           }}>
-        {/* Modern Header */}
-        <div style={{
-          background: 'rgba(255, 255, 255, 0.1)',
-          backdropFilter: 'blur(20px)',
-          margin: isMobile ? '12px' : '24px',
-          borderRadius: '20px',
-          border: '1px solid rgba(255, 255, 255, 0.2)',
-          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)',
-          position: 'sticky',
-          top: isMobile ? '12px' : '24px',
-          zIndex: 50,
-          transform: isMobile && !headerVisible ? 'translateY(-100%)' : 'translateY(0)',
-          transition: 'transform 0.3s ease-in-out',
-          opacity: isMobile && !headerVisible ? 0 : 1
-        }}>
-          <div style={{ padding: isMobile ? '16px 20px' : '24px 32px' }}>
-            <div style={{ 
-              display: 'flex', 
-              alignItems: 'center', 
-              justifyContent: 'space-between',
-              flexDirection: isMobile ? 'column' : 'row',
-              gap: isMobile ? '16px' : '0'
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '12px' : '16px' }}>
-                <div style={{
-                  width: isMobile ? '48px' : '56px',
-                  height: isMobile ? '48px' : '56px',
-                  background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
-                  borderRadius: '16px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  boxShadow: '0 10px 25px rgba(59, 130, 246, 0.3)',
-                  fontSize: isMobile ? '20px' : '24px'
-                }}>
-                  🏠
-                </div>
-                <div>
-                  <h1 style={{ 
-                    fontSize: isMobile ? '24px' : '32px', 
-                    fontWeight: '800', 
-                    margin: 0,
-                    color: textColor,
-                    transition: 'color 0.3s ease-in-out'
-                  }}>
-                    {getDashboardTitle(user)}
-                  </h1>
-                  <p style={{ 
-                    color: textColorSecondary, 
-                    margin: 0, 
-                    fontWeight: '500', 
-                    transition: 'color 0.3s ease-in-out',
-                    fontSize: isMobile ? '14px' : '16px'
-                  }}>
-                    {user.tenant?.name || 'Property Management'}
-                  </p>
-                </div>
-              </div>
+        {/* Mobile Header */}
+        {isMobile ? (
+          <MobileHeader
+            user={user}
+            textColor={textColor}
+            textColorSecondary={textColorSecondary}
+            onProfileUpdate={(updatedUser) => {
+              setUser(updatedUser)
+            }}
+          />
+        ) : (
+          /* Desktop Header */
+          <div style={{
+            background: 'rgba(255, 255, 255, 0.1)',
+            backdropFilter: 'blur(20px)',
+            margin: '24px',
+            borderRadius: '20px',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)',
+            position: 'sticky',
+            top: '24px',
+            zIndex: 50
+          }}>
+            <div style={{ padding: '24px 32px' }}>
               <div style={{ 
                 display: 'flex', 
                 alignItems: 'center', 
-                gap: '16px',
-                flexDirection: isMobile ? 'column' : 'row',
-                width: isMobile ? '100%' : 'auto'
+                justifyContent: 'space-between'
               }}>
-                {/* <NotificationBell /> */}
-              <TenantInfo 
-                user={user} 
-                textColor={textColor} 
-                textColorSecondary={textColorSecondary}
-                isMobile={isMobile}
-              />
-              <UserProfile 
-                showDetails={true} 
-                onProfileUpdate={(updatedUser) => {
-                  setUser(updatedUser)
-                }}
-                textColor={textColor}
-                textColorSecondary={textColorSecondary}
-                isMobile={isMobile}
-              />
+                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                  <div style={{
+                    width: '56px',
+                    height: '56px',
+                    background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
+                    borderRadius: '16px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: '0 10px 25px rgba(59, 130, 246, 0.3)',
+                    fontSize: '24px'
+                  }}>
+                    🏠
+                  </div>
+                  <div>
+                    <h1 style={{ 
+                      fontSize: '32px', 
+                      fontWeight: '800', 
+                      margin: 0,
+                      color: textColor,
+                      transition: 'color 0.3s ease-in-out'
+                    }}>
+                      {getDashboardTitle(user)}
+                    </h1>
+                    <p style={{ 
+                      color: textColorSecondary, 
+                      margin: 0, 
+                      fontWeight: '500', 
+                      transition: 'color 0.3s ease-in-out',
+                      fontSize: '16px'
+                    }}>
+                      {user.tenant?.name || 'Property Management'}
+                    </p>
+                  </div>
+                </div>
+                <div style={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: '16px'
+                }}>
+                  {/* <NotificationBell /> */}
+                <TenantInfo 
+                  user={user} 
+                  textColor={textColor} 
+                  textColorSecondary={textColorSecondary}
+                  isMobile={false}
+                />
+                <UserProfile 
+                  showDetails={true} 
+                  onProfileUpdate={(updatedUser) => {
+                    setUser(updatedUser)
+                  }}
+                  textColor={textColor}
+                  textColorSecondary={textColorSecondary}
+                  isMobile={false}
+                />
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        )}
 
         <div style={{ 
           maxWidth: '1200px', 
           margin: '0 auto', 
-          padding: isMobile ? '0 8px 48px' : '0 24px 48px',
+          padding: isMobile ? '80px 4px 48px' : '0 24px 48px',
           width: '100%',
           overflow: 'hidden',
-          boxSizing: 'border-box'
+          boxSizing: 'border-box',
+          position: 'relative'
         }}>
           {/* Refresh Button */}
           <div style={{ 
@@ -1811,25 +1798,32 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
                     />
                     
                     {/* View Mode Toggle */}
-                    <div style={{ display: 'flex', background: '#f3f4f6', borderRadius: '12px', padding: '4px' }}>
+                    <div style={{ 
+                      display: 'flex', 
+                      background: '#f3f4f6', 
+                      borderRadius: '12px', 
+                      padding: '4px',
+                      minWidth: isMobile ? '140px' : 'auto'
+                    }}>
                       <button
                         onClick={() => setViewMode('cards')}
                         style={{
                           background: viewMode === 'cards' ? '#3b82f6' : 'transparent',
                           color: viewMode === 'cards' ? 'white' : '#6b7280',
                           border: 'none',
-                          padding: '8px 16px',
+                          padding: isMobile ? '10px 12px' : '8px 16px',
                           borderRadius: '8px',
-                          fontSize: '14px',
+                          fontSize: isMobile ? '13px' : '14px',
                           fontWeight: '600',
                           cursor: 'pointer',
                           transition: 'all 0.2s ease',
                           display: 'flex',
                           alignItems: 'center',
-                          gap: '6px'
+                          gap: '4px',
+                          flex: 1
                         }}
                       >
-                        <svg style={{ width: '16px', height: '16px' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg style={{ width: isMobile ? '14px' : '16px', height: isMobile ? '14px' : '16px' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
                         </svg>
                         Cards
@@ -1840,18 +1834,19 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
                           background: viewMode === 'list' ? '#3b82f6' : 'transparent',
                           color: viewMode === 'list' ? 'white' : '#6b7280',
                           border: 'none',
-                          padding: '8px 16px',
+                          padding: isMobile ? '10px 12px' : '8px 16px',
                           borderRadius: '8px',
-                          fontSize: '14px',
+                          fontSize: isMobile ? '13px' : '14px',
                           fontWeight: '600',
                           cursor: 'pointer',
                           transition: 'all 0.2s ease',
                           display: 'flex',
                           alignItems: 'center',
-                          gap: '6px'
+                          gap: '4px',
+                          flex: 1
                         }}
                       >
-                        <svg style={{ width: '16px', height: '16px' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg style={{ width: isMobile ? '14px' : '16px', height: isMobile ? '14px' : '16px' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
                         </svg>
                         List
@@ -2144,22 +2139,24 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
               <div key={refreshKey} style={{ 
                 display: 'grid', 
                 gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(400px, 1fr))', 
-                gap: isMobile ? '16px' : '32px',
+                gap: isMobile ? '12px' : '32px',
                 width: '100%',
-                boxSizing: 'border-box'
+                boxSizing: 'border-box',
+                maxWidth: '100%'
               }}>
                 {displayItems.map((item) => (
                   <div key={item.id} style={{
                     background: 'white',
                     borderRadius: '20px',
-                    padding: isMobile ? '20px' : '32px',
+                    padding: isMobile ? '16px' : '32px',
                     boxShadow: selectedItems.has(item.id) ? '0 32px 64px rgba(59, 130, 246, 0.2)' : '0 20px 40px rgba(0, 0, 0, 0.08)',
                     border: selectedItems.has(item.id) ? '2px solid #3b82f6' : '1px solid rgba(0, 0, 0, 0.05)',
                     transition: 'all 0.4s ease',
                     position: 'relative',
                     width: '100%',
                     boxSizing: 'border-box',
-                    maxWidth: '100%'
+                    maxWidth: '100%',
+                    overflow: 'hidden'
                   }}
                   onMouseOver={(e) => {
                     e.currentTarget.style.transform = 'translateY(-8px)'
