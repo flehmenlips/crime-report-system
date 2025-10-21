@@ -70,8 +70,10 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
         avatar: user.avatar || ''
       })
     }
+  }, [user])
 
-    // Mobile detection
+  // Mobile detection - separate effect to avoid unnecessary re-registration
+  useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768)
     }
@@ -79,7 +81,7 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
     checkMobile()
     window.addEventListener('resize', checkMobile)
     return () => window.removeEventListener('resize', checkMobile)
-  }, [user])
+  }, [])
 
   const handleProfileUpdate = async (e: React.FormEvent) => {
     e.preventDefault()
