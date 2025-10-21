@@ -335,6 +335,31 @@ export function MobileHeader({
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 <button
                   style={{
+                    background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+                    color: 'white',
+                    border: 'none',
+                    padding: '16px 20px',
+                    borderRadius: '12px',
+                    fontSize: '15px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)',
+                    transition: 'transform 0.2s ease'
+                  }}
+                  onClick={() => {
+                    setIsMenuOpen(false)
+                    router.push('/add-item')
+                  }}
+                >
+                  <span style={{ fontSize: '20px' }}>➕</span>
+                  <span>Add New Item</span>
+                </button>
+                <button
+                  style={{
                     background: 'linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)',
                     color: 'white',
                     border: 'none',
