@@ -389,7 +389,7 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
                   {item.description.length > 100 ? `${item.description.substring(0, 100)}...` : item.description}
                 </p>
                 <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-                  {evidenceCache?.[item.id]?.filter(e => e.type === 'photo')?.length > 0 && (
+                  {evidenceCache && evidenceCache[item.id] && evidenceCache[item.id].filter(e => e.type === 'photo').length > 0 && (
                     <span style={{
                       background: '#dbeafe',
                       color: '#1e40af',
@@ -398,10 +398,10 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
                       fontSize: '11px',
                       fontWeight: '600'
                     }}>
-                      📷 {evidenceCache?.[item.id]?.filter(e => e.type === 'photo').length || 0}
+                      📷 {evidenceCache[item.id].filter(e => e.type === 'photo').length}
                     </span>
                   )}
-                  {evidenceCache?.[item.id]?.filter(e => e.type === 'video')?.length > 0 && (
+                  {evidenceCache && evidenceCache[item.id] && evidenceCache[item.id].filter(e => e.type === 'video').length > 0 && (
                     <span style={{
                       background: '#dcfce7',
                       color: '#166534',
@@ -410,7 +410,7 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
                       fontSize: '11px',
                       fontWeight: '600'
                     }}>
-                      🎥 {evidenceCache?.[item.id]?.filter(e => e.type === 'video').length || 0}
+                      🎥 {evidenceCache[item.id].filter(e => e.type === 'video').length}
                     </span>
                   )}
                 </div>
