@@ -340,8 +340,8 @@ export function MobileHeader({
                     gap: '8px'
                   }}
                   onClick={() => {
-                    onAnalyticsClick?.()
                     setIsMenuOpen(false)
+                    router.push('/analytics')
                   }}
                 >
                   📊 View Analytics
@@ -362,8 +362,8 @@ export function MobileHeader({
                     gap: '8px'
                   }}
                   onClick={() => {
-                    onReportClick?.()
                     setIsMenuOpen(false)
+                    router.push('/reports')
                   }}
                 >
                   📄 Generate Report
@@ -384,10 +384,10 @@ export function MobileHeader({
                       alignItems: 'center',
                       gap: '8px'
                     }}
-                    onClick={() => {
-                      onPropertyClick?.()
-                      setIsMenuOpen(false)
-                    }}
+                  onClick={() => {
+                    setIsMenuOpen(false)
+                    router.push('/my-property')
+                  }}
                   >
                     🏢 Manage Property
                   </button>
