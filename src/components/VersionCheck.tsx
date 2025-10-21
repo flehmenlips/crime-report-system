@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react'
 
-const CURRENT_VERSION = '1.8.5' // Update this with each release
+const CURRENT_VERSION = '1.8.7' // Update this with each release
 
 export function VersionCheck() {
   useEffect(() => {
