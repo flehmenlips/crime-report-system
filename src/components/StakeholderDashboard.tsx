@@ -342,9 +342,10 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
           100% { transform: rotate(360deg); }
         }
       `}</style>
+      {/* Full-screen wrapper for desktop only */}
       <div style={{
-        minHeight: '100vh',
-        background: 'linear-gradient(135deg, #0f0f23 0%, #1e1b4b 50%, #312e81 100%)',
+        minHeight: isMobile ? 'auto' : '100vh',
+        background: isMobile ? 'transparent' : 'linear-gradient(135deg, #0f0f23 0%, #1e1b4b 50%, #312e81 100%)',
         fontFamily: 'Inter, -apple-system, sans-serif',
         color: 'white'
       }}>
@@ -1351,7 +1352,7 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
           />
         )}
       </div>
-    </div>
+      </div>
     </>
   )
 }
