@@ -356,17 +356,18 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
       alignItems: 'center',
       justifyContent: 'center',
       zIndex: 1000,
-      padding: isMobile ? '8px' : '24px',
+      padding: isMobile ? '0' : '24px',
       fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif'
     }}>
       <div style={{
         background: 'rgba(255, 255, 255, 0.95)',
         backdropFilter: 'blur(20px)',
-        borderRadius: isMobile ? '16px' : '24px',
-        padding: isMobile ? '20px' : '32px',
+        borderRadius: isMobile ? '0' : '24px',
+        padding: isMobile ? '16px' : '32px',
         maxWidth: isMobile ? '100%' : '1000px',
         width: '100%',
-        maxHeight: isMobile ? '95vh' : '90vh',
+        maxHeight: isMobile ? '100vh' : '90vh',
+        height: isMobile ? '100vh' : 'auto',
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',
@@ -497,14 +498,14 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
           flex: 1, 
           overflow: 'auto',
           paddingRight: '8px',
-          paddingBottom: '20px'
+          paddingBottom: isMobile ? '80px' : '20px'
         }}>
           {activeTab === 'profile' && (
-            <form onSubmit={handleProfileUpdate} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+            <form onSubmit={handleProfileUpdate} style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? '16px' : '24px' }}>
               <div style={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-                gap: '24px'
+                gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(300px, 1fr))',
+                gap: isMobile ? '16px' : '24px'
               }}>
                 <div>
                   <label style={{
@@ -590,8 +591,8 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
 
               <div style={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-                gap: '24px'
+                gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(300px, 1fr))',
+                gap: isMobile ? '16px' : '24px'
               }}>
                 <div>
                   <label style={{
@@ -713,8 +714,8 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
 
               <div style={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-                gap: '24px'
+                gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(200px, 1fr))',
+                gap: isMobile ? '16px' : '24px'
               }}>
                 <div>
                   <label style={{
@@ -837,8 +838,8 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
 
               <div style={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-                gap: '24px'
+                gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(300px, 1fr))',
+                gap: isMobile ? '16px' : '24px'
               }}>
                 <div>
                   <label style={{
@@ -1079,7 +1080,7 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
           )}
 
           {activeTab === 'password' && (
-            <form onSubmit={handlePasswordChange} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+            <form onSubmit={handlePasswordChange} style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? '16px' : '24px' }}>
               <div>
                 <label style={{
                   display: 'block',
@@ -1123,8 +1124,8 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
 
               <div style={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-                gap: '24px'
+                gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(300px, 1fr))',
+                gap: isMobile ? '16px' : '24px'
               }}>
                 <div>
                   <label style={{
@@ -1283,10 +1284,10 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
           )}
 
           {activeTab === 'account' && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? '16px' : '24px' }}>
               <div style={{
                 background: '#f9fafb',
-                padding: '24px',
+                padding: isMobile ? '16px' : '24px',
                 borderRadius: '12px',
                 border: '1px solid #e5e7eb'
               }}>
@@ -1300,7 +1301,7 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
                 </h3>
                 <div style={{
                   display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+                  gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(250px, 1fr))',
                   gap: '16px'
                 }}>
                   <div>
@@ -1437,19 +1438,20 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
         {/* Fixed Footer with Action Buttons */}
         <div style={{
           borderTop: '1px solid rgba(255, 255, 255, 0.1)',
-          paddingTop: '24px',
-          marginTop: '24px',
+          paddingTop: isMobile ? '16px' : '24px',
+          marginTop: isMobile ? '16px' : '24px',
           display: 'flex',
           justifyContent: 'flex-end',
-          gap: '16px',
+          gap: isMobile ? '12px' : '16px',
           background: 'rgba(255, 255, 255, 0.95)',
-          backdropFilter: 'blur(20px)'
+          backdropFilter: 'blur(20px)',
+          flexDirection: isMobile ? 'column' : 'row'
         }}>
           <button
             type="button"
             onClick={onClose}
             style={{
-              padding: '16px 32px',
+              padding: isMobile ? '12px 24px' : '16px 32px',
               background: 'rgba(107, 114, 128, 0.1)',
               border: '1px solid rgba(107, 114, 128, 0.2)',
               borderRadius: '16px',
@@ -1457,7 +1459,8 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
               fontSize: '16px',
               fontWeight: '600',
               cursor: 'pointer',
-              transition: 'all 0.3s ease'
+              transition: 'all 0.3s ease',
+              width: isMobile ? '100%' : 'auto'
             }}
             onMouseEnter={(e) => {
               const target = e.target as HTMLButtonElement
@@ -1484,7 +1487,7 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
             }}
             disabled={loading}
             style={{
-              padding: '16px 32px',
+              padding: isMobile ? '12px 24px' : '16px 32px',
               background: loading ? 'rgba(59, 130, 246, 0.7)' : 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)',
               border: 'none',
               borderRadius: '16px',
@@ -1494,7 +1497,8 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
               cursor: loading ? 'not-allowed' : 'pointer',
               transition: 'all 0.3s ease',
               boxShadow: '0 10px 25px rgba(59, 130, 246, 0.3)',
-              opacity: loading ? 0.7 : 1
+              opacity: loading ? 0.7 : 1,
+              width: isMobile ? '100%' : 'auto'
             }}
             onMouseEnter={(e) => {
               if (!loading) {
