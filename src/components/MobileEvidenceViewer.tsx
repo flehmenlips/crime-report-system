@@ -74,7 +74,7 @@ export function MobileEvidenceViewer({ evidence, initialIndex, onClose, onDelete
     }
   }
 
-  const getCloudinaryUrl = (cloudinaryId: string, url?: string | null) => {
+  const getCloudinaryUrl = (cloudinaryId: string, url?: string | null, type?: string) => {
     const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'dhaacekdd'
     
     // If we have a direct URL, use it
@@ -87,8 +87,11 @@ export function MobileEvidenceViewer({ evidence, initialIndex, onClose, onDelete
       return cloudinaryId
     }
     
-    // Construct URL from public_id
-    return `https://res.cloudinary.com/${cloudName}/image/upload/${cloudinaryId}`
+    // Determine resource type based on evidence type
+    const resourceType = type === 'video' ? 'video' : type === 'document' ? 'raw' : 'image'
+    
+    // Construct URL from public_id with correct resource type
+    return `https://res.cloudinary.com/${cloudName}/${resourceType}/upload/${cloudinaryId}`
   }
 
   return (
@@ -211,7 +214,7 @@ export function MobileEvidenceViewer({ evidence, initialIndex, onClose, onDelete
         }}>
           {currentEvidence.type === 'photo' ? (
             <img
-              src={getCloudinaryUrl(currentEvidence.cloudinaryId, currentEvidence.url)}
+              src={getCloudinaryUrl(currentEvidence.cloudinaryId, currentEvidence.url, currentEvidence.type)}
               alt={currentEvidence.originalName || 'Evidence photo'}
               style={{
                 maxWidth: '100%',
@@ -222,7 +225,7 @@ export function MobileEvidenceViewer({ evidence, initialIndex, onClose, onDelete
             />
           ) : currentEvidence.type === 'video' ? (
             <video
-              src={getCloudinaryUrl(currentEvidence.cloudinaryId, currentEvidence.url)}
+              src={getCloudinaryUrl(currentEvidence.cloudinaryId, currentEvidence.url, currentEvidence.type)}
               controls
               style={{
                 maxWidth: '100%',
@@ -256,7 +259,7 @@ export function MobileEvidenceViewer({ evidence, initialIndex, onClose, onDelete
                 Document viewing coming soon
               </p>
               <a
-                href={getCloudinaryUrl(currentEvidence.cloudinaryId, currentEvidence.url)}
+                href={getCloudinaryUrl(currentEvidence.cloudinaryId, currentEvidence.url, currentEvidence.type)}
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{
