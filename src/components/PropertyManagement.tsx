@@ -340,7 +340,7 @@ export default function PropertyManagement() {
                   position: 'absolute',
                   top: '16px',
                   right: '16px',
-                  background: 'none',
+                  background: '#f3f4f6',
                   border: 'none',
                   fontSize: '24px',
                   cursor: 'pointer',
@@ -350,8 +350,7 @@ export default function PropertyManagement() {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  borderRadius: '50%',
-                  background: '#f3f4f6'
+                  borderRadius: '50%'
                 }}
               >
                 ×
