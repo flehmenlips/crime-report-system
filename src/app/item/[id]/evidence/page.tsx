@@ -3,6 +3,7 @@
 import { useRouter, useParams } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import { StolenItem } from '@/types'
+import { MobileEvidenceViewer } from '@/components/MobileEvidenceViewer'
 
 export default function EvidenceManagerPage() {
   const router = useRouter()
@@ -17,6 +18,8 @@ export default function EvidenceManagerPage() {
   const [evidence, setEvidence] = useState<any[]>([])
   const [activeFilter, setActiveFilter] = useState<'all' | 'photo' | 'video' | 'document'>('all')
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
+  const [showViewer, setShowViewer] = useState(false)
+  const [viewerIndex, setViewerIndex] = useState(0)
 
   // Mobile detection
   useEffect(() => {
@@ -336,8 +339,9 @@ export default function EvidenceManagerPage() {
                       transition: 'all 0.2s ease'
                     }}
                     onClick={() => {
-                      // TODO: Open evidence viewer
-                      alert('Evidence viewer - Coming soon!')
+                      const index = filteredEvidence.findIndex(e => e.id === ev.id)
+                      setViewerIndex(index)
+                      setShowViewer(true)
                     }}
                   >
                     <div style={{
@@ -416,6 +420,36 @@ export default function EvidenceManagerPage() {
           </button>
         </div>
       </div>
+
+      {/* Evidence Viewer */}
+      {showViewer && filteredEvidence.length > 0 && (
+        <MobileEvidenceViewer
+          evidence={filteredEvidence}
+          initialIndex={viewerIndex}
+          onClose={() => setShowViewer(false)}
+          onDelete={async (evidenceId) => {
+            try {
+              const response = await fetch(`/api/evidence/${evidenceId}`, {
+                method: 'DELETE'
+              })
+              if (response.ok) {
+                // Reload evidence after delete
+                const evidenceResponse = await fetch(`/api/evidence?itemId=${itemId}`)
+                if (evidenceResponse.ok) {
+                  const evidenceData = await evidenceResponse.json()
+                  setEvidence(evidenceData.evidence || [])
+                }
+                setShowViewer(false)
+              } else {
+                alert('Failed to delete evidence')
+              }
+            } catch (err) {
+              console.error('Delete failed:', err)
+              alert('Failed to delete evidence')
+            }
+          }}
+        />
+      )}
     </div>
   )
 }
