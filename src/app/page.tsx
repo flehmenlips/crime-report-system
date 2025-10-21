@@ -3112,26 +3112,38 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
 
       {/* Main Dashboard Content - Only show if user is not super_admin and (property is set up or user is not a property owner) */}
       {user && user.role !== 'super_admin' && !(user && user.role === 'property_owner' && !user.tenantId) && (
-        <ProgressiveLoader
-          loading={!initialDataLoaded}
-          skeletonType="dashboard"
-          skeletonCount={6}
-          loadingMessage="Loading Dashboard..."
-          showProgress={evidenceLoading}
-          progress={evidenceProgress}
-        >
-          <StakeholderDashboard 
-            user={user} 
-            items={allItems} 
-            onItemsUpdate={(updatedItems) => setAllItems(updatedItems)}
-            loading={loading}
-            error={error}
-            onRefresh={handleRefresh}
-            evidenceCache={evidenceCache}
-            evidenceLoaded={evidenceLoaded}
-            isMobile={isMobile}
-          />
-        </ProgressiveLoader>
+        <>
+          {/* Mobile Header for Stakeholders */}
+          {isMobile && (
+            <MobileHeader
+              user={user}
+              textColor={textColor}
+              textColorSecondary={textColorSecondary}
+              onViewModeChange={setViewMode}
+              currentViewMode={viewMode}
+            />
+          )}
+          <ProgressiveLoader
+            loading={!initialDataLoaded}
+            skeletonType="dashboard"
+            skeletonCount={6}
+            loadingMessage="Loading Dashboard..."
+            showProgress={evidenceLoading}
+            progress={evidenceProgress}
+          >
+            <StakeholderDashboard 
+              user={user} 
+              items={allItems} 
+              onItemsUpdate={(updatedItems) => setAllItems(updatedItems)}
+              loading={loading}
+              error={error}
+              onRefresh={handleRefresh}
+              evidenceCache={evidenceCache}
+              evidenceLoaded={evidenceLoaded}
+              isMobile={isMobile}
+            />
+          </ProgressiveLoader>
+        </>
       )}
         
         {/* Evidence loading overlay */}
