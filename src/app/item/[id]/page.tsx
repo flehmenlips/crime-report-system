@@ -454,10 +454,7 @@ export default function ItemDetailPage() {
                   Edit Item
                 </button>
                 <button
-                  onClick={() => {
-                    // TODO: Implement upload evidence
-                    alert('Upload evidence - Coming soon!')
-                  }}
+                  onClick={() => router.push(`/item/${itemId}/evidence`)}
                   style={{
                     width: '100%',
                     padding: '16px',
@@ -475,8 +472,8 @@ export default function ItemDetailPage() {
                     boxShadow: '0 4px 12px rgba(139, 92, 246, 0.3)'
                   }}
                 >
-                  <span style={{ fontSize: '20px' }}>📤</span>
-                  Upload Evidence
+                  <span style={{ fontSize: '20px' }}>📂</span>
+                  Manage Evidence
                 </button>
                 <button
                   onClick={() => {

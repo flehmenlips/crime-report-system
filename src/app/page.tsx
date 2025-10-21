@@ -2502,8 +2502,12 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
                         
                         <button
                           onClick={() => {
-                            setEvidenceManagementItem(item)
-                            setShowEvidenceManagement(true)
+                            if (isMobile) {
+                              router.push(`/item/${item.id}/evidence`)
+                            } else {
+                              setEvidenceManagementItem(item)
+                              setShowEvidenceManagement(true)
+                            }
                           }}
                           style={{
                             background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
