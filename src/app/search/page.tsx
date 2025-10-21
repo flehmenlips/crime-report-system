@@ -425,7 +425,7 @@ export default function SearchPage() {
                           fontSize: '12px',
                           color: '#9ca3af'
                         }}>
-                          <span>📁 {item.category}</span>
+                          <span>📁 {item.category || 'Uncategorized'}</span>
                           <span>•</span>
                           <span>📅 {new Date(item.createdAt).toLocaleDateString()}</span>
                         </div>

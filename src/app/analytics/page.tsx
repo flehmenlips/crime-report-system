@@ -328,7 +328,7 @@ export default function AnalyticsPage() {
                                   {item.name}
                                 </div>
                                 <div style={{ fontSize: '12px', color: '#6b7280' }}>
-                                  {item.category}
+                                  {item.category || 'Uncategorized'}
                                 </div>
                               </div>
                             </div>
