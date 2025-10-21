@@ -73,6 +73,7 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
   const [showCaseDetails, setShowCaseDetails] = useState(false)
   const [filteredItems, setFilteredItems] = useState<StolenItem[]>([])
   const [isFiltered, setIsFiltered] = useState(false)
+  const [searchFilters, setSearchFilters] = useState<any>(null)
 
   // Debug logging
   console.log('StakeholderDashboard rendered for user:', user?.name, 'role:', user?.role, 'viewMode:', viewMode)
@@ -297,6 +298,48 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
   }
 
   const displayItems = isFiltered ? getSortedItems(filteredItems) : getSortedItems(items)
+
+  // Generate search description from filters
+  const getSearchDescription = (filters: any) => {
+    if (!filters) return ''
+    
+    const conditions = []
+    
+    // Basic text searches
+    if (filters.name) conditions.push(`name contains "${filters.name}"`)
+    if (filters.description) conditions.push(`description contains "${filters.description}"`)
+    if (filters.serialNumber) conditions.push(`serial number contains "${filters.serialNumber}"`)
+    if (filters.location) conditions.push(`location contains "${filters.location}"`)
+    
+    // Category filter
+    if (filters.category && filters.category !== '') {
+      conditions.push(`category is "${filters.category}"`)
+    }
+    
+    // Value range
+    if (filters.minValue !== null && filters.minValue !== undefined) {
+      conditions.push(`value ≥ $${filters.minValue}`)
+    }
+    if (filters.maxValue !== null && filters.maxValue !== undefined) {
+      conditions.push(`value ≤ $${filters.maxValue}`)
+    }
+    
+    // Date range
+    if (filters.dateLastSeenFrom) {
+      conditions.push(`date ≥ ${filters.dateLastSeenFrom}`)
+    }
+    if (filters.dateLastSeenTo) {
+      conditions.push(`date ≤ ${filters.dateLastSeenTo}`)
+    }
+    
+    // Evidence requirements
+    if (filters.hasPhotos === true) conditions.push('has photos')
+    if (filters.hasVideos === true) conditions.push('has videos')
+    if (filters.hasDocuments === true) conditions.push('has documents')
+    
+    if (conditions.length === 0) return 'all items'
+    return conditions.join(' and ')
+  }
   
   // Calculate evidence count from evidenceCache instead of item.evidence
   // since evidence is now loaded progressively
@@ -339,6 +382,28 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
     return (
       <>
         <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '80px 8px 48px', width: '100%', boxSizing: 'border-box' }}>
+          {/* Search Description for Mobile */}
+          {isFiltered && searchFilters && (
+            <div style={{
+              background: 'linear-gradient(135deg, #dbeafe 0%, #e0f2fe 100%)',
+              border: '1px solid #3b82f6',
+              borderRadius: '12px',
+              padding: '12px 16px',
+              margin: '0 8px 16px 8px'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontSize: '16px' }}>🔍</span>
+                <span style={{ 
+                  fontSize: '14px', 
+                  fontWeight: '600', 
+                  color: '#1e40af' 
+                }}>
+                  Found {displayItems.length} items where {getSearchDescription(searchFilters)}
+                </span>
+              </div>
+            </div>
+          )}
+          
           {/* Items Display */}
           <div style={{ 
             display: 'grid', 
@@ -881,6 +946,26 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
                 <p style={{ color: '#6b7280', fontSize: '16px' }}>
                   {getRoleDisplayName(user.role)} view • {displayItems.length} items catalogued
                 </p>
+                {isFiltered && searchFilters && (
+                  <div style={{
+                    background: 'linear-gradient(135deg, #dbeafe 0%, #e0f2fe 100%)',
+                    border: '1px solid #3b82f6',
+                    borderRadius: '12px',
+                    padding: '12px 16px',
+                    marginTop: '12px'
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span style={{ fontSize: '16px' }}>🔍</span>
+                      <span style={{ 
+                        fontSize: '14px', 
+                        fontWeight: '600', 
+                        color: '#1e40af' 
+                      }}>
+                        Found {displayItems.length} items where {getSearchDescription(searchFilters)}
+                      </span>
+                    </div>
+                  </div>
+                )}
               </div>
               )}
               
@@ -960,6 +1045,7 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
                   onClick={() => {
                     setIsFiltered(false)
                     setFilteredItems([])
+                    setSearchFilters(null)
                   }}
                   style={{
                     background: 'rgba(59, 130, 246, 0.1)',
@@ -990,6 +1076,7 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
                   onClick={() => {
                     setIsFiltered(false)
                     setFilteredItems([])
+                    setSearchFilters(null)
                   }}
                   style={{
                     background: 'rgba(239, 68, 68, 0.1)',
@@ -1421,9 +1508,10 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
           <AdvancedSearch
             items={items}
             onClose={() => setShowAdvancedSearch(false)}
-            onResults={(results) => {
+            onResults={(results, filters) => {
               setFilteredItems(results)
               setIsFiltered(true)
+              setSearchFilters(filters)
               setShowAdvancedSearch(false)
             }}
             user={user}

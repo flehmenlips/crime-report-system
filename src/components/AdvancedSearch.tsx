@@ -7,7 +7,7 @@ import { useCategories } from '@/hooks/useCategories'
 interface AdvancedSearchProps {
   items: StolenItem[]
   onClose: () => void
-  onResults: (filteredItems: StolenItem[]) => void
+  onResults: (filteredItems: StolenItem[], searchFilters?: SearchFilters) => void
   user?: any
   evidenceCache?: Record<string, any[]> // Optional evidence cache for filtering
 }
@@ -265,9 +265,9 @@ export function AdvancedSearch({ items, onClose, onResults, user, evidenceCache 
   // Update parent component with search results
   useEffect(() => {
     if (showResults) {
-      onResults(searchResults)
+      onResults(searchResults, filters)
     }
-  }, [searchResults, showResults, onResults])
+  }, [searchResults, showResults, onResults, filters])
 
   const clearFilters = () => {
     setFilters({
@@ -291,7 +291,7 @@ export function AdvancedSearch({ items, onClose, onResults, user, evidenceCache 
   }
 
   const applyResults = () => {
-    onResults(searchResults)
+    onResults(searchResults, filters)
     onClose()
   }
 
