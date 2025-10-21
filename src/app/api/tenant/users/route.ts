@@ -41,6 +41,8 @@ export async function GET(request: NextRequest) {
         role: true,
         accessLevel: true,
         username: true,
+        isActive: true,
+        lastLoginAt: true,
         _count: {
           select: {
             items: true
@@ -58,6 +60,8 @@ export async function GET(request: NextRequest) {
       role: user.role,
       accessLevel: user.accessLevel,
       username: user.username,
+      isActive: user.isActive,
+      lastLoginAt: user.lastLoginAt,
       itemCount: user._count.items
     }))
 
