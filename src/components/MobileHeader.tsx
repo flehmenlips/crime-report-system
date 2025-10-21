@@ -147,40 +147,52 @@ export function MobileHeader({
           }}>
             {/* Header with Close Button */}
             <div style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              padding: '20px',
-              borderBottom: '1px solid #e5e7eb',
-              background: '#f8fafc'
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              padding: '24px 20px',
+              borderBottom: 'none',
+              color: 'white'
             }}>
-              <h2 style={{
-                fontSize: '20px',
-                fontWeight: '700',
-                color: '#1f2937',
-                margin: 0
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: '20px'
               }}>
-                Menu
-              </h2>
-              <button
-                onClick={() => setIsMenuOpen(false)}
-                style={{
-                  background: '#ef4444',
-                  border: 'none',
-                  fontSize: '18px',
-                  cursor: 'pointer',
-                  color: 'white',
-                  width: '32px',
-                  height: '32px',
-                  borderRadius: '50%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontWeight: 'bold'
-                }}
-              >
-                ×
-              </button>
+                <h2 style={{
+                  fontSize: '24px',
+                  fontWeight: '700',
+                  margin: 0
+                }}>
+                  🏠 REMISE
+                </h2>
+                <button
+                  onClick={() => setIsMenuOpen(false)}
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.2)',
+                    backdropFilter: 'blur(10px)',
+                    border: '1px solid rgba(255, 255, 255, 0.3)',
+                    fontSize: '18px',
+                    cursor: 'pointer',
+                    color: 'white',
+                    width: '36px',
+                    height: '36px',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontWeight: 'bold'
+                  }}
+                >
+                  ×
+                </button>
+              </div>
+              <p style={{
+                fontSize: '14px',
+                margin: 0,
+                opacity: 0.9
+              }}>
+                Property Management System
+              </p>
             </div>
 
 
@@ -188,16 +200,17 @@ export function MobileHeader({
             <div style={{ padding: '20px', flex: 1 }}>
               {/* User Profile Section */}
               <div style={{
-                background: '#f8fafc',
-                borderRadius: '12px',
-                padding: '16px',
-                marginBottom: '24px'
+                background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
+                borderRadius: '16px',
+                padding: '20px',
+                marginBottom: '24px',
+                border: '1px solid #e5e7eb'
               }}>
               <div style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: '12px',
-                marginBottom: '12px'
+                gap: '16px',
+                marginBottom: '16px'
               }}>
                 <div style={{
                   width: '48px',
@@ -250,17 +263,18 @@ export function MobileHeader({
                     router.push('/profile')
                   }}
                   style={{
-                    background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                     color: 'white',
                     border: 'none',
-                    padding: '8px 12px',
-                    borderRadius: '8px',
-                    fontSize: '12px',
+                    padding: '10px 16px',
+                    borderRadius: '10px',
+                    fontSize: '13px',
                     fontWeight: '600',
-                    cursor: 'pointer'
+                    cursor: 'pointer',
+                    boxShadow: '0 4px 8px rgba(102, 126, 234, 0.3)'
                   }}
                 >
-                  Edit Profile
+                  ✏️ Edit Profile
                 </button>
               </div>
               
@@ -309,56 +323,65 @@ export function MobileHeader({
             <div style={{ marginBottom: '24px' }}>
               <h3 style={{
                 fontSize: '16px',
-                fontWeight: '600',
-                color: '#374151',
-                margin: '0 0 12px 0'
+                fontWeight: '700',
+                color: '#1f2937',
+                margin: '0 0 16px 0',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
               }}>
-                Quick Actions
+                <span>⚡</span>Quick Actions
               </h3>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 <button
                   style={{
-                    background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                     color: 'white',
                     border: 'none',
-                    padding: '12px 16px',
-                    borderRadius: '8px',
-                    fontSize: '14px',
+                    padding: '16px 20px',
+                    borderRadius: '12px',
+                    fontSize: '15px',
                     fontWeight: '600',
                     cursor: 'pointer',
                     textAlign: 'left',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '8px'
+                    gap: '12px',
+                    boxShadow: '0 4px 12px rgba(102, 126, 234, 0.3)',
+                    transition: 'transform 0.2s ease'
                   }}
                   onClick={() => {
                     setIsMenuOpen(false)
                     router.push('/analytics')
                   }}
                 >
-                  📊 View Analytics
+                  <span style={{ fontSize: '20px' }}>📊</span>
+                  <span>View Analytics</span>
                 </button>
                 <button
                   style={{
                     background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
                     color: 'white',
                     border: 'none',
-                    padding: '12px 16px',
-                    borderRadius: '8px',
-                    fontSize: '14px',
+                    padding: '16px 20px',
+                    borderRadius: '12px',
+                    fontSize: '15px',
                     fontWeight: '600',
                     cursor: 'pointer',
                     textAlign: 'left',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '8px'
+                    gap: '12px',
+                    boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)',
+                    transition: 'transform 0.2s ease'
                   }}
                   onClick={() => {
                     setIsMenuOpen(false)
                     router.push('/reports')
                   }}
                 >
-                  📄 Generate Report
+                  <span style={{ fontSize: '20px' }}>📄</span>
+                  <span>Generate Report</span>
                 </button>
                 {user.role === 'property_owner' && (
                   <button
@@ -366,22 +389,25 @@ export function MobileHeader({
                       background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
                       color: 'white',
                       border: 'none',
-                      padding: '12px 16px',
-                      borderRadius: '8px',
-                      fontSize: '14px',
+                      padding: '16px 20px',
+                      borderRadius: '12px',
+                      fontSize: '15px',
                       fontWeight: '600',
                       cursor: 'pointer',
                       textAlign: 'left',
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '8px'
+                      gap: '12px',
+                      boxShadow: '0 4px 12px rgba(139, 92, 246, 0.3)',
+                      transition: 'transform 0.2s ease'
                     }}
                   onClick={() => {
                     setIsMenuOpen(false)
                     router.push('/my-property')
                   }}
                   >
-                    🏢 Manage Property
+                    <span style={{ fontSize: '20px' }}>🏢</span>
+                    <span>Manage Property</span>
                   </button>
                 )}
               </div>
@@ -395,8 +421,8 @@ export function MobileHeader({
                 background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
                 color: 'white',
                 border: 'none',
-                padding: '16px 20px',
-                borderRadius: '8px',
+                padding: '18px 24px',
+                borderRadius: '12px',
                 fontSize: '16px',
                 fontWeight: '600',
                 cursor: 'pointer',
@@ -405,7 +431,9 @@ export function MobileHeader({
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: '8px'
+                gap: '12px',
+                boxShadow: '0 4px 12px rgba(239, 68, 68, 0.3)',
+                transition: 'transform 0.2s ease'
               }}
               onClick={async () => {
                 try {
@@ -416,7 +444,8 @@ export function MobileHeader({
                 }
               }}
             >
-              🚪 Logout
+              <span style={{ fontSize: '20px' }}>🚪</span>
+              <span>Logout</span>
             </button>
           </div>
         </>
