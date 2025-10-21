@@ -2444,8 +2444,14 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '8px' }}>
                       <button
                         onClick={() => {
-                          setDetailViewItem(item)
-                          setShowDetailView(true)
+                          if (isMobile) {
+                            // Navigate to dedicated page on mobile
+                            router.push(`/item/${item.id}`)
+                          } else {
+                            // Use modal on desktop
+                            setDetailViewItem(item)
+                            setShowDetailView(true)
+                          }
                         }}
                         style={{
                           background: 'linear-gradient(135deg, #1f2937 0%, #374151 100%)',
