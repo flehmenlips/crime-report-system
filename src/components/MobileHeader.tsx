@@ -335,6 +335,31 @@ export function MobileHeader({
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 <button
                   style={{
+                    background: 'linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)',
+                    color: 'white',
+                    border: 'none',
+                    padding: '16px 20px',
+                    borderRadius: '12px',
+                    fontSize: '15px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    boxShadow: '0 4px 12px rgba(6, 182, 212, 0.3)',
+                    transition: 'transform 0.2s ease'
+                  }}
+                  onClick={() => {
+                    setIsMenuOpen(false)
+                    router.push('/search')
+                  }}
+                >
+                  <span style={{ fontSize: '20px' }}>🔍</span>
+                  <span>Advanced Search</span>
+                </button>
+                <button
+                  style={{
                     background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                     color: 'white',
                     border: 'none',
@@ -382,6 +407,31 @@ export function MobileHeader({
                 >
                   <span style={{ fontSize: '20px' }}>📄</span>
                   <span>Generate Report</span>
+                </button>
+                <button
+                  style={{
+                    background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+                    color: 'white',
+                    border: 'none',
+                    padding: '16px 20px',
+                    borderRadius: '12px',
+                    fontSize: '15px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    boxShadow: '0 4px 12px rgba(245, 158, 11, 0.3)',
+                    transition: 'transform 0.2s ease'
+                  }}
+                  onClick={() => {
+                    setIsMenuOpen(false)
+                    router.push('/upload')
+                  }}
+                >
+                  <span style={{ fontSize: '20px' }}>📤</span>
+                  <span>Bulk Upload</span>
                 </button>
                 {user.role === 'property_owner' && (
                   <button
