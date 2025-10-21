@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
     if (!user) {
       // AUDIT LOG: Failed login attempt (CRITICAL for security monitoring)
       await logAuthAttempt({
-        username,
+        username: normalizedUsername,
         success: false,
         reason: 'Invalid credentials',
         request
