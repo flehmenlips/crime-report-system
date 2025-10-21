@@ -1311,7 +1311,8 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
             </div>
           </div>
 
-          {/* Quick Actions */}
+          {/* Quick Actions - Hidden on mobile */}
+          {!isMobile && (
           <div style={{
             background: 'rgba(255, 255, 255, 0.95)',
             borderRadius: '24px',
@@ -1749,6 +1750,7 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
             </div>
             )}
           </div>
+          )}
 
           {/* Modern Item Grid */}
           <ProgressiveLoader

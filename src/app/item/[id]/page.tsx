@@ -48,25 +48,32 @@ export default function ItemDetailPage() {
     checkAuth()
   }, [router])
 
-  // Load item data
+  // Load item data (fetch all items and find the one we need)
   useEffect(() => {
     if (!authenticated || !itemId) return
 
     const loadItem = async () => {
       try {
-        const response = await fetch(`/api/items/${itemId}`)
+        const response = await fetch('/api/items')
         if (response.ok) {
           const data = await response.json()
-          setItem(data.item)
+          const foundItem = data.items.find((i: StolenItem) => i.id.toString() === itemId.toString())
+          if (foundItem) {
+            setItem(foundItem)
+          } else {
+            console.error('Item not found')
+            router.back()
+          }
         }
       } catch (err) {
         console.error('Failed to load item:', err)
+        router.back()
       } finally {
         setLoading(false)
       }
     }
     loadItem()
-  }, [authenticated, itemId])
+  }, [authenticated, itemId, router])
 
   // Load evidence
   useEffect(() => {
