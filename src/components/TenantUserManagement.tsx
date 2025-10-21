@@ -21,8 +21,75 @@ export function TenantUserManagement({ tenant, onClose, onUpdate }: TenantUserMa
   const [showInviteUser, setShowInviteUser] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  // Helper function to get user status text
+  const getUserStatusText = (user: UserWithRole) => {
+    if (!user.isActive) {
+      return '🚫 INACTIVE'
+    }
+    
+    if (!user.lastLoginAt) {
+      return '⏳ INVITED'
+    }
+    
+    // Check if last login was recent (within last 30 days)
+    const lastLogin = new Date(user.lastLoginAt)
+    const thirtyDaysAgo = new Date()
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
+    
+    if (lastLogin >= thirtyDaysAgo) {
+      return '✓ ACTIVE'
+    } else {
+      return '😴 INACTIVE'
+    }
+  }
+
+  // Helper function to get user status styling
+  const getUserStatusStyle = (user: UserWithRole) => {
+    if (!user.isActive) {
+      return {
+        color: '#dc2626',
+        background: '#fee2e2',
+        border: '1px solid #fca5a5'
+      }
+    }
+    
+    if (!user.lastLoginAt) {
+      return {
+        color: '#f59e0b',
+        background: '#fef3c7',
+        border: '1px solid #fde68a'
+      }
+    }
+    
+    // Check if last login was recent (within last 30 days)
+    const lastLogin = new Date(user.lastLoginAt)
+    const thirtyDaysAgo = new Date()
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
+    
+    if (lastLogin >= thirtyDaysAgo) {
+      return {
+        color: '#059669',
+        background: '#d1fae5',
+        border: '1px solid #6ee7b7'
+      }
+    } else {
+      return {
+        color: '#6b7280',
+        background: '#f3f4f6',
+        border: '1px solid #d1d5db'
+      }
+    }
+  }
+
   useEffect(() => {
     loadTenantUsers()
+    
+    // Set up periodic refresh to check for user status updates
+    const refreshInterval = setInterval(() => {
+      loadTenantUsers()
+    }, 30000) // Refresh every 30 seconds
+    
+    return () => clearInterval(refreshInterval)
   }, [tenant.id])
 
   const loadTenantUsers = async () => {
@@ -297,28 +364,25 @@ export function TenantUserManagement({ tenant, onClose, onUpdate }: TenantUserMa
                         <p style={{ color: '#6b7280', fontSize: '12px' }}>
                           @{user.username} • {user.itemCount || 0} items
                         </p>
+                        {user.lastLoginAt && (
+                          <p style={{ color: '#9ca3af', fontSize: '11px', marginTop: '2px' }}>
+                            Last login: {new Date(user.lastLoginAt).toLocaleDateString()}
+                          </p>
+                        )}
                       </div>
                     </div>
                     
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                      {/* Verification Status Badge - Only show for non-owners */}
+                      {/* User Status Badge - Only show for non-owners */}
                       {user.role !== 'property_owner' && (
                         <div style={{
                           padding: '4px 8px',
                           borderRadius: '12px',
                           fontSize: '10px',
                           fontWeight: '600',
-                          ...((user.isActive && user.lastLoginAt) ? {
-                            color: '#059669',
-                            background: '#d1fae5',
-                            border: '1px solid #6ee7b7'
-                          } : {
-                            color: '#f59e0b',
-                            background: '#fef3c7',
-                            border: '1px solid #fde68a'
-                          })
+                          ...getUserStatusStyle(user)
                         }}>
-                          {(user.isActive && user.lastLoginAt) ? '✓ VERIFIED' : '⏳ INVITED'}
+                          {getUserStatusText(user)}
                         </div>
                       )}
                       
