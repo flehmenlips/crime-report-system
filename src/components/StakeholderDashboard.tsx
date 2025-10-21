@@ -398,7 +398,7 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
                       fontSize: '11px',
                       fontWeight: '600'
                     }}>
-                      📷 {evidenceCache[item.id].filter(e => e.type === 'photo').length}
+                      📷 {evidenceCache?.[item.id]?.filter(e => e.type === 'photo').length || 0}
                     </span>
                   )}
                   {evidenceCache?.[item.id]?.filter(e => e.type === 'video')?.length > 0 && (
@@ -410,7 +410,7 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
                       fontSize: '11px',
                       fontWeight: '600'
                     }}>
-                      🎥 {evidenceCache[item.id].filter(e => e.type === 'video').length}
+                      🎥 {evidenceCache?.[item.id]?.filter(e => e.type === 'video').length || 0}
                     </span>
                   )}
                 </div>
