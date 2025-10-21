@@ -3129,6 +3129,7 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
             onRefresh={handleRefresh}
             evidenceCache={evidenceCache}
             evidenceLoaded={evidenceLoaded}
+            isMobile={isMobile}
           />
         </ProgressiveLoader>
       )}

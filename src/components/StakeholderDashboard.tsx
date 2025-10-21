@@ -32,9 +32,10 @@ interface StakeholderDashboardProps {
   onRefresh?: () => void
   evidenceCache?: Record<string, any[]> // Optional evidence cache to avoid API calls
   evidenceLoaded?: boolean // Flag to indicate if evidence cache is ready
+  isMobile?: boolean // Flag to hide header on mobile (MobileHeader is used instead)
 }
 
-export function StakeholderDashboard({ user, items, onItemsUpdate, loading = false, error = null, onRefresh, evidenceCache, evidenceLoaded }: StakeholderDashboardProps) {
+export function StakeholderDashboard({ user, items, onItemsUpdate, loading = false, error = null, onRefresh, evidenceCache, evidenceLoaded, isMobile = false }: StakeholderDashboardProps) {
   const [scrollY, setScrollY] = useState(0)
   
   // Add scroll listener for dynamic text color
@@ -347,7 +348,8 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
         fontFamily: 'Inter, -apple-system, sans-serif',
         color: 'white'
       }}>
-      {/* Role-Specific Header */}
+      {/* Role-Specific Header - Hidden on mobile (MobileHeader is used instead) */}
+      {!isMobile && (
       <div style={{
         background: 'rgba(255, 255, 255, 0.1)',
         backdropFilter: 'blur(20px)',
@@ -397,6 +399,7 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
           </div>
         </div>
       </div>
+      )}
 
       <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 24px 48px' }}>
         {/* Role-Specific Stats */}
