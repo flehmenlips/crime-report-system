@@ -334,6 +334,152 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
     )
   }
 
+  // On mobile, render simplified version without wrapper
+  if (isMobile) {
+    return (
+      <>
+        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '80px 8px 48px', width: '100%', boxSizing: 'border-box' }}>
+          {/* Items Display */}
+          <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: '1fr',
+            gap: '16px',
+            width: '100%',
+            padding: '0 4px'
+          }}>
+            {displayItems.map((item) => (
+              <div key={item.id} style={{
+                background: 'white',
+                borderRadius: '16px',
+                padding: '16px',
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+                border: '1px solid #e5e7eb',
+                width: '100%',
+                boxSizing: 'border-box',
+                cursor: 'pointer'
+              }}
+              onClick={() => {
+                setDetailViewItem(item)
+                setShowDetailView(true)
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+                  <div style={{
+                    width: '56px',
+                    height: '56px',
+                    borderRadius: '12px',
+                    overflow: 'hidden',
+                    flexShrink: 0
+                  }}>
+                    <ItemCardThumbnails 
+                      item={item} 
+                      compact={true}
+                      evidence={evidenceCache?.[item.id]}
+                    />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <h3 style={{ fontSize: '16px', fontWeight: '700', color: '#1f2937', margin: '0 0 4px 0' }}>
+                      {item.name}
+                    </h3>
+                    <p style={{ fontSize: '12px', color: '#6b7280', margin: 0 }}>
+                      {formatCurrency(item.estimatedValue)}
+                    </p>
+                  </div>
+                </div>
+                <p style={{ fontSize: '14px', color: '#4b5563', lineHeight: '1.4', margin: '0 0 12px 0' }}>
+                  {item.description.length > 100 ? `${item.description.substring(0, 100)}...` : item.description}
+                </p>
+                <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                  {evidenceCache?.[item.id]?.filter(e => e.type === 'photo')?.length > 0 && (
+                    <span style={{
+                      background: '#dbeafe',
+                      color: '#1e40af',
+                      padding: '4px 8px',
+                      borderRadius: '6px',
+                      fontSize: '11px',
+                      fontWeight: '600'
+                    }}>
+                      📷 {evidenceCache[item.id].filter(e => e.type === 'photo').length}
+                    </span>
+                  )}
+                  {evidenceCache?.[item.id]?.filter(e => e.type === 'video')?.length > 0 && (
+                    <span style={{
+                      background: '#dcfce7',
+                      color: '#166534',
+                      padding: '4px 8px',
+                      borderRadius: '6px',
+                      fontSize: '11px',
+                      fontWeight: '600'
+                    }}>
+                      🎥 {evidenceCache[item.id].filter(e => e.type === 'video').length}
+                    </span>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Modals */}
+          {showDetailView && detailViewItem && (
+            <ItemDetailView
+              item={detailViewItem}
+              onClose={() => {
+                setShowDetailView(false)
+                setDetailViewItem(null)
+              }}
+              onEdit={(item) => {
+                setShowDetailView(false)
+                setDetailViewItem(null)
+              }}
+              onDelete={(item) => {
+                setShowDetailView(false)
+                setDetailViewItem(null)
+              }}
+              onDuplicate={(item) => {
+                setShowDetailView(false)
+                setDetailViewItem(null)
+              }}
+              onUploadEvidence={(item) => {
+                setShowDetailView(false)
+                setDetailViewItem(null)
+                setUploadEvidenceItem(item)
+                setShowUploadEvidence(true)
+              }}
+              onViewNotes={(item) => {
+                setShowDetailView(false)
+                setDetailViewItem(null)
+                setInvestigationNotesItem(item)
+                setShowInvestigationNotes(true)
+              }}
+              permissions={{
+                canEdit: roleConfig.canEdit,
+                canDelete: roleConfig.canDelete,
+                canUpload: roleConfig.canUpload,
+                canAddNotes: roleConfig.canAddNotes
+              }}
+              user={user}
+              evidence={evidenceCache?.[detailViewItem.id]}
+            />
+          )}
+          {showUploadEvidence && uploadEvidenceItem && (
+            <UploadEvidenceModal
+              item={uploadEvidenceItem}
+              user={user}
+              onClose={() => {
+                setShowUploadEvidence(false)
+                setUploadEvidenceItem(null)
+              }}
+              onUploadComplete={() => {
+                if (onRefresh) {
+                  onRefresh()
+                }
+              }}
+            />
+          )}
+        </div>
+      </>
+    )
+  }
+
   return (
     <>
       <style jsx>{`
@@ -344,8 +490,8 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
       `}</style>
       {/* Full-screen wrapper for desktop only */}
       <div style={{
-        minHeight: isMobile ? 'auto' : '100vh',
-        background: isMobile ? 'transparent' : 'linear-gradient(135deg, #0f0f23 0%, #1e1b4b 50%, #312e81 100%)',
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #0f0f23 0%, #1e1b4b 50%, #312e81 100%)',
         fontFamily: 'Inter, -apple-system, sans-serif',
         color: 'white'
       }}>
