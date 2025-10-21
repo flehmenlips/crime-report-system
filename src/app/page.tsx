@@ -1088,12 +1088,6 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
             user={user}
             textColor={textColor}
             textColorSecondary={textColorSecondary}
-            onProfileUpdate={(updatedUser) => {
-              setUser(updatedUser)
-            }}
-            onAnalyticsClick={() => setShowAnalytics(true)}
-            onReportClick={() => setShowGenerateReport(true)}
-            onPropertyClick={() => window.location.href = '/my-property'}
             onViewModeChange={setViewMode}
             currentViewMode={viewMode}
           />

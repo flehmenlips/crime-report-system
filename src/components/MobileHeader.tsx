@@ -8,10 +8,6 @@ interface MobileHeaderProps {
   user: User
   textColor: string
   textColorSecondary: string
-  onProfileUpdate: (updatedUser: User) => void
-  onAnalyticsClick?: () => void
-  onReportClick?: () => void
-  onPropertyClick?: () => void
   onViewModeChange?: (mode: 'cards' | 'list') => void
   currentViewMode?: 'cards' | 'list'
 }
@@ -20,10 +16,6 @@ export function MobileHeader({
   user, 
   textColor, 
   textColorSecondary, 
-  onProfileUpdate,
-  onAnalyticsClick,
-  onReportClick,
-  onPropertyClick,
   onViewModeChange,
   currentViewMode = 'cards'
 }: MobileHeaderProps) {
