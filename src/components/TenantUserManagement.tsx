@@ -301,24 +301,26 @@ export function TenantUserManagement({ tenant, onClose, onUpdate }: TenantUserMa
                     </div>
                     
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                      {/* Verification Status Badge */}
-                      <div style={{
-                        padding: '4px 8px',
-                        borderRadius: '12px',
-                        fontSize: '10px',
-                        fontWeight: '600',
-                        ...((user.isActive && user.lastLoginAt) ? {
-                          color: '#059669',
-                          background: '#d1fae5',
-                          border: '1px solid #6ee7b7'
-                        } : {
-                          color: '#f59e0b',
-                          background: '#fef3c7',
-                          border: '1px solid #fde68a'
-                        })
-                      }}>
-                        {(user.isActive && user.lastLoginAt) ? '✓ VERIFIED' : '⏳ INVITED'}
-                      </div>
+                      {/* Verification Status Badge - Only show for non-owners */}
+                      {user.role !== 'property_owner' && (
+                        <div style={{
+                          padding: '4px 8px',
+                          borderRadius: '12px',
+                          fontSize: '10px',
+                          fontWeight: '600',
+                          ...((user.isActive && user.lastLoginAt) ? {
+                            color: '#059669',
+                            background: '#d1fae5',
+                            border: '1px solid #6ee7b7'
+                          } : {
+                            color: '#f59e0b',
+                            background: '#fef3c7',
+                            border: '1px solid #fde68a'
+                          })
+                        }}>
+                          {(user.isActive && user.lastLoginAt) ? '✓ VERIFIED' : '⏳ INVITED'}
+                        </div>
+                      )}
                       
                       <div style={{
                         padding: '4px 8px',
