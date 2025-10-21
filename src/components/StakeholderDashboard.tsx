@@ -1426,6 +1426,8 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
               setIsFiltered(true)
               setShowAdvancedSearch(false)
             }}
+            user={user}
+            evidenceCache={evidenceCache}
           />
         )}
 

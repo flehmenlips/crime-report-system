@@ -9,6 +9,7 @@ interface AdvancedSearchProps {
   onClose: () => void
   onResults: (filteredItems: StolenItem[]) => void
   user?: any
+  evidenceCache?: Record<string, any[]> // Optional evidence cache for filtering
 }
 
 interface SearchFilters {
@@ -29,7 +30,7 @@ interface SearchFilters {
   hasDocuments: boolean | null
 }
 
-export function AdvancedSearch({ items, onClose, onResults, user }: AdvancedSearchProps) {
+export function AdvancedSearch({ items, onClose, onResults, user, evidenceCache }: AdvancedSearchProps) {
   const [filters, setFilters] = useState<SearchFilters>({
     name: '',
     description: '',
@@ -209,29 +210,35 @@ export function AdvancedSearch({ items, onClose, onResults, user }: AdvancedSear
           }
         }
 
-        // Evidence filters with null safety
+        // Evidence filters with null safety - use evidenceCache if available, fallback to item.evidence
         if (filters.hasPhotos === true) {
-          const photoCount = item.evidence?.filter(e => e.type === 'photo')?.length || 0
+          const itemEvidence = evidenceCache && evidenceCache[item.id] ? evidenceCache[item.id] : (item.evidence || [])
+          const photoCount = itemEvidence.filter(e => e.type === 'photo').length
           if (photoCount === 0) return false
         }
         if (filters.hasPhotos === false) {
-          const photoCount = item.evidence?.filter(e => e.type === 'photo')?.length || 0
+          const itemEvidence = evidenceCache && evidenceCache[item.id] ? evidenceCache[item.id] : (item.evidence || [])
+          const photoCount = itemEvidence.filter(e => e.type === 'photo').length
           if (photoCount > 0) return false
         }
         if (filters.hasVideos === true) {
-          const videoCount = item.evidence?.filter(e => e.type === 'video')?.length || 0
+          const itemEvidence = evidenceCache && evidenceCache[item.id] ? evidenceCache[item.id] : (item.evidence || [])
+          const videoCount = itemEvidence.filter(e => e.type === 'video').length
           if (videoCount === 0) return false
         }
         if (filters.hasVideos === false) {
-          const videoCount = item.evidence?.filter(e => e.type === 'video')?.length || 0
+          const itemEvidence = evidenceCache && evidenceCache[item.id] ? evidenceCache[item.id] : (item.evidence || [])
+          const videoCount = itemEvidence.filter(e => e.type === 'video').length
           if (videoCount > 0) return false
         }
         if (filters.hasDocuments === true) {
-          const docCount = item.evidence?.filter(e => e.type === 'document')?.length || 0
+          const itemEvidence = evidenceCache && evidenceCache[item.id] ? evidenceCache[item.id] : (item.evidence || [])
+          const docCount = itemEvidence.filter(e => e.type === 'document').length
           if (docCount === 0) return false
         }
         if (filters.hasDocuments === false) {
-          const docCount = item.evidence?.filter(e => e.type === 'document')?.length || 0
+          const itemEvidence = evidenceCache && evidenceCache[item.id] ? evidenceCache[item.id] : (item.evidence || [])
+          const docCount = itemEvidence.filter(e => e.type === 'document').length
           if (docCount > 0) return false
         }
 
