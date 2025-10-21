@@ -1329,6 +1329,8 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
               </p>
             </div>
             
+            {/* Action Buttons Grid - Hidden on mobile (use hamburger menu instead) */}
+            {!isMobile && (
             <div style={{ 
               display: 'grid', 
               gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', 
@@ -1745,6 +1747,7 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
                 </button>
               )}
             </div>
+            )}
           </div>
 
           {/* Modern Item Grid */}
