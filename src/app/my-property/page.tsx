@@ -594,72 +594,58 @@ export default function PropertyManagementPage() {
                     />
                   </div>
                 </div>
+
+                {/* Form Buttons */}
+                <div style={{
+                  display: 'flex',
+                  gap: '12px',
+                  flexDirection: isMobile ? 'column' : 'row',
+                  marginTop: '24px'
+                }}>
+                  <button
+                    type="button"
+                    onClick={cancelEdit}
+                    disabled={saving}
+                    style={{
+                      padding: '14px 24px',
+                      background: '#f3f4f6',
+                      border: 'none',
+                      borderRadius: '12px',
+                      color: '#374151',
+                      fontSize: '16px',
+                      fontWeight: '600',
+                      cursor: saving ? 'not-allowed' : 'pointer',
+                      flex: isMobile ? 'none' : 1,
+                      opacity: saving ? 0.5 : 1
+                    }}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={saving}
+                    style={{
+                      padding: '14px 24px',
+                      background: saving ? 'rgba(139, 92, 246, 0.7)' : 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
+                      border: 'none',
+                      borderRadius: '12px',
+                      color: 'white',
+                      fontSize: '16px',
+                      fontWeight: '600',
+                      cursor: saving ? 'not-allowed' : 'pointer',
+                      boxShadow: '0 4px 12px rgba(139, 92, 246, 0.3)',
+                      flex: isMobile ? 'none' : 2,
+                      opacity: saving ? 0.7 : 1
+                    }}
+                  >
+                    {saving ? '💾 Saving...' : '💾 Save Changes'}
+                  </button>
+                </div>
               </form>
             </div>
           )}
         </div>
       </div>
-
-      {/* Fixed Footer (Edit Mode Only) */}
-      {isEditing && (
-        <div style={{
-          position: 'fixed',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          background: 'white',
-          borderTop: '1px solid #e5e7eb',
-          padding: isMobile ? '16px' : '20px 32px',
-          boxShadow: '0 -2px 8px rgba(0, 0, 0, 0.1)',
-          zIndex: 100
-        }}>
-          <div style={{
-            maxWidth: isMobile ? '100%' : '1200px',
-            margin: '0 auto',
-            display: 'flex',
-            gap: '12px',
-            flexDirection: isMobile ? 'column' : 'row'
-          }}>
-            <button
-              onClick={cancelEdit}
-              disabled={saving}
-              style={{
-                padding: '14px 24px',
-                background: '#f3f4f6',
-                border: 'none',
-                borderRadius: '12px',
-                color: '#374151',
-                fontSize: '16px',
-                fontWeight: '600',
-                cursor: saving ? 'not-allowed' : 'pointer',
-                flex: isMobile ? 'none' : 1,
-                opacity: saving ? 0.5 : 1
-              }}
-            >
-              Cancel
-            </button>
-            <button
-              onClick={handleSubmit}
-              disabled={saving}
-              style={{
-                padding: '14px 24px',
-                background: saving ? 'rgba(139, 92, 246, 0.7)' : 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
-                border: 'none',
-                borderRadius: '12px',
-                color: 'white',
-                fontSize: '16px',
-                fontWeight: '600',
-                cursor: saving ? 'not-allowed' : 'pointer',
-                boxShadow: '0 4px 12px rgba(139, 92, 246, 0.3)',
-                flex: isMobile ? 'none' : 2,
-                opacity: saving ? 0.7 : 1
-              }}
-            >
-              {saving ? '💾 Saving...' : '💾 Save Changes'}
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   )
 }

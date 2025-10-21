@@ -448,67 +448,55 @@ export default function AddItemPage() {
                   }}
                 />
               </div>
+
+              {/* Form Buttons */}
+              <div style={{
+                display: 'flex',
+                gap: '12px',
+                flexDirection: isMobile ? 'column' : 'row',
+                marginTop: '24px'
+              }}>
+                <button
+                  type="button"
+                  onClick={() => router.back()}
+                  disabled={saving}
+                  style={{
+                    padding: '14px 24px',
+                    background: '#f3f4f6',
+                    border: 'none',
+                    borderRadius: '12px',
+                    color: '#374151',
+                    fontSize: '16px',
+                    fontWeight: '600',
+                    cursor: saving ? 'not-allowed' : 'pointer',
+                    flex: isMobile ? 'none' : 1,
+                    opacity: saving ? 0.5 : 1
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={saving || success}
+                  style={{
+                    padding: '14px 24px',
+                    background: (saving || success) ? 'rgba(59, 130, 246, 0.7)' : 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+                    border: 'none',
+                    borderRadius: '12px',
+                    color: 'white',
+                    fontSize: '16px',
+                    fontWeight: '600',
+                    cursor: (saving || success) ? 'not-allowed' : 'pointer',
+                    boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)',
+                    flex: isMobile ? 'none' : 2,
+                    opacity: (saving || success) ? 0.7 : 1
+                  }}
+                >
+                  {saving ? '💾 Saving...' : success ? '✓ Saved!' : '💾 Add Item'}
+                </button>
+              </div>
             </form>
           </div>
-        </div>
-      </div>
-
-      {/* Fixed Footer */}
-      <div style={{
-        position: 'fixed',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        background: 'white',
-        borderTop: '1px solid #e5e7eb',
-        padding: isMobile ? '16px' : '20px 32px',
-        boxShadow: '0 -2px 8px rgba(0, 0, 0, 0.1)',
-        zIndex: 100
-      }}>
-        <div style={{
-          maxWidth: isMobile ? '100%' : '1200px',
-          margin: '0 auto',
-          display: 'flex',
-          gap: '12px',
-          flexDirection: isMobile ? 'column' : 'row'
-        }}>
-          <button
-            onClick={() => router.back()}
-            disabled={saving}
-            style={{
-              padding: '14px 24px',
-              background: '#f3f4f6',
-              border: 'none',
-              borderRadius: '12px',
-              color: '#374151',
-              fontSize: '16px',
-              fontWeight: '600',
-              cursor: saving ? 'not-allowed' : 'pointer',
-              flex: isMobile ? 'none' : 1,
-              opacity: saving ? 0.5 : 1
-            }}
-          >
-            Cancel
-          </button>
-          <button
-            onClick={handleSubmit}
-            disabled={saving || success}
-            style={{
-              padding: '14px 24px',
-              background: (saving || success) ? 'rgba(59, 130, 246, 0.7)' : 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
-              border: 'none',
-              borderRadius: '12px',
-              color: 'white',
-              fontSize: '16px',
-              fontWeight: '600',
-              cursor: (saving || success) ? 'not-allowed' : 'pointer',
-              boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)',
-              flex: isMobile ? 'none' : 2,
-              opacity: (saving || success) ? 0.7 : 1
-            }}
-          >
-            {saving ? '💾 Saving...' : success ? '✓ Saved!' : '💾 Add Item'}
-          </button>
         </div>
       </div>
     </div>
