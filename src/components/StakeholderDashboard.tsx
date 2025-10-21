@@ -401,8 +401,9 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
       </div>
       )}
 
-      <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 24px 48px' }}>
-        {/* Role-Specific Stats */}
+      <div style={{ maxWidth: '1400px', margin: '0 auto', padding: isMobile ? '80px 8px 48px' : '0 24px 48px' }}>
+        {/* Role-Specific Stats - Hidden on mobile */}
+        {!isMobile && (
         <div style={{ 
           display: 'grid', 
           gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', 
@@ -461,8 +462,10 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
             <div style={{ color: 'white', fontSize: '18px', fontWeight: '600' }}>Items w/ Photos</div>
           </div>
         </div>
+        )}
 
-        {/* Role-Specific Tools */}
+        {/* Role-Specific Tools - Hidden on mobile */}
+        {!isMobile && (
         <div style={{
           background: 'rgba(255, 255, 255, 0.95)',
           borderRadius: '20px',
@@ -712,15 +715,17 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
             )}
           </div>
         </div>
+        )}
 
         {/* Professional Evidence Table */}
         <div style={{
-          background: 'rgba(255, 255, 255, 0.95)',
-          borderRadius: '20px',
-          padding: '32px',
-          boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)'
+          background: isMobile ? 'transparent' : 'rgba(255, 255, 255, 0.95)',
+          borderRadius: isMobile ? '0' : '20px',
+          padding: isMobile ? '0' : '32px',
+          boxShadow: isMobile ? 'none' : '0 10px 25px rgba(0, 0, 0, 0.1)'
         }}>
-          <div style={{ marginBottom: '24px' }}>
+          <div style={{ marginBottom: isMobile ? '16px' : '24px' }}>
+            {!isMobile && (
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
               <div>
                 <h2 style={{ fontSize: '28px', fontWeight: '700', color: '#1f2937', marginBottom: '8px' }}>
@@ -730,6 +735,9 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
                   {getRoleDisplayName(user.role)} view • {displayItems.length} items catalogued
                 </p>
               </div>
+            )}
+            
+            <div style={{ display: isMobile ? 'block' : 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: isMobile ? '0' : '16px' }}>
               
               {/* Controls Row */}
               <div style={{ 
