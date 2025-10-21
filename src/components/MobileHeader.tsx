@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import { User } from '@/types'
-import { UserProfileManagement } from '@/components/UserProfileManagement'
 import { useRouter } from 'next/navigation'
 
 interface MobileHeaderProps {
@@ -28,8 +27,8 @@ export function MobileHeader({
   onViewModeChange,
   currentViewMode = 'cards'
 }: MobileHeaderProps) {
+  const router = useRouter()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [showProfileEdit, setShowProfileEdit] = useState(false)
 
   return (
     <div style={{
@@ -254,7 +253,10 @@ export function MobileHeader({
                   </p>
                 </div>
                 <button
-                  onClick={() => setShowProfileEdit(true)}
+                  onClick={() => {
+                    setIsMenuOpen(false)
+                    router.push('/profile')
+                  }}
                   style={{
                     background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
                     color: 'white',
@@ -428,68 +430,6 @@ export function MobileHeader({
         </>
       )}
 
-      {/* Profile Edit Modal */}
-      {showProfileEdit && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: 'rgba(0, 0, 0, 0.5)',
-          zIndex: 10000,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: '20px'
-        }}>
-          <div style={{
-            background: 'white',
-            borderRadius: '16px',
-            padding: '24px',
-            width: '100%',
-            maxWidth: '400px',
-            maxHeight: '80vh',
-            overflowY: 'auto'
-          }}>
-            <div style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              marginBottom: '20px'
-            }}>
-              <h2 style={{
-                fontSize: '20px',
-                fontWeight: '700',
-                color: '#1f2937',
-                margin: 0
-              }}>
-                Edit Profile
-              </h2>
-              <button
-                onClick={() => setShowProfileEdit(false)}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  fontSize: '24px',
-                  cursor: 'pointer',
-                  color: '#6b7280'
-                }}
-              >
-                ×
-              </button>
-            </div>
-            <UserProfileManagement
-              user={user}
-              onProfileUpdate={(updatedUser) => {
-                onProfileUpdate(updatedUser)
-                setShowProfileEdit(false)
-              }}
-              onClose={() => setShowProfileEdit(false)}
-            />
-          </div>
-        </div>
-      )}
     </div>
   )
 }
