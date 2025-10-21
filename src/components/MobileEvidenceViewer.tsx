@@ -20,12 +20,13 @@ interface MobileEvidenceViewerProps {
 }
 
 export function MobileEvidenceViewer({ evidence, initialIndex, onClose, onDelete }: MobileEvidenceViewerProps) {
-  const [currentIndex, setCurrentIndex] = useState(initialIndex)
+  // Initialize with validated index
+  const [currentIndex, setCurrentIndex] = useState(() => {
+    return Math.max(0, Math.min(initialIndex, evidence.length - 1))
+  })
   const [isMobile, setIsMobile] = useState(false)
   
-  // Validate and clamp currentIndex to valid range
-  const validIndex = Math.max(0, Math.min(currentIndex, evidence.length - 1))
-  const currentEvidence = evidence[validIndex]
+  const currentEvidence = evidence[currentIndex]
   
   // If no valid evidence, close the viewer
   useEffect(() => {
@@ -33,6 +34,15 @@ export function MobileEvidenceViewer({ evidence, initialIndex, onClose, onDelete
       onClose()
     }
   }, [currentEvidence, evidence.length, onClose])
+  
+  // Validate currentIndex if evidence array changes
+  useEffect(() => {
+    if (currentIndex >= evidence.length && evidence.length > 0) {
+      setCurrentIndex(evidence.length - 1)
+    } else if (currentIndex < 0 && evidence.length > 0) {
+      setCurrentIndex(0)
+    }
+  }, [currentIndex, evidence.length])
 
   // Mobile detection
   useEffect(() => {
@@ -151,7 +161,7 @@ export function MobileEvidenceViewer({ evidence, initialIndex, onClose, onDelete
           fontSize: '14px',
           color: 'rgba(255, 255, 255, 0.8)'
         }}>
-          {validIndex + 1} / {evidence.length}
+          {currentIndex + 1} / {evidence.length}
         </div>
         
         {onDelete && (
