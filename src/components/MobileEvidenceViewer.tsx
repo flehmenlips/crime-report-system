@@ -28,12 +28,12 @@ export function MobileEvidenceViewer({ evidence, initialIndex, onClose, onDelete
   
   const currentEvidence = evidence[currentIndex]
   
-  // If no valid evidence, close the viewer immediately
-  if (!currentEvidence || evidence.length === 0) {
-    // Close viewer if no valid evidence
-    setTimeout(() => onClose(), 0)
-    return null
-  }
+  // Close viewer if no valid evidence (using useEffect to avoid render-time side effects)
+  useEffect(() => {
+    if (!currentEvidence || evidence.length === 0) {
+      onClose()
+    }
+  }, [currentEvidence, evidence.length, onClose])
   
   // Validate currentIndex if evidence array changes
   useEffect(() => {
@@ -43,6 +43,11 @@ export function MobileEvidenceViewer({ evidence, initialIndex, onClose, onDelete
       setCurrentIndex(0)
     }
   }, [currentIndex, evidence.length])
+  
+  // Early return to prevent rendering with invalid data
+  if (!currentEvidence) {
+    return null
+  }
 
   // Mobile detection
   useEffect(() => {
