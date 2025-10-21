@@ -154,9 +154,12 @@ export default function SimpleLoginPage() {
                   name="username"
                   type="text"
                   autoComplete="username"
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  spellCheck="false"
                   required
                   value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  onChange={(e) => setUsername(e.target.value.toLowerCase())}
                   style={{
                     width: '100%',
                     padding: '16px 16px 16px 52px',

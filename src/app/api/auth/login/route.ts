@@ -17,7 +17,10 @@ export async function POST(request: NextRequest) {
       )
     }
     
-    const user = await authenticateUser(username, password)
+    // Normalize username to lowercase for case-insensitive comparison
+    const normalizedUsername = username.toLowerCase().trim()
+    
+    const user = await authenticateUser(normalizedUsername, password)
     console.log('Authentication result:', user ? 'SUCCESS' : 'FAILED')
     
     if (!user) {
