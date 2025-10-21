@@ -21,6 +21,18 @@ export function MobileHeader({
 }: MobileHeaderProps) {
   const router = useRouter()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isNavigating, setIsNavigating] = useState(false)
+  const [navigationTarget, setNavigationTarget] = useState('')
+
+  const handleNavigation = (route: string, label: string) => {
+    setIsNavigating(true)
+    setNavigationTarget(label)
+    setIsMenuOpen(false)
+    // Small delay to show feedback, then navigate
+    setTimeout(() => {
+      router.push(route)
+    }, 100)
+  }
 
   return (
     <div style={{
@@ -258,10 +270,7 @@ export function MobileHeader({
                   </p>
                 </div>
                 <button
-                  onClick={() => {
-                    setIsMenuOpen(false)
-                    router.push('/profile')
-                  }}
+                  onClick={() => handleNavigation('/profile', 'Profile')}
                   style={{
                     background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                     color: 'white',
@@ -350,10 +359,7 @@ export function MobileHeader({
                     boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)',
                     transition: 'transform 0.2s ease'
                   }}
-                  onClick={() => {
-                    setIsMenuOpen(false)
-                    router.push('/add-item')
-                  }}
+                  onClick={() => handleNavigation('/add-item', 'Add Item')}
                 >
                   <span style={{ fontSize: '20px' }}>➕</span>
                   <span>Add New Item</span>
@@ -375,10 +381,7 @@ export function MobileHeader({
                     boxShadow: '0 4px 12px rgba(6, 182, 212, 0.3)',
                     transition: 'transform 0.2s ease'
                   }}
-                  onClick={() => {
-                    setIsMenuOpen(false)
-                    router.push('/search')
-                  }}
+                  onClick={() => handleNavigation('/search', 'Search')}
                 >
                   <span style={{ fontSize: '20px' }}>🔍</span>
                   <span>Advanced Search</span>
@@ -400,10 +403,7 @@ export function MobileHeader({
                     boxShadow: '0 4px 12px rgba(102, 126, 234, 0.3)',
                     transition: 'transform 0.2s ease'
                   }}
-                  onClick={() => {
-                    setIsMenuOpen(false)
-                    router.push('/analytics')
-                  }}
+                  onClick={() => handleNavigation('/analytics', 'Analytics')}
                 >
                   <span style={{ fontSize: '20px' }}>📊</span>
                   <span>View Analytics</span>
@@ -425,10 +425,7 @@ export function MobileHeader({
                     boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)',
                     transition: 'transform 0.2s ease'
                   }}
-                  onClick={() => {
-                    setIsMenuOpen(false)
-                    router.push('/reports')
-                  }}
+                  onClick={() => handleNavigation('/reports', 'Reports')}
                 >
                   <span style={{ fontSize: '20px' }}>📄</span>
                   <span>Generate Report</span>
@@ -450,10 +447,7 @@ export function MobileHeader({
                     boxShadow: '0 4px 12px rgba(245, 158, 11, 0.3)',
                     transition: 'transform 0.2s ease'
                   }}
-                  onClick={() => {
-                    setIsMenuOpen(false)
-                    router.push('/upload')
-                  }}
+                  onClick={() => handleNavigation('/upload', 'Upload')}
                 >
                   <span style={{ fontSize: '20px' }}>📤</span>
                   <span>Bulk Upload</span>
@@ -476,10 +470,7 @@ export function MobileHeader({
                       boxShadow: '0 4px 12px rgba(139, 92, 246, 0.3)',
                       transition: 'transform 0.2s ease'
                     }}
-                  onClick={() => {
-                    setIsMenuOpen(false)
-                    router.push('/my-property')
-                  }}
+                  onClick={() => handleNavigation('/my-property', 'Property')}
                   >
                     <span style={{ fontSize: '20px' }}>🏢</span>
                     <span>Manage Property</span>
@@ -524,6 +515,48 @@ export function MobileHeader({
             </button>
           </div>
         </>
+      )}
+
+      {/* Navigation Loading Overlay */}
+      {isNavigating && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0, 0, 0, 0.9)',
+          backdropFilter: 'blur(10px)',
+          zIndex: 10000,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '20px'
+        }}>
+          {/* Spinner */}
+          <div style={{
+            width: '60px',
+            height: '60px',
+            border: '4px solid rgba(255, 255, 255, 0.2)',
+            borderTop: '4px solid white',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite'
+          }} />
+          <div style={{
+            color: 'white',
+            fontSize: '18px',
+            fontWeight: '600'
+          }}>
+            Loading {navigationTarget}...
+          </div>
+          <style>{`
+            @keyframes spin {
+              0% { transform: rotate(0deg); }
+              100% { transform: rotate(360deg); }
+            }
+          `}</style>
+        </div>
       )}
 
     </div>
