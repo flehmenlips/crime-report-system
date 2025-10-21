@@ -365,8 +365,8 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
         padding: isMobile ? '20px' : '32px',
         maxWidth: isMobile ? '100%' : '1000px',
         width: '100%',
-        maxHeight: isMobile ? 'calc(100vh - 20px)' : '90vh',
-        height: isMobile ? 'calc(100vh - 20px)' : 'auto',
+        maxHeight: isMobile ? 'calc(100vh - 120px)' : '90vh',
+        height: isMobile ? 'calc(100vh - 120px)' : 'auto',
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',
@@ -498,7 +498,7 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
           flex: 1, 
           overflow: 'auto',
           paddingRight: '8px',
-          paddingBottom: isMobile ? '180px' : '20px',
+          paddingBottom: isMobile ? '20px' : '20px',
           paddingTop: isMobile ? '8px' : '0'
         }}>
           {activeTab === 'profile' && (
@@ -1440,6 +1440,7 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
         <div style={{
           borderTop: '1px solid rgba(0, 0, 0, 0.1)',
           paddingTop: isMobile ? '20px' : '24px',
+          paddingBottom: isMobile ? '20px' : '0',
           marginTop: isMobile ? '20px' : '24px',
           display: 'flex',
           justifyContent: 'flex-end',
@@ -1448,7 +1449,8 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
           flexDirection: isMobile ? 'column' : 'row',
           position: 'sticky',
           bottom: 0,
-          zIndex: 10
+          zIndex: 10,
+          flexShrink: 0
         }}>
           <button
             type="button"
