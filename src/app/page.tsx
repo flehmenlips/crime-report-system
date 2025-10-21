@@ -2149,16 +2149,17 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
               <div key={refreshKey} style={{ 
                 display: 'grid', 
                 gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(400px, 1fr))', 
-                gap: isMobile ? '12px' : '32px',
+                gap: isMobile ? '16px' : '32px',
                 width: '100%',
                 boxSizing: 'border-box',
-                maxWidth: '100%'
+                maxWidth: '100%',
+                padding: isMobile ? '0 4px' : '0'
               }}>
                 {displayItems.map((item) => (
                   <div key={item.id} style={{
                     background: 'white',
-                    borderRadius: '20px',
-                    padding: isMobile ? '8px' : '32px',
+                    borderRadius: isMobile ? '16px' : '20px',
+                    padding: isMobile ? '16px' : '32px',
                     boxShadow: selectedItems.has(item.id) ? '0 32px 64px rgba(59, 130, 246, 0.2)' : '0 20px 40px rgba(0, 0, 0, 0.08)',
                     border: selectedItems.has(item.id) ? '2px solid #3b82f6' : '1px solid rgba(0, 0, 0, 0.05)',
                     transition: 'all 0.4s ease',
@@ -2194,20 +2195,27 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
                     )}
 
                     {/* Header with Action Menu */}
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                        <ItemCardIcon item={item} size={80} evidence={evidenceCache[item.id]} />
-                        <div>
-                          <h3 style={{ fontSize: '24px', fontWeight: '700', color: '#1f2937', marginBottom: '4px' }}>
+                    <div style={{ 
+                      display: 'flex', 
+                      alignItems: isMobile ? 'flex-start' : 'center', 
+                      justifyContent: 'space-between', 
+                      marginBottom: isMobile ? '16px' : '24px',
+                      flexDirection: isMobile ? 'column' : 'row',
+                      gap: isMobile ? '12px' : '0'
+                    }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '12px' : '16px', width: isMobile ? '100%' : 'auto' }}>
+                        <ItemCardIcon item={item} size={isMobile ? 60 : 80} evidence={evidenceCache[item.id]} />
+                        <div style={{ flex: 1 }}>
+                          <h3 style={{ fontSize: isMobile ? '18px' : '24px', fontWeight: '700', color: '#1f2937', marginBottom: '4px' }}>
                             {item.name}
                           </h3>
-                          <p style={{ color: '#6b7280', fontSize: '14px', marginBottom: '4px' }}>
+                          <p style={{ color: '#6b7280', fontSize: isMobile ? '12px' : '14px', marginBottom: '4px' }}>
                             ID: {item.id}
                           </p>
                           {item.serialNumber && (
                             <p style={{
                               color: '#92400e',
-                              fontSize: '14px',
+                              fontSize: isMobile ? '12px' : '14px',
                               fontWeight: '600',
                               fontFamily: 'monospace',
                               background: '#fef3c7',
@@ -2222,7 +2230,7 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
                       </div>
                       
                       {/* Action Menu Button */}
-                      <div style={{ position: 'relative' }}>
+                      <div style={{ position: 'relative', alignSelf: isMobile ? 'flex-end' : 'auto' }}>
                         <button
                           onClick={() => setShowActionMenu(showActionMenu === item.id ? null : item.id)}
                           style={{
@@ -2355,17 +2363,20 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
                       </div>
                     </div>
 
+                    {/* Value Badge - Different layout for mobile */}
                     <div style={{
-                      position: 'absolute',
+                      position: isMobile ? 'static' : 'absolute',
                       top: '24px',
                       right: '24px',
                       background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
                       color: 'white',
-                      padding: '8px 16px',
+                      padding: isMobile ? '10px 16px' : '8px 16px',
                       borderRadius: '12px',
                       fontWeight: '700',
-                      fontSize: '16px',
-                      boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)'
+                      fontSize: isMobile ? '18px' : '16px',
+                      boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)',
+                      marginBottom: isMobile ? '16px' : '0',
+                      textAlign: isMobile ? 'center' : 'left'
                     }}>
                       {formatCurrency(item.estimatedValue)}
                     </div>
