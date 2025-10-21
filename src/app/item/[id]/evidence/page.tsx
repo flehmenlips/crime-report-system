@@ -394,10 +394,7 @@ export default function EvidenceManagerPage() {
           flexDirection: isMobile ? 'column' : 'row'
         }}>
           <button
-            onClick={() => {
-              // TODO: Implement upload evidence
-              alert('Upload evidence - Coming soon!')
-            }}
+            onClick={() => router.push(`/item/${itemId}/evidence/upload`)}
             style={{
               padding: '14px 24px',
               background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
