@@ -498,7 +498,7 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
           flex: 1, 
           overflow: 'auto',
           paddingRight: '8px',
-          paddingBottom: isMobile ? '100px' : '20px',
+          paddingBottom: isMobile ? '140px' : '20px',
           paddingTop: isMobile ? '8px' : '0'
         }}>
           {activeTab === 'profile' && (
