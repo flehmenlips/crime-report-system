@@ -64,15 +64,12 @@ export function MobileEvidenceViewer({ evidence, initialIndex, onClose, onDelete
     }
   }
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (confirm(`Delete ${currentEvidence.originalName}?`)) {
-      onDelete?.(currentEvidence.id)
-      // If this was the last item, close viewer
-      if (evidence.length === 1) {
-        onClose()
-      } else if (currentIndex === evidence.length - 1) {
-        // If deleting last item, move to previous
-        setCurrentIndex(prev => prev - 1)
+      if (onDelete) {
+        await onDelete(currentEvidence.id)
+        // Parent component will handle the deletion and state updates
+        // We just close the viewer or let parent decide
       }
     }
   }
