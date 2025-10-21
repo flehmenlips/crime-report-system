@@ -350,28 +350,27 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
     <div style={{
       position: 'fixed',
       inset: '0',
-      background: 'rgba(0, 0, 0, 0.9)',
-      backdropFilter: 'blur(16px)',
+      background: 'rgba(0, 0, 0, 0.95)',
+      backdropFilter: 'blur(20px)',
       display: 'flex',
-      alignItems: 'center',
+      alignItems: isMobile ? 'flex-start' : 'center',
       justifyContent: 'center',
       zIndex: 1000,
-      padding: isMobile ? '0' : '24px',
+      padding: isMobile ? '20px 0 0 0' : '24px',
       fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif'
     }}>
       <div style={{
-        background: 'rgba(255, 255, 255, 0.95)',
-        backdropFilter: 'blur(20px)',
-        borderRadius: isMobile ? '0' : '24px',
-        padding: isMobile ? '16px' : '32px',
+        background: 'white',
+        borderRadius: isMobile ? '20px 20px 0 0' : '24px',
+        padding: isMobile ? '20px' : '32px',
         maxWidth: isMobile ? '100%' : '1000px',
         width: '100%',
-        maxHeight: isMobile ? '100vh' : '90vh',
-        height: isMobile ? '100vh' : 'auto',
+        maxHeight: isMobile ? 'calc(100vh - 20px)' : '90vh',
+        height: isMobile ? 'calc(100vh - 20px)' : 'auto',
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',
-        boxShadow: '0 32px 64px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15)',
+        boxShadow: isMobile ? '0 -10px 40px rgba(0, 0, 0, 0.3)' : '0 32px 64px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15)',
         border: '1px solid rgba(255, 255, 255, 0.2)'
       }}>
         {/* Header */}
@@ -379,7 +378,8 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          marginBottom: '32px'
+          marginBottom: isMobile ? '24px' : '32px',
+          paddingTop: isMobile ? '8px' : '0'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
             <div style={{
@@ -443,7 +443,7 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
         <div style={{
           display: 'flex',
           gap: '8px',
-          marginBottom: '32px',
+          marginBottom: isMobile ? '24px' : '32px',
           background: 'rgba(107, 114, 128, 0.1)',
           padding: '8px',
           borderRadius: '16px'
@@ -498,7 +498,8 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
           flex: 1, 
           overflow: 'auto',
           paddingRight: '8px',
-          paddingBottom: isMobile ? '80px' : '20px'
+          paddingBottom: isMobile ? '100px' : '20px',
+          paddingTop: isMobile ? '8px' : '0'
         }}>
           {activeTab === 'profile' && (
             <form onSubmit={handleProfileUpdate} style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? '16px' : '24px' }}>
@@ -1437,15 +1438,17 @@ export function UserProfileManagement({ user, onClose, onProfileUpdate }: UserPr
 
         {/* Fixed Footer with Action Buttons */}
         <div style={{
-          borderTop: '1px solid rgba(255, 255, 255, 0.1)',
-          paddingTop: isMobile ? '16px' : '24px',
-          marginTop: isMobile ? '16px' : '24px',
+          borderTop: '1px solid rgba(0, 0, 0, 0.1)',
+          paddingTop: isMobile ? '20px' : '24px',
+          marginTop: isMobile ? '20px' : '24px',
           display: 'flex',
           justifyContent: 'flex-end',
           gap: isMobile ? '12px' : '16px',
-          background: 'rgba(255, 255, 255, 0.95)',
-          backdropFilter: 'blur(20px)',
-          flexDirection: isMobile ? 'column' : 'row'
+          background: 'white',
+          flexDirection: isMobile ? 'column' : 'row',
+          position: 'sticky',
+          bottom: 0,
+          zIndex: 10
         }}>
           <button
             type="button"
