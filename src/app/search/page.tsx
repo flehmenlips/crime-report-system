@@ -8,6 +8,8 @@ export default function SearchPage() {
   const router = useRouter()
   const [isMobile, setIsMobile] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [authLoading, setAuthLoading] = useState(true)
+  const [authenticated, setAuthenticated] = useState(false)
   const [searching, setSearching] = useState(false)
   const [allItems, setAllItems] = useState<StolenItem[]>([])
   const [results, setResults] = useState<StolenItem[]>([])
@@ -34,8 +36,30 @@ export default function SearchPage() {
     return () => window.removeEventListener('resize', checkMobile)
   }, [])
 
-  // Load all items
+  // Check authentication first
   useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const response = await fetch('/api/user/profile')
+        if (response.ok) {
+          setAuthenticated(true)
+        } else {
+          router.push('/login-simple')
+        }
+      } catch (err) {
+        console.error('Auth check failed:', err)
+        router.push('/login-simple')
+      } finally {
+        setAuthLoading(false)
+      }
+    }
+    checkAuth()
+  }, [router])
+
+  // Load all items (only after authentication)
+  useEffect(() => {
+    if (!authenticated) return
+
     const loadItems = async () => {
       try {
         const response = await fetch('/api/items')
@@ -50,7 +74,7 @@ export default function SearchPage() {
       }
     }
     loadItems()
-  }, [])
+  }, [authenticated])
 
   const handleSearch = () => {
     setSearching(true)
@@ -107,7 +131,7 @@ export default function SearchPage() {
     setSearchExecuted(false)
   }
 
-  if (loading) {
+  if (authLoading || loading) {
     return (
       <div style={{
         minHeight: '100vh',
@@ -116,9 +140,15 @@ export default function SearchPage() {
         justifyContent: 'center',
         background: 'linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)'
       }}>
-        <div style={{ color: 'white', fontSize: '18px' }}>Loading...</div>
+        <div style={{ color: 'white', fontSize: '18px' }}>
+          {authLoading ? 'Checking authentication...' : 'Loading...'}
+        </div>
       </div>
     )
+  }
+
+  if (!authenticated) {
+    return null // Will redirect
   }
 
   return (

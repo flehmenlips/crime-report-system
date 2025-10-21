@@ -7,6 +7,7 @@ import { UserProfile, PasswordChangeRequest } from '@/types'
 export default function ProfilePage() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
+  const [authLoading, setAuthLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
   const [isMobile, setIsMobile] = useState(false)
@@ -51,7 +52,7 @@ export default function ProfilePage() {
     return () => window.removeEventListener('resize', checkMobile)
   }, [])
 
-  // Load user data
+  // Check authentication and load user data
   useEffect(() => {
     const loadUser = async () => {
       try {
@@ -73,13 +74,19 @@ export default function ProfilePage() {
             bio: data.user.bio || '',
             avatar: data.user.avatar || ''
           })
+        } else {
+          // Not authenticated, redirect to login
+          router.push('/login-simple')
         }
       } catch (err) {
         console.error('Failed to load user:', err)
+        router.push('/login-simple')
+      } finally {
+        setAuthLoading(false)
       }
     }
     loadUser()
-  }, [])
+  }, [router])
 
   const handleProfileUpdate = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -149,7 +156,7 @@ export default function ProfilePage() {
     }
   }
 
-  if (!user) {
+  if (authLoading || !user) {
     return (
       <div style={{
         display: 'flex',
@@ -158,7 +165,9 @@ export default function ProfilePage() {
         minHeight: '100vh',
         background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
       }}>
-        <div style={{ color: 'white', fontSize: '18px' }}>Loading...</div>
+        <div style={{ color: 'white', fontSize: '18px' }}>
+          {authLoading ? 'Checking authentication...' : 'Redirecting...'}
+        </div>
       </div>
     )
   }

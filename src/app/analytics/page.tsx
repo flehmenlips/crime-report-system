@@ -7,6 +7,8 @@ import { StolenItem } from '@/types'
 export default function AnalyticsPage() {
   const router = useRouter()
   const [loading, setLoading] = useState(true)
+  const [authLoading, setAuthLoading] = useState(true)
+  const [authenticated, setAuthenticated] = useState(false)
   const [items, setItems] = useState<StolenItem[]>([])
   const [isMobile, setIsMobile] = useState(false)
   const [activeTab, setActiveTab] = useState<'overview' | 'trends' | 'categories' | 'evidence'>('overview')
@@ -23,8 +25,30 @@ export default function AnalyticsPage() {
     return () => window.removeEventListener('resize', checkMobile)
   }, [])
 
-  // Load items data
+  // Check authentication first
   useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const response = await fetch('/api/user/profile')
+        if (response.ok) {
+          setAuthenticated(true)
+        } else {
+          router.push('/login-simple')
+        }
+      } catch (err) {
+        console.error('Auth check failed:', err)
+        router.push('/login-simple')
+      } finally {
+        setAuthLoading(false)
+      }
+    }
+    checkAuth()
+  }, [router])
+
+  // Load items data (only after authentication)
+  useEffect(() => {
+    if (!authenticated) return
+
     const loadData = async () => {
       try {
         const response = await fetch('/api/items')
@@ -39,7 +63,7 @@ export default function AnalyticsPage() {
       }
     }
     loadData()
-  }, [])
+  }, [authenticated])
 
   // Calculate analytics
   useEffect(() => {
@@ -105,7 +129,7 @@ export default function AnalyticsPage() {
     })
   }, [items])
 
-  if (loading) {
+  if (authLoading || loading) {
     return (
       <div style={{
         minHeight: '100vh',
@@ -114,9 +138,15 @@ export default function AnalyticsPage() {
         justifyContent: 'center',
         background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
       }}>
-        <div style={{ color: 'white', fontSize: '18px' }}>Loading analytics...</div>
+        <div style={{ color: 'white', fontSize: '18px' }}>
+          {authLoading ? 'Checking authentication...' : 'Loading analytics...'}
+        </div>
       </div>
     )
+  }
+
+  if (!authenticated) {
+    return null // Will redirect
   }
 
   return (

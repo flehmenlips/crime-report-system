@@ -7,6 +7,8 @@ import { StolenItem } from '@/types'
 export default function ReportsPage() {
   const router = useRouter()
   const [loading, setLoading] = useState(true)
+  const [authLoading, setAuthLoading] = useState(true)
+  const [authenticated, setAuthenticated] = useState(false)
   const [items, setItems] = useState<StolenItem[]>([])
   const [isMobile, setIsMobile] = useState(false)
   const [generating, setGenerating] = useState(false)
@@ -32,8 +34,30 @@ export default function ReportsPage() {
     return () => window.removeEventListener('resize', checkMobile)
   }, [])
 
-  // Load items data
+  // Check authentication first
   useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const response = await fetch('/api/user/profile')
+        if (response.ok) {
+          setAuthenticated(true)
+        } else {
+          router.push('/login-simple')
+        }
+      } catch (err) {
+        console.error('Auth check failed:', err)
+        router.push('/login-simple')
+      } finally {
+        setAuthLoading(false)
+      }
+    }
+    checkAuth()
+  }, [router])
+
+  // Load items data (only after authentication)
+  useEffect(() => {
+    if (!authenticated) return
+
     const loadData = async () => {
       try {
         const response = await fetch('/api/items')
@@ -48,7 +72,7 @@ export default function ReportsPage() {
       }
     }
     loadData()
-  }, [])
+  }, [authenticated])
 
   const handleGenerateReport = () => {
     setGenerating(true)
@@ -65,18 +89,24 @@ export default function ReportsPage() {
     return sum + item.evidence.length
   }, 0)
 
-  if (loading) {
+  if (authLoading || loading) {
     return (
       <div style={{
         minHeight: '100vh',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+        background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
       }}>
-        <div style={{ color: 'white', fontSize: '18px' }}>Loading...</div>
+        <div style={{ color: 'white', fontSize: '18px' }}>
+          {authLoading ? 'Checking authentication...' : 'Loading...'}
+        </div>
       </div>
     )
+  }
+
+  if (!authenticated) {
+    return null // Will redirect
   }
 
   return (

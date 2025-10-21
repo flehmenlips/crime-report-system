@@ -6,6 +6,8 @@ import { useState, useEffect } from 'react'
 export default function AddItemPage() {
   const router = useRouter()
   const [isMobile, setIsMobile] = useState(false)
+  const [authLoading, setAuthLoading] = useState(true)
+  const [authenticated, setAuthenticated] = useState(false)
   const [saving, setSaving] = useState(false)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState('')
@@ -35,8 +37,30 @@ export default function AddItemPage() {
     return () => window.removeEventListener('resize', checkMobile)
   }, [])
 
-  // Load categories
+  // Check authentication first
   useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const response = await fetch('/api/user/profile')
+        if (response.ok) {
+          setAuthenticated(true)
+        } else {
+          router.push('/login-simple')
+        }
+      } catch (err) {
+        console.error('Auth check failed:', err)
+        router.push('/login-simple')
+      } finally {
+        setAuthLoading(false)
+      }
+    }
+    checkAuth()
+  }, [router])
+
+  // Load categories (only after authentication)
+  useEffect(() => {
+    if (!authenticated) return
+
     const loadCategories = async () => {
       try {
         const response = await fetch('/api/categories')
@@ -49,7 +73,7 @@ export default function AddItemPage() {
       }
     }
     loadCategories()
-  }, [])
+  }, [authenticated])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -82,6 +106,24 @@ export default function AddItemPage() {
     } finally {
       setSaving(false)
     }
+  }
+
+  if (authLoading) {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)'
+      }}>
+        <div style={{ color: 'white', fontSize: '18px' }}>Checking authentication...</div>
+      </div>
+    )
+  }
+
+  if (!authenticated) {
+    return null // Will redirect
   }
 
   return (

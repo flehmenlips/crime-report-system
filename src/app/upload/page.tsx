@@ -6,6 +6,8 @@ import { useState, useEffect } from 'react'
 export default function UploadPage() {
   const router = useRouter()
   const [isMobile, setIsMobile] = useState(false)
+  const [authLoading, setAuthLoading] = useState(true)
+  const [authenticated, setAuthenticated] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [files, setFiles] = useState<File[]>([])
   const [uploadProgress, setUploadProgress] = useState(0)
@@ -20,6 +22,26 @@ export default function UploadPage() {
     window.addEventListener('resize', checkMobile)
     return () => window.removeEventListener('resize', checkMobile)
   }, [])
+
+  // Check authentication
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const response = await fetch('/api/user/profile')
+        if (response.ok) {
+          setAuthenticated(true)
+        } else {
+          router.push('/login-simple')
+        }
+      } catch (err) {
+        console.error('Auth check failed:', err)
+        router.push('/login-simple')
+      } finally {
+        setAuthLoading(false)
+      }
+    }
+    checkAuth()
+  }, [router])
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -52,6 +74,24 @@ export default function UploadPage() {
       setUploading(false)
       setFiles([])
     }, 2500)
+  }
+
+  if (authLoading) {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)'
+      }}>
+        <div style={{ color: 'white', fontSize: '18px' }}>Checking authentication...</div>
+      </div>
+    )
+  }
+
+  if (!authenticated) {
+    return null // Will redirect
   }
 
   return (
