@@ -92,41 +92,61 @@ export default function UploadEvidencePage() {
     setError('')
 
     try {
-      const formData = new FormData()
-      files.forEach((file) => {
-        formData.append('files', file)
-      })
-      formData.append('itemId', itemId)
+      // Get current user for upload tracking
+      const userResponse = await fetch('/api/user/profile')
+      const userData = userResponse.ok ? await userResponse.json() : null
+      
+      let successCount = 0
+      const totalFiles = files.length
+      
+      // Upload files one at a time using existing API
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i]
+        
+        // Determine evidence type from file type
+        let evidenceType = 'document'
+        if (file.type.startsWith('image/')) evidenceType = 'photo'
+        else if (file.type.startsWith('video/')) evidenceType = 'video'
+        
+        const formData = new FormData()
+        formData.append('file', file)
+        formData.append('itemId', itemId)
+        formData.append('type', evidenceType)
+        
+        if (userData?.user) {
+          formData.append('uploadedBy', userData.user.id)
+          formData.append('uploadedByName', userData.user.name)
+          formData.append('uploadedByRole', userData.user.role)
+        }
 
-      // Simulate progress
-      const interval = setInterval(() => {
-        setUploadProgress(prev => {
-          if (prev >= 90) {
-            clearInterval(interval)
-            return 90
-          }
-          return prev + 10
+        const response = await fetch('/api/evidence/upload', {
+          method: 'POST',
+          body: formData
         })
-      }, 200)
 
-      const response = await fetch('/api/evidence/upload', {
-        method: 'POST',
-        body: formData
-      })
+        if (response.ok) {
+          successCount++
+        }
+        
+        // Update progress
+        setUploadProgress(Math.round(((i + 1) / totalFiles) * 100))
+      }
 
-      clearInterval(interval)
-      setUploadProgress(100)
-
-      if (response.ok) {
+      if (successCount === totalFiles) {
         setSuccess(true)
         setTimeout(() => {
           router.push(`/item/${itemId}/evidence`)
         }, 1500)
+      } else if (successCount > 0) {
+        setError(`Uploaded ${successCount} of ${totalFiles} files. Some uploads failed.`)
+        setTimeout(() => {
+          router.push(`/item/${itemId}/evidence`)
+        }, 2000)
       } else {
-        const result = await response.json()
-        setError(result.error || 'Upload failed')
+        setError('All uploads failed. Please try again.')
       }
     } catch (err) {
+      console.error('Upload error:', err)
       setError('Upload failed. Please try again.')
     } finally {
       setUploading(false)
