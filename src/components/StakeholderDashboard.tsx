@@ -725,8 +725,8 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
           boxShadow: isMobile ? 'none' : '0 10px 25px rgba(0, 0, 0, 0.1)'
         }}>
           <div style={{ marginBottom: isMobile ? '16px' : '24px' }}>
-            {!isMobile && (
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', flexDirection: isMobile ? 'column' : 'row', gap: isMobile ? '16px' : '0' }}>
+              {!isMobile && (
               <div>
                 <h2 style={{ fontSize: '28px', fontWeight: '700', color: '#1f2937', marginBottom: '8px' }}>
                   Evidence Database
@@ -735,9 +735,7 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
                   {getRoleDisplayName(user.role)} view • {displayItems.length} items catalogued
                 </p>
               </div>
-            )}
-            
-            <div style={{ display: isMobile ? 'block' : 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: isMobile ? '0' : '16px' }}>
+              )}
               
               {/* Controls Row */}
               <div style={{ 
