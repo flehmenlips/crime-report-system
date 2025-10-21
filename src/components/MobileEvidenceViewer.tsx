@@ -23,7 +23,16 @@ export function MobileEvidenceViewer({ evidence, initialIndex, onClose, onDelete
   const [currentIndex, setCurrentIndex] = useState(initialIndex)
   const [isMobile, setIsMobile] = useState(false)
   
-  const currentEvidence = evidence[currentIndex]
+  // Validate and clamp currentIndex to valid range
+  const validIndex = Math.max(0, Math.min(currentIndex, evidence.length - 1))
+  const currentEvidence = evidence[validIndex]
+  
+  // If no valid evidence, close the viewer
+  useEffect(() => {
+    if (!currentEvidence || evidence.length === 0) {
+      onClose()
+    }
+  }, [currentEvidence, evidence.length, onClose])
 
   // Mobile detection
   useEffect(() => {
@@ -142,7 +151,7 @@ export function MobileEvidenceViewer({ evidence, initialIndex, onClose, onDelete
           fontSize: '14px',
           color: 'rgba(255, 255, 255, 0.8)'
         }}>
-          {currentIndex + 1} / {evidence.length}
+          {validIndex + 1} / {evidence.length}
         </div>
         
         {onDelete && (
