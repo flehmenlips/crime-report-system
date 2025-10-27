@@ -118,7 +118,64 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
   const canGenerateReports = () => canReadAll(user) || user?.permissions?.includes('generate:reports')
   const canAccessAdminFeatures = () => canAccessAdmin(user)
 
-  // Load evidence data progressively in background
+  // Load dashboard snapshot on mount
+  const loadSnapshot = async () => {
+    try {
+      const response = await fetch('/api/dashboard-snapshot')
+      if (response.ok) {
+        const data = await response.json()
+        if (data.snapshot) {
+          console.log('📸 Loaded dashboard snapshot:', data.snapshot)
+          // Use snapshot data to instantly populate UI
+          // We'll use this for quick stats display
+        }
+      }
+    } catch (error) {
+      console.error('Error loading snapshot:', error)
+    }
+  }
+
+  // Save dashboard snapshot
+  const saveSnapshot = async (items: StolenItem[], evidenceCache: Record<string, any[]>) => {
+    try {
+      let totalItems = items.length
+      let totalValue = items.reduce((sum, item) => sum + item.estimatedValue, 0)
+      let totalEvidenceFiles = 0
+      let photosCount = 0
+      let videosCount = 0
+      let documentsCount = 0
+
+      // Calculate evidence counts from cache
+      Object.values(evidenceCache).forEach((evidenceArray: any[]) => {
+        if (Array.isArray(evidenceArray)) {
+          totalEvidenceFiles += evidenceArray.length
+          evidenceArray.forEach((e: any) => {
+            if (e.type === 'photo') photosCount++
+            else if (e.type === 'video') videosCount++
+            else if (e.type === 'document') documentsCount++
+          })
+        }
+      })
+
+      await fetch('/api/dashboard-snapshot', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          totalItems,
+          totalValue,
+          totalEvidenceFiles,
+          photosCount,
+          videosCount,
+          documentsCount
+        })
+      })
+      console.log('💾 Saved dashboard snapshot')
+    } catch (error) {
+      console.error('Error saving snapshot:', error)
+    }
+  }
+
+  // Load evidence data progressively in background with priority ordering
   const loadEvidenceInBackground = async (items: StolenItem[]) => {
     console.log('🔍 loadEvidenceInBackground called with', items.length, 'items')
     setEvidenceLoading(true)
@@ -126,55 +183,83 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
     
     try {
       const cache: Record<string, any[]> = {}
+      
+      // Sort items by priority: highest value first
+      const sortedItems = [...items].sort((a, b) => b.estimatedValue - a.estimatedValue)
+      
+      // Load top 10 items immediately (first batch)
+      const priorityItems = sortedItems.slice(0, 10)
+      const remainingItems = sortedItems.slice(10)
+      
       const batchSize = 5 // Process 5 items at a time to avoid overwhelming the server
       
-      for (let i = 0; i < items.length; i += batchSize) {
-        const batch = items.slice(i, i + batchSize)
-        console.log(`📡 Processing evidence batch ${Math.floor(i/batchSize) + 1}/${Math.ceil(items.length/batchSize)} (items ${i + 1}-${Math.min(i + batchSize, items.length)})`)
-        
-        const batchPromises = batch.map(async (item) => {
-          try {
-            const response = await fetch(`/api/evidence?itemId=${item.id}`)
-            if (response.ok) {
-              const data = await response.json()
-              console.log(`✅ Got evidence for item ${item.id}:`, data.evidence?.length || 0, 'items')
-              return { itemId: item.id, evidence: data.evidence || [] }
-            } else {
-              console.error(`❌ Failed to get evidence for item ${item.id}:`, response.status)
-              return { itemId: item.id, evidence: [] }
-            }
-          } catch (error) {
-            console.error(`❌ Error loading evidence for item ${item.id}:`, error)
-            return { itemId: item.id, evidence: [] }
-          }
-        })
-        
-        const batchResults = await Promise.all(batchPromises)
-        batchResults.forEach(result => {
-          cache[result.itemId] = result.evidence
-        })
-        
-        // Update progress and cache incrementally
-        const progress = Math.round(((i + batchSize) / items.length) * 100)
-        setEvidenceProgress(Math.min(100, progress))
-        setEvidenceCache({ ...cache }) // Trigger re-render with new evidence data
-        
-        console.log(`✅ Batch ${Math.floor(i/batchSize) + 1} complete. Progress: ${progress}%`)
-        
-        // Small delay between batches to prevent overwhelming the server
-        if (i + batchSize < items.length) {
-          await new Promise(resolve => setTimeout(resolve, 100))
-        }
+      // Load priority items first
+      for (let i = 0; i < priorityItems.length; i += batchSize) {
+        const batch = priorityItems.slice(i, i + batchSize)
+        await loadBatch(batch, cache, priorityItems.length, i)
+      }
+      
+      // Load remaining items
+      for (let i = 0; i < remainingItems.length; i += batchSize) {
+        const batch = remainingItems.slice(i, i + batchSize)
+        await loadBatch(batch, cache, sortedItems.length, priorityItems.length + i)
       }
       
       setEvidenceLoaded(true)
       setEvidenceLoading(false)
       console.log(`✅ Progressive evidence loading completed for ${items.length} items`)
       console.log('Evidence cache populated with keys:', Object.keys(cache).length)
+      
+      // Save snapshot after loading completes
+      await saveSnapshot(items, cache)
     } catch (error) {
       console.error('❌ Error in progressive evidence loading:', error)
       setEvidenceLoaded(false)
       setEvidenceLoading(false)
+    }
+  }
+
+  // Helper function to load a batch of evidence
+  const loadBatch = async (
+    batch: StolenItem[], 
+    cache: Record<string, any[]>, 
+    totalItems: number, 
+    currentIndex: number
+  ) => {
+    console.log(`📡 Processing evidence batch (items ${currentIndex + 1}-${currentIndex + batch.length} of ${totalItems})`)
+    
+    const batchPromises = batch.map(async (item) => {
+      try {
+        const response = await fetch(`/api/evidence?itemId=${item.id}`)
+        if (response.ok) {
+          const data = await response.json()
+          console.log(`✅ Got evidence for item ${item.id}:`, data.evidence?.length || 0, 'items')
+          return { itemId: item.id, evidence: data.evidence || [] }
+        } else {
+          console.error(`❌ Failed to get evidence for item ${item.id}:`, response.status)
+          return { itemId: item.id, evidence: [] }
+        }
+      } catch (error) {
+        console.error(`❌ Error loading evidence for item ${item.id}:`, error)
+        return { itemId: item.id, evidence: [] }
+      }
+    })
+    
+    const batchResults = await Promise.all(batchPromises)
+    batchResults.forEach(result => {
+      cache[result.itemId] = result.evidence
+    })
+    
+    // Update progress and cache incrementally
+    const progress = Math.round(((currentIndex + batch.length) / totalItems) * 100)
+    setEvidenceProgress(Math.min(100, progress))
+    setEvidenceCache({ ...cache }) // Trigger re-render with new evidence data
+    
+    console.log(`✅ Batch complete. Progress: ${progress}%`)
+    
+    // Small delay between batches to prevent overwhelming the server
+    if (currentIndex + batch.length < totalItems) {
+      await new Promise(resolve => setTimeout(resolve, 100))
     }
   }
 
@@ -228,6 +313,9 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
       
       // Check for existing case (for property owners) - do this in background
       checkExistingCase()
+      
+      // Load snapshot for instant display
+      loadSnapshot()
       
       // Load evidence in background - non-blocking
       if (loadedItems.length > 0) {

@@ -48,6 +48,7 @@ model User {
   state                String?
   title                String?
   zipCode              String?
+  dashboardSnapshot    DashboardSnapshot?
   accessLevel          AccessLevel? @default(owner)
   tenantId             String?      @default("tenant-1")
   passwordResetExpires DateTime?
@@ -290,4 +291,22 @@ enum AccessLevel {
   staff
   stakeholder
   view_only
+}
+
+model DashboardSnapshot {
+  id                 Int       @id @default(autoincrement())
+  userId             String
+  tenantId           String?
+  totalItems         Int
+  totalValue         Float
+  totalEvidenceFiles Int
+  photosCount        Int
+  videosCount        Int
+  documentsCount     Int
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  user               User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId])
+  @@map("dashboard_snapshots")
 }
