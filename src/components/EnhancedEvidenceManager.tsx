@@ -13,10 +13,29 @@ interface EnhancedEvidenceManagerProps {
 export function EnhancedEvidenceManager({ item, onClose, onUpdate }: EnhancedEvidenceManagerProps) {
   const [activeTab, setActiveTab] = useState<'photos' | 'videos' | 'documents' | 'all'>('all')
   const [showUploadModal, setShowUploadModal] = useState(false)
-  const [evidence, setEvidence] = useState<Evidence[]>(item.evidence || [])
+  const [evidence, setEvidence] = useState<Evidence[]>([])
+  const [loading, setLoading] = useState(true)
   const [selectedEvidence, setSelectedEvidence] = useState<Evidence | null>(null)
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [failedThumbnails, setFailedThumbnails] = useState<Set<number>>(new Set())
+
+  // Load evidence when component mounts
+  useEffect(() => {
+    const loadEvidence = async () => {
+      try {
+        const response = await fetch(`/api/evidence?itemId=${item.id}`)
+        if (response.ok) {
+          const data = await response.json()
+          setEvidence(data.evidence || [])
+        }
+      } catch (error) {
+        console.error('Error loading evidence:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    loadEvidence()
+  }, [item.id])
 
   // Filter evidence based on active tab
   const filteredEvidence = evidence.filter(e => {
@@ -413,7 +432,16 @@ export function EnhancedEvidenceManager({ item, onClose, onUpdate }: EnhancedEvi
           </div>
 
           {/* Evidence List */}
-          {filteredEvidence.length === 0 ? (
+          {loading ? (
+            <div style={{
+              textAlign: 'center',
+              padding: '64px 32px',
+              color: '#6b7280'
+            }}>
+              <div style={{ fontSize: '64px', marginBottom: '16px' }}>⏳</div>
+              <p style={{ fontSize: '16px' }}>Loading evidence...</p>
+            </div>
+          ) : filteredEvidence.length === 0 ? (
             <div style={{
               textAlign: 'center',
               padding: '64px 32px',
