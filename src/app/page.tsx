@@ -106,6 +106,14 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
   // Evidence data cache to avoid individual API calls per item
   const [evidenceCache, setEvidenceCache] = useState<Record<string, any[]>>({})
   const [evidenceLoaded, setEvidenceLoaded] = useState(false)
+  
+  // Dashboard snapshot state for instant loading
+  const [snapshotData, setSnapshotData] = useState<{
+    totalEvidenceFiles: number
+    photosCount: number
+    videosCount: number
+    documentsCount: number
+  } | null>(null)
 
   // Mobile and PWA state
   const [isMobile, setIsMobile] = useState(false)
@@ -127,7 +135,12 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
         if (data.snapshot) {
           console.log('📸 Loaded dashboard snapshot:', data.snapshot)
           // Use snapshot data to instantly populate UI
-          // We'll use this for quick stats display
+          setSnapshotData({
+            totalEvidenceFiles: data.snapshot.totalEvidenceFiles || 0,
+            photosCount: data.snapshot.photosCount || 0,
+            videosCount: data.snapshot.videosCount || 0,
+            documentsCount: data.snapshot.documentsCount || 0
+          })
         }
       }
     } catch (error) {
@@ -1037,11 +1050,12 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
 
   const userRole = user?.role
   
-  // Calculate evidence count from evidenceCache instead of item.evidence
-  // since evidence is now loaded progressively
-  const evidenceCount = Object.values(evidenceCache || {}).reduce((total, evidenceList) => 
-    total + evidenceList.length, 0
-  )
+  // Calculate evidence count - use snapshot data if available (instant display), otherwise use cache
+  const evidenceCount = snapshotData 
+    ? snapshotData.totalEvidenceFiles 
+    : Object.values(evidenceCache || {}).reduce((total, evidenceList) => 
+        total + evidenceList.length, 0
+      )
   
   // Stable sorting using useMemo - TEMPORARILY DISABLED FOR DEBUGGING
   // const sortedItems = useMemo(() => {
@@ -1391,11 +1405,31 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
               e.currentTarget.style.transform = 'translateY(0) scale(1)'
               e.currentTarget.style.boxShadow = '0 20px 40px rgba(59, 130, 246, 0.3)'
             }}>
-              <div style={{ fontSize: '72px', fontWeight: '900', color: 'white', marginBottom: '16px' }}>
+              <div style={{ fontSize: '72px', fontWeight: '900', color: 'white', marginBottom: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
                 {evidenceCount}
+                {evidenceLoading && (
+                  <div style={{
+                    width: '24px',
+                    height: '24px',
+                    border: '3px solid rgba(255, 255, 255, 0.3)',
+                    borderTop: '3px solid white',
+                    borderRadius: '50%',
+                    animation: 'spin 1s linear infinite'
+                  }}></div>
+                )}
               </div>
-              <div style={{ color: 'white', fontSize: '24px', fontWeight: '600' }}>Evidence Files</div>
-              <div style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: '16px', marginTop: '8px' }}>Photos, videos, documents</div>
+              <div style={{ color: 'white', fontSize: '24px', fontWeight: '600' }}>
+                Evidence Files
+                {evidenceLoading && <span style={{ fontSize: '14px', marginLeft: '8px', opacity: 0.8 }}>(loading...)</span>}
+              </div>
+              <div style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: '16px', marginTop: '8px' }}>
+                Photos, videos, documents
+                {evidenceLoading && !snapshotData && (
+                  <div style={{ fontSize: '12px', marginTop: '4px', opacity: 0.7 }}>
+                    Loading from previous session...
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
