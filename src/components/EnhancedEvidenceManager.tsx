@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { StolenItem, Evidence } from '@/types'
 import { EnhancedEvidenceUpload } from './EnhancedEvidenceUpload'
+import { thumbnailCache } from '@/lib/thumbnail-cache'
 
 interface EnhancedEvidenceManagerProps {
   item: StolenItem
