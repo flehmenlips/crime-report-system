@@ -9,6 +9,14 @@ interface CaseSummaryProps {
   user: User
   items: StolenItem[]
   onClose: () => void
+  evidenceCache?: Record<string, any[]> // Evidence cache for accurate stats
+  snapshotData?: {
+    totalEvidenceFiles: number
+    photosCount: number
+    videosCount: number
+    documentsCount: number
+    itemsWithPhotos: number
+  } | null // Snapshot data for instant display
 }
 
 interface CaseMetrics {
@@ -24,7 +32,7 @@ interface CaseMetrics {
   evidenceTypes: { [key: string]: number }
 }
 
-export function CaseSummary({ user, items, onClose }: CaseSummaryProps) {
+export function CaseSummary({ user, items, onClose, evidenceCache, snapshotData }: CaseSummaryProps) {
   const [metrics, setMetrics] = useState<CaseMetrics | null>(null)
   const [loading, setLoading] = useState(true)
   const [exporting, setExporting] = useState(false)
@@ -53,30 +61,71 @@ export function CaseSummary({ user, items, onClose }: CaseSummaryProps) {
       const totalItems = items.length
       const totalValue = items.reduce((sum, item) => sum + item.estimatedValue, 0)
       
-      // Calculate evidence metrics
+      // Calculate evidence metrics - use snapshot data if available, otherwise use cache
       let evidenceCount = 0
       let itemsWithPhotos = 0
       let itemsWithVideos = 0
       let itemsWithDocuments = 0
       const evidenceTypes: { [key: string]: number } = {}
       
-      items.forEach(item => {
-        if (item.evidence && item.evidence.length > 0) {
-          evidenceCount += item.evidence.length
-          
-          const hasPhoto = item.evidence.some(e => e.type === 'photo')
-          const hasVideo = item.evidence.some(e => e.type === 'video')
-          const hasDocument = item.evidence.some(e => e.type === 'document')
-          
-          if (hasPhoto) itemsWithPhotos++
-          if (hasVideo) itemsWithVideos++
-          if (hasDocument) itemsWithDocuments++
-          
-          item.evidence.forEach(evidence => {
-            evidenceTypes[evidence.type] = (evidenceTypes[evidence.type] || 0) + 1
+      if (snapshotData) {
+        // Use snapshot data for instant display
+        evidenceCount = snapshotData.totalEvidenceFiles
+        itemsWithPhotos = snapshotData.itemsWithPhotos
+        // Calculate other metrics from evidenceCache if available
+        if (evidenceCache) {
+          Object.entries(evidenceCache).forEach(([itemId, evidenceList]) => {
+            if (Array.isArray(evidenceList)) {
+              const hasVideo = evidenceList.some(e => e.type === 'video')
+              const hasDocument = evidenceList.some(e => e.type === 'document')
+              if (hasVideo) itemsWithVideos++
+              if (hasDocument) itemsWithDocuments++
+              
+              evidenceList.forEach(e => {
+                evidenceTypes[e.type] = (evidenceTypes[e.type] || 0) + 1
+              })
+            }
           })
         }
-      })
+      } else if (evidenceCache) {
+        // Calculate from cache
+        Object.entries(evidenceCache).forEach(([itemId, evidenceList]) => {
+          if (Array.isArray(evidenceList)) {
+            evidenceCount += evidenceList.length
+            
+            const hasPhoto = evidenceList.some(e => e.type === 'photo')
+            const hasVideo = evidenceList.some(e => e.type === 'video')
+            const hasDocument = evidenceList.some(e => e.type === 'document')
+            
+            if (hasPhoto) itemsWithPhotos++
+            if (hasVideo) itemsWithVideos++
+            if (hasDocument) itemsWithDocuments++
+            
+            evidenceList.forEach(e => {
+              evidenceTypes[e.type] = (evidenceTypes[e.type] || 0) + 1
+            })
+          }
+        })
+      } else {
+        // Fallback to item.evidence if no cache available
+        items.forEach(item => {
+          if (item.evidence && item.evidence.length > 0) {
+            evidenceCount += item.evidence.length
+            
+            const hasPhoto = item.evidence.some(e => e.type === 'photo')
+            const hasVideo = item.evidence.some(e => e.type === 'video')
+            const hasDocument = item.evidence.some(e => e.type === 'document')
+            
+            if (hasPhoto) itemsWithPhotos++
+            if (hasVideo) itemsWithVideos++
+            if (hasDocument) itemsWithDocuments++
+            
+            item.evidence.forEach(evidence => {
+              evidenceTypes[evidence.type] = (evidenceTypes[evidence.type] || 0) + 1
+            })
+          }
+        })
+      }
 
       // Calculate categories
       const categories: { [key: string]: number } = {}
@@ -113,7 +162,7 @@ export function CaseSummary({ user, items, onClose }: CaseSummaryProps) {
     }
 
     calculateMetrics()
-  }, [items])
+  }, [items, evidenceCache, snapshotData])
 
   const handleExportPDF = async () => {
     if (!metrics) return
