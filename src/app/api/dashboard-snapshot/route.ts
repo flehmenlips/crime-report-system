@@ -49,7 +49,8 @@ export async function POST(request: NextRequest) {
       totalEvidenceFiles, 
       photosCount, 
       videosCount, 
-      documentsCount 
+      documentsCount,
+      itemsWithPhotos
     } = body
 
     // Upsert (create or update) the snapshot
@@ -63,7 +64,8 @@ export async function POST(request: NextRequest) {
         totalEvidenceFiles: totalEvidenceFiles || 0,
         photosCount: photosCount || 0,
         videosCount: videosCount || 0,
-        documentsCount: documentsCount || 0
+        documentsCount: documentsCount || 0,
+        itemsWithPhotos: itemsWithPhotos || 0
       },
       update: {
         totalItems: totalItems || 0,
@@ -72,6 +74,7 @@ export async function POST(request: NextRequest) {
         photosCount: photosCount || 0,
         videosCount: videosCount || 0,
         documentsCount: documentsCount || 0,
+        itemsWithPhotos: itemsWithPhotos || 0,
         updatedAt: new Date()
       }
     })

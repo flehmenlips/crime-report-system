@@ -38,6 +38,7 @@ interface StakeholderDashboardProps {
     photosCount: number
     videosCount: number
     documentsCount: number
+    itemsWithPhotos: number
   } | null // Snapshot data for instant display
   evidenceLoading?: boolean // Flag to show loading indicator
 }
@@ -355,10 +356,12 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
         total + evidenceList.length, 0
       )
   
-  // Calculate items with photos from evidenceCache
-  const itemsWithPhotos = Object.entries(evidenceCache || {}).filter(([itemId, evidenceList]) => 
-    evidenceList.some(e => e.type === 'photo')
-  ).length
+  // Calculate items with photos - use snapshot data if available, otherwise use cache
+  const itemsWithPhotos = snapshotData 
+    ? snapshotData.itemsWithPhotos 
+    : Object.entries(evidenceCache || {}).filter(([itemId, evidenceList]) => 
+        evidenceList.some(e => e.type === 'photo')
+      ).length
 
   // Show loading state
   if (loading) {
@@ -689,10 +692,23 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
             textAlign: 'center',
             boxShadow: '0 10px 25px rgba(234, 88, 12, 0.3)'
           }}>
-            <div style={{ fontSize: '48px', fontWeight: '900', color: 'white', marginBottom: '12px' }}>
+            <div style={{ fontSize: '48px', fontWeight: '900', color: 'white', marginBottom: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
               {itemsWithPhotos}
+              {evidenceLoading && (
+                <div style={{
+                  width: '20px',
+                  height: '20px',
+                  border: '3px solid rgba(255, 255, 255, 0.3)',
+                  borderTop: '3px solid white',
+                  borderRadius: '50%',
+                  animation: 'spin 1s linear infinite'
+                }}></div>
+              )}
             </div>
-            <div style={{ color: 'white', fontSize: '18px', fontWeight: '600' }}>Items w/ Photos</div>
+            <div style={{ color: 'white', fontSize: '18px', fontWeight: '600' }}>
+              Items w/ Photos
+              {evidenceLoading && <span style={{ fontSize: '14px', marginLeft: '8px', opacity: 0.8 }}>(loading...)</span>}
+            </div>
           </div>
         </div>
         )}

@@ -113,6 +113,7 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
     photosCount: number
     videosCount: number
     documentsCount: number
+    itemsWithPhotos: number
   } | null>(null)
 
   // Mobile and PWA state
@@ -139,7 +140,8 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
             totalEvidenceFiles: data.snapshot.totalEvidenceFiles || 0,
             photosCount: data.snapshot.photosCount || 0,
             videosCount: data.snapshot.videosCount || 0,
-            documentsCount: data.snapshot.documentsCount || 0
+            documentsCount: data.snapshot.documentsCount || 0,
+            itemsWithPhotos: data.snapshot.itemsWithPhotos || 0
           })
         }
       }
@@ -157,6 +159,7 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
       let photosCount = 0
       let videosCount = 0
       let documentsCount = 0
+      let itemsWithPhotos = 0
 
       // Calculate evidence counts from cache
       Object.values(evidenceCache).forEach((evidenceArray: any[]) => {
@@ -170,6 +173,11 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
         }
       })
 
+      // Calculate items with photos
+      itemsWithPhotos = Object.entries(evidenceCache).filter(([itemId, evidenceList]) => 
+        evidenceList.some(e => e.type === 'photo')
+      ).length
+
       await fetch('/api/dashboard-snapshot', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -179,7 +187,8 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
           totalEvidenceFiles,
           photosCount,
           videosCount,
-          documentsCount
+          documentsCount,
+          itemsWithPhotos
         })
       })
       console.log('💾 Saved dashboard snapshot')
