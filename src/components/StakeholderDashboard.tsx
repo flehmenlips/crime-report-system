@@ -33,9 +33,16 @@ interface StakeholderDashboardProps {
   evidenceCache?: Record<string, any[]> // Optional evidence cache to avoid API calls
   evidenceLoaded?: boolean // Flag to indicate if evidence cache is ready
   isMobile?: boolean // Flag to hide header on mobile (MobileHeader is used instead)
+  snapshotData?: {
+    totalEvidenceFiles: number
+    photosCount: number
+    videosCount: number
+    documentsCount: number
+  } | null // Snapshot data for instant display
+  evidenceLoading?: boolean // Flag to show loading indicator
 }
 
-export function StakeholderDashboard({ user, items, onItemsUpdate, loading = false, error = null, onRefresh, evidenceCache, evidenceLoaded, isMobile = false }: StakeholderDashboardProps) {
+export function StakeholderDashboard({ user, items, onItemsUpdate, loading = false, error = null, onRefresh, evidenceCache, evidenceLoaded, isMobile = false, snapshotData, evidenceLoading = false }: StakeholderDashboardProps) {
   const [scrollY, setScrollY] = useState(0)
   
   // Add scroll listener for dynamic text color
@@ -341,11 +348,12 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
     return conditions.join(' and ')
   }
   
-  // Calculate evidence count from evidenceCache instead of item.evidence
-  // since evidence is now loaded progressively
-  const evidenceCount = Object.values(evidenceCache || {}).reduce((total, evidenceList) => 
-    total + evidenceList.length, 0
-  )
+  // Calculate evidence count - use snapshot data if available (instant display), otherwise use cache
+  const evidenceCount = snapshotData 
+    ? snapshotData.totalEvidenceFiles 
+    : Object.values(evidenceCache || {}).reduce((total, evidenceList) => 
+        total + evidenceList.length, 0
+      )
   
   // Calculate items with photos from evidenceCache
   const itemsWithPhotos = Object.entries(evidenceCache || {}).filter(([itemId, evidenceList]) => 
@@ -655,10 +663,23 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
             textAlign: 'center',
             boxShadow: '0 10px 25px rgba(124, 58, 237, 0.3)'
           }}>
-            <div style={{ fontSize: '48px', fontWeight: '900', color: 'white', marginBottom: '12px' }}>
+            <div style={{ fontSize: '48px', fontWeight: '900', color: 'white', marginBottom: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
               {evidenceCount}
+              {evidenceLoading && (
+                <div style={{
+                  width: '20px',
+                  height: '20px',
+                  border: '3px solid rgba(255, 255, 255, 0.3)',
+                  borderTop: '3px solid white',
+                  borderRadius: '50%',
+                  animation: 'spin 1s linear infinite'
+                }}></div>
+              )}
             </div>
-            <div style={{ color: 'white', fontSize: '18px', fontWeight: '600' }}>Evidence Files</div>
+            <div style={{ color: 'white', fontSize: '18px', fontWeight: '600' }}>
+              Evidence Files
+              {evidenceLoading && <span style={{ fontSize: '14px', marginLeft: '8px', opacity: 0.8 }}>(loading...)</span>}
+            </div>
           </div>
           
           <div style={{

@@ -3263,6 +3263,8 @@ function AppContentInner({ initialUser }: AppContentInnerProps) {
               evidenceCache={evidenceCache}
               evidenceLoaded={evidenceLoaded}
               isMobile={isMobile}
+              snapshotData={snapshotData}
+              evidenceLoading={evidenceLoading}
             />
           </ProgressiveLoader>
         </>
