@@ -342,28 +342,31 @@ export function MobileHeader({
                 <span>⚡</span>Quick Actions
               </h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                <button
-                  style={{
-                    background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
-                    color: 'white',
-                    border: 'none',
-                    padding: '16px 20px',
-                    borderRadius: '12px',
-                    fontSize: '15px',
-                    fontWeight: '600',
-                    cursor: 'pointer',
-                    textAlign: 'left',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '12px',
-                    boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)',
-                    transition: 'transform 0.2s ease'
-                  }}
-                  onClick={() => handleNavigation('/add-item', 'Add Item')}
-                >
-                  <span style={{ fontSize: '20px' }}>➕</span>
-                  <span>Add New Item</span>
-                </button>
+                {/* Add New Item - Only for property owners */}
+                {user.role === 'property_owner' && (
+                  <button
+                    style={{
+                      background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+                      color: 'white',
+                      border: 'none',
+                      padding: '16px 20px',
+                      borderRadius: '12px',
+                      fontSize: '15px',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      textAlign: 'left',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '12px',
+                      boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)',
+                      transition: 'transform 0.2s ease'
+                    }}
+                    onClick={() => handleNavigation('/add-item', 'Add Item')}
+                  >
+                    <span style={{ fontSize: '20px' }}>➕</span>
+                    <span>Add New Item</span>
+                  </button>
+                )}
                 <button
                   style={{
                     background: 'linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)',
@@ -430,28 +433,57 @@ export function MobileHeader({
                   <span style={{ fontSize: '20px' }}>📄</span>
                   <span>Generate Report</span>
                 </button>
-                <button
-                  style={{
-                    background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
-                    color: 'white',
-                    border: 'none',
-                    padding: '16px 20px',
-                    borderRadius: '12px',
-                    fontSize: '15px',
-                    fontWeight: '600',
-                    cursor: 'pointer',
-                    textAlign: 'left',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '12px',
-                    boxShadow: '0 4px 12px rgba(245, 158, 11, 0.3)',
-                    transition: 'transform 0.2s ease'
-                  }}
-                  onClick={() => handleNavigation('/upload', 'Upload')}
-                >
-                  <span style={{ fontSize: '20px' }}>📤</span>
-                  <span>Bulk Upload</span>
-                </button>
+                {/* Bulk Upload - Only for property owners */}
+                {user.role === 'property_owner' && (
+                  <button
+                    style={{
+                      background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+                      color: 'white',
+                      border: 'none',
+                      padding: '16px 20px',
+                      borderRadius: '12px',
+                      fontSize: '15px',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      textAlign: 'left',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '12px',
+                      boxShadow: '0 4px 12px rgba(245, 158, 11, 0.3)',
+                      transition: 'transform 0.2s ease'
+                    }}
+                    onClick={() => handleNavigation('/upload', 'Upload')}
+                  >
+                    <span style={{ fontSize: '20px' }}>📤</span>
+                    <span>Bulk Upload</span>
+                  </button>
+                )}
+                
+                {/* Case Details - For law enforcement */}
+                {user.role === 'law_enforcement' && (
+                  <button
+                    style={{
+                      background: 'linear-gradient(135deg, #14b8a6 0%, #0d9488 100%)',
+                      color: 'white',
+                      border: 'none',
+                      padding: '16px 20px',
+                      borderRadius: '12px',
+                      fontSize: '15px',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      textAlign: 'left',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '12px',
+                      boxShadow: '0 4px 12px rgba(20, 184, 166, 0.3)',
+                      transition: 'transform 0.2s ease'
+                    }}
+                    onClick={() => handleNavigation('/case-details', 'Case Details')}
+                  >
+                    <span style={{ fontSize: '20px' }}>🏛️</span>
+                    <span>Case Details</span>
+                  </button>
+                )}
                 {user.role === 'property_owner' && (
                   <button
                     style={{

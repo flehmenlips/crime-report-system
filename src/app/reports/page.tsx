@@ -10,6 +10,7 @@ export default function ReportsPage() {
   const [authLoading, setAuthLoading] = useState(true)
   const [authenticated, setAuthenticated] = useState(false)
   const [items, setItems] = useState<StolenItem[]>([])
+  const [evidenceCache, setEvidenceCache] = useState<Record<string, any[]>>({})
   const [isMobile, setIsMobile] = useState(false)
   const [generating, setGenerating] = useState(false)
   const [reportOptions, setReportOptions] = useState({
@@ -54,16 +55,32 @@ export default function ReportsPage() {
     checkAuth()
   }, [router])
 
-  // Load items data (only after authentication)
+  // Load items data and evidence cache (only after authentication)
   useEffect(() => {
     if (!authenticated) return
 
     const loadData = async () => {
       try {
-        const response = await fetch('/api/items')
-        if (response.ok) {
-          const data = await response.json()
-          setItems(data.items || [])
+        // Load items
+        const itemsResponse = await fetch('/api/items')
+        if (itemsResponse.ok) {
+          const itemsData = await itemsResponse.json()
+          setItems(itemsData.items || [])
+          
+          // Load evidence for each item
+          const cache: Record<string, any[]> = {}
+          for (const item of itemsData.items) {
+            try {
+              const evidenceResponse = await fetch(`/api/evidence?itemId=${item.id}`)
+              if (evidenceResponse.ok) {
+                const evidenceData = await evidenceResponse.json()
+                cache[item.id] = evidenceData.evidence || []
+              }
+            } catch (err) {
+              console.error(`Failed to load evidence for item ${item.id}:`, err)
+            }
+          }
+          setEvidenceCache(cache)
         }
       } catch (err) {
         console.error('Failed to load items:', err)
@@ -84,10 +101,9 @@ export default function ReportsPage() {
   }
 
   const totalValue = items.reduce((sum, item) => sum + item.estimatedValue, 0)
-  const totalEvidence = items.reduce((sum, item) => {
-    if (!item.evidence) return sum
-    return sum + item.evidence.length
-  }, 0)
+  const totalEvidence = Object.values(evidenceCache).reduce((sum, evidenceList) => 
+    sum + (evidenceList?.length || 0), 0
+  )
 
   if (authLoading || loading) {
     return (
