@@ -8,6 +8,13 @@ interface AnalyticsDashboardProps {
   items: StolenItem[]
   onClose: () => void
   user?: any
+  evidenceCache?: Record<string, any[]> // Evidence cache for accurate stats
+  snapshotData?: {
+    totalEvidenceFiles: number
+    photosCount: number
+    videosCount: number
+    documentsCount: number
+  } | null // Snapshot data for instant display
 }
 
 interface AnalyticsData {
@@ -30,7 +37,7 @@ interface AnalyticsData {
   }>
 }
 
-export function AnalyticsDashboard({ items, onClose, user }: AnalyticsDashboardProps) {
+export function AnalyticsDashboard({ items, onClose, user, evidenceCache, snapshotData }: AnalyticsDashboardProps) {
   const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null)
   const [activeTab, setActiveTab] = useState<'overview' | 'trends' | 'categories' | 'evidence'>('overview')
   
@@ -70,32 +77,32 @@ export function AnalyticsDashboard({ items, onClose, user }: AnalyticsDashboardP
       monthlyTrend[month].value += item.estimatedValue
     })
 
-    // Evidence statistics
-    const evidenceStats = {
+    // Evidence statistics - use snapshot data if available, otherwise calculate from cache
+    const evidenceStats = snapshotData ? {
+      totalEvidence: snapshotData.totalEvidenceFiles,
+      photosCount: snapshotData.photosCount,
+      videosCount: snapshotData.videosCount,
+      documentsCount: snapshotData.documentsCount
+    } : {
       totalEvidence: 0,
       photosCount: 0,
       videosCount: 0,
       documentsCount: 0
     }
 
-    items.forEach(item => {
-      if (item.evidence) {
-        evidenceStats.totalEvidence += item.evidence.length
-        item.evidence.forEach(evidence => {
-          switch (evidence.type) {
-            case 'photo':
-              evidenceStats.photosCount++
-              break
-            case 'video':
-              evidenceStats.videosCount++
-              break
-            case 'document':
-              evidenceStats.documentsCount++
-              break
-          }
-        })
-      }
-    })
+    // If no snapshot, calculate from evidenceCache
+    if (!snapshotData && evidenceCache) {
+      Object.values(evidenceCache).forEach((evidenceList: any[]) => {
+        if (Array.isArray(evidenceList)) {
+          evidenceStats.totalEvidence += evidenceList.length
+          evidenceList.forEach((e: any) => {
+            if (e.type === 'photo') evidenceStats.photosCount++
+            else if (e.type === 'video') evidenceStats.videosCount++
+            else if (e.type === 'document') evidenceStats.documentsCount++
+          })
+        }
+      })
+    }
 
     // Top items by value
     const topItems = [...items]

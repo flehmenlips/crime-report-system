@@ -1567,6 +1567,9 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
           <AnalyticsDashboard
             items={isFiltered ? filteredItems : items}
             onClose={() => setShowAnalytics(false)}
+            user={user}
+            evidenceCache={evidenceCache}
+            snapshotData={snapshotData}
           />
         )}
 
