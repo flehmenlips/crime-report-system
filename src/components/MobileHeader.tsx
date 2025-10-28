@@ -459,31 +459,6 @@ export function MobileHeader({
                   </button>
                 )}
                 
-                {/* Case Details - For law enforcement */}
-                {user.role === 'law_enforcement' && (
-                  <button
-                    style={{
-                      background: 'linear-gradient(135deg, #14b8a6 0%, #0d9488 100%)',
-                      color: 'white',
-                      border: 'none',
-                      padding: '16px 20px',
-                      borderRadius: '12px',
-                      fontSize: '15px',
-                      fontWeight: '600',
-                      cursor: 'pointer',
-                      textAlign: 'left',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '12px',
-                      boxShadow: '0 4px 12px rgba(20, 184, 166, 0.3)',
-                      transition: 'transform 0.2s ease'
-                    }}
-                    onClick={() => handleNavigation('/case-details', 'Case Details')}
-                  >
-                    <span style={{ fontSize: '20px' }}>🏛️</span>
-                    <span>Case Details</span>
-                  </button>
-                )}
                 {user.role === 'property_owner' && (
                   <button
                     style={{

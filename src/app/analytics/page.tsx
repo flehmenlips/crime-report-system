@@ -10,6 +10,7 @@ export default function AnalyticsPage() {
   const [authLoading, setAuthLoading] = useState(true)
   const [authenticated, setAuthenticated] = useState(false)
   const [items, setItems] = useState<StolenItem[]>([])
+  const [evidenceCache, setEvidenceCache] = useState<Record<string, any[]>>({})
   const [isMobile, setIsMobile] = useState(false)
   const [activeTab, setActiveTab] = useState<'overview' | 'trends' | 'categories' | 'evidence'>('overview')
   const [analyticsData, setAnalyticsData] = useState<any>(null)
@@ -51,10 +52,26 @@ export default function AnalyticsPage() {
 
     const loadData = async () => {
       try {
-        const response = await fetch('/api/items')
-        if (response.ok) {
-          const data = await response.json()
-          setItems(data.items || [])
+        // Load items
+        const itemsResponse = await fetch('/api/items')
+        if (itemsResponse.ok) {
+          const itemsData = await itemsResponse.json()
+          setItems(itemsData.items || [])
+          
+          // Load evidence for each item
+          const cache: Record<string, any[]> = {}
+          for (const item of itemsData.items) {
+            try {
+              const evidenceResponse = await fetch(`/api/evidence?itemId=${item.id}`)
+              if (evidenceResponse.ok) {
+                const evidenceData = await evidenceResponse.json()
+                cache[item.id] = evidenceData.evidence || []
+              }
+            } catch (err) {
+              console.error(`Failed to load evidence for item ${item.id}:`, err)
+            }
+          }
+          setEvidenceCache(cache)
         }
       } catch (err) {
         console.error('Failed to load items:', err)
@@ -87,7 +104,7 @@ export default function AnalyticsPage() {
       categories[category].value += item.estimatedValue
     })
 
-    // Evidence statistics
+    // Evidence statistics - calculate from evidence cache
     const evidenceStats = {
       totalEvidence: 0,
       photosCount: 0,
@@ -95,21 +112,13 @@ export default function AnalyticsPage() {
       documentsCount: 0
     }
 
-    items.forEach(item => {
-      if (item.evidence) {
-        evidenceStats.totalEvidence += item.evidence.length
-        item.evidence.forEach((evidence: any) => {
-          switch (evidence.type) {
-            case 'photo':
-              evidenceStats.photosCount++
-              break
-            case 'video':
-              evidenceStats.videosCount++
-              break
-            case 'document':
-              evidenceStats.documentsCount++
-              break
-          }
+    Object.values(evidenceCache).forEach((evidenceList: any[]) => {
+      if (Array.isArray(evidenceList)) {
+        evidenceStats.totalEvidence += evidenceList.length
+        evidenceList.forEach((e: any) => {
+          if (e.type === 'photo') evidenceStats.photosCount++
+          else if (e.type === 'video') evidenceStats.videosCount++
+          else if (e.type === 'document') evidenceStats.documentsCount++
         })
       }
     })
@@ -127,7 +136,7 @@ export default function AnalyticsPage() {
       evidenceStats,
       topItems
     })
-  }, [items])
+  }, [items, evidenceCache])
 
   if (authLoading || loading) {
     return (
