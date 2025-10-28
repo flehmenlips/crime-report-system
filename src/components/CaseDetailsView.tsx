@@ -54,7 +54,17 @@ export function CaseDetailsView({ user, caseId, onClose, onEdit, onManagePermiss
     } else {
       loadFirstCase()
     }
-  }, [caseId, user.tenant?.id])
+    
+    // Set timeout to prevent infinite spinner
+    const timeout = setTimeout(() => {
+      if (loading) {
+        console.warn('⚠️ Case Details loading timeout - closing modal')
+        onClose()
+      }
+    }, 10000) // 10 second timeout
+    
+    return () => clearTimeout(timeout)
+  }, [caseId, user.tenant?.id, loading, onClose])
 
   const loadFirstCase = async () => {
     try {
