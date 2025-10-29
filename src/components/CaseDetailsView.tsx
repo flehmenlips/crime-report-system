@@ -60,8 +60,16 @@ export function CaseDetailsView({ user, caseId, onClose, onEdit, onManagePermiss
   )
 
   const loadingTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const lastLoadedCaseIdRef = useRef<string | null | undefined>(null)
+  const isLoadingRef = useRef(false)
 
   const loadFirstCase = useCallback(async () => {
+    if (isLoadingRef.current) {
+      console.log('⏭️ Already loading, skipping duplicate call')
+      return
+    }
+    
+    isLoadingRef.current = true
     try {
       setError(null)
       
@@ -103,15 +111,18 @@ export function CaseDetailsView({ user, caseId, onClose, onEdit, onManagePermiss
       if (data.caseDetails && data.caseDetails.length > 0) {
         console.log('✅ Setting case details:', data.caseDetails[0].caseName)
         setCaseDetails(data.caseDetails[0])
+        lastLoadedCaseIdRef.current = data.caseDetails[0].id
       } else {
         console.warn('⚠️ No case details found in response - showing error state')
         setError('No case details found. Property owner should create a case report first.')
+        lastLoadedCaseIdRef.current = null
       }
     } catch (err) {
       console.error('❌ Error loading case details:', err)
       const errorMessage = err instanceof Error ? err.message : 'Failed to load case details'
       console.error('Error details:', { errorMessage, error: err })
       setError(errorMessage)
+      lastLoadedCaseIdRef.current = null
     } finally {
       // Clear timeout since we're done loading
       if (loadingTimeoutRef.current) {
@@ -120,10 +131,17 @@ export function CaseDetailsView({ user, caseId, onClose, onEdit, onManagePermiss
       }
       console.log('✅ Loading complete, setting loading to false')
       setLoading(false)
+      isLoadingRef.current = false
     }
   }, [user.tenant?.id, user.id])
 
   const loadCaseDetails = useCallback(async () => {
+    if (isLoadingRef.current && lastLoadedCaseIdRef.current === caseId) {
+      console.log('⏭️ Already loading this case, skipping duplicate call')
+      return
+    }
+    
+    isLoadingRef.current = true
     try {
       setError(null)
       
@@ -146,13 +164,16 @@ export function CaseDetailsView({ user, caseId, onClose, onEdit, onManagePermiss
       if (foundCase) {
         console.log('✅ Found case:', foundCase.caseName)
         setCaseDetails(foundCase)
+        lastLoadedCaseIdRef.current = caseId
       } else {
         console.warn('⚠️ Case not found:', caseId)
         setError('Case not found or you do not have permission to view it')
+        lastLoadedCaseIdRef.current = null
       }
     } catch (err) {
       console.error('❌ Error loading case details:', err)
       setError(err instanceof Error ? err.message : 'Failed to load case details')
+      lastLoadedCaseIdRef.current = null
     } finally {
       // Clear timeout since we're done loading
       if (loadingTimeoutRef.current) {
@@ -160,6 +181,7 @@ export function CaseDetailsView({ user, caseId, onClose, onEdit, onManagePermiss
         loadingTimeoutRef.current = null
       }
       setLoading(false)
+      isLoadingRef.current = false
     }
   }, [caseId, user.tenant?.id, user.id])
 
@@ -169,12 +191,26 @@ export function CaseDetailsView({ user, caseId, onClose, onEdit, onManagePermiss
       caseId, 
       tenantId: user.tenant?.id, 
       userId: user.id,
-      userRole: user.role 
+      userRole: user.role,
+      hasTenant: !!user.tenant,
+      hasUser: !!user,
+      lastLoadedCaseId: lastLoadedCaseIdRef.current,
+      isLoading: isLoadingRef.current
     })
     
-    setLoading(true)
-    setError(null)
-    setCaseDetails(null)
+    // Guard: Don't reset if we already have case details for this caseId (unless tenant/user changed)
+    const alreadyLoaded = lastLoadedCaseIdRef.current === caseId && !isLoadingRef.current
+    
+    if (!alreadyLoaded) {
+      console.log('🔄 Resetting component state')
+      setLoading(true)
+      setError(null)
+      setCaseDetails(null)
+      lastLoadedCaseIdRef.current = null
+    } else {
+      console.log('⏭️ Skipping reset - case details already loaded for this caseId')
+      return // Don't make API call if we already have the data
+    }
     
     // Clear any existing timeout
     if (loadingTimeoutRef.current) {
@@ -184,16 +220,32 @@ export function CaseDetailsView({ user, caseId, onClose, onEdit, onManagePermiss
 
     // Validate required data before making API call
     if (!user.tenant?.id) {
-      console.error('❌ CaseDetailsView: Missing tenantId', { user })
+      console.error('❌ CaseDetailsView: Missing tenantId', { 
+        user: {
+          id: user.id,
+          name: user.name,
+          role: user.role,
+          hasTenant: !!user.tenant,
+          tenantId: user.tenant?.id
+        }
+      })
       setError('Property tenant information is missing. Please refresh the page.')
       setLoading(false)
+      isLoadingRef.current = false
       return
     }
 
     if (!user.id) {
-      console.error('❌ CaseDetailsView: Missing userId', { user })
+      console.error('❌ CaseDetailsView: Missing userId', { 
+        user: {
+          id: user.id,
+          name: user.name,
+          role: user.role
+        }
+      })
       setError('User information is missing. Please refresh the page.')
       setLoading(false)
+      isLoadingRef.current = false
       return
     }
 
@@ -213,6 +265,7 @@ export function CaseDetailsView({ user, caseId, onClose, onEdit, onManagePermiss
         if (currentLoading) {
           console.error('⚠️ Case Details loading timeout after 10 seconds - API call may have failed silently')
           setError('Loading timeout. The request took too long. Please check your connection and try again.')
+          isLoadingRef.current = false
           return false
         }
         return currentLoading
@@ -225,7 +278,7 @@ export function CaseDetailsView({ user, caseId, onClose, onEdit, onManagePermiss
         loadingTimeoutRef.current = null
       }
     }
-  }, [caseId, user.tenant?.id, loadCaseDetails, loadFirstCase]) // Include functions in dependencies
+  }, [caseId, user.tenant?.id, user.id, loadCaseDetails, loadFirstCase]) // Removed caseDetails from deps to prevent loops
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
