@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { User } from '@/types'
 import { CasePermissions } from './CasePermissions'
 
@@ -48,71 +48,123 @@ export function CaseDetailsView({ user, caseId, onClose, onEdit, onManagePermiss
     user.role === 'super_admin'
   )
 
+  const loadingTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+
+  const loadFirstCase = useCallback(async () => {
+    try {
+      setError(null)
+      
+      console.log('🔍 Loading first case details:', { tenantId: user.tenant?.id, userId: user.id })
+      
+      const response = await fetch(`/api/case-details?tenantId=${user.tenant?.id}&userId=${user.id}`)
+      
+      if (!response.ok) {
+        throw new Error(`Failed to load case details: ${response.status} ${response.statusText}`)
+      }
+
+      const data = await response.json()
+      console.log('📦 Received case details response:', { 
+        caseCount: data.caseDetails?.length || 0,
+        hasData: !!data.caseDetails 
+      })
+      
+      if (data.caseDetails && data.caseDetails.length > 0) {
+        console.log('✅ Setting case details:', data.caseDetails[0].caseName)
+        setCaseDetails(data.caseDetails[0])
+      } else {
+        console.warn('⚠️ No case details found in response')
+        setError('No case details found. Property owner should create a case report first.')
+      }
+    } catch (err) {
+      console.error('❌ Error loading case details:', err)
+      setError(err instanceof Error ? err.message : 'Failed to load case details')
+    } finally {
+      // Clear timeout since we're done loading
+      if (loadingTimeoutRef.current) {
+        clearTimeout(loadingTimeoutRef.current)
+        loadingTimeoutRef.current = null
+      }
+      setLoading(false)
+    }
+  }, [user.tenant?.id, user.id])
+
+  const loadCaseDetails = useCallback(async () => {
+    try {
+      setError(null)
+      
+      console.log('🔍 Loading specific case details:', { caseId, tenantId: user.tenant?.id, userId: user.id })
+      
+      const response = await fetch(`/api/case-details?tenantId=${user.tenant?.id}&userId=${user.id}`)
+      
+      if (!response.ok) {
+        throw new Error(`Failed to load case details: ${response.status} ${response.statusText}`)
+      }
+
+      const data = await response.json()
+      console.log('📦 Received case details response:', { 
+        caseCount: data.caseDetails?.length || 0,
+        searchingFor: caseId
+      })
+      
+      const foundCase = data.caseDetails.find((c: CaseDetailsData) => c.id === caseId)
+      
+      if (foundCase) {
+        console.log('✅ Found case:', foundCase.caseName)
+        setCaseDetails(foundCase)
+      } else {
+        console.warn('⚠️ Case not found:', caseId)
+        setError('Case not found or you do not have permission to view it')
+      }
+    } catch (err) {
+      console.error('❌ Error loading case details:', err)
+      setError(err instanceof Error ? err.message : 'Failed to load case details')
+    } finally {
+      // Clear timeout since we're done loading
+      if (loadingTimeoutRef.current) {
+        clearTimeout(loadingTimeoutRef.current)
+        loadingTimeoutRef.current = null
+      }
+      setLoading(false)
+    }
+  }, [caseId, user.tenant?.id, user.id])
+
   useEffect(() => {
+    // Reset states when component mounts or caseId/tenant changes
+    setLoading(true)
+    setError(null)
+    setCaseDetails(null)
+    
+    // Clear any existing timeout
+    if (loadingTimeoutRef.current) {
+      clearTimeout(loadingTimeoutRef.current)
+    }
+
+    // Load case details
     if (caseId) {
       loadCaseDetails()
     } else {
       loadFirstCase()
     }
     
-    // Set timeout to prevent infinite spinner
-    const timeout = setTimeout(() => {
-      if (loading) {
-        console.warn('⚠️ Case Details loading timeout - closing modal')
-        onClose()
-      }
+    // Set timeout to prevent infinite spinner (only if still loading after 10s)
+    loadingTimeoutRef.current = setTimeout(() => {
+      // Check loading state via a closure-safe check
+      setLoading((currentLoading) => {
+        if (currentLoading) {
+          console.warn('⚠️ Case Details loading timeout - data may be missing')
+          setError('Loading timeout. Please try again or contact support if the problem persists.')
+        }
+        return false
+      })
     }, 10000) // 10 second timeout
     
-    return () => clearTimeout(timeout)
-  }, [caseId, user.tenant?.id, loading, onClose])
-
-  const loadFirstCase = async () => {
-    try {
-      setLoading(true)
-      const response = await fetch(`/api/case-details?tenantId=${user.tenant?.id}&userId=${user.id}`)
-      
-      if (!response.ok) {
-        throw new Error('Failed to load case details')
+    return () => {
+      if (loadingTimeoutRef.current) {
+        clearTimeout(loadingTimeoutRef.current)
+        loadingTimeoutRef.current = null
       }
-
-      const data = await response.json()
-      if (data.caseDetails && data.caseDetails.length > 0) {
-        setCaseDetails(data.caseDetails[0])
-      } else {
-        setError('No case details found. Property owner should create a case report first.')
-      }
-    } catch (err) {
-      console.error('Error loading case details:', err)
-      setError(err instanceof Error ? err.message : 'Failed to load case details')
-    } finally {
-      setLoading(false)
     }
-  }
-
-  const loadCaseDetails = async () => {
-    try {
-      setLoading(true)
-      const response = await fetch(`/api/case-details?tenantId=${user.tenant?.id}&userId=${user.id}`)
-      
-      if (!response.ok) {
-        throw new Error('Failed to load case details')
-      }
-
-      const data = await response.json()
-      const foundCase = data.caseDetails.find((c: CaseDetailsData) => c.id === caseId)
-      
-      if (foundCase) {
-        setCaseDetails(foundCase)
-      } else {
-        setError('Case not found or you do not have permission to view it')
-      }
-    } catch (err) {
-      console.error('Error loading case details:', err)
-      setError(err instanceof Error ? err.message : 'Failed to load case details')
-    } finally {
-      setLoading(false)
-    }
-  }
+  }, [caseId, user.tenant?.id, loadCaseDetails, loadFirstCase]) // Include functions in dependencies
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -151,6 +203,7 @@ export function CaseDetailsView({ user, caseId, onClose, onEdit, onManagePermiss
     }
   }
 
+  // Show loading state
   if (loading) {
     return (
       <div
@@ -177,6 +230,12 @@ export function CaseDetailsView({ user, caseId, onClose, onEdit, onManagePermiss
           }}
           onClick={(e) => e.stopPropagation()}
         >
+          <style jsx>{`
+            @keyframes spin {
+              0% { transform: rotate(0deg); }
+              100% { transform: rotate(360deg); }
+            }
+          `}</style>
           <div style={{
             width: '48px',
             height: '48px',
@@ -194,6 +253,7 @@ export function CaseDetailsView({ user, caseId, onClose, onEdit, onManagePermiss
     )
   }
 
+  // Only show error state after loading completes - prevents flashing
   if (error || !caseDetails) {
     return (
       <div
