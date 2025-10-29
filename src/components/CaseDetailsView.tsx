@@ -54,36 +54,60 @@ export function CaseDetailsView({ user, caseId, onClose, onEdit, onManagePermiss
     try {
       setError(null)
       
-      console.log('🔍 Loading first case details:', { tenantId: user.tenant?.id, userId: user.id })
+      const tenantId = user.tenant?.id
+      const userId = user.id
       
-      const response = await fetch(`/api/case-details?tenantId=${user.tenant?.id}&userId=${user.id}`)
+      console.log('🔍 Loading first case details:', { tenantId, userId })
+      
+      if (!tenantId) {
+        throw new Error('Tenant ID is required but missing')
+      }
+      
+      if (!userId) {
+        throw new Error('User ID is required but missing')
+      }
+      
+      const apiUrl = `/api/case-details?tenantId=${tenantId}&userId=${userId}`
+      console.log('📡 Fetching from:', apiUrl)
+      
+      const fetchStartTime = Date.now()
+      const response = await fetch(apiUrl)
+      const fetchDuration = Date.now() - fetchStartTime
+      
+      console.log(`⏱️ API call completed in ${fetchDuration}ms, status: ${response.status}`)
       
       if (!response.ok) {
+        const errorText = await response.text()
+        console.error('❌ API error response:', { status: response.status, statusText: response.statusText, body: errorText })
         throw new Error(`Failed to load case details: ${response.status} ${response.statusText}`)
       }
 
       const data = await response.json()
       console.log('📦 Received case details response:', { 
         caseCount: data.caseDetails?.length || 0,
-        hasData: !!data.caseDetails 
+        hasData: !!data.caseDetails,
+        responseData: data
       })
       
       if (data.caseDetails && data.caseDetails.length > 0) {
         console.log('✅ Setting case details:', data.caseDetails[0].caseName)
         setCaseDetails(data.caseDetails[0])
       } else {
-        console.warn('⚠️ No case details found in response')
+        console.warn('⚠️ No case details found in response - showing error state')
         setError('No case details found. Property owner should create a case report first.')
       }
     } catch (err) {
       console.error('❌ Error loading case details:', err)
-      setError(err instanceof Error ? err.message : 'Failed to load case details')
+      const errorMessage = err instanceof Error ? err.message : 'Failed to load case details'
+      console.error('Error details:', { errorMessage, error: err })
+      setError(errorMessage)
     } finally {
       // Clear timeout since we're done loading
       if (loadingTimeoutRef.current) {
         clearTimeout(loadingTimeoutRef.current)
         loadingTimeoutRef.current = null
       }
+      console.log('✅ Loading complete, setting loading to false')
       setLoading(false)
     }
   }, [user.tenant?.id, user.id])
@@ -130,6 +154,13 @@ export function CaseDetailsView({ user, caseId, onClose, onEdit, onManagePermiss
 
   useEffect(() => {
     // Reset states when component mounts or caseId/tenant changes
+    console.log('🚀 CaseDetailsView useEffect triggered:', { 
+      caseId, 
+      tenantId: user.tenant?.id, 
+      userId: user.id,
+      userRole: user.role 
+    })
+    
     setLoading(true)
     setError(null)
     setCaseDetails(null)
@@ -137,12 +168,30 @@ export function CaseDetailsView({ user, caseId, onClose, onEdit, onManagePermiss
     // Clear any existing timeout
     if (loadingTimeoutRef.current) {
       clearTimeout(loadingTimeoutRef.current)
+      loadingTimeoutRef.current = null
+    }
+
+    // Validate required data before making API call
+    if (!user.tenant?.id) {
+      console.error('❌ CaseDetailsView: Missing tenantId', { user })
+      setError('Property tenant information is missing. Please refresh the page.')
+      setLoading(false)
+      return
+    }
+
+    if (!user.id) {
+      console.error('❌ CaseDetailsView: Missing userId', { user })
+      setError('User information is missing. Please refresh the page.')
+      setLoading(false)
+      return
     }
 
     // Load case details
     if (caseId) {
+      console.log('📞 Calling loadCaseDetails with caseId:', caseId)
       loadCaseDetails()
     } else {
+      console.log('📞 Calling loadFirstCase (no caseId provided)')
       loadFirstCase()
     }
     
@@ -151,10 +200,11 @@ export function CaseDetailsView({ user, caseId, onClose, onEdit, onManagePermiss
       // Check loading state via a closure-safe check
       setLoading((currentLoading) => {
         if (currentLoading) {
-          console.warn('⚠️ Case Details loading timeout - data may be missing')
-          setError('Loading timeout. Please try again or contact support if the problem persists.')
+          console.error('⚠️ Case Details loading timeout after 10 seconds - API call may have failed silently')
+          setError('Loading timeout. The request took too long. Please check your connection and try again.')
+          return false
         }
-        return false
+        return currentLoading
       })
     }, 10000) // 10 second timeout
     
