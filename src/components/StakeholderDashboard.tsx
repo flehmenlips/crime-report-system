@@ -85,29 +85,18 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
   const [uploadEvidenceItem, setUploadEvidenceItem] = useState<StolenItem | null>(null)
   const [showInvestigationNotes, setShowInvestigationNotes] = useState(false)
   const [investigationNotesItem, setInvestigationNotesItem] = useState<StolenItem | null>(null)
-  // Initialize showCaseDetails from URL parameter immediately (before useState)
-  const getInitialShowCaseDetails = () => {
-    if (typeof window === 'undefined') return false
-    const searchParams = new URLSearchParams(window.location.search)
-    const shouldOpen = searchParams.get('openCaseDetails') === 'true'
-    console.log('🔴🔴🔴 Initial showCaseDetails check:', {
-      url: window.location.href,
-      searchParams: window.location.search,
-      openCaseDetails: searchParams.get('openCaseDetails'),
-      shouldOpen
-    })
-    return shouldOpen
-  }
-  
-  const initialShowCaseDetails = getInitialShowCaseDetails()
-  console.log('🔴🔴🔴 About to set useState with initial value:', initialShowCaseDetails)
-  const [showCaseDetails, setShowCaseDetails] = useState(initialShowCaseDetails)
-  console.log('🔴🔴🔴 useState completed, showCaseDetails is now:', showCaseDetails)
+  // Initialize showCaseDetails state - always start as false, then check URL in useEffect
+  const [showCaseDetails, setShowCaseDetails] = useState(false)
   
   // Check for URL parameter to open Case Details modal (for mobile navigation)
-  // Using window.location.search instead of useSearchParams to avoid Suspense requirement
+  // This MUST run in useEffect to avoid SSR/hydration issues
   useEffect(() => {
-    console.log('🔴🔴🔴 useEffect for URL parameter check running')
+    console.log('🔴🔴🔴 useEffect for URL parameter check running (client-side only)')
+    if (typeof window === 'undefined') {
+      console.log('🔴🔴🔴 Skipping - window not available (SSR)')
+      return
+    }
+    
     const searchParams = new URLSearchParams(window.location.search)
     const shouldOpen = searchParams.get('openCaseDetails') === 'true'
     console.log('🔴🔴🔴 URL Parameter Check (in useEffect):', {
@@ -118,19 +107,17 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
       currentShowCaseDetails: showCaseDetails
     })
     
-    if (shouldOpen && !showCaseDetails) {
-      console.log('🔴🔴🔴 SETTING showCaseDetails TO TRUE in useEffect')
-      setShowCaseDetails(true)
-    }
-    
-    // Clean up URL parameter after checking (but don't rely on it for state)
     if (shouldOpen) {
+      console.log('🔴🔴🔴 SETTING showCaseDetails TO TRUE from URL parameter')
+      setShowCaseDetails(true)
+      
+      // Clean up URL parameter after setting state
       const url = new URL(window.location.href)
       url.searchParams.delete('openCaseDetails')
       window.history.replaceState({}, '', url.toString())
       console.log('🔴🔴🔴 URL cleaned, new URL:', window.location.href)
     }
-  }, [showCaseDetails]) // Re-run if showCaseDetails changes
+  }, []) // Empty dependency array - only run once on mount
   
   // Log when showCaseDetails changes
   useEffect(() => {
