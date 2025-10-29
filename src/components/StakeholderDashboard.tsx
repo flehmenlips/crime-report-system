@@ -1605,10 +1605,21 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
 
         {/* Case Details Modal */}
         {showCaseDetails && (
-          <CaseDetailsView
-            user={user}
-            onClose={() => setShowCaseDetails(false)}
-          />
+          <>
+            {console.log('🔴 StakeholderDashboard: Rendering CaseDetailsView modal', { 
+              showCaseDetails, 
+              userId: user?.id, 
+              tenantId: user?.tenant?.id,
+              userRole: user?.role 
+            })}
+            <CaseDetailsView
+              user={user}
+              onClose={() => {
+                console.log('🔴 Closing Case Details modal')
+                setShowCaseDetails(false)
+              }}
+            />
+          </>
         )}
       </div>
       </div>

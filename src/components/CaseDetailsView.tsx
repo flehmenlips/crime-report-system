@@ -35,11 +35,22 @@ interface CaseDetailsData {
 }
 
 export function CaseDetailsView({ user, caseId, onClose, onEdit, onManagePermissions }: CaseDetailsViewProps) {
+  console.log('🔴 CaseDetailsView COMPONENT RENDERED', { 
+    caseId, 
+    userId: user?.id, 
+    tenantId: user?.tenant?.id,
+    userRole: user?.role,
+    hasUser: !!user,
+    hasTenant: !!user?.tenant
+  })
+  
   const [caseDetails, setCaseDetails] = useState<CaseDetailsData | null>(null)
   const [activeTab, setActiveTab] = useState<'overview' | 'timeline' | 'suspects' | 'evidence' | 'updates'>('overview')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [showPermissions, setShowPermissions] = useState(false)
+  
+  console.log('🔴 CaseDetailsView state initialized', { loading, error, hasCaseDetails: !!caseDetails })
 
   // Check if user can edit this case
   const canEdit = caseDetails && (
