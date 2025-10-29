@@ -479,8 +479,8 @@ export function MobileHeader({
                       transition: 'transform 0.2s ease'
                     }}
                     onClick={() => {
-                      // Navigate back to dashboard where Case Details modal is available
-                      handleNavigation('/', 'Dashboard')
+                      // Navigate to dashboard with query param to open Case Details modal
+                      handleNavigation('/?openCaseDetails=true', 'Case Details')
                     }}
                   >
                     <span style={{ fontSize: '20px' }}>🏛️</span>

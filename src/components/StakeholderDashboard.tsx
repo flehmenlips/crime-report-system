@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { StolenItem, User, Role } from '@/types'
 import { formatCurrency, formatDate } from '@/lib/data'
 import { ItemDetailView } from './ItemDetailView'
@@ -44,6 +45,7 @@ interface StakeholderDashboardProps {
 
 export function StakeholderDashboard({ user, items, onItemsUpdate, loading = false, error = null, onRefresh, evidenceCache, evidenceLoaded, isMobile = false, snapshotData, evidenceLoading = false }: StakeholderDashboardProps) {
   const [scrollY, setScrollY] = useState(0)
+  const searchParams = useSearchParams()
   
   // Add scroll listener for dynamic text color
   useEffect(() => {
@@ -77,6 +79,17 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
   const [showInvestigationNotes, setShowInvestigationNotes] = useState(false)
   const [investigationNotesItem, setInvestigationNotesItem] = useState<StolenItem | null>(null)
   const [showCaseDetails, setShowCaseDetails] = useState(false)
+  
+  // Check for URL parameter to open Case Details modal (for mobile navigation)
+  useEffect(() => {
+    if (searchParams.get('openCaseDetails') === 'true') {
+      setShowCaseDetails(true)
+      // Clean up URL parameter without page reload
+      const url = new URL(window.location.href)
+      url.searchParams.delete('openCaseDetails')
+      window.history.replaceState({}, '', url.toString())
+    }
+  }, [searchParams])
   const [filteredItems, setFilteredItems] = useState<StolenItem[]>([])
   const [isFiltered, setIsFiltered] = useState(false)
   const [searchFilters, setSearchFilters] = useState<any>(null)
