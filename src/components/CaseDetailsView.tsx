@@ -35,6 +35,14 @@ interface CaseDetailsData {
 }
 
 export function CaseDetailsView({ user, caseId, onClose, onEdit, onManagePermissions }: CaseDetailsViewProps) {
+  console.log('[CaseDetailsView] Component rendered/mounted', {
+    caseId,
+    userId: user?.id,
+    tenantId: user?.tenant?.id,
+    userName: user?.name,
+    role: user?.role
+  })
+  
   const [caseDetails, setCaseDetails] = useState<CaseDetailsData | null>(null)
   const [activeTab, setActiveTab] = useState<'overview' | 'timeline' | 'suspects' | 'evidence' | 'updates'>('overview')
   const [loading, setLoading] = useState(true)
@@ -175,6 +183,18 @@ export function CaseDetailsView({ user, caseId, onClose, onEdit, onManagePermiss
   }, [caseId, user.tenant?.id, user.id])
 
   useEffect(() => {
+    console.log('[CaseDetailsView] useEffect triggered', {
+      caseId,
+      normalizedCaseId: caseId ?? null,
+      tenantId: user.tenant?.id,
+      userId: user.id,
+      hasAttemptedLoad: hasAttemptedLoadRef.current,
+      isLoading: isLoadingRef.current,
+      lastLoadedCaseId: lastLoadedCaseIdRef.current,
+      lastLoadedTenantId: lastLoadedTenantIdRef.current,
+      lastLoadedUserId: lastLoadedUserIdRef.current
+    })
+    
     // Reset states when component mounts or caseId/tenant changes
     // Guard: Don't reset if we already have case details for this caseId AND same tenant/user
     const currentTenantId = user.tenant?.id
@@ -188,6 +208,7 @@ export function CaseDetailsView({ user, caseId, onClose, onEdit, onManagePermiss
       const errorMsg = !currentTenantId 
         ? 'Property tenant information is missing. Please refresh the page.'
         : 'User information is missing. Please refresh the page.'
+      console.error('[CaseDetailsView] Validation failed:', errorMsg, { currentTenantId, currentUserId })
       setError(errorMsg)
       setLoading(false)
       isLoadingRef.current = false
@@ -212,6 +233,7 @@ export function CaseDetailsView({ user, caseId, onClose, onEdit, onManagePermiss
     
     if (isSameRequestInFlight) {
       // Request is already in flight for these exact parameters, don't do anything
+      console.log('[CaseDetailsView] Same request already in flight, skipping')
       return
     }
     
@@ -224,6 +246,13 @@ export function CaseDetailsView({ user, caseId, onClose, onEdit, onManagePermiss
     // This ensures mobile mounts always trigger a load even if refs are stale
     const isFirstLoadAttempt = !hasAttemptedLoadRef.current
     
+    console.log('[CaseDetailsView] Loading check:', {
+      isFirstLoadAttempt,
+      caseIdMatches,
+      hasCaseDetailsInState,
+      caseDetailsInState: caseDetails !== null
+    })
+    
     // Only check if already loaded if we've attempted a load before
     // On first mount, we skip this check to ensure we always load
     if (!isFirstLoadAttempt) {
@@ -234,8 +263,18 @@ export function CaseDetailsView({ user, caseId, onClose, onEdit, onManagePermiss
         !isLoadingRef.current &&
         hasCaseDetailsInState  // Critical: ensure we actually have case details in state
       
+      console.log('[CaseDetailsView] Already loaded check:', {
+        alreadyLoaded,
+        caseIdMatches,
+        tenantMatches: lastLoadedTenantIdRef.current === currentTenantId,
+        userMatches: lastLoadedUserIdRef.current === currentUserId,
+        notLoading: !isLoadingRef.current,
+        hasCaseDetailsInState
+      })
+      
       if (alreadyLoaded) {
         // Already have the data and we've attempted a load before, no need to reload
+        console.log('[CaseDetailsView] Already loaded, skipping reload')
         return
       }
     }
@@ -282,11 +321,15 @@ export function CaseDetailsView({ user, caseId, onClose, onEdit, onManagePermiss
     }
 
     // Load case details based on whether we have a specific caseId or need first case
+    // IMPORTANT: Call the functions directly, don't rely on them being in dependencies
+    // This ensures the effect always runs when caseId/tenant/user changes
     if (normalizedCaseId) {
       console.log('[CaseDetailsView] Loading specific case:', normalizedCaseId)
+      // Call loadCaseDetails directly - it's stable via useCallback
       loadCaseDetails()
     } else {
       console.log('[CaseDetailsView] Loading first case for tenant:', currentTenantId, 'user:', currentUserId)
+      // Call loadFirstCase directly - it's stable via useCallback  
       loadFirstCase()
     }
     
@@ -306,7 +349,7 @@ export function CaseDetailsView({ user, caseId, onClose, onEdit, onManagePermiss
         loadingTimeoutRef.current = null
       }
     }
-  }, [caseId, user.tenant?.id, user.id, loadCaseDetails, loadFirstCase]) // caseId can be undefined/null, both mean "load first case"
+  }, [caseId, user.tenant?.id, user.id]) // caseId can be undefined/null, both mean "load first case"
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
