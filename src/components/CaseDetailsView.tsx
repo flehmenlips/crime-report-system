@@ -168,11 +168,14 @@ export function CaseDetailsView({ user, caseId, onClose, onEdit, onManagePermiss
     const currentTenantId = user.tenant?.id
     const currentUserId = user.id
     
-    // For "load first case" scenario (caseId is null): check if we've loaded any case
+    // Normalize caseId: treat undefined as null (both mean "load first case")
+    const normalizedCaseId = caseId ?? null
+    
+    // For "load first case" scenario (caseId is null/undefined): check if we've loaded any case
     // For specific case scenario (caseId is not null): check if we've loaded that specific case
-    const caseIdMatches = caseId === null 
+    const caseIdMatches = normalizedCaseId === null 
       ? lastLoadedCaseIdRef.current !== null  // When loading first case, any loaded case means already loaded
-      : lastLoadedCaseIdRef.current === caseId  // When loading specific case, must match exactly
+      : lastLoadedCaseIdRef.current === normalizedCaseId  // When loading specific case, must match exactly
     
     const alreadyLoaded = 
       caseIdMatches &&
@@ -181,10 +184,13 @@ export function CaseDetailsView({ user, caseId, onClose, onEdit, onManagePermiss
       !isLoadingRef.current
     
     // Check if we're already loading the same request (prevents race conditions)
-    const alreadyLoadingSameRequest = 
-      isLoadingRef.current &&
-      lastLoadedCaseIdRef.current === caseId &&
-      lastLoadedTenantIdRef.current === currentTenantId &&
+    // For "load first case" scenario (caseId is null/undefined): only prevent if we're loading AND already have a case loaded
+    // For specific case scenario: prevent if we're loading the exact same caseId
+    const alreadyLoadingSameRequest = isLoadingRef.current && (
+      normalizedCaseId === null
+        ? lastLoadedCaseIdRef.current !== null  // Only prevent if already loaded a case (not if we're loading first time)
+        : lastLoadedCaseIdRef.current === normalizedCaseId  // Prevent if loading same specific case
+    ) && lastLoadedTenantIdRef.current === currentTenantId &&
       lastLoadedUserIdRef.current === currentUserId
     
     if (alreadyLoadingSameRequest) {
@@ -192,19 +198,28 @@ export function CaseDetailsView({ user, caseId, onClose, onEdit, onManagePermiss
       return
     }
     
-    if (!alreadyLoaded) {
-      setLoading(true)
-      setError(null)
-      setCaseDetails(null)
-      // Only reset refs if NOT currently loading a request (prevents race conditions)
-      // If a request is in flight, keep the refs so guards in loadCaseDetails/loadFirstCase work correctly
-      if (!isLoadingRef.current) {
-        lastLoadedCaseIdRef.current = null
-        lastLoadedTenantIdRef.current = null
-        lastLoadedUserIdRef.current = null
-      }
-    } else {
+    // If already loaded and not loading, don't reload
+    if (alreadyLoaded) {
       return // Don't make API call if we already have the data
+    }
+    
+    // Reset states for new load
+    setLoading(true)
+    setError(null)
+    setCaseDetails(null)
+    
+    // Only reset refs if NOT currently loading a request (prevents race conditions)
+    // If a request is in flight, keep the refs so guards in loadCaseDetails/loadFirstCase work correctly
+    // But if we're starting fresh (not loading), reset the refs to clear any stale state
+    if (!isLoadingRef.current) {
+      // For "load first case" scenario, don't reset caseId ref since it's already null
+      // For specific case scenario, reset to null to indicate we're loading this case
+      if (normalizedCaseId !== null) {
+        lastLoadedCaseIdRef.current = null
+      }
+      // Always reset tenant/user refs when starting a new load if we're not currently loading
+      lastLoadedTenantIdRef.current = null
+      lastLoadedUserIdRef.current = null
     }
     
     // Clear any existing timeout
@@ -229,7 +244,7 @@ export function CaseDetailsView({ user, caseId, onClose, onEdit, onManagePermiss
     }
 
     // Load case details
-    if (caseId) {
+    if (normalizedCaseId) {
       loadCaseDetails()
     } else {
       loadFirstCase()
@@ -251,7 +266,7 @@ export function CaseDetailsView({ user, caseId, onClose, onEdit, onManagePermiss
         loadingTimeoutRef.current = null
       }
     }
-  }, [caseId, user.tenant?.id, user.id, loadCaseDetails, loadFirstCase]) // Removed caseDetails from deps to prevent loops
+  }, [caseId, user.tenant?.id, user.id, loadCaseDetails, loadFirstCase]) // caseId can be undefined/null, both mean "load first case"
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
