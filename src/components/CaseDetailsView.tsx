@@ -167,8 +167,15 @@ export function CaseDetailsView({ user, caseId, onClose, onEdit, onManagePermiss
     // Guard: Don't reset if we already have case details for this caseId AND same tenant/user
     const currentTenantId = user.tenant?.id
     const currentUserId = user.id
+    
+    // For "load first case" scenario (caseId is null): check if we've loaded any case
+    // For specific case scenario (caseId is not null): check if we've loaded that specific case
+    const caseIdMatches = caseId === null 
+      ? lastLoadedCaseIdRef.current !== null  // When loading first case, any loaded case means already loaded
+      : lastLoadedCaseIdRef.current === caseId  // When loading specific case, must match exactly
+    
     const alreadyLoaded = 
-      lastLoadedCaseIdRef.current === caseId && 
+      caseIdMatches &&
       lastLoadedTenantIdRef.current === currentTenantId &&
       lastLoadedUserIdRef.current === currentUserId &&
       !isLoadingRef.current
