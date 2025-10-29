@@ -57,9 +57,11 @@ export function CaseDetailsView({ user, caseId, onClose, onEdit, onManagePermiss
 
   const loadFirstCase = useCallback(async () => {
     if (isLoadingRef.current) {
+      console.log('[CaseDetailsView] loadFirstCase: Already loading, skipping')
       return
     }
     
+    console.log('[CaseDetailsView] loadFirstCase: Starting load')
     isLoadingRef.current = true
     try {
       setError(null)
@@ -86,12 +88,14 @@ export function CaseDetailsView({ user, caseId, onClose, onEdit, onManagePermiss
       const data = await response.json()
       
       if (data.caseDetails && data.caseDetails.length > 0) {
+        console.log('[CaseDetailsView] loadFirstCase: Successfully loaded case:', data.caseDetails[0].id)
         setCaseDetails(data.caseDetails[0])
         lastLoadedCaseIdRef.current = data.caseDetails[0].id
         lastLoadedTenantIdRef.current = tenantId
         lastLoadedUserIdRef.current = userId
         hasAttemptedLoadRef.current = true // Mark that we've successfully loaded
       } else {
+        console.log('[CaseDetailsView] loadFirstCase: No case details found')
         setError('No case details found. Property owner should create a case report first.')
         lastLoadedCaseIdRef.current = null
         lastLoadedTenantIdRef.current = null
@@ -100,6 +104,7 @@ export function CaseDetailsView({ user, caseId, onClose, onEdit, onManagePermiss
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to load case details'
+      console.error('[CaseDetailsView] loadFirstCase: Error:', errorMessage, err)
       setError(errorMessage)
       lastLoadedCaseIdRef.current = null
       lastLoadedTenantIdRef.current = null
@@ -215,22 +220,27 @@ export function CaseDetailsView({ user, caseId, onClose, onEdit, onManagePermiss
     // eslint-disable-next-line react-hooks/exhaustive-deps
     const hasCaseDetailsInState = caseDetails !== null
     
-    const alreadyLoaded = 
-      caseIdMatches &&
-      lastLoadedTenantIdRef.current === currentTenantId &&
-      lastLoadedUserIdRef.current === currentUserId &&
-      !isLoadingRef.current &&
-      hasCaseDetailsInState  // Critical: ensure we actually have case details in state
-    
     // On first mount or when switching cases, if we haven't attempted a load yet, we must load
     // This ensures mobile mounts always trigger a load even if refs are stale
     const isFirstLoadAttempt = !hasAttemptedLoadRef.current
     
-    if (alreadyLoaded && !isFirstLoadAttempt) {
-      // Already have the data and we've attempted a load before, no need to reload
-      return
+    // Only check if already loaded if we've attempted a load before
+    // On first mount, we skip this check to ensure we always load
+    if (!isFirstLoadAttempt) {
+      const alreadyLoaded = 
+        caseIdMatches &&
+        lastLoadedTenantIdRef.current === currentTenantId &&
+        lastLoadedUserIdRef.current === currentUserId &&
+        !isLoadingRef.current &&
+        hasCaseDetailsInState  // Critical: ensure we actually have case details in state
+      
+      if (alreadyLoaded) {
+        // Already have the data and we've attempted a load before, no need to reload
+        return
+      }
     }
     
+    // If we get here, we need to load (either first attempt or data changed)
     // Note: We don't set hasAttemptedLoadRef here - it will be set after load completes
     // This ensures if the effect runs multiple times rapidly, we still attempt the load
     
@@ -273,8 +283,10 @@ export function CaseDetailsView({ user, caseId, onClose, onEdit, onManagePermiss
 
     // Load case details based on whether we have a specific caseId or need first case
     if (normalizedCaseId) {
+      console.log('[CaseDetailsView] Loading specific case:', normalizedCaseId)
       loadCaseDetails()
     } else {
+      console.log('[CaseDetailsView] Loading first case for tenant:', currentTenantId, 'user:', currentUserId)
       loadFirstCase()
     }
     

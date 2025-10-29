@@ -535,14 +535,37 @@ export function MobileHeader({
                 justifyContent: 'center',
                 gap: '12px',
                 boxShadow: '0 4px 12px rgba(239, 68, 68, 0.3)',
-                transition: 'transform 0.2s ease'
+                transition: 'transform 0.2s ease',
+                position: 'relative',
+                zIndex: 10000
               }}
-              onClick={async () => {
+              onClick={async (e) => {
+                e.preventDefault()
+                e.stopPropagation()
                 try {
-                  await fetch('/api/auth/logout', { method: 'POST' })
-                  window.location.href = '/login-simple'
+                  setIsMenuOpen(false) // Close menu first
+                  const response = await fetch('/api/auth/logout', { 
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                      'Content-Type': 'application/json'
+                    }
+                  })
+                  
+                  if (!response.ok) {
+                    throw new Error(`Logout failed: ${response.status}`)
+                  }
+                  
+                  // Use router.push for better navigation, fallback to window.location
+                  try {
+                    router.push('/login-simple')
+                  } catch (routerError) {
+                    window.location.href = '/login-simple'
+                  }
                 } catch (error) {
                   console.error('Logout error:', error)
+                  // Even if API call fails, redirect to login
+                  window.location.href = '/login-simple'
                 }
               }}
             >
