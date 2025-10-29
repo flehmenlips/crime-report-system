@@ -43,6 +43,15 @@ interface StakeholderDashboardProps {
 }
 
 export function StakeholderDashboard({ user, items, onItemsUpdate, loading = false, error = null, onRefresh, evidenceCache, evidenceLoaded, isMobile = false, snapshotData, evidenceLoading = false }: StakeholderDashboardProps) {
+  // Immediate log when component renders
+  console.log('🔴🔴🔴 StakeholderDashboard COMPONENT RENDERED', {
+    hasUser: !!user,
+    userId: user?.id,
+    tenantId: user?.tenant?.id,
+    isMobile,
+    url: typeof window !== 'undefined' ? window.location.href : 'SSR'
+  })
+  
   const [scrollY, setScrollY] = useState(0)
   
   // Add scroll listener for dynamic text color
@@ -78,19 +87,47 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
   const [investigationNotesItem, setInvestigationNotesItem] = useState<StolenItem | null>(null)
   const [showCaseDetails, setShowCaseDetails] = useState(false)
   
+  // Immediate check and log
+  if (typeof window !== 'undefined') {
+    const searchParams = new URLSearchParams(window.location.search)
+    const shouldOpen = searchParams.get('openCaseDetails') === 'true'
+    console.log('🔴🔴🔴 URL Parameter Check (immediate):', {
+      url: window.location.href,
+      searchParams: window.location.search,
+      openCaseDetails: searchParams.get('openCaseDetails'),
+      shouldOpen,
+      currentShowCaseDetails: showCaseDetails
+    })
+  }
+  
   // Check for URL parameter to open Case Details modal (for mobile navigation)
   // Using window.location.search instead of useSearchParams to avoid Suspense requirement
   useEffect(() => {
+    console.log('🔴🔴🔴 useEffect for URL parameter check running')
     const searchParams = new URLSearchParams(window.location.search)
-    if (searchParams.get('openCaseDetails') === 'true') {
-      console.log('🔍 Mobile: Opening Case Details modal from URL parameter')
+    const shouldOpen = searchParams.get('openCaseDetails') === 'true'
+    console.log('🔴🔴🔴 URL Parameter Check (in useEffect):', {
+      url: window.location.href,
+      searchParams: window.location.search,
+      openCaseDetails: searchParams.get('openCaseDetails'),
+      shouldOpen
+    })
+    
+    if (shouldOpen) {
+      console.log('🔴🔴🔴 SETTING showCaseDetails TO TRUE')
       setShowCaseDetails(true)
       // Clean up URL parameter without page reload
       const url = new URL(window.location.href)
       url.searchParams.delete('openCaseDetails')
       window.history.replaceState({}, '', url.toString())
+      console.log('🔴🔴🔴 URL cleaned, new URL:', window.location.href)
     }
   }, []) // Run once on mount
+  
+  // Log when showCaseDetails changes
+  useEffect(() => {
+    console.log('🔴🔴🔴 showCaseDetails STATE CHANGED:', showCaseDetails)
+  }, [showCaseDetails])
   const [filteredItems, setFilteredItems] = useState<StolenItem[]>([])
   const [isFiltered, setIsFiltered] = useState(false)
   const [searchFilters, setSearchFilters] = useState<any>(null)
