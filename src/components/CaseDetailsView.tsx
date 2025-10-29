@@ -53,6 +53,7 @@ export function CaseDetailsView({ user, caseId, onClose, onEdit, onManagePermiss
   const lastLoadedTenantIdRef = useRef<string | null | undefined>(null)
   const lastLoadedUserIdRef = useRef<string | null | undefined>(null)
   const isLoadingRef = useRef(false)
+  const hasAttemptedLoadRef = useRef(false) // Track if we've attempted a load for this mount
 
   const loadFirstCase = useCallback(async () => {
     if (isLoadingRef.current) {
@@ -89,11 +90,13 @@ export function CaseDetailsView({ user, caseId, onClose, onEdit, onManagePermiss
         lastLoadedCaseIdRef.current = data.caseDetails[0].id
         lastLoadedTenantIdRef.current = tenantId
         lastLoadedUserIdRef.current = userId
+        hasAttemptedLoadRef.current = true // Mark that we've successfully loaded
       } else {
         setError('No case details found. Property owner should create a case report first.')
         lastLoadedCaseIdRef.current = null
         lastLoadedTenantIdRef.current = null
         lastLoadedUserIdRef.current = null
+        hasAttemptedLoadRef.current = true // Mark attempt even on error
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to load case details'
@@ -101,6 +104,7 @@ export function CaseDetailsView({ user, caseId, onClose, onEdit, onManagePermiss
       lastLoadedCaseIdRef.current = null
       lastLoadedTenantIdRef.current = null
       lastLoadedUserIdRef.current = null
+      hasAttemptedLoadRef.current = true // Mark attempt even on error
     } finally {
       // Clear timeout since we're done loading
       if (loadingTimeoutRef.current) {
@@ -140,17 +144,20 @@ export function CaseDetailsView({ user, caseId, onClose, onEdit, onManagePermiss
         lastLoadedCaseIdRef.current = caseId
         lastLoadedTenantIdRef.current = user.tenant?.id
         lastLoadedUserIdRef.current = user.id
+        hasAttemptedLoadRef.current = true // Mark that we've successfully loaded
       } else {
         setError('Case not found or you do not have permission to view it')
         lastLoadedCaseIdRef.current = null
         lastLoadedTenantIdRef.current = null
         lastLoadedUserIdRef.current = null
+        hasAttemptedLoadRef.current = true // Mark attempt even on error
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load case details')
       lastLoadedCaseIdRef.current = null
       lastLoadedTenantIdRef.current = null
       lastLoadedUserIdRef.current = null
+      hasAttemptedLoadRef.current = true // Mark attempt even on error
     } finally {
       // Clear timeout since we're done loading
       if (loadingTimeoutRef.current) {
@@ -171,16 +178,12 @@ export function CaseDetailsView({ user, caseId, onClose, onEdit, onManagePermiss
     // Normalize caseId: treat undefined as null (both mean "load first case")
     const normalizedCaseId = caseId ?? null
     
-    // Validate required data FIRST - exit early if missing (but don't reset refs)
-    if (!currentTenantId) {
-      setError('Property tenant information is missing. Please refresh the page.')
-      setLoading(false)
-      isLoadingRef.current = false
-      return
-    }
-
-    if (!currentUserId) {
-      setError('User information is missing. Please refresh the page.')
+    // Validate required data FIRST - exit early if missing
+    if (!currentTenantId || !currentUserId) {
+      const errorMsg = !currentTenantId 
+        ? 'Property tenant information is missing. Please refresh the page.'
+        : 'User information is missing. Please refresh the page.'
+      setError(errorMsg)
       setLoading(false)
       isLoadingRef.current = false
       return
@@ -192,50 +195,72 @@ export function CaseDetailsView({ user, caseId, onClose, onEdit, onManagePermiss
       ? lastLoadedCaseIdRef.current !== null  // When loading first case, any loaded case means already loaded
       : lastLoadedCaseIdRef.current === normalizedCaseId  // When loading specific case, must match exactly
     
-    // Check if we already have the data loaded (use caseDetails from closure to avoid dependency)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    const alreadyLoaded = 
-      caseIdMatches &&
-      lastLoadedTenantIdRef.current === currentTenantId &&
-      lastLoadedUserIdRef.current === currentUserId &&
-      !isLoadingRef.current &&
-      caseDetails !== null  // Also ensure we actually have case details in state (not in deps to avoid loops)
-    
     // Check if we're already loading the same request (prevents race conditions)
-    // For "load first case" scenario (caseId is null/undefined): only prevent if we're loading AND already have a case loaded
+    // For "load first case" scenario: only prevent if we're loading AND already have a case loaded
     // For specific case scenario: prevent if we're loading the exact same caseId
-    const alreadyLoadingSameRequest = isLoadingRef.current && (
+    const isSameRequestInFlight = isLoadingRef.current && (
       normalizedCaseId === null
         ? lastLoadedCaseIdRef.current !== null  // Only prevent if already loaded a case (not if we're loading first time)
         : lastLoadedCaseIdRef.current === normalizedCaseId  // Prevent if loading same specific case
     ) && lastLoadedTenantIdRef.current === currentTenantId &&
       lastLoadedUserIdRef.current === currentUserId
     
-    if (alreadyLoadingSameRequest) {
+    if (isSameRequestInFlight) {
       // Request is already in flight for these exact parameters, don't do anything
       return
     }
     
-    // If already loaded and not loading, don't reload
-    if (alreadyLoaded) {
-      return // Don't make API call if we already have the data
+    // Check if we already have the data loaded - must verify both refs AND state
+    // Use caseDetails from closure - if it's null, we definitely need to load
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const hasCaseDetailsInState = caseDetails !== null
+    
+    const alreadyLoaded = 
+      caseIdMatches &&
+      lastLoadedTenantIdRef.current === currentTenantId &&
+      lastLoadedUserIdRef.current === currentUserId &&
+      !isLoadingRef.current &&
+      hasCaseDetailsInState  // Critical: ensure we actually have case details in state
+    
+    // On first mount or when switching cases, if we haven't attempted a load yet, we must load
+    // This ensures mobile mounts always trigger a load even if refs are stale
+    const isFirstLoadAttempt = !hasAttemptedLoadRef.current
+    
+    if (alreadyLoaded && !isFirstLoadAttempt) {
+      // Already have the data and we've attempted a load before, no need to reload
+      return
     }
     
-    // Reset states for new load
+    // Note: We don't set hasAttemptedLoadRef here - it will be set after load completes
+    // This ensures if the effect runs multiple times rapidly, we still attempt the load
+    
+    // We need to load - reset states first
     setLoading(true)
     setError(null)
     setCaseDetails(null)
     
-    // Only reset refs if NOT currently loading a request (prevents race conditions)
-    // If a request is in flight, keep the refs so guards in loadCaseDetails/loadFirstCase work correctly
-    // But if we're starting fresh (not loading), reset the refs to clear any stale state
+    // Reset refs when starting a NEW load (not if request is already in flight)
+    // This ensures we clear stale state from previous loads
+    // Also reset the load attempt flag when switching cases or tenant/user changes
     if (!isLoadingRef.current) {
+      // Check if tenant/user/caseId changed BEFORE resetting refs
+      const tenantOrUserChanged = 
+        (lastLoadedTenantIdRef.current !== null && lastLoadedTenantIdRef.current !== currentTenantId) ||
+        (lastLoadedUserIdRef.current !== null && lastLoadedUserIdRef.current !== currentUserId)
+      const caseIdChanged = normalizedCaseId !== lastLoadedCaseIdRef.current
+      
+      // Reset attempt flag when switching cases/tenant/user - this forces a new load
+      if (tenantOrUserChanged || caseIdChanged) {
+        hasAttemptedLoadRef.current = false
+      }
+      
       // For "load first case" scenario, don't reset caseId ref since it's already null
       // For specific case scenario, reset to null to indicate we're loading this case
       if (normalizedCaseId !== null) {
         lastLoadedCaseIdRef.current = null
       }
-      // Always reset tenant/user refs when starting a new load if we're not currently loading
+      
+      // Reset tenant/user refs to clear any stale state
       lastLoadedTenantIdRef.current = null
       lastLoadedUserIdRef.current = null
     }
@@ -246,7 +271,7 @@ export function CaseDetailsView({ user, caseId, onClose, onEdit, onManagePermiss
       loadingTimeoutRef.current = null
     }
 
-    // Load case details
+    // Load case details based on whether we have a specific caseId or need first case
     if (normalizedCaseId) {
       loadCaseDetails()
     } else {
