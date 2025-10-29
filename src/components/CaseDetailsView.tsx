@@ -171,17 +171,35 @@ export function CaseDetailsView({ user, caseId, onClose, onEdit, onManagePermiss
     // Normalize caseId: treat undefined as null (both mean "load first case")
     const normalizedCaseId = caseId ?? null
     
+    // Validate required data FIRST - exit early if missing (but don't reset refs)
+    if (!currentTenantId) {
+      setError('Property tenant information is missing. Please refresh the page.')
+      setLoading(false)
+      isLoadingRef.current = false
+      return
+    }
+
+    if (!currentUserId) {
+      setError('User information is missing. Please refresh the page.')
+      setLoading(false)
+      isLoadingRef.current = false
+      return
+    }
+    
     // For "load first case" scenario (caseId is null/undefined): check if we've loaded any case
     // For specific case scenario (caseId is not null): check if we've loaded that specific case
     const caseIdMatches = normalizedCaseId === null 
       ? lastLoadedCaseIdRef.current !== null  // When loading first case, any loaded case means already loaded
       : lastLoadedCaseIdRef.current === normalizedCaseId  // When loading specific case, must match exactly
     
+    // Check if we already have the data loaded (use caseDetails from closure to avoid dependency)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     const alreadyLoaded = 
       caseIdMatches &&
       lastLoadedTenantIdRef.current === currentTenantId &&
       lastLoadedUserIdRef.current === currentUserId &&
-      !isLoadingRef.current
+      !isLoadingRef.current &&
+      caseDetails !== null  // Also ensure we actually have case details in state (not in deps to avoid loops)
     
     // Check if we're already loading the same request (prevents race conditions)
     // For "load first case" scenario (caseId is null/undefined): only prevent if we're loading AND already have a case loaded
@@ -226,21 +244,6 @@ export function CaseDetailsView({ user, caseId, onClose, onEdit, onManagePermiss
     if (loadingTimeoutRef.current) {
       clearTimeout(loadingTimeoutRef.current)
       loadingTimeoutRef.current = null
-    }
-
-    // Validate required data before making API call
-    if (!user.tenant?.id) {
-      setError('Property tenant information is missing. Please refresh the page.')
-      setLoading(false)
-      isLoadingRef.current = false
-      return
-    }
-
-    if (!user.id) {
-      setError('User information is missing. Please refresh the page.')
-      setLoading(false)
-      isLoadingRef.current = false
-      return
     }
 
     // Load case details
