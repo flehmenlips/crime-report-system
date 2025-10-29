@@ -43,15 +43,6 @@ interface StakeholderDashboardProps {
 }
 
 export function StakeholderDashboard({ user, items, onItemsUpdate, loading = false, error = null, onRefresh, evidenceCache, evidenceLoaded, isMobile = false, snapshotData, evidenceLoading = false }: StakeholderDashboardProps) {
-  // Immediate log when component renders
-  console.log('🔴🔴🔴 StakeholderDashboard COMPONENT RENDERED', {
-    hasUser: !!user,
-    userId: user?.id,
-    tenantId: user?.tenant?.id,
-    isMobile,
-    url: typeof window !== 'undefined' ? window.location.href : 'SSR'
-  })
-  
   const [scrollY, setScrollY] = useState(0)
   
   // Add scroll listener for dynamic text color
@@ -91,54 +82,26 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
   // Check for URL parameter to open Case Details modal (for mobile navigation)
   // This MUST run in useEffect to avoid SSR/hydration issues
   useEffect(() => {
-    console.log('🔴🔴🔴 useEffect for URL parameter check running (client-side only)')
     if (typeof window === 'undefined') {
-      console.log('🔴🔴🔴 Skipping - window not available (SSR)')
       return
     }
     
     const searchParams = new URLSearchParams(window.location.search)
     const shouldOpen = searchParams.get('openCaseDetails') === 'true'
-    console.log('🔴🔴🔴 URL Parameter Check (in useEffect):', {
-      url: window.location.href,
-      searchParams: window.location.search,
-      openCaseDetails: searchParams.get('openCaseDetails'),
-      shouldOpen,
-      currentShowCaseDetails: showCaseDetails
-    })
     
     if (shouldOpen) {
-      console.log('🔴🔴🔴 SETTING showCaseDetails TO TRUE from URL parameter')
       setShowCaseDetails(true)
       
       // Clean up URL parameter after setting state
       const url = new URL(window.location.href)
       url.searchParams.delete('openCaseDetails')
       window.history.replaceState({}, '', url.toString())
-      console.log('🔴🔴🔴 URL cleaned, new URL:', window.location.href)
     }
   }, []) // Empty dependency array - only run once on mount
   
-  // Log when showCaseDetails changes
-  useEffect(() => {
-    console.log('🔴🔴🔴 showCaseDetails STATE CHANGED:', showCaseDetails)
-  }, [showCaseDetails])
-  
-  // Log modal rendering condition
-  console.log('🔴🔴🔴 Modal rendering check - showCaseDetails:', showCaseDetails, 'will render:', showCaseDetails)
   const [filteredItems, setFilteredItems] = useState<StolenItem[]>([])
   const [isFiltered, setIsFiltered] = useState(false)
   const [searchFilters, setSearchFilters] = useState<any>(null)
-
-  // Debug logging
-  console.log('StakeholderDashboard rendered for user:', user?.name, 'role:', user?.role, 'viewMode:', viewMode)
-  console.log('Rendering view toggle for viewMode:', viewMode)
-  console.log('StakeholderDashboard evidenceCache keys:', evidenceCache ? Object.keys(evidenceCache).length : 'No cache')
-  console.log('StakeholderDashboard evidenceLoaded:', evidenceLoaded)
-  console.log('StakeholderDashboard items count:', items.length)
-  if (evidenceCache && Object.keys(evidenceCache).length > 0) {
-    console.log('Sample evidence cache data:', Object.keys(evidenceCache).slice(0, 3).map(key => ({ itemId: key, evidenceCount: evidenceCache[key]?.length || 0 })))
-  }
 
   // Role-based access controls
   const canReadAll = () => user.role === 'law_enforcement' || user.role === 'insurance_agent' || user.role === 'banker'
@@ -1639,26 +1602,12 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
         )}
 
         {/* Case Details Modal */}
-        {(() => {
-          console.log('🔴🔴🔴 Checking if modal should render - showCaseDetails:', showCaseDetails, 'type:', typeof showCaseDetails, 'isTruthy:', !!showCaseDetails)
-          return showCaseDetails ? (
-            <>
-              {console.log('🔴🔴🔴 RENDERING CaseDetailsView modal NOW', { 
-                showCaseDetails, 
-                userId: user?.id, 
-                tenantId: user?.tenant?.id,
-                userRole: user?.role 
-              })}
-              <CaseDetailsView
-                user={user}
-                onClose={() => {
-                  console.log('🔴 Closing Case Details modal')
-                  setShowCaseDetails(false)
-                }}
-              />
-            </>
-          ) : null
-        })()}
+        {showCaseDetails && (
+          <CaseDetailsView
+            user={user}
+            onClose={() => setShowCaseDetails(false)}
+          />
+        )}
       </div>
       </div>
     </>
