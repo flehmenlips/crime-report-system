@@ -99,7 +99,10 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
     return shouldOpen
   }
   
-  const [showCaseDetails, setShowCaseDetails] = useState(getInitialShowCaseDetails())
+  const initialShowCaseDetails = getInitialShowCaseDetails()
+  console.log('🔴🔴🔴 About to set useState with initial value:', initialShowCaseDetails)
+  const [showCaseDetails, setShowCaseDetails] = useState(initialShowCaseDetails)
+  console.log('🔴🔴🔴 useState completed, showCaseDetails is now:', showCaseDetails)
   
   // Check for URL parameter to open Case Details modal (for mobile navigation)
   // Using window.location.search instead of useSearchParams to avoid Suspense requirement
@@ -133,6 +136,9 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
   useEffect(() => {
     console.log('🔴🔴🔴 showCaseDetails STATE CHANGED:', showCaseDetails)
   }, [showCaseDetails])
+  
+  // Log modal rendering condition
+  console.log('🔴🔴🔴 Modal rendering check - showCaseDetails:', showCaseDetails, 'will render:', showCaseDetails)
   const [filteredItems, setFilteredItems] = useState<StolenItem[]>([])
   const [isFiltered, setIsFiltered] = useState(false)
   const [searchFilters, setSearchFilters] = useState<any>(null)
@@ -1646,23 +1652,26 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
         )}
 
         {/* Case Details Modal */}
-        {showCaseDetails && (
-          <>
-            {console.log('🔴 StakeholderDashboard: Rendering CaseDetailsView modal', { 
-              showCaseDetails, 
-              userId: user?.id, 
-              tenantId: user?.tenant?.id,
-              userRole: user?.role 
-            })}
-            <CaseDetailsView
-              user={user}
-              onClose={() => {
-                console.log('🔴 Closing Case Details modal')
-                setShowCaseDetails(false)
-              }}
-            />
-          </>
-        )}
+        {(() => {
+          console.log('🔴🔴🔴 Checking if modal should render - showCaseDetails:', showCaseDetails, 'type:', typeof showCaseDetails, 'isTruthy:', !!showCaseDetails)
+          return showCaseDetails ? (
+            <>
+              {console.log('🔴🔴🔴 RENDERING CaseDetailsView modal NOW', { 
+                showCaseDetails, 
+                userId: user?.id, 
+                tenantId: user?.tenant?.id,
+                userRole: user?.role 
+              })}
+              <CaseDetailsView
+                user={user}
+                onClose={() => {
+                  console.log('🔴 Closing Case Details modal')
+                  setShowCaseDetails(false)
+                }}
+              />
+            </>
+          ) : null
+        })()}
       </div>
       </div>
     </>
