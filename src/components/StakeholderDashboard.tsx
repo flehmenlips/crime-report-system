@@ -85,20 +85,21 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
   const [uploadEvidenceItem, setUploadEvidenceItem] = useState<StolenItem | null>(null)
   const [showInvestigationNotes, setShowInvestigationNotes] = useState(false)
   const [investigationNotesItem, setInvestigationNotesItem] = useState<StolenItem | null>(null)
-  const [showCaseDetails, setShowCaseDetails] = useState(false)
-  
-  // Immediate check and log
-  if (typeof window !== 'undefined') {
+  // Initialize showCaseDetails from URL parameter immediately (before useState)
+  const getInitialShowCaseDetails = () => {
+    if (typeof window === 'undefined') return false
     const searchParams = new URLSearchParams(window.location.search)
     const shouldOpen = searchParams.get('openCaseDetails') === 'true'
-    console.log('🔴🔴🔴 URL Parameter Check (immediate):', {
+    console.log('🔴🔴🔴 Initial showCaseDetails check:', {
       url: window.location.href,
       searchParams: window.location.search,
       openCaseDetails: searchParams.get('openCaseDetails'),
-      shouldOpen,
-      currentShowCaseDetails: showCaseDetails
+      shouldOpen
     })
+    return shouldOpen
   }
+  
+  const [showCaseDetails, setShowCaseDetails] = useState(getInitialShowCaseDetails())
   
   // Check for URL parameter to open Case Details modal (for mobile navigation)
   // Using window.location.search instead of useSearchParams to avoid Suspense requirement
@@ -110,19 +111,23 @@ export function StakeholderDashboard({ user, items, onItemsUpdate, loading = fal
       url: window.location.href,
       searchParams: window.location.search,
       openCaseDetails: searchParams.get('openCaseDetails'),
-      shouldOpen
+      shouldOpen,
+      currentShowCaseDetails: showCaseDetails
     })
     
-    if (shouldOpen) {
-      console.log('🔴🔴🔴 SETTING showCaseDetails TO TRUE')
+    if (shouldOpen && !showCaseDetails) {
+      console.log('🔴🔴🔴 SETTING showCaseDetails TO TRUE in useEffect')
       setShowCaseDetails(true)
-      // Clean up URL parameter without page reload
+    }
+    
+    // Clean up URL parameter after checking (but don't rely on it for state)
+    if (shouldOpen) {
       const url = new URL(window.location.href)
       url.searchParams.delete('openCaseDetails')
       window.history.replaceState({}, '', url.toString())
       console.log('🔴🔴🔴 URL cleaned, new URL:', window.location.href)
     }
-  }, []) // Run once on mount
+  }, [showCaseDetails]) // Re-run if showCaseDetails changes
   
   // Log when showCaseDetails changes
   useEffect(() => {
