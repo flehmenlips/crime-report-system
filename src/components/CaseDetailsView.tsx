@@ -61,6 +61,8 @@ export function CaseDetailsView({ user, caseId, onClose, onEdit, onManagePermiss
 
   const loadingTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const lastLoadedCaseIdRef = useRef<string | null | undefined>(null)
+  const lastLoadedTenantIdRef = useRef<string | null | undefined>(null)
+  const lastLoadedUserIdRef = useRef<string | null | undefined>(null)
   const isLoadingRef = useRef(false)
 
   const loadFirstCase = useCallback(async () => {
@@ -112,10 +114,14 @@ export function CaseDetailsView({ user, caseId, onClose, onEdit, onManagePermiss
         console.log('✅ Setting case details:', data.caseDetails[0].caseName)
         setCaseDetails(data.caseDetails[0])
         lastLoadedCaseIdRef.current = data.caseDetails[0].id
+        lastLoadedTenantIdRef.current = tenantId
+        lastLoadedUserIdRef.current = userId
       } else {
         console.warn('⚠️ No case details found in response - showing error state')
         setError('No case details found. Property owner should create a case report first.')
         lastLoadedCaseIdRef.current = null
+        lastLoadedTenantIdRef.current = null
+        lastLoadedUserIdRef.current = null
       }
     } catch (err) {
       console.error('❌ Error loading case details:', err)
@@ -123,6 +129,8 @@ export function CaseDetailsView({ user, caseId, onClose, onEdit, onManagePermiss
       console.error('Error details:', { errorMessage, error: err })
       setError(errorMessage)
       lastLoadedCaseIdRef.current = null
+      lastLoadedTenantIdRef.current = null
+      lastLoadedUserIdRef.current = null
     } finally {
       // Clear timeout since we're done loading
       if (loadingTimeoutRef.current) {
@@ -136,8 +144,13 @@ export function CaseDetailsView({ user, caseId, onClose, onEdit, onManagePermiss
   }, [user.tenant?.id, user.id])
 
   const loadCaseDetails = useCallback(async () => {
-    if (isLoadingRef.current && lastLoadedCaseIdRef.current === caseId) {
-      console.log('⏭️ Already loading this case, skipping duplicate call')
+    const currentTenantId = user.tenant?.id
+    const currentUserId = user.id
+    if (isLoadingRef.current && 
+        lastLoadedCaseIdRef.current === caseId &&
+        lastLoadedTenantIdRef.current === currentTenantId &&
+        lastLoadedUserIdRef.current === currentUserId) {
+      console.log('⏭️ Already loading this case for this tenant/user, skipping duplicate call')
       return
     }
     
@@ -165,15 +178,21 @@ export function CaseDetailsView({ user, caseId, onClose, onEdit, onManagePermiss
         console.log('✅ Found case:', foundCase.caseName)
         setCaseDetails(foundCase)
         lastLoadedCaseIdRef.current = caseId
+        lastLoadedTenantIdRef.current = user.tenant?.id
+        lastLoadedUserIdRef.current = user.id
       } else {
         console.warn('⚠️ Case not found:', caseId)
         setError('Case not found or you do not have permission to view it')
         lastLoadedCaseIdRef.current = null
+        lastLoadedTenantIdRef.current = null
+        lastLoadedUserIdRef.current = null
       }
     } catch (err) {
       console.error('❌ Error loading case details:', err)
       setError(err instanceof Error ? err.message : 'Failed to load case details')
       lastLoadedCaseIdRef.current = null
+      lastLoadedTenantIdRef.current = null
+      lastLoadedUserIdRef.current = null
     } finally {
       // Clear timeout since we're done loading
       if (loadingTimeoutRef.current) {
@@ -198,17 +217,32 @@ export function CaseDetailsView({ user, caseId, onClose, onEdit, onManagePermiss
       isLoading: isLoadingRef.current
     })
     
-    // Guard: Don't reset if we already have case details for this caseId (unless tenant/user changed)
-    const alreadyLoaded = lastLoadedCaseIdRef.current === caseId && !isLoadingRef.current
+    // Guard: Don't reset if we already have case details for this caseId AND same tenant/user
+    const currentTenantId = user.tenant?.id
+    const currentUserId = user.id
+    const alreadyLoaded = 
+      lastLoadedCaseIdRef.current === caseId && 
+      lastLoadedTenantIdRef.current === currentTenantId &&
+      lastLoadedUserIdRef.current === currentUserId &&
+      !isLoadingRef.current
     
     if (!alreadyLoaded) {
-      console.log('🔄 Resetting component state')
+      console.log('🔄 Resetting component state', {
+        reason: {
+          caseIdChanged: lastLoadedCaseIdRef.current !== caseId,
+          tenantIdChanged: lastLoadedTenantIdRef.current !== currentTenantId,
+          userIdChanged: lastLoadedUserIdRef.current !== currentUserId,
+          wasLoading: isLoadingRef.current
+        }
+      })
       setLoading(true)
       setError(null)
       setCaseDetails(null)
       lastLoadedCaseIdRef.current = null
+      lastLoadedTenantIdRef.current = null
+      lastLoadedUserIdRef.current = null
     } else {
-      console.log('⏭️ Skipping reset - case details already loaded for this caseId')
+      console.log('⏭️ Skipping reset - case details already loaded for this caseId/tenant/user combination')
       return // Don't make API call if we already have the data
     }
     
