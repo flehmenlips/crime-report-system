@@ -180,13 +180,29 @@ export function CaseDetailsView({ user, caseId, onClose, onEdit, onManagePermiss
       lastLoadedUserIdRef.current === currentUserId &&
       !isLoadingRef.current
     
+    // Check if we're already loading the same request (prevents race conditions)
+    const alreadyLoadingSameRequest = 
+      isLoadingRef.current &&
+      lastLoadedCaseIdRef.current === caseId &&
+      lastLoadedTenantIdRef.current === currentTenantId &&
+      lastLoadedUserIdRef.current === currentUserId
+    
+    if (alreadyLoadingSameRequest) {
+      // Request is already in flight for these exact parameters, don't do anything
+      return
+    }
+    
     if (!alreadyLoaded) {
       setLoading(true)
       setError(null)
       setCaseDetails(null)
-      lastLoadedCaseIdRef.current = null
-      lastLoadedTenantIdRef.current = null
-      lastLoadedUserIdRef.current = null
+      // Only reset refs if NOT currently loading a request (prevents race conditions)
+      // If a request is in flight, keep the refs so guards in loadCaseDetails/loadFirstCase work correctly
+      if (!isLoadingRef.current) {
+        lastLoadedCaseIdRef.current = null
+        lastLoadedTenantIdRef.current = null
+        lastLoadedUserIdRef.current = null
+      }
     } else {
       return // Don't make API call if we already have the data
     }
